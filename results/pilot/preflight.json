@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED",
+  "tools": {
+    "ngspice": null,
+    "magic": null,
+    "netgen": null
+  },
+  "PDK_ROOT": null,
+  "missing_inputs": [
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/toolchain.json",
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/five_transistor_ota/topology.json",
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/five_transistor_ota/testbench.spice",
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/five_transistor_ota/layout-template.json",
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/miller_ota/topology.json",
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/miller_ota/testbench.spice",
+    "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/pilot-inputs/miller_ota/layout-template.json"
+  ],
+  "circuit_simulations_run": 0,
+  "note": "Preflight checks existence only. Model patch, DRC/LVS, layout reproducibility, simulator adapter and training harness must pass the pilot launch checklist before data collection."
+}
