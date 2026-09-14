@@ -1,0 +1,12 @@
+Known-answer resistive divider
+V1 supply 0 2
+R1 supply out 1000
+R2 out 0 1000
+.control
+set wr_vecnames
+set wr_singlescale
+op
+wrdata measurements.dat v(out)
+quit
+.endc
+.end

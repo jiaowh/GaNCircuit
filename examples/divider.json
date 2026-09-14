@@ -1,0 +1,7 @@
+{
+  "elements": [
+    {"name": "V1", "kind": "V", "terminals": {"p": "supply", "n": "0"}, "value": 2},
+    {"name": "R1", "kind": "R", "terminals": {"p": "supply", "n": "out"}, "value": 1000},
+    {"name": "R2", "kind": "R", "terminals": {"p": "out", "n": "0"}, "value": 1000}
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "device-references/1",
+  "sources": [
+    {
+      "name": "devsim",
+      "url": "https://github.com/devsim/devsim",
+      "path": "devices/devsim-upstream",
+      "commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+      "license": "Apache-2.0",
+      "license_sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "references": [
+        "examples/diode/diode_1d.py",
+        "examples/mobility/gmsh_mos2d.py"
+      ]
+    },
+    {
+      "name": "spicexplorer-release",
+      "url": "https://github.com/MacAnalog/spicexplorer-release",
+      "path": "devices/spicexplorer-release",
+      "commit": "263d0322f8900dc331536fbbe6c0e804514fc454",
+      "license": "release contains platform/LICENSE and analog-db/LICENSE; package-specific license mapping pending",
+      "license_sha256": "6377c6f314b79302972d6a34a9ab7c4a90c4b445b402c9dbf20937d73093bb35",
+      "leaf_packages": [
+        "spicexplorer-core",
+        "spicexplorer-circuitgraph",
+        "spicexplorer-netlist2xschem",
+        "spicexplorer-netlist2tf",
+        "spicexplorer-gmid",
+        "spicexplorer-waveview",
+        "spicexplorer-layout",
+        "spicexplorer-signoff"
+      ]
+    },
+    {
+      "name": "mcp-spice",
+      "url": "https://github.com/Casys-AI/mcp-spice",
+      "path": "devices/mcp-spice",
+      "commit": "034813cd2e445dfb06f1efcb643f5926582fa1f8",
+      "license": "MIT",
+      "license_sha256": "39e2b3113a59350029abc4bcbad9e17e0b6c32efcd01a343fa7e72be58a3421a",
+      "runtime_note": "inspected only; Deno unavailable and source targets ngspice 44.2"
+    }
+  ]
+}

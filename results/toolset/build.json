@@ -1,0 +1,24 @@
+﻿{
+    "schema":  "toolset-build/1",
+    "date":  "2026-09-14",
+    "runtime":  "WSL Ubuntu Python 3.12",
+    "tests":  {
+                  "command":  "PYTHONPATH=src python3 -m unittest discover -s tests -v",
+                  "failed":  0,
+                  "passed":  17
+              },
+    "package":  {
+                    "path":  ".tools/wheels/circuit_tools-0.1.0-py3-none-any.whl",
+                    "sha256":  "c3eddf2f3250b0528f76941ca594be0f69bf53e082c9c146fbdae2f73e598735",
+                    "isolated_install":  "passed"
+                },
+    "ngspice":  {
+                    "package_sha256":  "466c4c06418107ceaa9c9457065b3bb71a9d9dc5ec6fef186d7de9d5208ce8db",
+                    "binary_sha256":  "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
+                    "version":  "42"
+                },
+    "circuit_evidence":  "results/toolset/circuit-fixtures.json",
+    "bridge_evidence":  "results/toolset/diode-bridge.json",
+    "device_evidence":  "results/device-reference/latest.json",
+    "complete_codesign_release":  false
+}

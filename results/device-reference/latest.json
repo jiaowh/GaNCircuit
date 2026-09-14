@@ -1,0 +1,58 @@
+{
+  "schema": "device-reference/1",
+  "generated_by": "scripts/device_reference.py",
+  "backend": {
+    "available": true,
+    "python": "/usr/bin/python3",
+    "devsim_version": "2.11.0",
+    "python_version": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]"
+  },
+  "provenance": {
+    "repository": "https://github.com/devsim/devsim",
+    "commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "expected_commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "pin_match": true,
+    "license": "Apache-2.0",
+    "license_sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+  },
+  "references": [
+    {
+      "name": "official_diode_1d",
+      "script": "devices/devsim-upstream/examples/diode/diode_1d.py",
+      "status": "completed",
+      "returncode": 0,
+      "elapsed_s": 0.630256,
+      "stdout_log": "results/device-reference/work/8138465352a9406d85b72c421336fbd2/official_diode_1d/stdout.log",
+      "stderr_log": "results/device-reference/work/8138465352a9406d85b72c421336fbd2/official_diode_1d/stderr.log",
+      "artifacts": {
+        "diode_1d.dat": "45afef72101a7981475e3220267018c78e6265895cb9fbb394e58ffb4489ebd2",
+        "gmsh_diode2d.msh": "af976dad2d734ac8bf84ffce5cb041d9f0c93eb01600ad104f9f90ee2748bc18",
+        "gmsh_diode3d.msh": "6cb8f2a9025a8a5e6c22885728ac1ebb7a3bc09b63e00429fa6e08098626f51f",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "f9e839f4716470a050a7a3231e002291c71c20b8475b99544a302f64beb84c70"
+      }
+    },
+    {
+      "name": "official_planar_mos_2d",
+      "script": "devices/devsim-upstream/examples/mobility/gmsh_mos2d.py",
+      "status": "completed",
+      "returncode": 0,
+      "elapsed_s": 5.677931,
+      "stdout_log": "results/device-reference/work/8138465352a9406d85b72c421336fbd2/official_planar_mos_2d/stdout.log",
+      "stderr_log": "results/device-reference/work/8138465352a9406d85b72c421336fbd2/official_planar_mos_2d/stderr.log",
+      "artifacts": {
+        "gmsh_mos2d.msh": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+        "gmsh_mos2d_dd.dat": "c31b405a7f35b2ee999a1fe414fe8821e6e399189664ae90c0e7433e1016f405",
+        "gmsh_mos2d_out.msh": "e55692cfb87cfbfdcff14103e89e995f29f2019a6aae07d9a8dadd5b69f6707a",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "7198cb38bf1a0817ddeb3c424b5f807b47e3cc6413d5a43654201cdbd915ded5",
+        "gmsh_mos2d_potentialonly_1.vtu": "bef1a50647f238e813b3e7139fb59fdd202e67db3e37bdf2a1c4be9b0746580d",
+        "gmsh_mos2d_potentialonly_2.vtu": "9c43dcce5f70fc37bbe8d0fb9c0f15a58f50667c8bafb1653a846cce6c729038",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "4851de701174d6a04e61dee903aec3a0957e36725fe8bd48f7e3e70589e5aca0"
+      }
+    }
+  ],
+  "tcad_claim": "script execution evidence only; no physical acceptance follows from process exit status"
+}

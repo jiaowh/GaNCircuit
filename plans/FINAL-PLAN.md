@@ -1,5 +1,7 @@
 # Final consolidated research plan
 
+> **Historical research protocol.** On 11 September 2026 the project owner redirected the project toward a reusable agent toolset, with custom semiconductor-device design and circuit co-design from the start. Read the [active toolset plan](autonomous-circuit-toolset-plan.md). The text below is preserved for the earlier experiment; its frozen priorities, exclusions and resource gates do not govern the new toolset programme.
+
 9 September 2026. Working title: **Local response fidelity, candidate ranking and model-based physical verification of AI-sized analog circuits.**
 
 The research direction is retained. The next committed task is a small fidelity-versus-ranking pilot, followed by a measured resource decision. This is the final operational consolidation; there is no further numbered prose revision scheduled. New experimental measurements populate the manifests and result tables, rather than adding competing definitions.

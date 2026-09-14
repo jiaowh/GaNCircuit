@@ -1,0 +1,78 @@
+{
+  "schema": "reference-audit/1",
+  "outcome": "pass",
+  "scope": "Finite final contact data, expected final biases, and current conservation only; mesh convergence and 2D current normalization remain unqualified",
+  "contact_columns": [
+    "bias_V",
+    "electron_current_native",
+    "hole_current_native",
+    "total_current_native"
+  ],
+  "reference_report_sha256": "bc4524b3b646e26677630dcf20443cacfacfa2f48141d225b17da64b5ee32d65",
+  "checks": [
+    {
+      "reference": "official_diode_1d",
+      "outcome": "pass",
+      "final_contact_rows": {
+        "top": [
+          0.5,
+          0.011810543175282576,
+          0.006344611998005865,
+          0.018155155173288442
+        ],
+        "bot": [
+          0.0,
+          -0.012249431878576914,
+          -0.0059057988809275855,
+          -0.0181552307595045
+        ]
+      },
+      "relative_current_imbalance": 2.0816693107290253e-06,
+      "imbalance_tolerance": 0.0001,
+      "expected_bias_volts": {
+        "top": 0.5,
+        "bot": 0.0
+      },
+      "log_sha256": "f9e839f4716470a050a7a3231e002291c71c20b8475b99544a302f64beb84c70"
+    },
+    {
+      "reference": "official_planar_mos_2d",
+      "outcome": "pass",
+      "final_contact_rows": {
+        "body": [
+          0.0,
+          -4.766167188932759e-15,
+          -1.3239866306323395e-13,
+          -1.3716483025216672e-13
+        ],
+        "drain": [
+          0.5,
+          3.0187837064933305,
+          8.827025421179764e-17,
+          3.0187837064933305
+        ],
+        "gate": [
+          0.5,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "source": [
+          0.0,
+          -3.018783706493001,
+          -1.5025102616180933e-17,
+          -3.018783706493001
+        ]
+      },
+      "relative_current_imbalance": 3.1858752093243227e-14,
+      "imbalance_tolerance": 0.0001,
+      "expected_bias_volts": {
+        "gate": 0.5,
+        "drain": 0.5,
+        "source": 0.0,
+        "body": 0.0
+      },
+      "log_sha256": "4851de701174d6a04e61dee903aec3a0957e36725fe8bd48f7e3e70589e5aca0"
+    }
+  ]
+}

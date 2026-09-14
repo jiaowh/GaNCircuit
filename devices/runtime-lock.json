@@ -1,0 +1,27 @@
+﻿{
+    "schema":  "device-runtime/1",
+    "python":  "3.12",
+    "platform":  "Ubuntu 24.04 amd64 under WSL",
+    "packages":  [
+                     {
+                         "file":  "devsim-2.11.0-cp39-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+                         "sha256":  "13e5230d5279739fc9ecac6e3bd1f80a7137f6bc631d4a3f38f388766d52ef4f"
+                     },
+                     {
+                         "file":  "numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+                         "sha256":  "fd83c01228a688733f1ded5201c678f0c53ecc1006ffbc404db9f7a899ac6249"
+                     },
+                     {
+                         "file":  "libblas3.deb",
+                         "sha256":  "1b0ef0ad0893ff77bf7d5ab75723771788e16137ea1efde557dbac7b7b83a758"
+                     },
+                     {
+                         "file":  "liblapack3.deb",
+                         "sha256":  "05ced5049d4fd393e0ae6dc71211e7c07ed0c85e8099649d679cf4b5a1aed59b"
+                     },
+                     {
+                         "file":  "libgfortran5.deb",
+                         "sha256":  "2b05896c477275ad3473bb63a5ac5a5b8a7e4a6ad6ed7cb23c442ccd1abc28f5"
+                     }
+                 ]
+}

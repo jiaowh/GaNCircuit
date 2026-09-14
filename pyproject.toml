@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "circuit-tools"
+version = "0.1.0"
+description = "Evidence-preserving device and circuit engineering tools"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+circuit-tools = "circuit_tools.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

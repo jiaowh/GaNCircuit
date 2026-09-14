@@ -1,0 +1,73 @@
+{
+  "schema": "diode-bridge/1",
+  "scope": "Native SPICE fixture data; not a TCAD-derived physical device",
+  "outcome": "pass",
+  "dataset_hash": "663a1afdb3afd591733152d65204756123ebfbad9b6c52d477fa6370a5906cdd",
+  "device_revision": "native-spice-fixture:880c16cd7c479d41a44554e9bbf772772b0161a6062e77eca6725eacc5540079",
+  "train_ids": [
+    "point-4",
+    "point-6",
+    "point-8",
+    "point-10"
+  ],
+  "holdout_ids": [
+    "point-5",
+    "point-7",
+    "point-9"
+  ],
+  "heldout_mean_relative_error": 0.00012510209325307205,
+  "export_replay_max_relative_error": 0.00030661042036120664,
+  "tolerance": 0.002,
+  "model": ".model fitted_diode D(Is=9.9942692090432441e-13 N=0.99996555759024031 TNOM=26.85)\n",
+  "reference_provenance": {
+    "simulator": "ngspice",
+    "executable": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
+    "tool_version": "** ngspice-42 : Circuit level simulation program",
+    "tool_version_sha256": "1dfcf1a9423225b0fb543ad1f819066fe61fc60f2688fe035bf4b05fa22f7d73",
+    "executable_sha256": "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
+    "netlist_sha256": "880c16cd7c479d41a44554e9bbf772772b0161a6062e77eca6725eacc5540079",
+    "netlist": "netlist.cir",
+    "timeout_s": 30.0,
+    "options": [],
+    "command": [
+      "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
+      "-n",
+      "-b",
+      "-o",
+      "ngspice.log",
+      "netlist.cir"
+    ],
+    "status": "completed",
+    "returncode": 0,
+    "measurements": true,
+    "log_sha256": "10e228c3a1fcb1b7d894c2e37aae0fe19ea951ebb9d6f0bd0b2be468373cafd4",
+    "result_raw_sha256": "759ec54d6e79c739ce969c3c63add2c4c74aa8fd38d3facc1e22f1d110e6b245",
+    "result_sha256": "56bcc04feb343a4e306e00b363e89447ea18ea90ad2f6cb9055ce58d418c0861"
+  },
+  "replay_provenance": {
+    "simulator": "ngspice",
+    "executable": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
+    "tool_version": "** ngspice-42 : Circuit level simulation program",
+    "tool_version_sha256": "1dfcf1a9423225b0fb543ad1f819066fe61fc60f2688fe035bf4b05fa22f7d73",
+    "executable_sha256": "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
+    "netlist_sha256": "7734cf3d78c3744aff03ca07a812263a2348ed75e71794a399dc637e57abd1de",
+    "netlist": "netlist.cir",
+    "timeout_s": 30.0,
+    "options": [],
+    "command": [
+      "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
+      "-n",
+      "-b",
+      "-o",
+      "ngspice.log",
+      "netlist.cir"
+    ],
+    "status": "completed",
+    "returncode": 0,
+    "measurements": true,
+    "log_sha256": "ce22378b40cdc0c7fb73ebc8ced58d70107d5d1b5876d2a6273f4d639f997e76",
+    "result_raw_sha256": "31fa86681720f661e6090dca4b904d6d41775f467bead614f3a9dc867d279d73",
+    "result_sha256": "fc6aa6db8b65b4f0b5c25491a7eeb3345adb2c95c6f7ac788819d37c45acc6c5"
+  },
+  "evidence_directory": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/runs/diode-bridge-165fd6baae1d4eadacbeb02b0ce48c2b"
+}

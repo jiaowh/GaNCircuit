@@ -1,0 +1,14 @@
+Custom Shockley diode model DC fixture (not a TCAD-derived device)
+V1 anode 0 0
+D1 anode 0 research_diode
+.model research_diode D(IS=1e-12 N=1 TNOM=26.85)
+.temp 26.85
+.options gmin=1e-18
+.control
+set wr_vecnames
+set wr_singlescale
+dc V1 0 0.5 0.05
+wrdata measurements.dat v(anode) i(V1)
+quit
+.endc
+.end
