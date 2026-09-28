@@ -1,0 +1,109 @@
+{
+  "schema": "current-normalization/1",
+  "fixture": "uniform_2d_ohmic_resistor",
+  "units": {
+    "length": "cm",
+    "current_density": "A/cm^2",
+    "contact_current": "A/cm",
+    "depth": "cm"
+  },
+  "tolerances": {
+    "relative": 0.002,
+    "absolute_a_per_cm": 1e-12
+  },
+  "provenance": {
+    "devsim_source": "devices/devsim-upstream",
+    "devsim_expected_commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "fixture_script_sha256": "0d1ed0ca91ae18c873932dc010c001c59cb45cea1ac0c7872b64136fe496bdfe",
+    "test_common_sha256": "74425a070f35451606c246b6ebfe9d8320570fd11bf799bcda07750f6d1e702e",
+    "devsim_runtime_version": "2.11.0",
+    "devsim_observed_commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "devsim_source_dirty": false
+  },
+  "execution": {
+    "timeout_s": 120,
+    "elapsed_s": 0.250606,
+    "returncode": 0,
+    "stdout_log": "results/device-reference/current-normalization-work/1446b30cc08541cb9cf6062dd68ae80f/stdout.log",
+    "stderr_log": "results/device-reference/current-normalization-work/1446b30cc08541cb9cf6062dd68ae80f/stderr.log",
+    "stdout_sha256": "3337ab2acbb4ef01b55362debcbb41cf8ae9baf703636242ebd88d24b1a5cd7e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "result": {
+    "cases": [
+      {
+        "solver": {
+          "initial_converged": true,
+          "carrier_converged": true,
+          "initial_iterations": 5,
+          "carrier_iterations": 2
+        },
+        "geometry": {
+          "length_cm": 0.001,
+          "contact_width_cm": 0.0001,
+          "out_of_plane_depth_cm": 1.0,
+          "side_regions": "mesh-only silicon scaffolding outside the resistor; no equations or contact currents are assigned"
+        },
+        "inputs": {
+          "bias_v": 0.1,
+          "net_doping_cm3": 1e+16,
+          "electron_mobility_cm2_v_s": 400.0,
+          "electron_charge_c": 1.6e-19
+        },
+        "analytic": {
+          "current_density_a_per_cm2": 63.999999999999986,
+          "contact_current_a_per_cm": 0.006399999999999999,
+          "formula": "q_C * n_cm^-3 * mu_cm2_per_V_s * (bias_V / length_cm) * contact_width_cm"
+        },
+        "observed": {
+          "left_electron_current_a_per_cm": 0.006400000000000641,
+          "right_electron_current_a_per_cm": -0.006400000000000641,
+          "absolute_error_a_per_cm": 6.42715047849407e-16,
+          "relative_error": 1.0042422622646987e-13,
+          "contact_balance_a_per_cm": 0.0
+        },
+        "outcome": "pass"
+      },
+      {
+        "solver": {
+          "initial_converged": true,
+          "carrier_converged": true,
+          "initial_iterations": 5,
+          "carrier_iterations": 2
+        },
+        "geometry": {
+          "length_cm": 0.001,
+          "contact_width_cm": 0.0002,
+          "out_of_plane_depth_cm": 1.0,
+          "side_regions": "mesh-only silicon scaffolding outside the resistor; no equations or contact currents are assigned"
+        },
+        "inputs": {
+          "bias_v": 0.1,
+          "net_doping_cm3": 1e+16,
+          "electron_mobility_cm2_v_s": 400.0,
+          "electron_charge_c": 1.6e-19
+        },
+        "analytic": {
+          "current_density_a_per_cm2": 63.999999999999986,
+          "contact_current_a_per_cm": 0.012799999999999997,
+          "formula": "q_C * n_cm^-3 * mu_cm2_per_V_s * (bias_V / length_cm) * contact_width_cm"
+        },
+        "observed": {
+          "left_electron_current_a_per_cm": 0.012800000000001283,
+          "right_electron_current_a_per_cm": -0.012800000000001283,
+          "absolute_error_a_per_cm": 1.285430095698814e-15,
+          "relative_error": 1.0042422622646987e-13,
+          "contact_balance_a_per_cm": 0.0
+        },
+        "outcome": "pass"
+      }
+    ],
+    "width_scaling": {
+      "observed_current_ratio": 2.0,
+      "geometry_width_ratio": 2.0,
+      "relative_ratio_error": 0.0,
+      "pass": true
+    },
+    "outcome": "pass"
+  }
+}

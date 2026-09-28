@@ -1,0 +1,159 @@
+{
+  "schema": "device-reference-qualification/1",
+  "generated_by": "scripts/qualify_device_references.py",
+  "outcome": "pass",
+  "backend": {
+    "available": true,
+    "python": "/usr/bin/python3",
+    "devsim_version": "2.11.0",
+    "python_version": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+    "imported_package": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/__init__.py",
+    "imported_physics_source": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/python_packages/simple_physics.py",
+    "imported_physics_sha256": "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f"
+  },
+  "provenance": {
+    "repository": "https://github.com/devsim/devsim",
+    "commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "expected_commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "reference_script": "devices/devsim-upstream/examples/diode/diode_1d.py",
+    "reference_sha256": "b665a49188425e4c783882137e6dc91428cf9089348160e6c0366d15cdb929eb",
+    "physics_source": "devices/devsim-upstream/python_packages/simple_physics.py",
+    "physics_source_sha256": "b5d10286540d8bf5d09ed62f7310c1c01e2b72a9191d4918c60d1165e43953c1",
+    "imported_physics_source": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/python_packages/simple_physics.py",
+    "imported_physics_sha256": "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f"
+  },
+  "current_definition": {
+    "unit": "A/cm^2",
+    "basis": "DEVSIM simple_physics contact current using cm-based silicon parameters; 1D unit out-of-plane area",
+    "columns": [
+      "bias_V",
+      "electron_current_A_per_cm2",
+      "hole_current_A_per_cm2",
+      "total_current_A_per_cm2"
+    ],
+    "normalization_status": "explicit model-unit convention; not measured-current validation"
+  },
+  "mesh_policy": {
+    "midpoint": "0.5e-5 cm",
+    "mid_spacings_cm": [
+      2e-09,
+      1e-09,
+      5e-10
+    ],
+    "endpoint_spacing_cm": 1e-07
+  },
+  "tolerances": {
+    "mesh_relative_current": 0.001,
+    "mesh_absolute_current_A_per_cm2": 1e-12,
+    "conservation_relative_current": 0.0001
+  },
+  "cases": [
+    {
+      "mesh_mid_spacing_cm": 2e-09,
+      "status": "completed",
+      "returncode": 0,
+      "elapsed_s": 0.453181,
+      "solver_converged": true,
+      "solve_count": 8,
+      "node_count": 399,
+      "final_bias_V": 0.5,
+      "contacts": {
+        "top": [
+          0.5,
+          0.011810456548334137,
+          0.006344686024764453,
+          0.01815514257309859
+        ],
+        "bot": [
+          0.0,
+          -0.01224930913861842,
+          -0.005905866979681269,
+          -0.01815517611829969
+        ]
+      },
+      "relative_current_imbalance": 9.238476089425782e-07,
+      "runner_sha256": "aa62be8e3a83f026fa1bde908185bb5e730ee1f5e938fd3c4270b710e74ca289",
+      "stdout_log": "results/device-reference/qualification-work/1021693928bc4eb18acee96a4dc928d5/mid-2e-09/stdout.log",
+      "stderr_log": "results/device-reference/qualification-work/1021693928bc4eb18acee96a4dc928d5/mid-2e-09/stderr.log",
+      "stdout_sha256": "e207a1ae66be464c2ad617faf8acb137afd39e5368a10f085820e1e21d656a06",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "mesh_mid_spacing_cm": 1e-09,
+      "status": "completed",
+      "returncode": 0,
+      "elapsed_s": 0.459681,
+      "solver_converged": true,
+      "solve_count": 8,
+      "node_count": 465,
+      "final_bias_V": 0.5,
+      "contacts": {
+        "top": [
+          0.5,
+          0.011810543175282576,
+          0.006344611998005865,
+          0.018155155173288442
+        ],
+        "bot": [
+          0.0,
+          -0.012249431878576914,
+          -0.0059057988809275855,
+          -0.0181552307595045
+        ]
+      },
+      "relative_current_imbalance": 2.0816693107290253e-06,
+      "runner_sha256": "aa62be8e3a83f026fa1bde908185bb5e730ee1f5e938fd3c4270b710e74ca289",
+      "stdout_log": "results/device-reference/qualification-work/1021693928bc4eb18acee96a4dc928d5/mid-1e-09/stdout.log",
+      "stderr_log": "results/device-reference/qualification-work/1021693928bc4eb18acee96a4dc928d5/mid-1e-09/stderr.log",
+      "stdout_sha256": "772337280b6f8b78558088d6c6110e872b7afeb6f69f216b98bdda93ca05adb4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "mesh_mid_spacing_cm": 5e-10,
+      "status": "completed",
+      "returncode": 0,
+      "elapsed_s": 0.467675,
+      "solver_converged": true,
+      "solve_count": 8,
+      "node_count": 531,
+      "final_bias_V": 0.5,
+      "contacts": {
+        "top": [
+          0.5,
+          0.01181100826372001,
+          0.00634436296489067,
+          0.018155371228610682
+        ],
+        "bot": [
+          0.0,
+          -0.012249793148237502,
+          -0.0059055543036734695,
+          -0.018155347451910973
+        ]
+      },
+      "relative_current_imbalance": 6.548121484179792e-07,
+      "runner_sha256": "aa62be8e3a83f026fa1bde908185bb5e730ee1f5e938fd3c4270b710e74ca289",
+      "stdout_log": "results/device-reference/qualification-work/1021693928bc4eb18acee96a4dc928d5/mid-5e-10/stdout.log",
+      "stderr_log": "results/device-reference/qualification-work/1021693928bc4eb18acee96a4dc928d5/mid-5e-10/stderr.log",
+      "stdout_sha256": "ff86d052b5596ad404bf9906898b89f18287a59ec5fb5c0d909e09132d5df03e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "mesh_comparisons": [
+    {
+      "coarse_spacing_cm": 2e-09,
+      "fine_spacing_cm": 1e-09,
+      "absolute_delta_A_per_cm2": 1.2600189853301247e-08,
+      "relative_delta": 6.940282103366333e-07,
+      "pass": true
+    },
+    {
+      "coarse_spacing_cm": 1e-09,
+      "fine_spacing_cm": 5e-10,
+      "absolute_delta_A_per_cm2": 2.160553222406436e-07,
+      "relative_delta": 1.1900352767238733e-05,
+      "pass": true
+    }
+  ],
+  "claim_boundary": "Numerical midpoint-local mesh/current qualification for the 1D diode at final 0.5 V only; 2D planar MOS and independent physical validation remain unresolved."
+}

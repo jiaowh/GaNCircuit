@@ -78,11 +78,6 @@ def discover_capabilities() -> dict[str, ToolCapability]:
     return found
 
 
-def capabilities() -> dict[str, ToolCapability]:
-    """Compatibility alias used by command-line and agent clients."""
-    return discover_capabilities()
-
-
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -174,9 +169,6 @@ def run_ngspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
     else:
         netlist_path.write_text(str(netlist), encoding="utf-8")
     log_path, parsed_path, prov_path = out / "ngspice.log", out / "result.json", out / "provenance.json"
-    for stale in (log_path, parsed_path, out / "result.raw", out / "stdout.log", out / "stderr.log"):
-        try: stale.unlink()
-        except FileNotFoundError: pass
     try:
         explicit = Path(executable)
         exe = str(explicit.resolve()) if explicit.is_file() else shutil.which(executable)
@@ -216,10 +208,7 @@ def run_ngspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
         measurements: dict[str, list[float]] = {}
         raw_result_path: Path | None = None
         if result_file:
-            rp = Path(result_file)
-            if rp.is_absolute() or rp.parent != Path("."):
-                raise ValueError("result_file must be a basename in artifact_dir")
-            rp = out / rp
+            rp = out / result_file
             if rp.exists():
                 raw_result_path = out / "result.raw"
                 raw_result_path.write_bytes(rp.read_bytes())
@@ -250,16 +239,3 @@ def run_ngspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
         prov_path.write_text(json.dumps(base, indent=2, sort_keys=True), encoding="utf-8")
         return SimulationResult("failed", "unresolved", None, time.monotonic()-start, artifact_dir=str(out),
                                 netlist_path=str(netlist_path), log_path=str(log_path), provenance_path=str(prov_path), provenance=base, message=str(exc))
-
-
-class NgspiceAdapter:
-    """Object form of :func:`run_ngspice` for callers that inject an executable."""
-
-    def __init__(self, executable: str = "ngspice") -> None:
-        self.executable = executable
-
-    def run(self, netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike[str],
-            *, timeout_s: float = 30.0, result_file: str | os.PathLike[str] | None = None,
-            options: Sequence[str] = ()) -> SimulationResult:
-        return run_ngspice(netlist, artifact_dir, timeout_s=timeout_s,
-                           executable=self.executable, result_file=result_file, options=options)

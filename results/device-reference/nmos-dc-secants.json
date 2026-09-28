@@ -1,0 +1,79 @@
+{
+  "artifact": "e222b6dfd8625bd9bb85dc49b4978a358edc9509071d71caddafe87e1741eed5",
+  "dataset_fingerprint": "e8d0a079426374491b53804438368bbfd8b832c5a656ef28dc40a5786a9c1701",
+  "secants": {
+    "gm_vds_0.45": {
+      "value": 0.5090539364700495,
+      "units": "S/cm",
+      "low_id": "g0_d0",
+      "high_id": "g2_d0",
+      "low_bias": 0.45,
+      "high_bias": 0.55,
+      "low_current_A_per_cm": 2.6995184479504153,
+      "high_current_A_per_cm": 2.7504238415974203,
+      "span_v": 0.10000000000000003,
+      "numerator_A_per_cm": 0.05090539364700497
+    },
+    "gm_vds_0.5": {
+      "value": 0.5578513499876434,
+      "units": "S/cm",
+      "low_id": "g0_d1",
+      "high_id": "g2_d1",
+      "low_bias": 0.45,
+      "high_bias": 0.55,
+      "low_current_A_per_cm": 3.12468790577664,
+      "high_current_A_per_cm": 3.1804730407754045,
+      "span_v": 0.10000000000000003,
+      "numerator_A_per_cm": 0.05578513499876436
+    },
+    "gm_vds_0.55": {
+      "value": 0.6060899823355645,
+      "units": "S/cm",
+      "low_id": "g0_d2",
+      "high_id": "g2_d2",
+      "low_bias": 0.45,
+      "high_bias": 0.55,
+      "low_current_A_per_cm": 3.5753750162798563,
+      "high_current_A_per_cm": 3.635984014513413,
+      "span_v": 0.10000000000000003,
+      "numerator_A_per_cm": 0.06060899823355648
+    },
+    "gds_vgs_0.45": {
+      "value": 8.758565683294407,
+      "units": "S/cm",
+      "low_id": "g0_d0",
+      "high_id": "g0_d2",
+      "low_bias": 0.45,
+      "high_bias": 0.55,
+      "low_current_A_per_cm": 2.6995184479504153,
+      "high_current_A_per_cm": 3.5753750162798563,
+      "span_v": 0.10000000000000003,
+      "numerator_A_per_cm": 0.875856568329441
+    },
+    "gds_vgs_0.5": {
+      "value": 8.806981058876213,
+      "units": "S/cm",
+      "low_id": "g1_d0",
+      "high_id": "g1_d2",
+      "low_bias": 0.45,
+      "high_bias": 0.55,
+      "low_current_A_per_cm": 2.7248843342970215,
+      "high_current_A_per_cm": 3.605582440184643,
+      "span_v": 0.10000000000000003,
+      "numerator_A_per_cm": 0.8806981058876215
+    },
+    "gds_vgs_0.55": {
+      "value": 8.855601729159922,
+      "units": "S/cm",
+      "low_id": "g2_d0",
+      "high_id": "g2_d2",
+      "low_bias": 0.45,
+      "high_bias": 0.55,
+      "low_current_A_per_cm": 2.7504238415974203,
+      "high_current_A_per_cm": 3.635984014513413,
+      "span_v": 0.10000000000000003,
+      "numerator_A_per_cm": 0.8855601729159925
+    }
+  },
+  "scope": "Finite-span DC calculations; mesh and derivative step-size accuracy require separate evidence."
+}

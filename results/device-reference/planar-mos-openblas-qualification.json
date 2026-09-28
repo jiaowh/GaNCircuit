@@ -1,0 +1,792 @@
+{
+  "schema": "device-reference-planar-mos-qualification/2",
+  "outcome": "pass",
+  "backend": {
+    "available": true,
+    "version": "2.11.0",
+    "python": "/usr/bin/python3",
+    "imported_physics": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/python_packages/simple_physics.py",
+    "imported_physics_sha256": "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f",
+    "math_libraries": [
+      {
+        "path": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/openblas/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0",
+        "sha256": "bfc7492adbf84a8f567720a9e1fae2afc18f3d817da233e7f4d453683485308e"
+      }
+    ],
+    "openblas_num_threads": "1"
+  },
+  "provenance": {
+    "commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "expected_commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "source_mesh_sha256": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+    "implementation_at_start": {
+      "qualify_planar_mos.py": "828000e527597e6433ef4c06958a4448a022b387a12f55ee23420a26c1db0886",
+      "mesh_invariants.py": "481510ffe1c41dbfe2f30b5288d80ae66989ace518aa0286dff8dfc51c310d8f",
+      "refine_planar_mesh.py": "d87e78fc7b13dfec6cc4cf959babac4f71b74447a85c0bae3acdeb7e40fcf371",
+      "mesh_delaunay.py": "0c6f342a26fd208a5a4750129efb05097a32cf621fb17fb15e1c5221924e9b57"
+    },
+    "source_unchanged": true,
+    "evaluator_sha256": "828000e527597e6433ef4c06958a4448a022b387a12f55ee23420a26c1db0886",
+    "script_sha256": "f3499a2b99b67358cec9cf506518157baa266499c7f1211c07e486a9b45f0e8d",
+    "construction_sha256": "f2ce0aaa1d96de6c97212c6c23758bada5d560968ece358cce90a2f758da6b2c",
+    "invariant_checker_sha256": "481510ffe1c41dbfe2f30b5288d80ae66989ace518aa0286dff8dfc51c310d8f",
+    "local_refiner_sha256": "d87e78fc7b13dfec6cc4cf959babac4f71b74447a85c0bae3acdeb7e40fcf371"
+  },
+  "mesh_policy": {
+    "refinements": 3,
+    "method": "uniform",
+    "invariants": [
+      {
+        "pass": true,
+        "checks": 15,
+        "failed_checks": 0,
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-20,
+        "baseline": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 2847,
+          "element_count": 5731,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 5,
+            "1:3": 100,
+            "1:4": 27,
+            "1:5": 27,
+            "1:6": 49
+          },
+          "triangle_counts": {
+            "2:7": 57,
+            "2:8": 1207,
+            "2:9": 4255
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.500000000000001e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999998e-11,
+            "2:8": 9.999999999999999e-11,
+            "2:9": 1.0000000000000028e-08
+          }
+        },
+        "refined": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 11212,
+          "element_count": 22500,
+          "line_counts": {
+            "1:1": 8,
+            "1:2": 10,
+            "1:3": 200,
+            "1:4": 54,
+            "1:5": 54,
+            "1:6": 98
+          },
+          "triangle_counts": {
+            "2:7": 228,
+            "2:8": 4828,
+            "2:9": 17020
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.5e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999999e-11,
+            "2:8": 1.0000000000000046e-10,
+            "2:9": 1.0000000000000058e-08
+          }
+        },
+        "generation": {
+          "nodes": 11212,
+          "elements": 22500,
+          "line_elements": 424,
+          "triangle_elements": 22076,
+          "source_sha256": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+          "refined_sha256": "065fc9a07f6782b9149a88c7adbcc75c47292b24b2d43bfc7d7d6dd7a94b5032"
+        }
+      },
+      {
+        "pass": true,
+        "checks": 15,
+        "failed_checks": 0,
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-20,
+        "baseline": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 11212,
+          "element_count": 22500,
+          "line_counts": {
+            "1:1": 8,
+            "1:2": 10,
+            "1:3": 200,
+            "1:4": 54,
+            "1:5": 54,
+            "1:6": 98
+          },
+          "triangle_counts": {
+            "2:7": 228,
+            "2:8": 4828,
+            "2:9": 17020
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.5e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999999e-11,
+            "2:8": 1.0000000000000046e-10,
+            "2:9": 1.0000000000000058e-08
+          }
+        },
+        "refined": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 44499,
+          "element_count": 89152,
+          "line_counts": {
+            "1:1": 16,
+            "1:2": 20,
+            "1:3": 400,
+            "1:4": 108,
+            "1:5": 108,
+            "1:6": 196
+          },
+          "triangle_counts": {
+            "2:7": 912,
+            "2:8": 19312,
+            "2:9": 68080
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.4999999999999955e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 1.0000000000000002e-10,
+            "2:8": 1.0000000000000006e-10,
+            "2:9": 1.0000000000000098e-08
+          }
+        },
+        "generation": {
+          "nodes": 44499,
+          "elements": 89152,
+          "line_elements": 848,
+          "triangle_elements": 88304,
+          "source_sha256": "065fc9a07f6782b9149a88c7adbcc75c47292b24b2d43bfc7d7d6dd7a94b5032",
+          "refined_sha256": "1cda80489ae8890a939c18faa16ea8538a7647e48ffaae176096678710b2426f"
+        }
+      },
+      {
+        "pass": true,
+        "checks": 15,
+        "failed_checks": 0,
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-20,
+        "baseline": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 44499,
+          "element_count": 89152,
+          "line_counts": {
+            "1:1": 16,
+            "1:2": 20,
+            "1:3": 400,
+            "1:4": 108,
+            "1:5": 108,
+            "1:6": 196
+          },
+          "triangle_counts": {
+            "2:7": 912,
+            "2:8": 19312,
+            "2:9": 68080
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.4999999999999955e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 1.0000000000000002e-10,
+            "2:8": 1.0000000000000006e-10,
+            "2:9": 1.0000000000000098e-08
+          }
+        },
+        "refined": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 177301,
+          "element_count": 354912,
+          "line_counts": {
+            "1:1": 32,
+            "1:2": 40,
+            "1:3": 800,
+            "1:4": 216,
+            "1:5": 216,
+            "1:6": 392
+          },
+          "triangle_counts": {
+            "2:7": 3648,
+            "2:8": 77248,
+            "2:9": 272320
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.4999999999999955e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999903e-11,
+            "2:8": 1.0000000000000828e-10,
+            "2:9": 1.0000000000000091e-08
+          }
+        },
+        "generation": {
+          "nodes": 177301,
+          "elements": 354912,
+          "line_elements": 1696,
+          "triangle_elements": 353216,
+          "source_sha256": "1cda80489ae8890a939c18faa16ea8538a7647e48ffaae176096678710b2426f",
+          "refined_sha256": "ff609ace3f8b90111d05c2c9ca54de9bf29e89d94c2773ea4c0cb8a5afc0f673"
+        }
+      }
+    ],
+    "acceptance": "last adjacent pair; earlier comparisons retained"
+  },
+  "tolerances": {
+    "conservation_relative_current": 0.0001,
+    "mesh_relative_current": 0.01,
+    "mesh_absolute_current_A_per_cm": 1e-10
+  },
+  "execution_limits": {
+    "per_case_timeout_s": 600
+  },
+  "selected_mesh_sha256": "ff609ace3f8b90111d05c2c9ca54de9bf29e89d94c2773ea4c0cb8a5afc0f673",
+  "current_definition": {
+    "unit": "A/cm",
+    "out_of_plane_width": "apply separately once",
+    "columns": [
+      "bias_V",
+      "electron_current_native",
+      "hole_current_native",
+      "total_current_native"
+    ]
+  },
+  "cases": [
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -4.766167188932759e-15,
+          -1.3239866306323395e-13,
+          -1.3716483025216672e-13
+        ],
+        "drain": [
+          0.5,
+          3.0187837064933305,
+          8.827025421179764e-17,
+          3.0187837064933305
+        ],
+        "gate": [
+          0.5,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "source": [
+          0.0,
+          -3.018783706493001,
+          -1.5025102616180887e-17,
+          -3.018783706493001
+        ]
+      },
+      "nodes": {
+        "gate": 39,
+        "bulk": 2249,
+        "oxide": 666
+      },
+      "relative_current_imbalance": 3.1858752093243227e-14,
+      "elapsed_s": 3.5099534669999457,
+      "mesh_sha256": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+        "gmsh_mos2d_dd.dat": "185922e76ff172f27512c2617395f826e79cc627326ffee7f758bc747fa7445b",
+        "gmsh_mos2d_out.msh": "e55692cfb87cfbfdcff14103e89e995f29f2019a6aae07d9a8dadd5b69f6707a",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "86eb0a3947a44454a9d3df87df65fda1ad9cf2d9cf63c1eecfe5494a27250417",
+        "gmsh_mos2d_potentialonly_1.vtu": "bef1a50647f238e813b3e7139fb59fdd202e67db3e37bdf2a1c4be9b0746580d",
+        "gmsh_mos2d_potentialonly_2.vtu": "9c43dcce5f70fc37bbe8d0fb9c0f15a58f50667c8bafb1653a846cce6c729038",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "fc9524a3f370a248fdb28d604c99c9b3af2d22b6984eb9da7daeb7d1bbe4f496",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "a4bb190234d5309891182d512e580dadf9966150540024ee5add2b1f48751fab"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-0/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-0/stderr.log"
+    },
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -6.811467131978933e-15,
+          -1.3881103578870698e-13,
+          -1.456225029206859e-13
+        ],
+        "drain": [
+          0.5,
+          3.108503809927792,
+          7.958721410260853e-17,
+          3.108503809927792
+        ],
+        "gate": [
+          0.5,
+          -9.988172608039017e-12,
+          -4.994086304019508e-32,
+          -9.988172608039017e-12
+        ],
+        "source": [
+          0.0,
+          -3.1085038099269324,
+          -1.3004038122742502e-17,
+          -3.1085038099269324
+        ]
+      },
+      "nodes": {
+        "gate": 134,
+        "bulk": 8752,
+        "oxide": 2538
+      },
+      "relative_current_imbalance": 1.4917206102590518e-12,
+      "elapsed_s": 15.569725492999964,
+      "mesh_sha256": "065fc9a07f6782b9149a88c7adbcc75c47292b24b2d43bfc7d7d6dd7a94b5032",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "065fc9a07f6782b9149a88c7adbcc75c47292b24b2d43bfc7d7d6dd7a94b5032",
+        "gmsh_mos2d_dd.dat": "d7e12c7c6bd3a5802f85c2bdc5324eed408e3680ec89b272ed13de916ca5ffdc",
+        "gmsh_mos2d_out.msh": "f7144247b01287afd43f3dba6d5cd683bbdc77740d7796c62d3e8836cdc85479",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "d20510cd3b4ded068987a648c80208e30950be9c5ca4d373f76a29e117305754",
+        "gmsh_mos2d_potentialonly_1.vtu": "04e91d4eb8bf47fbd5bc07cd437a54404bd8b1532a4c4ce5f7b8bc5d8912e0f5",
+        "gmsh_mos2d_potentialonly_2.vtu": "ffb141ccf0007373d7f15b4880df651948f4e17852bfb550a5532c42f6461926",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "1bb27cf368fa4ed565878a97010558f62b24ce326557e01196c08c1b2b655f4c",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "bfe3aa79c651cc5ac4f1759197a57e74d0bf56a6b1a42370c92f4b49921c52b5"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-1/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-1/stderr.log"
+    },
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -8.707197708067395e-15,
+          -1.1368258311242027e-13,
+          -1.2238978082048768e-13
+        ],
+        "drain": [
+          0.5,
+          3.152488234392961,
+          7.719227189048141e-17,
+          3.152488234392961
+        ],
+        "gate": [
+          0.5,
+          -2.3831798311027647e-11,
+          -1.191589915551382e-31,
+          -2.3831798311027647e-11
+        ],
+        "source": [
+          0.0,
+          -3.1524882343917704,
+          -1.2480383877867728e-17,
+          -3.1524882343917704
+        ]
+      },
+      "nodes": {
+        "gate": 495,
+        "bulk": 34523,
+        "oxide": 9903
+      },
+      "relative_current_imbalance": 3.6104155238094417e-12,
+      "elapsed_s": 84.224734829,
+      "mesh_sha256": "1cda80489ae8890a939c18faa16ea8538a7647e48ffaae176096678710b2426f",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "1cda80489ae8890a939c18faa16ea8538a7647e48ffaae176096678710b2426f",
+        "gmsh_mos2d_dd.dat": "af2adb4d795d9b401a9d831e18074c004b05c5e1d06c2dcab4402bd9b7144be9",
+        "gmsh_mos2d_out.msh": "74a437998151629a8ae53469291eb2e0ddf19fd155cb40af9a1e2334ea73cba1",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "531a4988a36dc745a7b21c48d96a7661f517f33591c6543dcbf78385544b90a3",
+        "gmsh_mos2d_potentialonly_1.vtu": "dcdd10cd1c3c598c3bf7b81809c6ef061c5979a5f8384723a14ab25ef57353be",
+        "gmsh_mos2d_potentialonly_2.vtu": "20d7b7771ecd719da1cfbc5860424428ca0065e3503d77a5def2c6459f11a6cd",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "265a7ec68100217b71c6565b32a487ac328136e64e028eed2eafe09fcc981f19",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "a5fef7d5764a8e5524b1711082b4a9d5a8f6aa7e500a2f1cb1204b4d6eb63f57"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-2/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-2/stderr.log"
+    },
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -1.0008890442065226e-14,
+          -9.846177139705295e-14,
+          -1.0847066183911818e-13
+        ],
+        "drain": [
+          0.5,
+          3.158300632822425,
+          7.523079540314566e-17,
+          3.158300632822425
+        ],
+        "gate": [
+          0.5,
+          -3.7540870620048466e-11,
+          -1.877043531002423e-31,
+          -3.7540870620048466e-11
+        ],
+        "source": [
+          0.0,
+          -3.158300632821808,
+          -1.1826537442570987e-17,
+          -3.158300632821808
+        ]
+      },
+      "nodes": {
+        "gate": 1901,
+        "bulk": 137125,
+        "oxide": 39117
+      },
+      "relative_current_imbalance": 5.862725825453565e-12,
+      "elapsed_s": 544.5512045669999,
+      "mesh_sha256": "ff609ace3f8b90111d05c2c9ca54de9bf29e89d94c2773ea4c0cb8a5afc0f673",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "ff609ace3f8b90111d05c2c9ca54de9bf29e89d94c2773ea4c0cb8a5afc0f673",
+        "gmsh_mos2d_dd.dat": "c3ed9dc10a1fc1d12178e7c885b6902ea8d903a0b27fc8357e04cbfda6026882",
+        "gmsh_mos2d_out.msh": "47fd02dd87c6fa223925348370fd6d6724c31c2888692eb8221f3dfc90f113d5",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "082a00d8eafbde6f4cfcca51c19e15c8d04d61bfabcf154eaaee4cf7f5c201fc",
+        "gmsh_mos2d_potentialonly_1.vtu": "ce7d62c7e3fac1c6ca7243ec183ebec65c19a93b6cc91ad6344900f20bc92f87",
+        "gmsh_mos2d_potentialonly_2.vtu": "d3b2168ec5bd17d5659bba3de019a602d06ed2fefe1ce8222178154a85bafe6b",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "f89ba6e76314f7ef51bd080951f8a30a702633465cc7734780a90143eafc10a2",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "82f7d1e89c372a7683d8226abb5e8c3590fd971b0129efabc6635e605fe5e6a9"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-3/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/bf3582178dfb4cd5adf3153607b4d9ce/level-3/stderr.log"
+    }
+  ],
+  "mesh_comparisons": [
+    {
+      "levels": [
+        0,
+        1
+      ],
+      "outcome": "unresolved",
+      "currents": [
+        {
+          "contact": "gate",
+          "absolute_delta_A_per_cm": 9.988172608039017e-12,
+          "relative_delta": 0.09988172608039017,
+          "pass": true
+        },
+        {
+          "contact": "drain",
+          "absolute_delta_A_per_cm": 0.08972010343446168,
+          "relative_delta": 0.02886279345964379,
+          "pass": false
+        },
+        {
+          "contact": "source",
+          "absolute_delta_A_per_cm": 0.08972010343393144,
+          "relative_delta": 0.028862793459481194,
+          "pass": false
+        },
+        {
+          "contact": "body",
+          "absolute_delta_A_per_cm": 8.457672668519189e-15,
+          "relative_delta": 8.457672668519188e-05,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "levels": [
+        1,
+        2
+      ],
+      "outcome": "unresolved",
+      "currents": [
+        {
+          "contact": "gate",
+          "absolute_delta_A_per_cm": 1.384362570298863e-11,
+          "relative_delta": 0.1384362570298863,
+          "pass": true
+        },
+        {
+          "contact": "drain",
+          "absolute_delta_A_per_cm": 0.043984424465168814,
+          "relative_delta": 0.013952288222778537,
+          "pass": false
+        },
+        {
+          "contact": "source",
+          "absolute_delta_A_per_cm": 0.04398442446483797,
+          "relative_delta": 0.013952288222678858,
+          "pass": false
+        },
+        {
+          "contact": "body",
+          "absolute_delta_A_per_cm": 2.323272210019823e-14,
+          "relative_delta": 0.00023232722100198229,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "levels": [
+        2,
+        3
+      ],
+      "outcome": "pass",
+      "currents": [
+        {
+          "contact": "gate",
+          "absolute_delta_A_per_cm": 1.370907230902082e-11,
+          "relative_delta": 0.1370907230902082,
+          "pass": true
+        },
+        {
+          "contact": "drain",
+          "absolute_delta_A_per_cm": 0.005812398429463794,
+          "relative_delta": 0.001840356288143959,
+          "pass": true
+        },
+        {
+          "contact": "source",
+          "absolute_delta_A_per_cm": 0.0058123984300375575,
+          "relative_delta": 0.0018403562883259868,
+          "pass": true
+        },
+        {
+          "contact": "body",
+          "absolute_delta_A_per_cm": 1.3919118981369497e-14,
+          "relative_delta": 0.00013919118981369497,
+          "pass": true
+        }
+      ]
+    }
+  ],
+  "claim_boundary": "Endpoint only at Vg=Vd=0.5 V, Vs=Vb=0 V, 300 K; no bias-domain, slope, or physical-device validation. Upstream oxide material label is Silicon; oxide equations are assigned by simple_physics."
+}

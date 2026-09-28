@@ -1,0 +1,4302 @@
+{
+ "schema": "planar-nmos-sweep/1",
+ "spec": {
+  "schema": "planar-nmos-spec/1",
+  "name": "lc1",
+  "purpose": "First generated long-channel planar NMOS candidate for a resistively loaded common-source stage. Starting hypothesis, not a qualified design.",
+  "temperature_k": 300.0,
+  "supply_v": 3.3,
+  "geometry_um": {
+   "gate_length": 1.0,
+   "oxide_thickness": 0.01,
+   "poly_thickness": 0.1,
+   "source_drain_length": 0.5,
+   "junction_depth": 0.1,
+   "body_depth": 0.5
+  },
+  "doping_cm3": {
+   "body_acceptors": 1e+17,
+   "source_drain_donors": 1e+20,
+   "gate_poly_donors": 1e+20
+  },
+  "junction_grading_um": {
+   "lateral": 0.02,
+   "vertical": 0.02
+  },
+  "contacts": {
+   "gate": "ohmic contact on top of the n+ polysilicon gate region (sets the gate work function to n+ poly)",
+   "source": "top silicon surface from the left edge to the left gate edge",
+   "drain": "top silicon surface from the right gate edge to the right edge",
+   "body": "bottom silicon surface, full width"
+  },
+  "mesh_um": {
+   "scale": 2.0,
+   "surface": 0.001,
+   "junction_edge": 0.005,
+   "channel_centre": 0.02,
+   "junction_bottom": 0.005,
+   "body_bottom": 0.05,
+   "outer_edge": 0.02,
+   "oxide": 0.001,
+   "poly_top": 0.02
+  },
+  "physics": "DEVSIM simple_physics: constant mobility (mu_n 400, mu_p 200 cm^2/Vs), SRH, drift-diffusion, no velocity saturation, no field-dependent mobility, no gate tunneling, no interface charge"
+ },
+ "status": "completed",
+ "equilibrium": {
+  "currents_a_per_cm": {
+   "gate": 0.0,
+   "drain": 8.456945390067496e-12,
+   "source": 1.6349259057868577e-12,
+   "body": 1.3274412937295506e-16
+  },
+  "kcl_residual_a_per_cm": 1.0092004039983727e-11,
+  "kcl_pass": true
+ },
+ "transfer": [
+  {
+   "vd_v": 0.05,
+   "points": [
+    {
+     "vg_v": -0.5,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 7.972958980587006e-14,
+      "drain": 6.3156216958649474e-12,
+      "source": 2.0480357514218005e-12,
+      "body": -9.18330726787939e-15
+     },
+     "kcl_residual_a_per_cm": 8.434203729824739e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.4,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -7.854147689093302e-14,
+      "drain": 8.387484402463778e-12,
+      "source": -4.220247581940885e-12,
+      "body": -9.472837448349228e-15
+     },
+     "kcl_residual_a_per_cm": 4.079222506183611e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.3,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -1.3289675811187725e-12,
+      "drain": 2.9447139545893065e-11,
+      "source": -2.23015070564455e-11,
+      "body": -9.955662006168158e-15
+     },
+     "kcl_residual_a_per_cm": 5.806709246322624e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.2,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.7497573425919013e-10,
+      "source": -3.6559831630416485e-10,
+      "body": -1.0838465510553816e-14
+     },
+     "kcl_residual_a_per_cm": 9.366579489514725e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.1,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 5.897696610692499e-09,
+      "source": -5.898483382269395e-09,
+      "body": -1.1112820662951464e-14
+     },
+     "kcl_residual_a_per_cm": 7.978843975585453e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.0,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 9.821007525221016e-08,
+      "source": -9.822712256646726e-08,
+      "body": -1.1160973525706454e-14
+     },
+     "kcl_residual_a_per_cm": 1.7058475230628378e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.1,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.717396443886435e-06,
+      "source": -1.7174017858364527e-06,
+      "body": -1.0830040101928652e-14
+     },
+     "kcl_residual_a_per_cm": 5.3527800578545745e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.2,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.0884545104938656e-05,
+      "source": -3.0884564789222556e-05,
+      "body": -1.104866392299878e-14
+     },
+     "kcl_residual_a_per_cm": 1.9695332563785232e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.3,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 5.719452541094775e-13,
+      "drain": 0.00047865691192327327,
+      "source": -0.0004786569152137642,
+      "body": -1.1326108692505917e-14
+     },
+     "kcl_residual_a_per_cm": 2.729871781190965e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.4,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.0032148746606836445,
+      "source": -0.0032148746931174514,
+      "body": -1.1410555091989559e-14
+     },
+     "kcl_residual_a_per_cm": 3.244521749735338e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.008492048901473575,
+      "source": -0.008492048903154784,
+      "body": -1.1776630595559103e-14
+     },
+     "kcl_residual_a_per_cm": 1.6929856220619576e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.6,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.014744400183392608,
+      "source": -0.014744400189102419,
+      "body": -1.1964558449501921e-14
+     },
+     "kcl_residual_a_per_cm": 5.721775654604595e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.7,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 3.5527136788005016e-11,
+      "drain": 0.021353090518784618,
+      "source": -0.021353090527412542,
+      "body": -1.2064798134478312e-14
+     },
+     "kcl_residual_a_per_cm": 2.688714722634373e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.8,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.02812614401665349,
+      "source": -0.028126144014210822,
+      "body": -1.2194558790473848e-14
+     },
+     "kcl_residual_a_per_cm": 2.4304730371794202e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.9,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.0349885964825886,
+      "source": -0.03498859649226038,
+      "body": -1.190903770904809e-14
+     },
+     "kcl_residual_a_per_cm": 9.683693244564042e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.04190493619701959,
+      "source": -0.04190493619437641,
+      "body": -1.1829458462023479e-14
+     },
+     "kcl_residual_a_per_cm": 2.6313548240960298e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.1,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 3.5527136788005016e-11,
+      "drain": 0.04885593352065273,
+      "source": -0.04885593355801608,
+      "body": -1.1946615228474524e-14
+     },
+     "kcl_residual_a_per_cm": 1.8481583534438222e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.2,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 3.5527136788005016e-11,
+      "drain": 0.055830149794233216,
+      "source": -0.055830149799874204,
+      "body": -1.1703040604509437e-14
+     },
+     "kcl_residual_a_per_cm": 2.987444607043132e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.3,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 3.5527136788005016e-11,
+      "drain": 0.06282029917386699,
+      "source": -0.0628202991611209,
+      "body": -1.2176844298967316e-14
+     },
+     "kcl_residual_a_per_cm": 4.8261041911368855e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.4,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.06982149626489954,
+      "source": -0.06982149628413079,
+      "body": -1.2092632611666576e-14
+     },
+     "kcl_residual_a_per_cm": 1.9243334231805206e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.07683033211700022,
+      "source": -0.07683033213946751,
+      "body": -1.1922298163471487e-14
+     },
+     "kcl_residual_a_per_cm": 2.24792142139588e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.6,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.08384435130749583,
+      "source": -0.08384435132127552,
+      "body": -1.2007611415807878e-14
+     },
+     "kcl_residual_a_per_cm": 1.3791693337216824e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.7,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.09086173897609007,
+      "source": -0.0908617389392112,
+      "body": -1.2022791888576222e-14
+     },
+     "kcl_residual_a_per_cm": 3.686683828417318e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.8,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.09788112434234361,
+      "source": -0.09788112434154211,
+      "body": -1.1894025728343852e-14
+     },
+     "kcl_residual_a_per_cm": 7.896037313241723e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.9,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.10490145280889275,
+      "source": -0.10490145278961938,
+      "body": -1.2062016922949921e-14
+     },
+     "kcl_residual_a_per_cm": 1.9261312546055114e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.1119218997113578,
+      "source": -0.11192189974889297,
+      "body": -1.2067551779908998e-14
+     },
+     "kcl_residual_a_per_cm": 3.754723696884882e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.1,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.11894181086977193,
+      "source": -0.11894181086919262,
+      "body": -1.2022705930366084e-14
+     },
+     "kcl_residual_a_per_cm": 5.672916683190406e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.2,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.12596065997381853,
+      "source": -0.12596065999103181,
+      "body": -1.2184591874192371e-14
+     },
+     "kcl_residual_a_per_cm": 1.722547094372124e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.3,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.13297801842588694,
+      "source": -0.13297801843623355,
+      "body": -1.2249261708111025e-14
+     },
+     "kcl_residual_a_per_cm": 1.0358861717399795e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.4,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.13999353251099791,
+      "source": -0.1399935325199827,
+      "body": -1.1774817460271899e-14
+     },
+     "kcl_residual_a_per_cm": 8.996559955571124e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.5,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.14700690654479232,
+      "source": -0.14700690654966084,
+      "body": -1.1815714001960047e-14
+     },
+     "kcl_residual_a_per_cm": 4.880337966012581e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.6,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.154017889976414,
+      "source": -0.15401788997354499,
+      "body": -1.2064505928097087e-14
+     },
+     "kcl_residual_a_per_cm": 2.856946078732617e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.7,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.582321696577345e-13,
+      "drain": 0.16102626746994003,
+      "source": -0.16102626747724372,
+      "body": -1.1910904304020765e-14
+     },
+     "kcl_residual_a_per_cm": 7.973828508185194e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.8,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.582321696577345e-13,
+      "drain": 0.16803185108730345,
+      "source": -0.16803185108312552,
+      "body": -1.2134673167933384e-14
+     },
+     "kcl_residual_a_per_cm": 3.50756893229249e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.9,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 0.17503447404389286,
+      "source": -0.17503447401369043,
+      "body": -1.186705117953087e-14
+     },
+     "kcl_residual_a_per_cm": 2.951852433589207e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 0.1820339856678909,
+      "source": -0.1820339856657254,
+      "body": -1.1989266799249081e-14
+     },
+     "kcl_residual_a_per_cm": 1.481468234627808e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.1,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 0.18903024740167373,
+      "source": -0.18903024740079982,
+      "body": -1.189321179226519e-14
+     },
+     "kcl_residual_a_per_cm": 1.899863339371159e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.2,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 0.19602312923483342,
+      "source": -0.19602312923563997,
+      "body": -1.1953551276902075e-14
+     },
+     "kcl_residual_a_per_cm": 1.4905353311957736e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.3,
+     "vd_v": 0.05,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 0.2030125068961763,
+      "source": -0.20301250689946096,
+      "body": -1.2121548562663333e-14
+     },
+     "kcl_residual_a_per_cm": 3.968804386171731e-12,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vd_v": 1.65,
+   "points": [
+    {
+     "vg_v": -0.5,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -6.713908145234698e-14,
+      "drain": 1.6283947621602304e-10,
+      "source": 2.0485447143483924e-12,
+      "body": -5.830412200907642e-14
+     },
+     "kcl_residual_a_per_cm": 1.6476257772691e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.4,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -2.680222986480349e-13,
+      "drain": 1.6067200527584265e-10,
+      "source": -5.952829445172888e-12,
+      "body": -5.854709735939636e-14
+     },
+     "kcl_residual_a_per_cm": 1.5439260643466233e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.3,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.710028301554627e-10,
+      "source": -2.42399635449827e-11,
+      "body": -5.987590622008753e-14
+     },
+     "kcl_residual_a_per_cm": 1.4670299070425992e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.2,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 5.773042210957673e-10,
+      "source": -4.737233941728578e-10,
+      "body": -6.135084627466776e-14
+     },
+     "kcl_residual_a_per_cm": 1.035194760766349e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.1,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 7.617717135382725e-09,
+      "source": -7.60734927563115e-09,
+      "body": -6.228305407194542e-14
+     },
+     "kcl_residual_a_per_cm": 1.030557669750278e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.0,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.2713404885663782e-07,
+      "source": -1.271764984310628e-07,
+      "body": -6.229069991946113e-14
+     },
+     "kcl_residual_a_per_cm": 4.251186512490347e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.1,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.2367607662385017e-06,
+      "source": -2.236755824424492e-06,
+      "body": -6.129394748185597e-14
+     },
+     "kcl_residual_a_per_cm": 4.880520062221759e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.2,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 4.056642062033868e-05,
+      "source": -4.0566385343298344e-05,
+      "body": -6.070171489901228e-14
+     },
+     "kcl_residual_a_per_cm": 3.5216338620769176e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.3,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 5.719452541094775e-13,
+      "drain": 0.0006509138796701078,
+      "source": -0.0006509138538345139,
+      "body": -6.0553923748122e-14
+     },
+     "kcl_residual_a_per_cm": 2.6346985302699778e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.4,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.00524669968868044,
+      "source": -0.005246699763268857,
+      "body": -6.113879589381354e-14
+     },
+     "kcl_residual_a_per_cm": 7.464955496853227e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.019012579885222366,
+      "source": -0.01901257988970425,
+      "body": -6.267241364063773e-14
+     },
+     "kcl_residual_a_per_cm": 8.387946570033051e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.6,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.04438219742913082,
+      "source": -0.04438219742230128,
+      "body": -6.428594126538672e-14
+     },
+     "kcl_residual_a_per_cm": 6.765250994716264e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.7,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 3.328788860108444e-11,
+      "drain": 0.08214275640648533,
+      "source": -0.08214275642272213,
+      "body": -6.594277923287614e-14
+     },
+     "kcl_residual_a_per_cm": 1.6985142253525767e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.8,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.13257024602311512,
+      "source": -0.13257024609882664,
+      "body": -6.737167242556125e-14
+     },
+     "kcl_residual_a_per_cm": 7.577889205886003e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.9,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.1957508713890949,
+      "source": -0.19575087144612024,
+      "body": -6.89572599005766e-14
+     },
+     "kcl_residual_a_per_cm": 5.933356210578961e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.2716809964886602,
+      "source": -0.2716809965420542,
+      "body": -7.052873159290778e-14
+     },
+     "kcl_residual_a_per_cm": 5.346454016604179e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.1,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 3.420030909708951e-11,
+      "drain": 0.36030492517396173,
+      "source": -0.3603049250699575,
+      "body": -7.170338744381264e-14
+     },
+     "kcl_residual_a_per_cm": 1.3813285536659835e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.2,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 3.328788860108444e-11,
+      "drain": 0.4615307778539902,
+      "source": -0.4615307778175384,
+      "body": -7.342542751346895e-14
+     },
+     "kcl_residual_a_per_cm": 6.966630471878627e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.3,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 3.436739868258355e-11,
+      "drain": 0.5752366310017936,
+      "source": -0.5752366309648201,
+      "body": -7.449266057773611e-14
+     },
+     "kcl_residual_a_per_cm": 7.126633034419001e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.4,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.7012704898860118,
+      "source": -0.7012704898557119,
+      "body": -7.566341456801679e-14
+     },
+     "kcl_residual_a_per_cm": 2.7984962119673794e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8394434389406864,
+      "source": -0.8394434389366395,
+      "body": -7.683221512285347e-14
+     },
+     "kcl_residual_a_per_cm": 3.970041731938305e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.6,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.9895112633484493,
+      "source": -0.9895112633326838,
+      "body": -7.832702058741713e-14
+     },
+     "kcl_residual_a_per_cm": 1.5687172995997195e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.7,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.1511361308303885,
+      "source": -1.151136130835042,
+      "body": -7.925394437404654e-14
+     },
+     "kcl_residual_a_per_cm": 4.732864774392853e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.8,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.3238244577070626,
+      "source": -1.3238244577250933,
+      "body": -8.028384242222931e-14
+     },
+     "kcl_residual_a_per_cm": 1.8110971896149547e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.9,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.506852809489426,
+      "source": -1.5068528094280493,
+      "body": -8.142531272562275e-14
+     },
+     "kcl_residual_a_per_cm": 6.129525620223183e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.6992119017376417,
+      "source": -1.6992119016898581,
+      "body": -8.210226716825645e-14
+     },
+     "kcl_residual_a_per_cm": 4.770145262348863e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.1,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.8996276956231573,
+      "source": -1.8996276957084675,
+      "body": -8.280728105660755e-14
+     },
+     "kcl_residual_a_per_cm": 8.539301062706841e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.2,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.1066921463509227,
+      "source": -2.1066921462858765,
+      "body": -8.379773339566556e-14
+     },
+     "kcl_residual_a_per_cm": 6.496239292255286e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.3,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.3190403025919246,
+      "source": -2.3190403026304933,
+      "body": -8.423959475536196e-14
+     },
+     "kcl_residual_a_per_cm": 3.865294338102345e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.4,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.535481656580526,
+      "source": -2.5354816565982956,
+      "body": -8.489058408653476e-14
+     },
+     "kcl_residual_a_per_cm": 1.785467622702694e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.5,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.755051218144913,
+      "source": -2.7550512181834286,
+      "body": -8.534370388634307e-14
+     },
+     "kcl_residual_a_per_cm": 3.860075678497242e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.6,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.977000746434788,
+      "source": -2.9770007464535997,
+      "body": -8.608532363516791e-14
+     },
+     "kcl_residual_a_per_cm": 1.889770425288382e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.7,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -6.366093096543708e-14,
+      "drain": 3.2007631377053114,
+      "source": -3.2007631377205623,
+      "body": -8.624458375970504e-14
+     },
+     "kcl_residual_a_per_cm": 1.540081715939599e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.8,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -1.2982849904865582e-13,
+      "drain": 3.425912140187288,
+      "source": -3.425912140208957,
+      "body": -8.690065203896056e-14
+     },
+     "kcl_residual_a_per_cm": 2.1886062145721423e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.9,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -1.8781539751859026e-13,
+      "drain": 3.652127152777507,
+      "source": -3.652127152746174,
+      "body": -8.72578151955048e-14
+     },
+     "kcl_residual_a_per_cm": 3.1058085077466925e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -2.2758382428737584e-13,
+      "drain": 3.8791655908266582,
+      "source": -3.879165590893472,
+      "body": -8.750574483196553e-14
+     },
+     "kcl_residual_a_per_cm": 6.712875528027112e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.1,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -2.727085845292729e-13,
+      "drain": 4.10684225575506,
+      "source": -4.106842255693086,
+      "body": -8.787856850963088e-14
+     },
+     "kcl_residual_a_per_cm": 6.161383843837673e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.2,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -3.2310239298528664e-13,
+      "drain": 4.335014275422019,
+      "source": -4.335014275413644,
+      "body": -8.804981512618031e-14
+     },
+     "kcl_residual_a_per_cm": 7.963482111241014e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.3,
+     "vd_v": 1.65,
+     "currents_a_per_cm": {
+      "gate": -3.4948787625983994e-13,
+      "drain": 4.56357020055473,
+      "source": -4.56357020059833,
+      "body": -8.817813971694011e-14
+     },
+     "kcl_residual_a_per_cm": 4.4038344639055925e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vd_v": 3.3,
+   "points": [
+    {
+     "vg_v": -0.5,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -6.713908145234698e-14,
+      "drain": 1.8271638387363055e-10,
+      "source": 2.0495626402015766e-12,
+      "body": -9.262091485561488e-14
+     },
+     "kcl_residual_a_per_cm": 1.8460618651752416e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.4,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -2.680222986480349e-13,
+      "drain": 1.8404525669360028e-10,
+      "source": -5.961651469233816e-12,
+      "body": -9.360746135924076e-14
+     },
+     "kcl_residual_a_per_cm": 1.7772197546435918e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.3,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 2.511114385385176e-13,
+      "drain": 2.0837768508557327e-10,
+      "source": -2.6087317426662467e-11,
+      "body": -9.465665900603182e-14
+     },
+     "kcl_residual_a_per_cm": 1.8244682243844327e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.2,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -2.511114385385176e-13,
+      "drain": 6.24344103152069e-10,
+      "source": -4.945747835556542e-10,
+      "body": -9.628055155715412e-14
+     },
+     "kcl_residual_a_per_cm": 1.294219276063191e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": -0.1,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -2.511114385385176e-13,
+      "drain": 8.152937552779182e-09,
+      "source": -8.050303016521824e-09,
+      "body": -9.7563546528252e-14
+     },
+     "kcl_residual_a_per_cm": 1.0228586127229131e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.349582751742151e-07,
+      "source": -1.3490675602526765e-07,
+      "body": -9.744991783948603e-14
+     },
+     "kcl_residual_a_per_cm": 5.1421699029603773e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.1,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.3775458121568657e-06,
+      "source": -2.377437022345277e-06,
+      "body": -9.607330849703936e-14
+     },
+     "kcl_residual_a_per_cm": 1.0869373828016472e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.2,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 2.3015165426756378e-35,
+      "drain": 4.317997695700611e-05,
+      "source": -4.317992694250031e-05,
+      "body": -9.414878889109114e-14
+     },
+     "kcl_residual_a_per_cm": 4.992035701297037e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.3,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 5.719452541094775e-13,
+      "drain": 0.0006923942008049325,
+      "source": -0.0006923941562024707,
+      "body": -9.322461702539661e-14
+     },
+     "kcl_residual_a_per_cm": 4.5081182443480515e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.4,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.005564219085848827,
+      "source": -0.0055642189936759845,
+      "body": -9.417702737401849e-14
+     },
+     "kcl_residual_a_per_cm": 9.207866524798803e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.020120623782454737,
+      "source": -0.020120623821901367,
+      "body": -9.549341335203283e-14
+     },
+     "kcl_residual_a_per_cm": 4.281668426105932e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.6,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.046916686963441756,
+      "source": -0.046916686934706194,
+      "body": -9.74320959623879e-14
+     },
+     "kcl_residual_a_per_cm": 2.8638130444609247e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.7,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 3.1683746245850555e-11,
+      "drain": 0.08678857469537135,
+      "source": -0.08678857470246147,
+      "body": -9.908642204341798e-14
+     },
+     "kcl_residual_a_per_cm": 2.4494539666158155e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.8,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.14004719032678536,
+      "source": -0.1400471903533099,
+      "body": -1.0026991187379754e-13
+     },
+     "kcl_residual_a_per_cm": 2.6624802482222723e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.9,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -4.449317814957625e-12,
+      "drain": 0.2068135493894492,
+      "source": -0.20681354938857144,
+      "body": -1.0239587000031053e-13
+     },
+     "kcl_residual_a_per_cm": 3.673943606113671e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.2871233397191826,
+      "source": -0.28712333972784937,
+      "body": -1.0348460509754455e-13
+     },
+     "kcl_residual_a_per_cm": 8.770274113380135e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.1,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 3.1683746245850555e-11,
+      "drain": 0.3809674916972489,
+      "source": -0.38096749165590676,
+      "body": -1.0521342476969951e-13
+     },
+     "kcl_residual_a_per_cm": 7.292068474516505e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.2,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 3.2252575930522915e-11,
+      "drain": 0.4883107380636587,
+      "source": -0.4883107380680675,
+      "body": -1.0685083666458493e-13
+     },
+     "kcl_residual_a_per_cm": 2.773691844076937e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.3,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 3.278657930797044e-11,
+      "drain": 0.6091011353842026,
+      "source": -0.6091011353875174,
+      "body": -1.0780280948903622e-13
+     },
+     "kcl_residual_a_per_cm": 2.9363983613858075e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.4,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.7432753343002229,
+      "source": -0.7432753342080565,
+      "body": -1.0926997313998222e-13
+     },
+     "kcl_residual_a_per_cm": 8.878255480396238e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8907616256927889,
+      "source": -0.8907616257161779,
+      "body": -1.1085955833884768e-13
+     },
+     "kcl_residual_a_per_cm": 2.3499816995814557e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.6,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.0514817134108858,
+      "source": -1.0514817133587953,
+      "body": -1.1203669908902646e-13
+     },
+     "kcl_residual_a_per_cm": 5.1978517393298695e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.7,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.2253516851240969,
+      "source": -1.2253516851585673,
+      "body": -1.1340961196962278e-13
+     },
+     "kcl_residual_a_per_cm": 3.458383612513641e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.8,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.4122824366737938,
+      "source": -1.4122824366639297,
+      "body": -1.1427057415825457e-13
+     },
+     "kcl_residual_a_per_cm": 9.749838955031337e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.9,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.6121796783529068,
+      "source": -1.6121796783764373,
+      "body": -1.1542728969935056e-13
+     },
+     "kcl_residual_a_per_cm": 2.364593816281477e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.8249436018869687,
+      "source": -1.8249436018137888,
+      "body": -1.1670737972749756e-13
+     },
+     "kcl_residual_a_per_cm": 7.306319919922985e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.1,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.0504682504924387,
+      "source": -2.0504682505334193,
+      "body": -1.1786588855281054e-13
+     },
+     "kcl_residual_a_per_cm": 4.109841817351659e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.2,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.288640635063665,
+      "source": -2.2886406350320656,
+      "body": -1.190306740185631e-13
+     },
+     "kcl_residual_a_per_cm": 3.1480581142072493e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.3,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.5393396246050965,
+      "source": -2.5393396245908626,
+      "body": -1.2007995337906458e-13
+     },
+     "kcl_residual_a_per_cm": 1.4113867400735142e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.4,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.802434609612206,
+      "source": -2.802434609589666,
+      "body": -1.2116422289388653e-13
+     },
+     "kcl_residual_a_per_cm": 2.2418583623046042e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.5,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.07778384331169,
+      "source": -3.077783843227836,
+      "body": -1.223340253780514e-13
+     },
+     "kcl_residual_a_per_cm": 8.373147875693047e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.6,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.365232272928622,
+      "source": -3.365232272827217,
+      "body": -1.2282934677778052e-13
+     },
+     "kcl_residual_a_per_cm": 1.0128227718722491e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.7,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -6.366093096543708e-14,
+      "drain": 3.664608629325677,
+      "source": -3.6646086292909184,
+      "body": -1.2419395933156917e-13
+     },
+     "kcl_residual_a_per_cm": 3.45710075646674e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.8,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -1.1487235484991893e-13,
+      "drain": 3.9757216415412975,
+      "source": -3.975721641555485,
+      "body": -1.2498736161696228e-13
+     },
+     "kcl_residual_a_per_cm": 1.4427177703546832e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.9,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -1.52767504539519e-13,
+      "drain": 4.298355447643162,
+      "source": -4.298355447649941,
+      "body": -1.2593652925901432e-13
+     },
+     "kcl_residual_a_per_cm": 7.058169911369589e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -1.8781539751859026e-13,
+      "drain": 4.632264288604953,
+      "source": -4.632264288542735,
+      "body": -1.2683681112627522e-13
+     },
+     "kcl_residual_a_per_cm": 6.190402244818831e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.1,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -2.2758382428737584e-13,
+      "drain": 4.977165960082472,
+      "source": -4.977165960066426,
+      "body": -1.2769885087421903e-13
+     },
+     "kcl_residual_a_per_cm": 1.5690548655140867e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.2,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -2.494337081939786e-13,
+      "drain": 5.332732713593142,
+      "source": -5.3327327135900955,
+      "body": -1.2835079292005773e-13
+     },
+     "kcl_residual_a_per_cm": 2.668667478457393e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.3,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -2.975013875820864e-13,
+      "drain": 5.698578879829769,
+      "source": -5.698578879773558,
+      "body": -1.2936467615301782e-13
+     },
+     "kcl_residual_a_per_cm": 5.578416976224642e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  }
+ ],
+ "output": [
+  {
+   "vg_v": 0.5,
+   "points": [
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": -1.7424639921440061e-12,
+      "source": 4.262684486592061e-13,
+      "body": 7.936343877751201e-17
+     },
+     "kcl_residual_a_per_cm": 1.3161161800460225e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.013551613080833766,
+      "source": -0.013551613104079738,
+      "body": -1.685042596119983e-14
+     },
+     "kcl_residual_a_per_cm": 2.3262823280929523e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.2,
+     "currents_a_per_cm": {
+      "gate": -1.7763568394002454e-13,
+      "drain": 0.016941433225085546,
+      "source": -0.01694143322014777,
+      "body": -2.2436030471358384e-14
+     },
+     "kcl_residual_a_per_cm": 4.737704168207184e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.01745094774327554,
+      "source": -0.017450947759198792,
+      "body": -2.5197387450709897e-14
+     },
+     "kcl_residual_a_per_cm": 1.59484496874937e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.017653483783088446,
+      "source": -0.017653483805864494,
+      "body": -2.8403920751381507e-14
+     },
+     "kcl_residual_a_per_cm": 2.2804452329141918e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.5,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.01781080608492256,
+      "source": -0.017810806073968816,
+      "body": -3.414183090018321e-14
+     },
+     "kcl_residual_a_per_cm": 8.680354837781099e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.017949963458855533,
+      "source": -0.017949963289200493,
+      "body": -3.93053535351258e-14
+     },
+     "kcl_residual_a_per_cm": 1.696157346630013e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.7,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.018077744045935353,
+      "source": -0.01807774405958811,
+      "body": -4.147057644955382e-14
+     },
+     "kcl_residual_a_per_cm": 1.593347477243392e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.8,
+     "currents_a_per_cm": {
+      "gate": -1.159738105421459e-12,
+      "drain": 0.018197253492400377,
+      "source": -0.018197253622898694,
+      "body": -4.275502596751957e-14
+     },
+     "kcl_residual_a_per_cm": 1.3170081014500544e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 0.9,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.018310123906384798,
+      "source": -0.01831012394296806,
+      "body": -4.354115984282431e-14
+     },
+     "kcl_residual_a_per_cm": 3.8395433185658606e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.0,
+     "currents_a_per_cm": {
+      "gate": -2.072158601426531e-12,
+      "drain": 0.018417321092788496,
+      "source": -0.018417320993028154,
+      "body": -4.4195872169567225e-14
+     },
+     "kcl_residual_a_per_cm": 9.7643987874447e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.1,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.01851952428934979,
+      "source": -0.018519524302554827,
+      "body": -4.525124956136062e-14
+     },
+     "kcl_residual_a_per_cm": 1.548953719418392e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.2,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.01861727101413508,
+      "source": -0.018617271049694965,
+      "body": -4.6096210794071276e-14
+     },
+     "kcl_residual_a_per_cm": 3.7374612408086003e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.3,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.01871100976816945,
+      "source": -0.018711009780790315,
+      "body": -4.813385146739298e-14
+     },
+     "kcl_residual_a_per_cm": 1.5409557489221815e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.4,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.018801122247723876,
+      "source": -0.018801122251191946,
+      "body": -5.238468120001671e-14
+     },
+     "kcl_residual_a_per_cm": 5.2890855622211354e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.5,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.01888793578162604,
+      "source": -0.01888793569914211,
+      "body": -5.751167926394105e-14
+     },
+     "kcl_residual_a_per_cm": 7.968586024960674e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.6,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.018971733219996244,
+      "source": -0.018971733206322557,
+      "body": -6.120670909036047e-14
+     },
+     "kcl_residual_a_per_cm": 1.0871922993399993e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.7,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.01905276361389281,
+      "source": -0.019052764032356742,
+      "body": -6.367653264411037e-14
+     },
+     "kcl_residual_a_per_cm": 4.2076685836309607e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.8,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.0191312546409192,
+      "source": -0.019131254353332607,
+      "body": -6.51563587690151e-14
+     },
+     "kcl_residual_a_per_cm": 2.8575280576992535e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 1.9,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.01920741785226054,
+      "source": -0.019207417801966952,
+      "body": -6.659038445300801e-14
+     },
+     "kcl_residual_a_per_cm": 4.6952437496157764e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.0,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.019281463193432137,
+      "source": -0.01928146323944683,
+      "body": -6.728726345530048e-14
+     },
+     "kcl_residual_a_per_cm": 4.9925369862282614e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.1,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.019353595528544085,
+      "source": -0.01935359556839524,
+      "body": -6.800674745443247e-14
+     },
+     "kcl_residual_a_per_cm": 4.265971785452418e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.2,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.019424009995912296,
+      "source": -0.01942401001543558,
+      "body": -6.914310222491297e-14
+     },
+     "kcl_residual_a_per_cm": 2.3435815940753603e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.3,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.019492885163212053,
+      "source": -0.019492885162087706,
+      "body": -6.996405127129673e-14
+     },
+     "kcl_residual_a_per_cm": 1.6861743881393129e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.4,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.019560376475799744,
+      "source": -0.01956037642098195,
+      "body": -7.07721184731526e-14
+     },
+     "kcl_residual_a_per_cm": 5.090363000562314e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.5,
+     "currents_a_per_cm": {
+      "gate": -4.525932399140816e-12,
+      "drain": 0.019626613358061748,
+      "source": -0.019626613293477122,
+      "body": -7.141397425046186e-14
+     },
+     "kcl_residual_a_per_cm": 5.998727946841019e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.6,
+     "currents_a_per_cm": {
+      "gate": -4.449317814957625e-12,
+      "drain": 0.01969170040305968,
+      "source": -0.01969170040451308,
+      "body": -7.236617164571773e-14
+     },
+     "kcl_residual_a_per_cm": 5.975083887034039e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.7,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.01975572192522559,
+      "source": -0.019755721925248156,
+      "body": -7.399841022858466e-14
+     },
+     "kcl_residual_a_per_cm": 3.939954235358547e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.8,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.019818746158120733,
+      "source": -0.019818746107547094,
+      "body": -7.572448037828742e-14
+     },
+     "kcl_residual_a_per_cm": 4.665452400407486e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 2.9,
+     "currents_a_per_cm": {
+      "gate": -5.1763732713126505e-12,
+      "drain": 0.01988082936239181,
+      "source": -0.019880829417042,
+      "body": -7.913507372511405e-14
+     },
+     "kcl_residual_a_per_cm": 5.990569896793354e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 3.0,
+     "currents_a_per_cm": {
+      "gate": -3.819052845211302e-12,
+      "drain": 0.01994201948208899,
+      "source": -0.019942019466471828,
+      "body": -8.420158876239445e-14
+     },
+     "kcl_residual_a_per_cm": 1.1713905908733184e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 3.1,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.02000235759063364,
+      "source": -0.020002357704203957,
+      "body": -8.950711834775204e-14
+     },
+     "kcl_residual_a_per_cm": 1.1693438432156453e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 3.2,
+     "currents_a_per_cm": {
+      "gate": -4.449317814957625e-12,
+      "drain": 0.02006188122723955,
+      "source": -0.02006188116154508,
+      "body": -9.289355664129643e-14
+     },
+     "kcl_residual_a_per_cm": 6.115225932510995e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.5,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.020120623782454848,
+      "source": -0.020120623821901367,
+      "body": -9.549341335203283e-14
+     },
+     "kcl_residual_a_per_cm": 4.2816573238756856e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vg_v": 0.75,
+   "points": [
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.575073038188143e-13,
+      "source": -7.905573913745665e-13,
+      "body": 1.7669150050999633e-16
+     },
+     "kcl_residual_a_per_cm": 4.328733960552422e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.045281378866369196,
+      "source": -0.04528137887250891,
+      "body": -1.7233024615471346e-14
+     },
+     "kcl_residual_a_per_cm": 6.156946762034089e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.07457536203827887,
+      "source": -0.07457536200314827,
+      "body": -2.3864114211432153e-14
+     },
+     "kcl_residual_a_per_cm": 3.51067426427609e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.0901167413261497,
+      "source": -0.09011674132041124,
+      "body": -2.8065681764099128e-14
+     },
+     "kcl_residual_a_per_cm": 5.710399576767179e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.0962790477352836,
+      "source": -0.09627904771945184,
+      "body": -3.158751017527429e-14
+     },
+     "kcl_residual_a_per_cm": 1.580017894319165e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.09845031600368444,
+      "source": -0.09845031601213299,
+      "body": -3.7695267875968927e-14
+     },
+     "kcl_residual_a_per_cm": 8.48624268509287e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.09957102890399043,
+      "source": -0.09957102874943259,
+      "body": -4.2856578453470315e-14
+     },
+     "kcl_residual_a_per_cm": 1.5451498217117144e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.7,
+     "currents_a_per_cm": {
+      "gate": -9.120732828496048e-13,
+      "drain": 0.10041290550534801,
+      "source": -0.10041290551085563,
+      "body": -4.545776478167419e-14
+     },
+     "kcl_residual_a_per_cm": 6.465153183767371e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.10114194490026474,
+      "source": -0.10114194505080218,
+      "body": -4.661008780808394e-14
+     },
+     "kcl_residual_a_per_cm": 1.5058405370950915e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 0.9,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.10180542418672359,
+      "source": -0.10180542419268743,
+      "body": -4.756960086296476e-14
+     },
+     "kcl_residual_a_per_cm": 8.250658320313721e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.0,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.10242351080077573,
+      "source": -0.10242351066507924,
+      "body": -4.8579494818558504e-14
+     },
+     "kcl_residual_a_per_cm": 1.3387928491233488e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.1,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.10300636299300726,
+      "source": -0.10300636295732715,
+      "body": -4.9334090320384634e-14
+     },
+     "kcl_residual_a_per_cm": 3.3862146253182735e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.2,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.10355958463164629,
+      "source": -0.10355958466071119,
+      "body": -5.0335114575774074e-14
+     },
+     "kcl_residual_a_per_cm": 3.1855795856543136e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.3,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.10408687582130843,
+      "source": -0.1040868758749631,
+      "body": -5.2463607368061684e-14
+     },
+     "kcl_residual_a_per_cm": 5.547575895193075e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.4,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.10459106330700839,
+      "source": -0.1045910632946651,
+      "body": -5.643153590766982e-14
+     },
+     "kcl_residual_a_per_cm": 9.546304038386552e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.5,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.10507448191893672,
+      "source": -0.10507448201121986,
+      "body": -6.16602407712627e-14
+     },
+     "kcl_residual_a_per_cm": 9.41134310036903e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.6,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.10553912198437336,
+      "source": -0.1055391220348552,
+      "body": -6.550563099190239e-14
+     },
+     "kcl_residual_a_per_cm": 5.278659474761834e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.7,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.10598669794482048,
+      "source": -0.10598669818578742,
+      "body": -6.765842163138126e-14
+     },
+     "kcl_residual_a_per_cm": 2.4327384745396265e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.8,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.10641870495905202,
+      "source": -0.10641870472283402,
+      "body": -6.947484537030927e-14
+     },
+     "kcl_residual_a_per_cm": 2.3340797116553515e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 1.9,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.10683646965170668,
+      "source": -0.10683646966686457,
+      "body": -7.056120638239775e-14
+     },
+     "kcl_residual_a_per_cm": 1.9071840581531924e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.0,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.10724120339768108,
+      "source": -0.10724120337381658,
+      "body": -7.14935182922598e-14
+     },
+     "kcl_residual_a_per_cm": 2.1553752009285448e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.1,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.10763402982406399,
+      "source": -0.1076340299083522,
+      "body": -7.237577403577423e-14
+     },
+     "kcl_residual_a_per_cm": 8.659983925722508e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.2,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.1080160131481672,
+      "source": -0.108016013031559,
+      "body": -7.326176881691694e-14
+     },
+     "kcl_residual_a_per_cm": 1.1379437607303632e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.3,
+     "currents_a_per_cm": {
+      "gate": -5.213470859443461e-12,
+      "drain": 0.10838818063195177,
+      "source": -0.10838818056645523,
+      "body": -7.427141247673172e-14
+     },
+     "kcl_residual_a_per_cm": 6.020879647617971e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.4,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.10875151931874236,
+      "source": -0.10875151933848115,
+      "body": -7.48136776936907e-14
+     },
+     "kcl_residual_a_per_cm": 2.3088168467864522e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.5,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.10910693524428793,
+      "source": -0.10910693528584399,
+      "body": -7.559840496567333e-14
+     },
+     "kcl_residual_a_per_cm": 4.490622340780161e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.6,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.10945521100632231,
+      "source": -0.10945521099570432,
+      "body": -7.653593929921774e-14
+     },
+     "kcl_residual_a_per_cm": 7.2668957994921814e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.7,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.10979698883274325,
+      "source": -0.10979698892942646,
+      "body": -7.79111365712083e-14
+     },
+     "kcl_residual_a_per_cm": 9.950168560457522e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.8,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.1101327833838921,
+      "source": -0.11013278335349239,
+      "body": -7.968646608470659e-14
+     },
+     "kcl_residual_a_per_cm": 2.647663351841264e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 2.9,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.11046300647718384,
+      "source": -0.11046300655276271,
+      "body": -8.348942166491575e-14
+     },
+     "kcl_residual_a_per_cm": 7.89369267697144e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 3.0,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.1107879965074268,
+      "source": -0.11078799651579357,
+      "body": -8.844984855421373e-14
+     },
+     "kcl_residual_a_per_cm": 1.1195786820042047e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 3.1,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.11110803882812698,
+      "source": -0.11110803880027038,
+      "body": -9.340388824396049e-14
+     },
+     "kcl_residual_a_per_cm": 2.4488627287355937e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 3.2,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.11142338148627799,
+      "source": -0.11142338141392402,
+      "body": -9.745745846730031e-14
+     },
+     "kcl_residual_a_per_cm": 6.898195172162586e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 0.75,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.11173424397934827,
+      "source": -0.11173424396147291,
+      "body": -9.997000023011314e-14
+     },
+     "kcl_residual_a_per_cm": 1.4500823117082241e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vg_v": 1.0,
+   "points": [
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.627698317431728e-12,
+      "source": -8.291936801605918e-13,
+      "body": -1.3043942814988226e-16
+     },
+     "kcl_residual_a_per_cm": 2.7983741978429867e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.07952386555441257,
+      "source": -0.07952386554153967,
+      "body": -1.757784259539188e-14
+     },
+     "kcl_residual_a_per_cm": 1.285531935005522e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.14222208503327616,
+      "source": -0.14222208506980033,
+      "body": -2.450326509773791e-14
+     },
+     "kcl_residual_a_per_cm": 3.654867584036737e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.18890190855172503,
+      "source": -0.18890190851670932,
+      "body": -2.9027373392984366e-14
+     },
+     "kcl_residual_a_per_cm": 3.4986685178318445e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.22083802292286644,
+      "source": -0.22083802293983457,
+      "body": -3.327864659099105e-14
+     },
+     "kcl_residual_a_per_cm": 1.7001399999025187e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.2401944144016689,
+      "source": -0.2401944144089295,
+      "body": -4.0215873604146836e-14
+     },
+     "kcl_residual_a_per_cm": 7.30082465447213e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.25040172587550047,
+      "source": -0.25040172574781183,
+      "body": -4.571116764148557e-14
+     },
+     "kcl_residual_a_per_cm": 1.2764292627363963e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.255517674462071,
+      "source": -0.2555176744546005,
+      "body": -4.827795914665484e-14
+     },
+     "kcl_residual_a_per_cm": 7.42224624010233e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.8,
+     "currents_a_per_cm": {
+      "gate": -1.3268276909155008e-12,
+      "drain": 0.2585056077880804,
+      "source": -0.25850560790692534,
+      "body": -4.97585660624629e-14
+     },
+     "kcl_residual_a_per_cm": 1.2022152015100247e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 0.9,
+     "currents_a_per_cm": {
+      "gate": -1.7686312995074304e-12,
+      "drain": 0.26069629422170015,
+      "source": -0.2606962942120423,
+      "body": -5.0930138289893626e-14
+     },
+     "kcl_residual_a_per_cm": 7.838268653416913e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.26254287199444126,
+      "source": -0.2625428718794226,
+      "body": -5.21297880869046e-14
+     },
+     "kcl_residual_a_per_cm": 1.1496653147386946e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.1,
+     "currents_a_per_cm": {
+      "gate": -2.573467894540534e-12,
+      "drain": 0.2641999306552583,
+      "source": -0.264199930690016,
+      "body": -5.279069606185887e-14
+     },
+     "kcl_residual_a_per_cm": 3.738395531139094e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.2,
+     "currents_a_per_cm": {
+      "gate": -1.3268276909155008e-12,
+      "drain": 0.265732721555775,
+      "source": -0.26573272158164707,
+      "body": -5.433254734970803e-14
+     },
+     "kcl_residual_a_per_cm": 2.7253242492617543e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.3,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.26717323238084706,
+      "source": -0.2671732323879907,
+      "body": -5.5996518118154965e-14
+     },
+     "kcl_residual_a_per_cm": 9.438863734686835e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.4,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.2685381820394496,
+      "source": -0.2685381820055373,
+      "body": -6.014791739656529e-14
+     },
+     "kcl_residual_a_per_cm": 3.161292129437058e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.5,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.2698378677071002,
+      "source": -0.26983786771504054,
+      "body": -6.521575002083218e-14
+     },
+     "kcl_residual_a_per_cm": 1.0244779009060525e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.6,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.27107977889411883,
+      "source": -0.2710797788830611,
+      "body": -6.923957275090787e-14
+     },
+     "kcl_residual_a_per_cm": 8.749222543292616e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.7,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.2722699573365375,
+      "source": -0.2722699576720807,
+      "body": -7.17619986350854e-14
+     },
+     "kcl_residual_a_per_cm": 3.383554683003406e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.8,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.2734135263489252,
+      "source": -0.2734135260160668,
+      "body": -7.291276017008299e-14
+     },
+     "kcl_residual_a_per_cm": 3.300449372633177e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 1.9,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.2745149128287033,
+      "source": -0.2745149129094044,
+      "body": -7.442968500564434e-14
+     },
+     "kcl_residual_a_per_cm": 8.301479033120669e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.0,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.27557798069295386,
+      "source": -0.2755779805875523,
+      "body": -7.546273254228437e-14
+     },
+     "kcl_residual_a_per_cm": 1.0148272308104913e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.1,
+     "currents_a_per_cm": {
+      "gate": -2.239248186920573e-12,
+      "drain": 0.2766061021215397,
+      "source": -0.27660610210674624,
+      "body": -7.628955788960774e-14
+     },
+     "kcl_residual_a_per_cm": 1.2477906502563874e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.2,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.27760225059252636,
+      "source": -0.2776022505696883,
+      "body": -7.718976102531833e-14
+     },
+     "kcl_residual_a_per_cm": 1.9486314154149292e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.3,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.2785691498202295,
+      "source": -0.27856914978145725,
+      "body": -7.750132337204038e-14
+     },
+     "kcl_residual_a_per_cm": 3.5954204374426496e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.4,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.27950941791981887,
+      "source": -0.27950941783537286,
+      "body": -7.852829953224384e-14
+     },
+     "kcl_residual_a_per_cm": 8.162691996407676e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.5,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.2804256208686968,
+      "source": -0.28042562079639827,
+      "body": -7.95191592557551e-14
+     },
+     "kcl_residual_a_per_cm": 6.894447601412081e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.6,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.28132021151857023,
+      "source": -0.2813202115153592,
+      "body": -8.041363478793898e-14
+     },
+     "kcl_residual_a_per_cm": 3.9007142814959427e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.7,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.28219540721910613,
+      "source": -0.2821954071969888,
+      "body": -8.18197159918069e-14
+     },
+     "kcl_residual_a_per_cm": 1.9294930789043675e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.8,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.28305309412192853,
+      "source": -0.2830530940391377,
+      "body": -8.353964567152597e-14
+     },
+     "kcl_residual_a_per_cm": 7.943272924422754e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 2.9,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.2838948082199838,
+      "source": -0.28389480817851065,
+      "body": -8.723162822845158e-14
+     },
+     "kcl_residual_a_per_cm": 3.8111365755279415e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 3.0,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.28472178009552745,
+      "source": -0.2847217800164641,
+      "body": -9.252565405476243e-14
+     },
+     "kcl_residual_a_per_cm": 7.512745076829545e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 3.1,
+     "currents_a_per_cm": {
+      "gate": -2.7405574800345758e-12,
+      "drain": 0.28553500216590266,
+      "source": -0.2855350020946454,
+      "body": -9.751066882715004e-14
+     },
+     "kcl_residual_a_per_cm": 6.841920970720101e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 3.2,
+     "currents_a_per_cm": {
+      "gate": -3.274560857482096e-12,
+      "drain": 0.2863352920908814,
+      "source": -0.286335292057679,
+      "body": -1.0097291721099709e-13
+     },
+     "kcl_residual_a_per_cm": 2.982685151089807e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -3.843390542154456e-12,
+      "drain": 0.2871233397191823,
+      "source": -0.28712333972784937,
+      "body": -1.0348460509754455e-13
+     },
+     "kcl_residual_a_per_cm": 1.2613942211290747e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vg_v": 1.5,
+   "points": [
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 3.999908760484268e-12,
+      "source": -7.656365032179506e-13,
+      "body": -1.4323186262469694e-16
+     },
+     "kcl_residual_a_per_cm": 3.2341290254036923e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.14932995306144173,
+      "source": -0.14932995307595148,
+      "body": -1.7315724125946322e-14
+     },
+     "kcl_residual_a_per_cm": 1.4527070233132657e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.28151593086700183,
+      "source": -0.2815159308522105,
+      "body": -2.4688883650162206e-14
+     },
+     "kcl_residual_a_per_cm": 1.4766645939977106e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.3969319984243049,
+      "source": -0.3969319984582503,
+      "body": -2.940503147014309e-14
+     },
+     "kcl_residual_a_per_cm": 3.397480707629169e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.4960001098273708,
+      "source": -0.49600010986688925,
+      "body": -3.4145738360656385e-14
+     },
+     "kcl_residual_a_per_cm": 3.955258981104433e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.5792299745979423,
+      "source": -0.5792299745786293,
+      "body": -4.1577975638923896e-14
+     },
+     "kcl_residual_a_per_cm": 1.927141767153045e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.6472773016714105,
+      "source": -0.6472773015392056,
+      "body": -4.8396450382850015e-14
+     },
+     "kcl_residual_a_per_cm": 1.3215651723277094e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.7010296223062571,
+      "source": -0.7010296223043668,
+      "body": -5.18629398901448e-14
+     },
+     "kcl_residual_a_per_cm": 1.838402781836647e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.7417237909675484,
+      "source": -0.7417237911123162,
+      "body": -5.418251266169073e-14
+     },
+     "kcl_residual_a_per_cm": 1.4482204687556636e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 0.9,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.7710722520094695,
+      "source": -0.7710722519651079,
+      "body": -5.5860927496449193e-14
+     },
+     "kcl_residual_a_per_cm": 4.430576455666078e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.7913073317167004,
+      "source": -0.7913073315999881,
+      "body": -5.745581463433071e-14
+     },
+     "kcl_residual_a_per_cm": 1.166548506713877e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8049856062557846,
+      "source": -0.8049856062553697,
+      "body": -5.870735379965062e-14
+     },
+     "kcl_residual_a_per_cm": 3.561829905027704e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8145099969239638,
+      "source": -0.8145099969945448,
+      "body": -5.983284251675101e-14
+     },
+     "kcl_residual_a_per_cm": 7.064092936543153e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8216660081727192,
+      "source": -0.8216660081785525,
+      "body": -6.212120274503573e-14
+     },
+     "kcl_residual_a_per_cm": 5.8954550187305335e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8275202056380055,
+      "source": -0.8275202055862451,
+      "body": -6.64305373340617e-14
+     },
+     "kcl_residual_a_per_cm": 5.16940542498326e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8326238868995236,
+      "source": -0.8326238868392944,
+      "body": -7.174815954832298e-14
+     },
+     "kcl_residual_a_per_cm": 6.015740683715657e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8372558300266896,
+      "source": -0.8372558299645304,
+      "body": -7.583285948646187e-14
+     },
+     "kcl_residual_a_per_cm": 6.20833338432268e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8415609726752757,
+      "source": -0.8415609728676721,
+      "body": -7.804075637482593e-14
+     },
+     "kcl_residual_a_per_cm": 1.9247436185339625e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8456149175203986,
+      "source": -0.8456149172225192,
+      "body": -7.962225781348559e-14
+     },
+     "kcl_residual_a_per_cm": 2.977997655649613e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 1.9,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8494606436259116,
+      "source": -0.8494606436532296,
+      "body": -8.076140945446662e-14
+     },
+     "kcl_residual_a_per_cm": 2.7398798131078605e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8531265176528564,
+      "source": -0.853126517616202,
+      "body": -8.203379322374279e-14
+     },
+     "kcl_residual_a_per_cm": 3.657242345398565e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8566337559026794,
+      "source": -0.8566337559206743,
+      "body": -8.272597757478955e-14
+     },
+     "kcl_residual_a_per_cm": 1.8077553827606714e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8599994257975091,
+      "source": -0.8599994258318499,
+      "body": -8.365993759849238e-14
+     },
+     "kcl_residual_a_per_cm": 3.442441240148906e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8632377276831078,
+      "source": -0.8632377276626444,
+      "body": -8.442311682837471e-14
+     },
+     "kcl_residual_a_per_cm": 2.0378985628457586e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8663606920857377,
+      "source": -0.8663606920801585,
+      "body": -8.570231133952708e-14
+     },
+     "kcl_residual_a_per_cm": 5.493501454309272e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8693787366056274,
+      "source": -0.8693787365490464,
+      "body": -8.662031954631193e-14
+     },
+     "kcl_residual_a_per_cm": 5.649434181824032e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8723012066253758,
+      "source": -0.8723012066016098,
+      "body": -8.701654959249091e-14
+     },
+     "kcl_residual_a_per_cm": 2.367897262704592e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8751368616720454,
+      "source": -0.875136861648742,
+      "body": -8.836937265327503e-14
+     },
+     "kcl_residual_a_per_cm": 2.3214989869623835e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8778941672095939,
+      "source": -0.8778941672483689,
+      "body": -9.045055767799359e-14
+     },
+     "kcl_residual_a_per_cm": 3.8865433781921436e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 2.9,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8805812610399533,
+      "source": -0.8805812611065715,
+      "body": -9.412889319023982e-14
+     },
+     "kcl_residual_a_per_cm": 6.671239535200798e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 3.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8832056347082384,
+      "source": -0.8832056346389614,
+      "body": -9.972721760709276e-14
+     },
+     "kcl_residual_a_per_cm": 6.917730134058297e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 3.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8857737782457246,
+      "source": -0.885773778336135,
+      "body": -1.0438818793743878e-13
+     },
+     "kcl_residual_a_per_cm": 9.051484508677475e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 3.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8882910244746305,
+      "source": -0.8882910245263961,
+      "body": -1.0801185597218553e-13
+     },
+     "kcl_residual_a_per_cm": 5.1873603669052123e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 1.5,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.8907616256927912,
+      "source": -0.8907616257161779,
+      "body": -1.1085955833884768e-13
+     },
+     "kcl_residual_a_per_cm": 2.3497596549765307e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vg_v": 2.0,
+   "points": [
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 2.6786626700048955e-12,
+      "source": -8.684536962645987e-13,
+      "body": -3.227540907354518e-16
+     },
+     "kcl_residual_a_per_cm": 1.8098862196495615e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.2195128294830309,
+      "source": -0.21951282945603867,
+      "body": -1.776362848478848e-14
+     },
+     "kcl_residual_a_per_cm": 2.69744781465631e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.421846445355003,
+      "source": -0.4218464453802855,
+      "body": -2.461675492191813e-14
+     },
+     "kcl_residual_a_per_cm": 2.5307115072047063e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.6072851559631164,
+      "source": -0.6072851559586274,
+      "body": -2.947237192714014e-14
+     },
+     "kcl_residual_a_per_cm": 4.4594923835397555e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.7761137266101693,
+      "source": -0.7761137265868112,
+      "body": -3.448512791209213e-14
+     },
+     "kcl_residual_a_per_cm": 2.332360810947904e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 0.9286295902746017,
+      "source": -0.928629590250796,
+      "body": -4.229571113852374e-14
+     },
+     "kcl_residual_a_per_cm": 2.3763328427479007e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.065156493772028,
+      "source": -1.06515649362256,
+      "body": -4.901666544051519e-14
+     },
+     "kcl_residual_a_per_cm": 1.4941897687221477e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.1860611570415762,
+      "source": -1.1860611570207884,
+      "body": -5.273380810894461e-14
+     },
+     "kcl_residual_a_per_cm": 2.0735082104972485e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.2917748425835132,
+      "source": -1.2917748427263915,
+      "body": -5.5489357592952406e-14
+     },
+     "kcl_residual_a_per_cm": 1.4293386515488806e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 0.9,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.3828219688427172,
+      "source": -1.3828219687980174,
+      "body": -5.793103079801523e-14
+     },
+     "kcl_residual_a_per_cm": 4.464186838666004e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.4598574972998017,
+      "source": -1.4598574971447769,
+      "body": -5.987809074263378e-14
+     },
+     "kcl_residual_a_per_cm": 1.5496500372976647e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.5237132558714002,
+      "source": -1.5237132558682198,
+      "body": -6.142229022752558e-14
+     },
+     "kcl_residual_a_per_cm": 3.118922586113698e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.575448867119515,
+      "source": -1.5754488671419096,
+      "body": -6.363479099781699e-14
+     },
+     "kcl_residual_a_per_cm": 2.2458165465316776e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.6163933611580579,
+      "source": -1.616393361140216,
+      "body": -6.620063979491522e-14
+     },
+     "kcl_residual_a_per_cm": 1.7775749499746124e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.648149194759772,
+      "source": -1.6481491947207432,
+      "body": -7.077467584485287e-14
+     },
+     "kcl_residual_a_per_cm": 3.89580055318279e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.6725207652528304,
+      "source": -1.672520765297267,
+      "body": -7.654876053306524e-14
+     },
+     "kcl_residual_a_per_cm": 4.451300327655003e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.6913477989831023,
+      "source": -1.6913477989893968,
+      "body": -8.094960048312332e-14
+     },
+     "kcl_residual_a_per_cm": 6.375470060897911e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7062847333858573,
+      "source": -1.7062847336941402,
+      "body": -8.325913060699205e-14
+     },
+     "kcl_residual_a_per_cm": 3.083662138502367e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7186276594714889,
+      "source": -1.7186276592829328,
+      "body": -8.504779881662331e-14
+     },
+     "kcl_residual_a_per_cm": 1.8847101185602638e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 1.9,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7292730387866435,
+      "source": -1.7292730388998345,
+      "body": -8.636498788086887e-14
+     },
+     "kcl_residual_a_per_cm": 1.1327737710669931e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.738792968340482,
+      "source": -1.7387929682523409,
+      "body": -8.736971417377071e-14
+     },
+     "kcl_residual_a_per_cm": 8.805368030002726e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7475340446030712,
+      "source": -1.747534044625791,
+      "body": -8.813888097214451e-14
+     },
+     "kcl_residual_a_per_cm": 2.2807964901506275e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7556963900536051,
+      "source": -1.7556963899776215,
+      "body": -8.94475472178682e-14
+     },
+     "kcl_residual_a_per_cm": 7.589421625812785e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7633962330134387,
+      "source": -1.7633962329767157,
+      "body": -9.01730398682628e-14
+     },
+     "kcl_residual_a_per_cm": 3.6632895990262965e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.4,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7707065281704941,
+      "source": -1.7707065281110785,
+      "body": -9.101911544837026e-14
+     },
+     "kcl_residual_a_per_cm": 5.932456444881121e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.5,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.77767834161602,
+      "source": -1.777678341618144,
+      "body": -9.214523085974444e-14
+     },
+     "kcl_residual_a_per_cm": 2.216223921572594e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.6,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7843511913173387,
+      "source": -1.7843511911924592,
+      "body": -9.30434151357813e-14
+     },
+     "kcl_residual_a_per_cm": 1.247863967069363e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.7,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7907576386711637,
+      "source": -1.7907576386311068,
+      "body": -9.431611667262926e-14
+     },
+     "kcl_residual_a_per_cm": 3.996253061180302e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.8,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.7969252583736637,
+      "source": -1.7969252583610629,
+      "body": -9.619165856107378e-14
+     },
+     "kcl_residual_a_per_cm": 1.2504617626329528e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 2.9,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.8028778903111842,
+      "source": -1.8028778903134488,
+      "body": -1.0030001778793088e-13
+     },
+     "kcl_residual_a_per_cm": 2.364932943418325e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 3.0,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.8086368424160575,
+      "source": -1.8086368424030732,
+      "body": -1.0529748041645271e-13
+     },
+     "kcl_residual_a_per_cm": 1.2878982837179677e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 3.1,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.8142218963516707,
+      "source": -1.8142218963265968,
+      "body": -1.1041084847809097e-13
+     },
+     "kcl_residual_a_per_cm": 2.496353207347122e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 3.2,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.8196517288437297,
+      "source": -1.819651728756111,
+      "body": -1.1393843843785484e-13
+     },
+     "kcl_residual_a_per_cm": 8.75048626649795e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 2.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": 0.0,
+      "drain": 1.824943601886969,
+      "source": -1.8249436018180323,
+      "body": -1.1674298436568576e-13
+     },
+     "kcl_residual_a_per_cm": 6.881989119447431e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  },
+  {
+   "vg_v": 3.0,
+   "points": [
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.0,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 1.7423439313727358e-12,
+      "source": 2.6096860875302726e-12,
+      "body": -1.1152426114957644e-16
+     },
+     "kcl_residual_a_per_cm": 3.6798859865375476e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.1,
+     "currents_a_per_cm": {
+      "gate": -6.720325081043109e-13,
+      "drain": 0.35975693021300337,
+      "source": -0.3597569302331389,
+      "body": -1.766137485270952e-14
+     },
+     "kcl_residual_a_per_cm": 2.0825253769071172e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.2,
+     "currents_a_per_cm": {
+      "gate": -6.652396302412475e-13,
+      "drain": 0.7023919842990534,
+      "source": -0.7023919843219013,
+      "body": -2.4862136540968438e-14
+     },
+     "kcl_residual_a_per_cm": 2.353804752435809e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.3,
+     "currents_a_per_cm": {
+      "gate": -6.652396302412475e-13,
+      "drain": 1.0281360544845188,
+      "source": -1.028136054484589,
+      "body": -2.978054496204588e-14
+     },
+     "kcl_residual_a_per_cm": 7.651862703596033e-13,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.4,
+     "currents_a_per_cm": {
+      "gate": -6.324514253416489e-13,
+      "drain": 1.3372031681952732,
+      "source": -1.337203168201354,
+      "body": -3.493904292417858e-14
+     },
+     "kcl_residual_a_per_cm": 6.748304018742735e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.5,
+     "currents_a_per_cm": {
+      "gate": -5.200094025346122e-13,
+      "drain": 1.6297963258071966,
+      "source": -1.6297963257714794,
+      "body": -4.281284745426526e-14
+     },
+     "kcl_residual_a_per_cm": 3.5154384719831956e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.6,
+     "currents_a_per_cm": {
+      "gate": -4.4546502906808655e-13,
+      "drain": 1.9061121953120321,
+      "source": -1.9061121951804079,
+      "body": -4.982857441984909e-14
+     },
+     "kcl_residual_a_per_cm": 1.311289734377869e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.7,
+     "currents_a_per_cm": {
+      "gate": -4.005042906704222e-13,
+      "drain": 2.166345127657764,
+      "source": -2.16634512765149,
+      "body": -5.369399463458105e-14
+     },
+     "kcl_residual_a_per_cm": 5.8198940714566815e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.8,
+     "currents_a_per_cm": {
+      "gate": -3.4948787625983994e-13,
+      "drain": 2.41069093361967,
+      "source": -2.4106909337782456,
+      "body": -5.657281370989053e-14
+     },
+     "kcl_residual_a_per_cm": 1.5898187983243994e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 0.9,
+     "currents_a_per_cm": {
+      "gate": -3.2310239298528664e-13,
+      "drain": 2.6393508258001863,
+      "source": -2.6393508257751797,
+      "body": -5.91172013997086e-14
+     },
+     "kcl_residual_a_per_cm": 2.462444381227203e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.0,
+     "currents_a_per_cm": {
+      "gate": -2.975013875820864e-13,
+      "drain": 2.8525357225874104,
+      "source": -2.8525357224333785,
+      "body": -6.175292349068279e-14
+     },
+     "kcl_residual_a_per_cm": 1.536726440362116e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.1,
+     "currents_a_per_cm": {
+      "gate": -2.975013875820864e-13,
+      "drain": 3.0504711116036898,
+      "source": -3.0504711116249044,
+      "body": -6.40361508887162e-14
+     },
+     "kcl_residual_a_per_cm": 2.1576123182218143e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.2,
+     "currents_a_per_cm": {
+      "gate": -2.727085845292729e-13,
+      "drain": 3.2334027092351523,
+      "source": -3.2334027092401074,
+      "body": -6.602194388910445e-14
+     },
+     "kcl_residual_a_per_cm": 5.293877931925376e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.3,
+     "currents_a_per_cm": {
+      "gate": -2.494337081939786e-13,
+      "drain": 3.401603136344257,
+      "source": -3.4016031363636365,
+      "body": -6.968982827782672e-14
+     },
+     "kcl_residual_a_per_cm": 1.9698732565118688e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.4,
+     "currents_a_per_cm": {
+      "gate": -2.494337081939786e-13,
+      "drain": 3.5553798555487943,
+      "source": -3.555379855511365,
+      "body": -7.463880639007719e-14
+     },
+     "kcl_residual_a_per_cm": 3.7105098359208773e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.5,
+     "currents_a_per_cm": {
+      "gate": -2.494337081939786e-13,
+      "drain": 3.6950846051130792,
+      "source": -3.695084605176947,
+      "body": -8.100038248689475e-14
+     },
+     "kcl_residual_a_per_cm": 6.419801198368732e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.6,
+     "currents_a_per_cm": {
+      "gate": -2.2758382428737584e-13,
+      "drain": 3.821124494876681,
+      "source": -3.8211244948763947,
+      "body": -8.59074145837613e-14
+     },
+     "kcl_residual_a_per_cm": 2.7053698517846756e-14,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.7,
+     "currents_a_per_cm": {
+      "gate": -2.2758382428737584e-13,
+      "drain": 3.933974772969969,
+      "source": -3.933974773214702,
+      "body": -8.878060843172934e-14
+     },
+     "kcl_residual_a_per_cm": 2.450494870889901e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.8,
+     "currents_a_per_cm": {
+      "gate": -2.2758382428737584e-13,
+      "drain": 4.034192946058203,
+      "source": -4.0341929458092105,
+      "body": -9.092826669003889e-14
+     },
+     "kcl_residual_a_per_cm": 2.486743142661754e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 1.9,
+     "currents_a_per_cm": {
+      "gate": -2.2758382428737584e-13,
+      "drain": 4.122433274685442,
+      "source": -4.12243327459185,
+      "body": -9.296117979509827e-14
+     },
+     "kcl_residual_a_per_cm": 9.327214415023792e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.0,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.19945961314468,
+      "source": -4.199459613130389,
+      "body": -9.438017731814927e-14
+     },
+     "kcl_residual_a_per_cm": 1.3989338907281811e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.1,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.266153183639656,
+      "source": -4.266153183622644,
+      "body": -9.618333807112546e-14
+     },
+     "kcl_residual_a_per_cm": 1.670802624607032e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.2,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.32351105747656,
+      "source": -4.323511057486235,
+      "body": -9.747141153527978e-14
+     },
+     "kcl_residual_a_per_cm": 9.9794706257038e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.3,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.372630576578743,
+      "source": -4.372630576575008,
+      "body": -9.880386671254977e-14
+     },
+     "kcl_residual_a_per_cm": 3.4289146997514218e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.4,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.414675198031177,
+      "source": -4.41467519801998,
+      "body": -1.000882482954579e-13
+     },
+     "kcl_residual_a_per_cm": 1.0890105400488966e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.5,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.450821180383979,
+      "source": -4.450821180315589,
+      "body": -1.0091411335243316e-13
+     },
+     "kcl_residual_a_per_cm": 6.808264069360185e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.6,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.482192445648288,
+      "source": -4.482192445621498,
+      "body": -1.0241231950386985e-13
+     },
+     "kcl_residual_a_per_cm": 2.6479753487116253e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.7,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.50979841802796,
+      "source": -4.509798417922208,
+      "body": -1.0380708855003768e-13
+     },
+     "kcl_residual_a_per_cm": 1.0544097294309001e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.8,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.534489242145668,
+      "source": -4.534489242150462,
+      "body": -1.0586289911004071e-13
+     },
+     "kcl_residual_a_per_cm": 5.107321697026371e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 2.9,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.556935324278258,
+      "source": -4.556935324270649,
+      "body": -1.0973173492363707e-13
+     },
+     "kcl_residual_a_per_cm": 7.29222109827228e-12,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 3.0,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.577633376824394,
+      "source": -4.577633376776627,
+      "body": -1.1501015961922187e-13
+     },
+     "kcl_residual_a_per_cm": 4.744504174189816e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 3.1,
+     "currents_a_per_cm": {
+      "gate": -2.0707168837505486e-13,
+      "drain": 4.596935305630271,
+      "source": -4.596935305614006,
+      "body": -1.201087244355285e-13
+     },
+     "kcl_residual_a_per_cm": 1.593714280873811e-11,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 3.2,
+     "currents_a_per_cm": {
+      "gate": -1.8781539751859026e-13,
+      "drain": 4.615087032571728,
+      "source": -4.615087032466724,
+      "body": -1.2422491400952458e-13
+     },
+     "kcl_residual_a_per_cm": 1.0469196517909948e-10,
+     "kcl_pass": true,
+     "resolved": true
+    },
+    {
+     "vg_v": 3.0,
+     "vd_v": 3.3,
+     "currents_a_per_cm": {
+      "gate": -1.8781539751859026e-13,
+      "drain": 4.6322642886049525,
+      "source": -4.6322642885427365,
+      "body": -1.2683099131569068e-13
+     },
+     "kcl_residual_a_per_cm": 6.190136373273979e-11,
+     "kcl_pass": true,
+     "resolved": true
+    }
+   ]
+  }
+ ],
+ "metadata": {
+  "spec_path": "devices/planar-nmos-lc1.json",
+  "spec_sha256": "e93b516e6042e7641efb8cf95e2912ee3e27b05c1d68246311b02d0dc6b0cc3e",
+  "mesh_scale": 2.0,
+  "runner_sha256": "87c93ea5bdc23ffe610588be5d4d85e0a5f0287e16e207398506d52a1e6991a1",
+  "devsim_version": "2.11.0",
+  "openblas_num_threads": "1",
+  "nodes": {
+   "gate": 423,
+   "oxide": 282,
+   "bulk": 2883
+  },
+  "solver": {
+   "relative_error": 1e-06,
+   "absolute_error": 1e+30,
+   "maximum_iterations": 50,
+   "convergence": "every recorded point follows a DEVSIM solve that did not raise",
+   "kcl_relative": 1e-06,
+   "kcl_absolute_a_per_cm": 1e-09
+  },
+  "current_units": "A/cm (2D, per cm of out-of-plane width)",
+  "elapsed_s": 208.33527262399997,
+  "step_halvings": 2
+ }
+}

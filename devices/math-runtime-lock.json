@@ -1,0 +1,15 @@
+{
+  "schema": "device-math-runtime/1",
+  "platform": "Ubuntu 24.04 amd64 under WSL",
+  "package": "libopenblas0-pthread",
+  "version": "0.3.26+ds-1ubuntu0.1",
+  "url": "https://archive.ubuntu.com/ubuntu/pool/universe/o/openblas/libopenblas0-pthread_0.3.26+ds-1ubuntu0.1_amd64.deb",
+  "package_sha256": "7dc3b4384c02aecb87eb8b70fa26c5843a08af242f4638aa4b36922bdc4f5b04",
+  "extracted_to": ".tools/openblas",
+  "library": ".tools/openblas/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0",
+  "library_sha256": "bfc7492adbf84a8f567720a9e1fae2afc18f3d817da233e7f4d453683485308e",
+  "copyright_file": ".tools/openblas/usr/share/doc/libopenblas0-pthread/copyright",
+  "openblas_num_threads": 1,
+  "integer_interface": "LP64 (INTERFACE64=0)",
+  "scope": "Optional optimized math runtime; compare shared mesh results against the original runtime before accepting new results. No system package installation."
+}

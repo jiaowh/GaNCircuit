@@ -1,0 +1,65 @@
+{
+ "schema": "planar-nmos-amplifier-point/1",
+ "topology": "common-source, resistive drain load RD to VDD, source and body grounded",
+ "supply_v": 3.3,
+ "vgs_q_v": 0.6,
+ "vout_q_v": 1.65,
+ "target_id_a": 0.0001,
+ "device_width_um": 23.853673116667075,
+ "rd_ohm": 16500.0,
+ "gm_s": 0.0007204596509232279,
+ "gds_s": 4.1988529124929054e-06,
+ "gm_rd": 11.88758424023326,
+ "intrinsic_gain": 171.58487471176574,
+ "small_signal_gain_v_per_v": -11.117361505574138,
+ "supply_power_w": 0.00033,
+ "mesh_history": [
+  {
+   "mesh_scale": 2.0,
+   "bulk_nodes": 2883,
+   "id_a_per_cm": 0.0443821974291319,
+   "gm_s_per_cm": 0.3149466355715405,
+   "gds_s_per_cm": 0.0018718008234497319,
+   "intrinsic_gain": 168.2586264659791,
+   "gm_over_id_per_v": 7.0962379921462295
+  },
+  {
+   "mesh_scale": 1.0,
+   "bulk_nodes": 11907,
+   "id_a_per_cm": 0.0428423569646751,
+   "gm_s_per_cm": 0.30686324610987825,
+   "gds_s_per_cm": 0.0018000534729625817,
+   "intrinsic_gain": 170.47451685134308,
+   "gm_over_id_per_v": 7.162613540681173
+  },
+  {
+   "mesh_scale": 0.5,
+   "bulk_nodes": 45879,
+   "id_a_per_cm": 0.04192226476438459,
+   "gm_s_per_cm": 0.30203300238059655,
+   "gds_s_per_cm": 0.0017602542350423495,
+   "intrinsic_gain": 171.58487471176574,
+   "gm_over_id_per_v": 7.204596509232278
+  }
+ ],
+ "adjacent_mesh_relative_change": {
+  "id_a_per_cm": [
+   0.034695002808627695,
+   0.02147622739451882
+  ],
+  "gm_over_id_per_v": [
+   0.009353624921881742,
+   0.00586140356626208
+  ],
+  "intrinsic_gain": [
+   0.013169549947633863,
+   0.0065133363093259344
+  ]
+ },
+ "scope": "DC small-signal estimate from device-simulator derivatives at one bias; no compact model, circuit simulation, or dynamic behavior yet",
+ "sources": [
+  "results\\nmos-design\\lc1\\op-mesh2.json",
+  "results\\nmos-design\\lc1\\op.json",
+  "results\\nmos-design\\lc1\\op-mesh0.5.json"
+ ]
+}

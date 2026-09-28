@@ -9,6 +9,8 @@ import sys
 
 from .adapters import discover_capabilities, run_ngspice
 from .core import ArtifactStore, Circuit, CircuitPatch, RevisionConflict, ValidationError
+from .nmos_data import NMOSDataset
+from .nmos_metrics import dc_secants
 
 
 def _read(path):
@@ -22,8 +24,12 @@ def main(argv=None):
     commands.add_parser("capabilities")
     create = commands.add_parser("circuit-create")
     create.add_argument("input", help="Circuit JSON file; numeric values use SI units")
+    nmos_import = commands.add_parser("nmos-import", help="Validate and store an NMOS DC dataset")
+    nmos_import.add_argument("input", help="nmos-dc-dataset/1 JSON; terminal currents use A/cm")
     inspect = commands.add_parser("inspect")
     inspect.add_argument("artifact")
+    secants = commands.add_parser("nmos-secants", help="Calculate finite-span DC slopes from a stored 3x3 dataset")
+    secants.add_argument("artifact")
     patch = commands.add_parser("circuit-patch")
     patch.add_argument("artifact")
     patch.add_argument("patch", help="JSON with expected_revision and upsert/remove/connect")
@@ -44,6 +50,19 @@ def main(argv=None):
                 executable=args.executable, timeout_s=args.timeout, result_file=args.result_file))
             print(json.dumps(result, indent=2, allow_nan=False))
             return 0 if result["status"] == "completed" and result["measurements"] else 2
+        elif args.command == "nmos-import":
+            dataset = NMOSDataset.from_dict(_read(args.input))
+            store = ArtifactStore(args.store)
+            result = {
+                "artifact": store.put("NMOSDCDataset", dataset.to_dict()),
+                "fingerprint": dataset.fingerprint,
+                "points": len(dataset.records),
+                "train_points": len(dataset.train_ids),
+                "holdout_points": len(dataset.holdout_ids),
+                "temperature_k": dataset.temperature_k,
+                "current_units": "A/cm",
+                "scope": "Dataset contract validated; accuracy and physical validation require separate evidence.",
+            }
         else:
             store = ArtifactStore(args.store)
             if args.command == "circuit-create":
@@ -51,6 +70,17 @@ def main(argv=None):
                 result = {"artifact": store.put("CircuitDesign", circuit.to_dict()), "revision": circuit.revision}
             elif args.command == "inspect":
                 result = store.get(args.artifact)
+            elif args.command == "nmos-secants":
+                artifact = store.get(args.artifact)
+                if artifact["kind"] != "NMOSDCDataset":
+                    raise ValidationError("expected an NMOSDCDataset artifact")
+                dataset = NMOSDataset.from_dict(artifact["payload"])
+                result = {
+                    "artifact": args.artifact,
+                    "dataset_fingerprint": dataset.fingerprint,
+                    "secants": dc_secants(dataset),
+                    "scope": "Finite-span DC calculations; mesh and derivative step-size accuracy require separate evidence.",
+                }
             else:
                 artifact = store.get(args.artifact)
                 if artifact["kind"] != "CircuitDesign":

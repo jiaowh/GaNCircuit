@@ -1,0 +1,187 @@
+{
+  "schema": "nmos-step-size-comparison/1",
+  "outcome": "pass",
+  "mesh_level": 2,
+  "policy_sha256": "a19afea2cbcd488d28dd3a59226cbf1963cc45e2abfd69d0ad0ed19b777930d9",
+  "tolerances": {
+    "relative": 0.01,
+    "absolute_S_per_cm": 1e-08
+  },
+  "metrics": [
+    {
+      "half_span_v": 0.05,
+      "dataset_fingerprint": "e8d0a079426374491b53804438368bbfd8b832c5a656ef28dc40a5786a9c1701",
+      "gm": {
+        "value": 0.5578513499876434,
+        "units": "S/cm",
+        "low_id": "g0_d1",
+        "high_id": "g2_d1",
+        "low_bias": 0.45,
+        "high_bias": 0.55,
+        "low_current_A_per_cm": 3.12468790577664,
+        "high_current_A_per_cm": 3.1804730407754045,
+        "span_v": 0.10000000000000003,
+        "numerator_A_per_cm": 0.05578513499876436
+      },
+      "gds": {
+        "value": 8.806981058876213,
+        "units": "S/cm",
+        "low_id": "g1_d0",
+        "high_id": "g1_d2",
+        "low_bias": 0.45,
+        "high_bias": 0.55,
+        "low_current_A_per_cm": 2.7248843342970215,
+        "high_current_A_per_cm": 3.605582440184643,
+        "span_v": 0.10000000000000003,
+        "numerator_A_per_cm": 0.8806981058876215
+      },
+      "gm_over_gds": 0.06334194955777801
+    },
+    {
+      "half_span_v": 0.025,
+      "dataset_fingerprint": "ef72fcdb120028e926c64256d89545d417f3cb7294a972f87c650600135d8dd7",
+      "gm": {
+        "value": 0.5578610908808286,
+        "units": "S/cm",
+        "low_id": "g0_d1",
+        "high_id": "g2_d1",
+        "low_bias": 0.475,
+        "high_bias": 0.525,
+        "low_current_A_per_cm": 3.138564766768335,
+        "high_current_A_per_cm": 3.1664578213123766,
+        "span_v": 0.050000000000000044,
+        "numerator_A_per_cm": 0.02789305454404145
+      },
+      "gds": {
+        "value": 8.80752671267267,
+        "units": "S/cm",
+        "low_id": "g1_d0",
+        "high_id": "g1_d2",
+        "low_bias": 0.475,
+        "high_bias": 0.525,
+        "low_current_A_per_cm": 2.93548634832887,
+        "high_current_A_per_cm": 3.3758626839625037,
+        "span_v": 0.050000000000000044,
+        "numerator_A_per_cm": 0.4403763356336339
+      },
+      "gm_over_gds": 0.0633391312998407
+    },
+    {
+      "half_span_v": 0.0125,
+      "dataset_fingerprint": "78b2e322aebc3f6a48988ecff2383b34e10670bbf08d6afbe9497cabeb0c46a6",
+      "gm": {
+        "value": 0.5578635262459216,
+        "units": "S/cm",
+        "low_id": "g0_d1",
+        "high_id": "g2_d1",
+        "low_bias": 0.4875,
+        "high_bias": 0.5125,
+        "low_current_A_per_cm": 3.1455207052216005,
+        "high_current_A_per_cm": 3.1594672933777486,
+        "span_v": 0.024999999999999967,
+        "numerator_A_per_cm": 0.013946588156148021
+      },
+      "gds": {
+        "value": 8.807663344961346,
+        "units": "S/cm",
+        "low_id": "g1_d0",
+        "high_id": "g1_d2",
+        "low_bias": 0.4875,
+        "high_bias": 0.5125,
+        "low_current_A_per_cm": 3.0431890125251906,
+        "high_current_A_per_cm": 3.263380596149224,
+        "span_v": 0.024999999999999967,
+        "numerator_A_per_cm": 0.22019158362403335
+      },
+      "gm_over_gds": 0.06333842523227934
+    }
+  ],
+  "comparisons": [
+    {
+      "metric": "gm",
+      "half_spans_v": [
+        0.05,
+        0.025
+      ],
+      "units": "S/cm",
+      "first": 0.5578513499876434,
+      "second": 0.5578610908808286,
+      "absolute_delta": 9.740893185172794e-06,
+      "comparison_scale": 0.5578610908808286,
+      "relative_delta": 1.7461144618981257e-05,
+      "absolute_floor_dominated": false,
+      "allowed_delta": 0.005578620908808286,
+      "pass": true
+    },
+    {
+      "metric": "gds",
+      "half_spans_v": [
+        0.05,
+        0.025
+      ],
+      "units": "S/cm",
+      "first": 8.806981058876213,
+      "second": 8.80752671267267,
+      "absolute_delta": 0.0005456537964576569,
+      "comparison_scale": 8.80752671267267,
+      "relative_delta": 6.195312421505862e-05,
+      "absolute_floor_dominated": false,
+      "allowed_delta": 0.0880752771267267,
+      "pass": true
+    },
+    {
+      "metric": "gm",
+      "half_spans_v": [
+        0.025,
+        0.0125
+      ],
+      "units": "S/cm",
+      "first": 0.5578610908808286,
+      "second": 0.5578635262459216,
+      "absolute_delta": 2.435365093034214e-06,
+      "comparison_scale": 0.5578635262459216,
+      "relative_delta": 4.365521276185097e-06,
+      "absolute_floor_dominated": false,
+      "allowed_delta": 0.005578645262459216,
+      "pass": true
+    },
+    {
+      "metric": "gds",
+      "half_spans_v": [
+        0.025,
+        0.0125
+      ],
+      "units": "S/cm",
+      "first": 8.80752671267267,
+      "second": 8.807663344961346,
+      "absolute_delta": 0.00013663228867599742,
+      "comparison_scale": 8.807663344961346,
+      "relative_delta": 1.5512887280615862e-05,
+      "absolute_floor_dominated": false,
+      "allowed_delta": 0.08807664344961345,
+      "pass": true
+    }
+  ],
+  "claim_boundary": "Central gm/gds secant step-size agreement on one fixed mesh only. Smaller-stencil mesh accuracy, continuous-domain, model, circuit and physical-device validation remain unresolved.",
+  "inputs": [
+    {
+      "path": "results/device-reference/nmos-dc-characterization.json",
+      "sha256": "0739a4dcaa357dcbb28af8d061f161095dec9f17ed65f853445ee95a5a5076d9"
+    },
+    {
+      "path": "results/device-reference/nmos-dc-characterization-half-step.json",
+      "sha256": "d515733a65d5690123ccae25c0162bb5df7b3d3e27bdf3854d7a89d030a8f17c"
+    },
+    {
+      "path": "results/device-reference/nmos-dc-characterization-quarter-step.json",
+      "sha256": "d61a10a6c984ce3d78dde1881f8eaa57a45daecd4f5160e77888c1a4a4494659"
+    }
+  ],
+  "implementation": {
+    "scripts/compare_nmos_step_sizes.py": "a1f6adfaf3855b6d35d95d21da153a549f1c2d4544756b4ee630ac70ef14856e",
+    "scripts/nmos_evidence.py": "bff9825cb812e09884b37e2f0b1f3dc1944ac041c37aeb1e416cf9d4ec9b70e5",
+    "scripts/compare_nmos_characterization.py": "0ee84186713c40b1bfd131f5fc19f6058999f50d49ea3c3d3c82c20c0a410f98",
+    "src/circuit_tools/nmos_data.py": "4be7563d4c6425d18cbf7881b79436155039f49ee9dde19758f33e68b9026260",
+    "src/circuit_tools/nmos_metrics.py": "eb81612e1688b6c3bf35e8635c088cc81d238ed3f430eca57aa1978919fa806b"
+  }
+}
