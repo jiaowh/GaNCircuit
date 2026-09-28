@@ -859,8 +859,9 @@ commit `363e43e`).
 
 - **Licence.** MIT's 1994 licence permits "internal, noncommercial" use and
   prohibits distribution without MIT's written consent. The source and binary
-  therefore stay in the git-ignored `.tools/FastHenry2`. Owner confirmation of
-  this use is pending.
+  therefore stay in the git-ignored `.tools/FastHenry2`. The owner confirmed on
+  28 September 2026 that the project uses it internally and does not
+  distribute it. Each user builds their own copy with the steps below.
 - **Build** (Ubuntu 24.04 under WSL, gcc 13.3). `-fcommon` restores the
   pre-GCC-10 linking of shared globals that this old code needs; no other flag
   changes.

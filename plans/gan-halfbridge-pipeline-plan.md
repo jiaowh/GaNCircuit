@@ -26,6 +26,17 @@ checkpoints instead of performing each step:
 The end-to-end run should show which checkpoints still need a human and which
 loops can close on their own.
 
+### Workflow methods review incorporated on 28 September 2026
+
+The owner's review of *AI Agents for GaN Power Electronics Workflow and
+Methods V1* is incorporated below; see the [review record](../docs/gan-workflow-methods-review.md).
+The document's EPC90133/EPC2302 pairing is an additional, unverified candidate,
+not a selection or an instruction to replace EPC9097/EPC2204. A change of
+platform requires its own source, model and board qualification. Existing
+LTspice tools remain reusable; EPC2204 results do not validate another FET.
+Commercial transistor dimensions remain fixed; the design variables are the
+surrounding circuit and PCB layout.
+
 ## 2. Scope
 
 **Core.**
@@ -64,7 +75,7 @@ datasheets, checked 28 September 2026, give two candidate pairs:
 | Rating | 100 V, 20 A half-bridge | 350 V, 4 A half-bridge |
 | FETs | Two EPC2204 (100 V, 6 mΩ max) plus one EPC2038 | Two EPC2050 |
 | Gate driver | uPI uP1966E | onsemi NCP51820 |
-| Published measurements | Not yet checked | QSG Figs. 12–13: switch-node and inductor-current waveforms, efficiency and loss at 280 V → 28 V, 50 kHz |
+| Published measurements | QSG v3.0 switch-node screenshots digitized; diagnostic comparison at 48 V → 12 V, 1 MHz, 10/15 A; measurement setup and board identity unresolved | QSG Figs. 12–13: switch-node and inductor-current waveforms, efficiency and loss at 280 V → 28 V, 50 kHz |
 | Lab safety burden | Lower bus voltage | 280–350 V bus; stronger interlock and enclosure requirements |
 
 Sources:
@@ -96,6 +107,16 @@ Immediate deliverable: the unmodified EPC2204 model running through an
 LTspice adapter, with parsed results and a reproducible test bench. The lab
 inventory and the Altium request proceed in parallel and do not block
 simulator setup.
+
+That initial simulator/model deliverable is complete (G1 and G2 status below).
+The current deliverable is the stock-board simulation with identified layout,
+population and extracted parasitics. The 6-layer ODB++ lists EPC2619,
+4.7 ohm turn-on / 1 ohm turn-off resistors and uP1966A; the published BOM used
+by our bench specifies EPC2204, 1 ohm / 0 ohm and uP1966E. The 4-layer Rev 2.0
+Gerbers do not establish part values. Preserve separate records for geometry,
+population and measurement identity. Neither candidate is established as our
+physical board or the board used for EPC's screenshots. Editable Altium files
+alone would not establish the fitted population or measurement-board identity.
 
 Selection criteria:
 
@@ -134,6 +155,19 @@ interface: inputs, outputs and acceptance checks. The supervisor integrates the
 stages, and the whole pipeline runs end to end weekly on the shared device,
 board and framework.
 
+The common interfaces are:
+
+| Interface | Required handoff |
+|---|---|
+| I-1 model to design | Unmodified model revision and any separately justified tuned revision; simulator/settings; qualified operating range; curve errors, uncertainty and unresolved exceptions |
+| I-2 design to test and reviewer | Layout and component revisions; stackup; extraction method, frequency range, ports and return paths; predicted metrics and uncertainty; test conditions and requirements |
+| I-3 test to model and design | Raw measurements and instrument settings; board identity; comparison with frozen predictions; uncertainty and per-layer attribution, including unidentified causes |
+
+All handoffs use machine-readable, versioned records with units and source
+references, plus a readable summary. Freeze exact field schemas before their
+consuming agent is implemented. Existing scripts and runner interfaces are
+building blocks; an integrated autonomous three-stage loop is not yet demonstrated.
+
 ### Stage 1: datasheet-to-model
 
 | | |
@@ -170,6 +204,31 @@ field solvers. Adopt one only after it reproduces a known-answer geometry.
 Before designing our own board, simulate the stock EPC layout, so that a
 measured reference exists before any layout change.
 
+#### Layout optimization and stopping rules
+
+Keep the reference circuit topology fixed for the first layout demonstration.
+Declare a bounded set of geometry variables, fabrication/connectivity constraints,
+operating corners and performance targets before optimization. Begin with
+generated candidate layouts and a reproducible fixed search baseline:
+
+1. Extract each candidate's coupled parasitics, with physical ports and return paths.
+2. Simulate switching and identify which changes could meet the targets.
+3. Rebuild feasible geometry, rerun connectivity/DRC, then re-extract and simulate.
+
+Target parasitic values are search guidance, not proof that a layout can realize
+them independently. Learn a mapping between geometry and parasitics only after
+paired examples exist; compare its value with the fixed search baseline. This
+is staged research work, not a prerequisite for the current stock-board extraction.
+If layout changes alone are insufficient, permit declared component and dead-time
+changes within the approved design envelope, retaining the original baseline.
+
+Stop when the actual extracted candidate meets declared performance targets over
+specified corners, constraints pass, and improvement falls below a predefined
+threshold or the search budget is exhausted. Budget exhaustion without meeting
+targets is not success. Define the higher-accuracy electromagnetic cross-check's
+tool, quantities, frequency range and allowed disagreement before release;
+do not use an unspecified "high-accuracy" check as an acceptance gate.
+
 ### Stage 3: test and closure
 
 | | |
@@ -194,6 +253,21 @@ experiments that isolate each layer, for example:
 **Order.** Measure the unmodified EPC board first. Its layout is fixed and
 documented, so disagreements can be attributed before our own layout adds
 unknowns. Then fabricate and measure our layout.
+
+**Blind prediction and learning evaluation.** After stock-board calibration,
+freeze the new board's layout, component population, model/extraction revisions,
+simulation settings, operating conditions, predicted metrics with uncertainty,
+and acceptance thresholds before fabrication and before seeing its measurements.
+Separate calibration and held-out validation data. Score the first blind prediction
+unchanged; later corrections produce new revisions and do not overwrite that score.
+Feedback must first distinguish measurement, driver, parasitic, device and thermal
+contributions; it does not automatically authorize device-model tuning.
+
+Report agent reliability as well as electrical agreement: human interventions,
+failed/retried tool runs, elapsed engineering time and compute/model cost against
+a fixed-script or manually guided baseline on the same task. Decide before the
+own-board search whether performance improvement over the vendor board is a
+success requirement, and define its metric and constraints if so.
 
 ## 5. Simulator selection and adapter
 
@@ -287,8 +361,8 @@ envelope expansion are removed last.
 | G2 Model baseline | Stage 1 comparison of the unmodified model against the digitized datasheet | Declared tolerances; every discrepancy classified |
 | G3 Stock-board simulation | Reference schematic simulated with parasitics extracted from the stock layout | Extraction known-answer check; switching predictions with stated assumptions |
 | G4 Stock-board measurement | Approved test plan; interlocks verified; double-pulse and efficiency measurements on the unmodified EPC board | Measurement-chain characterization; first per-layer error budget |
-| G5 Own layout | KiCad revision driven by G3–G4 results; checks; human review; fabrication | Connectivity, DRC and review sign-off |
-| G6 Closure | Own board measured; back-fit; closure report; checkpoint log | End-to-end run with a record of which checkpoints needed a human |
+| G5 Own layout | KiCad revision driven by G3–G4 results; checks; human review; fabrication | Connectivity, DRC, declared EM cross-check and review sign-off; blind predictions frozen before fabrication |
+| G6 Closure | Own board measured; back-fit; closure report; checkpoint log | Score frozen predictions on held-out measurements; preserve first score; report agent performance and human interventions against a baseline |
 
 Status, 28 September 2026:
 
@@ -300,7 +374,7 @@ Status, 28 September 2026:
   - *Owner review, 28 September 2026:* useful as a sensitivity study; G3 stays open until the matching layout's parasitics are extracted.
   - *Open:* EPC publishes two layouts (6-layer ODB++ and 4-layer Rev 2.0 Gerbers). Identify our board's revision and, separately, the revision behind EPC's published waveforms; they need not match. Both files stay candidates until evidence connects one to the board or the measurements. Then verify the extraction tool on a known geometry, extract the power and gate paths including return paths, and rerun the comparison.
   - *Sensitivity, not a limit:* in the simplified bench the switch node reaches 96 V from 48 V at 0.8 nH. With gate-loop and common-source inductance omitted, an approximate driver and assumed capacitors, this prioritises extraction; it does not set a safe envelope or a margin below 100 V.
-  - *Extraction tool:* FastHenry 3.0.1 is built locally (MIT licence: internal noncommercial use, no redistribution; owner confirmation pending). It passes its known-answer checks for bars and a thin-dielectric plane pair ([docs](../docs/build.md#fasthenry-inductance-extraction-tool-qualification-g3)). One declared check failed because its reference omitted skin effect; the replacement check was declared before running and passes. Vias and plane holes are not yet qualified.
+  - *Extraction tool:* FastHenry 3.0.1 is built locally (MIT licence: internal noncommercial use, no redistribution; owner confirmed on 28 September 2026 that the project uses it internally and does not distribute it). It passes its known-answer checks for bars and a thin-dielectric plane pair ([docs](../docs/build.md#fasthenry-inductance-extraction-tool-qualification-g3)). One declared check failed because its reference omitted skin effect; the replacement check was declared before running and passes. Vias and plane holes are not yet qualified.
   - *Unidentified:* the source of EPC's 130 MHz ringing (power loop, bus network or probe path), and the cause of the slower measured rise. Measurement-path dominance is one candidate. The effective dead time inferred from the plateau (about 7.6 ns) depends on the driver model.
 
 G1–G3 can proceed in simulation while G0's lab inventory is completed. No
@@ -316,3 +390,32 @@ hardware is energized before G4's test plan and interlocks are approved.
    probes, current sensing, supplies, electronic load, temperature control.
 4. Whether to request EPC's Altium files, and the budget for fabricating
    boards.
+5. Whether an EPC9097 is owned or will be purchased; its silkscreen revision,
+   fitted population and any vendor confirmation. Identify separately the board
+   and population used for EPC's published measurements. No ownership is assumed.
+6. FastHenry use scope and institutional terms review for students, partners and
+   any commercial collaboration. The restrictive MIT-authored notice is not the
+   standard MIT License; keep source/binaries out of git. Separate local builds
+   do not by themselves settle whether a use is permitted.
+7. Final platform selection including the V1 document's EPC90133/EPC2302 candidate;
+   no switch is currently authorized. Define I-1/I-2/I-3 schemas, layout variables,
+   held-out validation conditions and whether board-performance improvement is required.
+
+## 10. Immediate work and dependencies
+
+- Record existing FastHenry A/B and replacement D passes and the retained C
+  failure. Qualification is limited to the tested bars and plane pairs; vias,
+  holes and solder-bar connections are not yet covered. Each extraction needs
+  its own mesh-refinement and frequency-range evidence.
+- Prepare the via known-answer specification and candidate-specific geometry
+  readers for supply, switch-node and ground copper, seven loop capacitors,
+  Q1/Q2, gate paths and return paths. Keep the 4-layer and 6-layer candidates separate.
+- Link the chosen layout and actual population to our board before board extraction;
+  separately resolve the published measurement-board identity before claiming a
+  matched vendor comparison. Continue parsing and qualification preparation while
+  those identities are open; do not silently combine the ODB++ population and BOM.
+- Prepare an EPC request covering both identities and editable Altium sources.
+  Sending a request requires an explicit instruction; none has been sent here.
+- After extraction and its refinement checks, rerun switching predictions and
+  proceed through G4's measurement-chain and hardware approvals. No simulation
+  sensitivity result alone establishes a safe test envelope.
