@@ -731,9 +731,15 @@ Assumptions, all recorded in the report:
 - **Physics check.** The ringing frequency implies 309–342 pF with each swept
   inductance. That is the model's COSS near 48 V (304 pF at 50 V), as expected
   for the loop resonating with the lower FET's output capacitance.
-- **Safety.** At 0.8 nH the switch node reaches 96 V from a 48 V bus, close
-  to the 100 V rating. The QSG requires ringing below 100 V. The G4 test
-  envelope therefore depends on the extracted loop inductance.
+- **Sensitivity to loop inductance.** In this simplified bench, the switch
+  node reaches 96 V from a 48 V bus at 0.8 nH, near the 100 V rating (the
+  QSG requires ringing below 100 V).
+  - The figure is conditional: gate-loop and common-source inductance are
+    omitted, the driver is approximate, and the capacitor and bus properties
+    are assumed.
+  - It shows that the peak voltage is sensitive to loop inductance, which is
+    why extraction is the priority. It does **not** establish a safe
+    operating envelope or a reliable margin below the rating.
 - **Insensitive quantities.** The fall time changes by only 9% across the
   sweep. The reverse-conduction plateau before the rise lasts exactly the
   dead time plus 1.1 ns (5.1 / 11.1 / 17.1 ns for 4 / 10 / 16 ns). The lower
@@ -741,14 +747,17 @@ Assumptions, all recorded in the report:
   resistance). That is below the 0.8 V minimum threshold, so the simulation
   shows no false turn-on.
 - **15 A** (at 0.4 nH): fall 2.10 ns, Eon 1.31 µJ, the same 21 V overshoot.
-- **Numerics.** Halving the maximum step and tightening `reltol` to 1e-7
-  changes every checked metric by less than 0.11% (tolerance 2%).
+- **Numerics.** For the 0.4 nH, 10 A reference case, halving the maximum step
+  and tightening `reltol` to 1e-7 together changes each checked metric by
+  less than 0.11% (tolerance 2%). That supports this case's numerical
+  stability. The other sweep cases were not refined separately.
 
 **Run time.** Most cases solve in about 3 s. Three 0.4 nH cases took 330–380
 s: LTspice took about 6 million sub-femtosecond steps during Q1's turn-off,
 while VGS1 passed through 1.2–1.5 V. The log says "Changing Tseed to 2e-15".
-The waveform stays continuous and the fine-step rerun (8 s) agrees, so the
-results stand. Two script fixes made the run fit in memory on this host:
+The waveform stays continuous. The fine-step rerun of the reference case took
+8 s without the stall and agrees with it; the other two stalled cases (4 and
+16 ns dead time) have no separate refinement. Two script fixes made the run fit in memory on this host:
 - the bench saves only the seven traces the metrics use (`.save`), with Q1's
   drain current read as I(Lloop);
 - the script keeps only each run's status summary.
@@ -767,9 +776,9 @@ at every load, a likely marker offset; treat levels as ±1.5 V.
 
 A damped-cosine fit finds persistent ringing at 129–134 MHz in all six panels
 ([digitized data](../results/gan/epc9097-qsg-waveforms.json)). That is the same
-frequency at 0, 10 and 15 A and on both edges, so it comes from a fixed L and
-C. The images cannot say whether that is the power loop, the bus or the probe
-connection.
+frequency at 0, 10 and 15 A and on both edges. Similar frequency across loads
+does not identify where the resonance sits. It could belong to the power loop,
+the bus network or the probe connection; the source remains unidentified.
 
 [Comparison](../results/gan/epc9097-switching-vs-qsg.json), simulation at
 0.4 nH. It is diagnostic, with no pass/fail tolerance: the measured values were
@@ -791,25 +800,39 @@ What this shows, and what it does not:
     winding, PCB, probe), or measurement bandwidth.
   - This is not evidence against the device model until those layers are
     measured separately (G4).
-- **Plateau.** In simulation it is dead time + 1.1 ns. The measured 8.7 ns
-  would mean an effective dead time of about 7.6 ns rather than the nominal 10.
-  - That is within the RC setting's tolerance plus the driver's delay mismatch
-    (1.5 ns typical, 6 ns maximum).
+- **Plateau.** In simulation it is dead time + 1.1 ns. Under the present
+  behavioural driver and plateau definition, the measured 8.7 ns corresponds to
+  an effective dead time of about 7.6 ns rather than the nominal 10.
+  - This is a model-dependent hypothesis, not a measurement of EPC's dead
+    time.
+  - If true, it would be within the RC setting's tolerance plus the driver's
+    delay mismatch (1.5 ns typical, 6 ns maximum).
   - The measured plateau is deeper than simulated. The cause is unresolved:
     the level offset, the probe, or ground-path voltage are candidates.
-- **Rise time and ringing.** If the simulated edge were exact, the
-  measurement system's own rise time would be about 2.3 ns, roughly 150 MHz
-  bandwidth. That is close to the 130 MHz ringing.
-  - A 130 MHz ring with one COSS (304 pF) would need 4.8 nH, an order of
-    magnitude above the swept range.
-  - Hypothesis: EPC's waveform is dominated by its measurement path. It is
-    untested until our probes are characterised on a known edge (G4).
-  - Overshoot is not compared: a 150 MHz system would suppress a 450 MHz ring.
+- **Rise time and ringing.** The measured rise is 2.4 ns against a simulated
+  0.7 ns.
+  - *Bandwidth estimate.* If the simulated edge were exact, the measurement
+    system's own rise time would be about 2.3 ns (roughly 150 MHz). This
+    assumes the simulation is correct, so it cannot independently show that
+    bandwidth caused the difference. A slower real edge (gate-loop or
+    common-source inductance, a weaker driver) would also explain it.
+  - *Implied inductance.* A 130 MHz ring with one COSS (304 pF) would need
+    4.8 nH, an order of magnitude above the swept range. The resonance could
+    instead involve other capacitances or a bus or probe path.
+  - *Candidate explanations*, none established: the measurement path, the
+    bus network, and parasitics the bench omits. Characterising our probes on
+    a known edge (G4) and extracting the loops (G3) can separate them.
+  - Overshoot is not compared, because the measurement bandwidth is unknown.
 - **Not yet tested.** The 0 A case (Fig. 12) needs a negative valley current
   and is not simulated yet.
 
-**Next (G3).**
-1. Choose the layout revision.
-2. Pick a parasitic-extraction tool and check it on a known-answer geometry.
-3. Extract the power and gate loops from the matching layout.
-4. Rerun this bench with the extracted values.
+**Next (G3; the gate stays open until the matching layout's parasitics are
+extracted).**
+1. Identify the layout revision of our physical board.
+2. Separately, identify the revision used for EPC's published waveforms; the
+   two need not match. Until evidence connects a revision to the board or the
+   measurements, the 6-layer and 4-layer files stay separate candidates.
+3. Verify the extraction tool on a known-answer geometry.
+4. Extract the power and gate paths, including their return paths.
+5. Rerun the switching comparison with those parasitics. The unmodified
+   transistor model is preserved.

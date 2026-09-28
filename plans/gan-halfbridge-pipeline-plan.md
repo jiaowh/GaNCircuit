@@ -297,8 +297,10 @@ Status, 28 September 2026:
 - **G3** is in progress: stock EPC9097 schematic, gate driver and layout parasitics.
   - *Done:* the board files are recorded with checksums and terms. A double-pulse bench runs two unmodified EPC2204 models with a datasheet-calibrated behavioural uP1966E driver (no vendor driver model exists), at EPC's published 48 V → 12 V, 1 MHz conditions, with the loop inductance swept.
   - *Comparison:* EPC's published switch-node screenshots are digitized and compared diagnostically ([docs](../docs/build.md#epc9097-switching-bench-g3-before-layout-extraction)).
-  - *Open:* EPC publishes two layouts (6-layer ODB++ and 4-layer Rev 2.0 Gerbers), and which one the board uses must be settled before extraction. The extraction tool and its known-answer check come next.
-  - *Finding for G4:* at 0.8 nH the switch node reaches 96 V from 48 V, so the extracted inductance sets the safe test envelope. The measured ringing and rise time suggest that EPC's waveforms are dominated by the measurement path (hypothesis), so probe characterisation precedes any device conclusion.
+  - *Owner review, 28 September 2026:* useful as a sensitivity study; G3 stays open until the matching layout's parasitics are extracted.
+  - *Open:* EPC publishes two layouts (6-layer ODB++ and 4-layer Rev 2.0 Gerbers). Identify our board's revision and, separately, the revision behind EPC's published waveforms; they need not match. Both files stay candidates until evidence connects one to the board or the measurements. Then verify the extraction tool on a known geometry, extract the power and gate paths including return paths, and rerun the comparison.
+  - *Sensitivity, not a limit:* in the simplified bench the switch node reaches 96 V from 48 V at 0.8 nH. With gate-loop and common-source inductance omitted, an approximate driver and assumed capacitors, this prioritises extraction; it does not set a safe envelope or a margin below 100 V.
+  - *Unidentified:* the source of EPC's 130 MHz ringing (power loop, bus network or probe path), and the cause of the slower measured rise. Measurement-path dominance is one candidate. The effective dead time inferred from the plateau (about 7.6 ns) depends on the driver model.
 
 G1–G3 can proceed in simulation while G0's lab inventory is completed. No
 hardware is energized before G4's test plan and interlocks are approved.
