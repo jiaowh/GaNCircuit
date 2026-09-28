@@ -531,20 +531,18 @@ replaced after review.
 EPC's datasheet figures are vector drawings, so they can be read exactly
 rather than traced from an image.
 
-- **Digitizing.** `scripts/digitize_datasheet_figure.py` reads the plotted
-  polyline and calibrates the axes by fitting the tick-label positions. It
-  needs PyMuPDF, which runs under WSL; Windows Smart App Control blocks it on
-  the host.
+- **Digitizing.** `scripts/digitize_datasheet_figures.py` reads every plotted
+  curve on datasheet pages 2–3 and calibrates the axes by fitting the
+  tick-label positions. It needs PyMuPDF, which runs under WSL; Windows Smart
+  App Control blocks it on the host.
 
   ```sh
-  python3 scripts/digitize_datasheet_figure.py --page 3 --region 330 295 600 500 \
-    --curve-color 0 0.47 0.29 --x-name qg_nC --y-name vgs_V \
-    --figure "Figure 7: Gate Charge (ID = 16 A, VDS = 50 V)" \
-    --output results/gan/epc2204-fig7-digitized.json
+  python3 scripts/digitize_datasheet_figures.py   # under WSL
   python scripts/compare_epc2204_gate_charge.py
   ```
 
-  [Figure 7](../results/gan/epc2204-fig7-digitized.json) has 25 vertices.
+  Figure 7 in [the digitized figures](../results/gan/epc2204-datasheet-figures.json)
+  has 25 vertices.
   Tick-label calibration residuals are 0.015 nC and 0.034 V, and the frame
   corners map to 0–5.99 nC and 0–4.99 V. The trace's half line width
   corresponds to about 0.03 V.
@@ -574,3 +572,85 @@ rather than traced from an image.
 - **Limits.** The close fit may reflect that EPC fitted the model to this
   curve, so it is consistency, not independent validation. Both sides are
   vendor material; no hardware has been measured.
+
+### Other datasheet curves (Figures 1–6, 8, 9)
+
+```sh
+PYTHONPATH=src python scripts/epc2204_curve_benches.py   # extra model benches
+python3 scripts/digitize_datasheet_figures.py            # under WSL
+python scripts/compare_epc2204_curves.py
+```
+
+- **Extra benches.** `scripts/epc2204_curve_benches.py` adds the model
+  simulations the baseline lacked:
+  - RDS(on) against VGS at 8/16/24/32 A (25 °C) and 16 A (125 °C);
+  - CISS and CRSS against VDS;
+  - reverse conduction at 25 and 125 °C;
+  - RDS(on) at 0–150 °C.
+
+  At low VGS, a forced drain current beyond the channel's capability drives
+  VDS to meaningless values. Only the range each figure plots is compared.
+- **Tolerances.** These were fixed before any of these figures were digitized
+  or compared. Each is a screening tolerance on vendor "typical" curves:
+
+  | Figures | Tolerance |
+  |---|---|
+  | 1, 2, 8 (current) | 5% + 1.6 A |
+  | 3, 4 (RDS(on)) | 5% + 0.16 mΩ |
+  | 5a (capacitance, linear) | 5% + 9 pF |
+  | 5b (capacitance, log) | 0.05 decades |
+  | 6 (QOSS / EOSS) | 5% + 0.4 nC / 5% + 0.016 µJ |
+  | 9 (normalized RDS(on)) | 0.03 |
+
+- **Curve assignment.** The PDF has no legend swatches, so curve colours are
+  assigned by physical ordering rules that do not use the values under test:
+  - more current at higher VGS;
+  - less current and more resistance at 125 °C;
+  - higher drain current reaches a given RDS(on) at higher VGS;
+  - CISS > COSS > CRSS;
+  - charge is concave in voltage.
+
+  The blue/red pair means 25/125 °C consistently in Figs. 2, 4 and 8.
+
+[Result, 28 September 2026](../results/gan/epc2204-curve-comparison.json):
+22 of 23 curves pass at every compared point.
+
+| Figure | Curves | Outcome | Worst error / allowed |
+|---|---|---|---|
+| 1 Output characteristics, 25 °C | VGS 2, 3, 4, 5 V | pass | 0.25–0.49 |
+| 2 Transfer, VDS = 3 V | 25, 125 °C | pass | 0.77, 0.78 |
+| 3 RDS(on) vs VGS | 8, 16, 24, 32 A | pass | 0.33–0.38 |
+| 4 RDS(on) vs VGS, 16 A | 25, 125 °C | pass | 0.40, 0.16 |
+| 5a/5b Capacitances | CISS, COSS, CRSS | pass | 0.03–0.43 |
+| 6 Output charge | QOSS | pass | 0.61 |
+| 6 Stored energy | EOSS | **fail** (63% of points within) | 1.79 at 9 V |
+| 8 Reverse conduction | 25, 125 °C | pass | 0.93, 0.92 |
+| 9 Normalized RDS(on) | 0–150 °C | pass | 0.11 |
+
+**EOSS failure.** The failure is confined to low voltage: the model is 8× the
+drawn curve at 9 V, 1.25× at 20 V and 1.04× at 50 V. EPC's drawn EOSS curve
+(four Bezier segments) starts at 7.3 V with zero energy.
+
+A diagnostic added after the failure integrates EPC's own Fig. 5a COSS curve,
+without the model:
+
+| VDS | Fig. 6 as drawn | From EPC's Fig. 5a COSS | Model |
+|---|---|---|---|
+| 10 V | 0.010 µJ | 0.039 µJ | 0.039 µJ |
+| 20 V | 0.100 µJ | 0.126 µJ | 0.127 µJ |
+| 50 V | 0.48 µJ | 0.50 µJ | 0.50 µJ |
+
+EPC's capacitance figure and the model agree; EPC's drawn energy curve
+disagrees with both at low voltage. The evidence therefore points to the
+drawing of Fig. 6 as the main cause, not the model. The declared check stays
+recorded as failed.
+
+**Limits.**
+- The worst ratios in Figs. 2 and 8 (0.77–0.93) occur where the curves are
+  steep. There, tick-label calibration residuals of 0.01–0.04 V move the
+  current noticeably.
+- All comparisons are against vendor-drawn typical curves. The model was
+  probably fitted to them, so agreement is consistency, not independent
+  validation.
+- Temperature curves test the model's `Temp` dependence; no self-heating is
+  modelled.

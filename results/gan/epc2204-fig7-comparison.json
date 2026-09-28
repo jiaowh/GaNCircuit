@@ -1,10 +1,10 @@
 {
   "schema": "epc2204-fig7-comparison/1",
   "scope": "Unmodified EPC2204 model (LTspice, reltol 1e-6) against the vendor-drawn typical gate-charge curve. Model-to-datasheet consistency only; not a hardware measurement.",
-  "evaluator_sha256": "c5f42662eb93bf2a3fc00ebb1aadb5dbde5b99edf00e02eaae19c420433431c2",
+  "evaluator_sha256": "8e28bddabaa4b491dc1630850b9d342a457e3a9d14342da3a4b018dad3d8781f",
   "inputs": {
     "model_curves_sha256": "58c285f99db8a8d567423efdccba5d84fb2333ee46064e91e5ea6610a5611655",
-    "digitized_sha256": "d111c5782b479e4042961479402ecf17bc7406e02166eb874ff35aab703475a5"
+    "digitized_sha256": "8d40a4e99b3b66238f9c48789d5be852c076453bc0423349dcfccae42ecbe833"
   },
   "model_charge_offset_nC": 0.027853703298519068,
   "primary_check": {
@@ -66,12 +66,6 @@
     "note": "If the vendor's own curve does not reproduce its table values under these boundary definitions, the table uses different (unstated) definitions or different data."
   },
   "vertices": [
-    {
-      "q_nC": -0.009911067162271081,
-      "vgs_datasheet_V": -0.00369417505237557,
-      "vgs_model_V": null,
-      "difference_V": null
-    },
     {
       "q_nC": 0.6647157991953971,
       "vgs_datasheet_V": 1.040349436743524,

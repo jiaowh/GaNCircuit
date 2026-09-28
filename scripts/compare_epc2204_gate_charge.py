@@ -2,7 +2,7 @@
 """Compare the model's VGS-QG curve with digitized datasheet Figure 7.
 
 Inputs: results/gan/epc2204-model-curves.json (from epc2204_baseline.py) and
-results/gan/epc2204-fig7-digitized.json (from digitize_datasheet_figure.py).
+results/gan/epc2204-datasheet-figures.json (from digitize_datasheet_figures.py).
 
 Primary check, fixed here before the comparison was run: at every datasheet
 vertex, |VGS_model(Q) - VGS_datasheet(Q)| <= VGS_TOLERANCE. The tolerance was
@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = ROOT / "results/gan/epc2204-model-curves.json"
-DIGITIZED = ROOT / "results/gan/epc2204-fig7-digitized.json"
+DIGITIZED = ROOT / "results/gan/epc2204-datasheet-figures.json"
 BASELINE = ROOT / "results/gan/epc2204-baseline.json"
 OUTPUT = ROOT / "results/gan/epc2204-fig7-comparison.json"
 VGS_TOLERANCE = 0.10  # V; about 3 half-line-widths of the datasheet trace
@@ -78,8 +78,10 @@ def main():
     k = next(i for i in range(len(qm)) if vm[i] - vm[0] > 0.05)
     offset = vm[0] * (qm[k] - qm[0]) / (vm[k] - vm[0])
     qm = [x + offset for x in qm]
-    qd = [p["qg_nC"] for p in dig["points"]]
-    vd = [p["vgs_V"] for p in dig["points"]]
+    fig7 = next(f for f in dig["figures"] if f["caption"].startswith("Figure 7:"))
+    trace = fig7["curves"][0]["points_by_axis"]["y_left"]
+    qd = [p[0] for p in trace]
+    vd = [p[1] for p in trace]
     rows = []
     for q, v in zip(qd, vd):
         vmod = interp(qm, vm, q)
