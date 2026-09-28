@@ -1,0 +1,142 @@
+{
+  "schema": "epc9097-switching-vs-qsg/1",
+  "kind": "diagnostic comparison; no acceptance tolerance (see script docstring)",
+  "evidence_classes": {
+    "simulated": "unmodified EPC2204 model, behavioural driver, swept loop inductance",
+    "measured": "vendor-described waveforms digitized from raster screenshots"
+  },
+  "inputs": {
+    "epc9097-switching-ideal-layout.json": "c2b512e63a5a2290b20caf4d53f6f658f988a856bf385374223f2d0050428959",
+    "epc9097-switching-traces.json": "b28768af6db0a17660898ecafd7106e6aa1532057899cd5663e462cf669de4f7",
+    "epc9097-qsg-waveforms.json": "5dbffabf5470907eb49aaa6767f0d61a2721bdf4c4252bd6a050c810db22e9a2",
+    "epc2204-model-curves.json": "58c285f99db8a8d567423efdccba5d84fb2333ee46064e91e5ea6610a5611655"
+  },
+  "evaluator_sha256": "39e0c6250c281669f476721df8dad3036a1509aff59ef07f6b6b79d353b87954",
+  "by_load": {
+    "10A": {
+      "measured_figure": "fig13",
+      "simulated_reference_case": "lloop_400pH_dt10ns",
+      "simulated_currents_A": {
+        "turn_off": 11.884891510011462,
+        "turn_on": 7.879112720482613
+      },
+      "turn_off_fall_time_10_90_s": {
+        "tests": "device output charge (Qoss/I); weakly dependent on loop inductance",
+        "measured": 3.969492448829642e-09,
+        "simulated": 2.9488863726152915e-09,
+        "simulated_range_over_loop_sweep": [
+          2.925084020305863e-09,
+          3.200573454845671e-09
+        ]
+      },
+      "reverse_conduction_plateau_before_rise": {
+        "tests": "dead time at the driver input and the lower FET's third-quadrant voltage",
+        "measured": {
+          "duration_s": 8.664259927797829e-09,
+          "depth_below_settled_V": 3.6656249999999986
+        },
+        "simulated": {
+          "duration_s": 1.11e-08,
+          "depth_below_settled_V": 1.909371
+        }
+      },
+      "rise_time_10_90_s": {
+        "tests": "loop inductance, driver strength and measurement bandwidth together",
+        "measured": 2.3662337001569786e-09,
+        "simulated": 6.980649978177469e-10,
+        "measurement_system_rise_time_if_simulation_were_exact_s": 2.260921755076963e-09,
+        "note": "root-sum-square convention for cascaded Gaussian-like responses; a hypothesis, not a measured bandwidth"
+      },
+      "overshoot_above_settled_V": {
+        "tests": "loop inductance and damping, measurement bandwidth",
+        "measured": 8.641954787234027,
+        "simulated_by_loop_inductance": {
+          "lloop_10pH_dt10ns": 0.022884368896484375,
+          "lloop_200pH_dt10ns": 3.7207603454589844,
+          "lloop_400pH_dt10ns": 21.372634887695312,
+          "lloop_800pH_dt10ns": 47.5886116027832
+        }
+      },
+      "ringing": {
+        "tests": "an LC resonance somewhere in the power loop, bus or measurement path",
+        "measured_persistent_frequency_Hz": 129998198.56552216,
+        "measured_decay_time_s": 4.855532371257835e-08,
+        "measured_early_crest_spacing_s": 7.48276993764358e-09,
+        "simulated_frequency_by_loop_inductance_Hz": {
+          "lloop_10pH_dt10ns": 2882287846.046644,
+          "lloop_200pH_dt10ns": 639849456.7474605,
+          "lloop_400pH_dt10ns": 447868303.8216707,
+          "lloop_800pH_dt10ns": 305079531.900416
+        },
+        "inductance_implied_if_it_rings_with_one_coss_H": 4.861394094547722e-09,
+        "coss_used_F": 3.083221784767326e-10,
+        "coss_source": "model COSS at 48 V from epc2204-model-curves.json"
+      }
+    },
+    "15A": {
+      "measured_figure": "fig14",
+      "simulated_reference_case": "lloop_400pH_dt10ns_15A",
+      "simulated_currents_A": {
+        "turn_off": 16.80001640313836,
+        "turn_on": 12.770439147970615
+      },
+      "turn_off_fall_time_10_90_s": {
+        "tests": "device output charge (Qoss/I); weakly dependent on loop inductance",
+        "measured": 2.5860284522654346e-09,
+        "simulated": 2.1009755090549316e-09,
+        "simulated_range_over_loop_sweep": [
+          2.1009755090549316e-09,
+          2.1009755090549316e-09
+        ]
+      },
+      "reverse_conduction_plateau_before_rise": {
+        "tests": "dead time at the driver input and the lower FET's third-quadrant voltage",
+        "measured": {
+          "duration_s": 8.672798948751641e-09,
+          "depth_below_settled_V": 3.6053042121684857
+        },
+        "simulated": {
+          "duration_s": 1.1300000000000002e-08,
+          "depth_below_settled_V": 1.9840585000000002
+        }
+      },
+      "rise_time_10_90_s": {
+        "tests": "loop inductance, driver strength and measurement bandwidth together",
+        "measured": 2.4364648553245206e-09,
+        "simulated": 6.834002997092432e-10,
+        "measurement_system_rise_time_if_simulation_were_exact_s": 2.3386588082892413e-09,
+        "note": "root-sum-square convention for cascaded Gaussian-like responses; a hypothesis, not a measured bandwidth"
+      },
+      "overshoot_above_settled_V": {
+        "tests": "loop inductance and damping, measurement bandwidth",
+        "measured": 8.596764923228505,
+        "simulated_by_loop_inductance": {
+          "lloop_400pH_dt10ns_15A": 20.9463958740214
+        }
+      },
+      "ringing": {
+        "tests": "an LC resonance somewhere in the power loop, bus or measurement path",
+        "measured_persistent_frequency_Hz": 130613907.35317752,
+        "measured_decay_time_s": 4.7994534850122054e-08,
+        "measured_early_crest_spacing_s": 2.3653088042049933e-09,
+        "simulated_frequency_by_loop_inductance_Hz": {
+          "lloop_400pH_dt10ns_15A": 448778517.29605776
+        },
+        "inductance_implied_if_it_rings_with_one_coss_H": 4.815669283087495e-09,
+        "coss_used_F": 3.083221784767326e-10,
+        "coss_source": "model COSS at 48 V from epc2204-model-curves.json"
+      }
+    }
+  },
+  "persistent_ringing": {
+    "persistent_ring_frequencies_Hz": {
+      "fig12_rising": 128933326.82304808,
+      "fig12_falling": 133271665.02702875,
+      "fig13_rising": 129998198.56552216,
+      "fig13_falling": 134268011.35218644,
+      "fig14_rising": 130613907.35317752,
+      "fig14_falling": 134023394.69800627
+    },
+    "observation": "the persistent ring has the same frequency at 0, 10 and 15 A and on both edges, so it comes from a fixed L and C; the digitized images cannot say whether that LC is the power loop, the bus network or the probe connection"
+  }
+}

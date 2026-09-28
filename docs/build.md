@@ -664,3 +664,152 @@ EPC's own Fig. 5a COSS curve, without the model:
   validation.
 - Temperature curves test the model's `Temp` dependence; no self-heating is
   modelled.
+
+## EPC9097 switching bench (G3, before layout extraction)
+
+```sh
+python scripts/epc9097_switching.py              # LTspice; about 20 min (see "Run time")
+python scripts/digitize_epc9097_qsg_waveforms.py # PyMuPDF; ran on the Windows host on 28 September 2026
+python scripts/compare_epc9097_qsg.py
+```
+
+**Board sources.** The EPC9097 files are recorded in `devices/epc/sources.json`
+(`board_files`); they are kept in the git-ignored `vendor/epc/epc9097/`. Facts
+taken from them:
+- the driver is the uP1966E (BOM and QSG v3.0; the 2020 schematic still says
+  uP1966A);
+- 1 Ω turn-on and 0 Ω turn-off gate resistors (R80–R83);
+- seven 220 nF, 100 V loop capacitors;
+- 10 ns default dead time, set at the driver inputs;
+- the driver's internal bootstrap supplies the high side (the synchronous
+  bootstrap option is not fitted).
+
+EPC publishes **two layouts**. One is 6-layer (the ODB++, the landing-page
+stackup and the 2024 test-point report). The other is 4-layer, "B5239 Rev
+2.0" (the Gerber zip, 2023). Both carry the same 38 nets. Parasitic extraction
+must use the revision of the board under test, which is not yet known.
+
+**Bench.** `scripts/epc9097_switching.py` runs a buck double pulse with two
+unmodified EPC2204 models at the conditions of EPC's published waveforms:
+48 V → 12 V, 1 MHz, 2.2 µH, 10 ns dead time. It is converter-equivalent: Q1
+turns off at the load current plus half the 4.1 A ripple, and turns on again
+after the converter's 750 ns off time, at the load current minus half the
+ripple.
+
+Assumptions, all recorded in the report:
+- **Driver.** EPC publishes no uP1966E SPICE model, so the driver is
+  behavioural. Each output pin is a ramped source behind the datasheet's
+  typical resistance (0.7 Ω source, 0.4 Ω sink), connected only while that pin
+  is active. The ramps (8.25 ns up, 3.73 ns down) were calibrated in the same
+  run to the datasheet's 8 ns rise and 4 ns fall into 3000 pF.
+  - A first version varied the switch resistance instead. It could not slow
+    the edge below the RC limit (4.6 ns), so it was replaced.
+  - Propagation delay is omitted, since it shifts both channels equally.
+- **Supplies.** A 4.8 V ideal floating high-side supply and 5 V on the low
+  side.
+- **Capacitors and bus.** The loop capacitors are one ideal 1.54 µF, with no
+  DC-bias derating. The bus network behind them uses assumed values.
+- **Parasitics.** All loop inductance is lumped at Q1's drain and **swept**
+  (0.01–0.8 nH), not extracted. Gate-loop and common-source inductance are
+  zero.
+
+[Result, 28 September 2026](../results/gan/epc9097-switching-ideal-layout.json),
+10 A load (Q1 turns off at 11.9 A and on at 7.9 A):
+
+| Loop L | Rise 10–90 % | Peak V(sw) | Ringing | Eon (Q1) | Fall 90–10 % | Eoff (Q1) |
+|---|---|---|---|---|---|---|
+| 0.01 nH | 1.19 ns | 48.3 V | none | 1.33 µJ | 3.20 ns | 0.50 µJ |
+| 0.2 nH | 0.87 ns | 51.8 V | 640 MHz | 1.23 µJ | 3.04 ns | 0.51 µJ |
+| 0.4 nH | 0.70 ns | 69.4 V | 448 MHz | 1.08 µJ | 2.95 ns | 0.45 µJ |
+| 0.8 nH | 0.70 ns | 95.7 V | 305 MHz | 0.71 µJ | 2.93 ns | 0.55 µJ |
+
+- **Energies.** Eon and Eoff are terminal V·I integrals of Q1, as a
+  measurement would take them. Eoff therefore includes Q1's stored output
+  energy, which is dissipated at the next turn-on.
+- **10 pH row.** The report lists 2.9 GHz "ringing" on a 0.02 V overshoot; that
+  is a detector artifact, not ringing.
+- **Physics check.** The ringing frequency implies 309–342 pF with each swept
+  inductance. That is the model's COSS near 48 V (304 pF at 50 V), as expected
+  for the loop resonating with the lower FET's output capacitance.
+- **Safety.** At 0.8 nH the switch node reaches 96 V from a 48 V bus, close
+  to the 100 V rating. The QSG requires ringing below 100 V. The G4 test
+  envelope therefore depends on the extracted loop inductance.
+- **Insensitive quantities.** The fall time changes by only 9% across the
+  sweep. The reverse-conduction plateau before the rise lasts exactly the
+  dead time plus 1.1 ns (5.1 / 11.1 / 17.1 ns for 4 / 10 / 16 ns). The lower
+  gate's peak during the rise is 0.35–0.37 V (0.59 V with the maximum driver
+  resistance). That is below the 0.8 V minimum threshold, so the simulation
+  shows no false turn-on.
+- **15 A** (at 0.4 nH): fall 2.10 ns, Eon 1.31 µJ, the same 21 V overshoot.
+- **Numerics.** Halving the maximum step and tightening `reltol` to 1e-7
+  changes every checked metric by less than 0.11% (tolerance 2%).
+
+**Run time.** Most cases solve in about 3 s. Three 0.4 nH cases took 330–380
+s: LTspice took about 6 million sub-femtosecond steps during Q1's turn-off,
+while VGS1 passed through 1.2–1.5 V. The log says "Changing Tseed to 2e-15".
+The waveform stays continuous and the fine-step rerun (8 s) agrees, so the
+results stand. Two script fixes made the run fit in memory on this host:
+- the bench saves only the seven traces the metrics use (`.save`), with Q1's
+  drain current read as I(Lloop);
+- the script keeps only each run's status summary.
+
+**EPC's measured waveforms.** QSG Figs. 12–14 (0, 10 and 15 A; 10 V/div,
+10 ns/div) are raster oscilloscope screenshots, not vector drawings.
+`scripts/digitize_epc9097_qsg_waveforms.py` reads them from pixels:
+- the grid, from grey-pixel rows and columns fitted to a uniform pitch;
+- zero volts, from the channel ground marker;
+- the trace, from the blue pixels.
+
+Resolution is about 0.3 V and 0.2 ns per pixel. Its check: the settled swing
+must be within 2 V of the 48 V bus, with grid lines within 1.5 px of uniform.
+All six panels pass, with swings of 49.1–49.8 V. The low level reads −1.3 V
+at every load, a likely marker offset; treat levels as ±1.5 V.
+
+A damped-cosine fit finds persistent ringing at 129–134 MHz in all six panels
+([digitized data](../results/gan/epc9097-qsg-waveforms.json)). That is the same
+frequency at 0, 10 and 15 A and on both edges, so it comes from a fixed L and
+C. The images cannot say whether that is the power loop, the bus or the probe
+connection.
+
+[Comparison](../results/gan/epc9097-switching-vs-qsg.json), simulation at
+0.4 nH. It is diagnostic, with no pass/fail tolerance: the measured values were
+digitized before the comparison categories were chosen, the loop inductance is
+not extracted, and EPC does not state the probe, bandwidth or probing point.
+
+| Quantity (what it tests) | 10 A meas / sim | 15 A meas / sim |
+|---|---|---|
+| Fall time (device output charge, Qoss/I) | 3.97 / 2.95 ns | 2.59 / 2.10 ns |
+| Dead-time plateau (driver timing) | 8.7 / 11.1 ns | 8.7 / 11.3 ns |
+| Plateau depth below settled low (lower FET reverse conduction) | 3.7 / 1.9 V | 3.6 / 2.0 V |
+| Rise time (loop L, drive, bandwidth) | 2.37 / 0.70 ns | 2.44 / 0.68 ns |
+| Persistent ringing | 130 MHz / 448 MHz | 131 MHz / 449 MHz |
+
+What this shows, and what it does not:
+- **Fall time.** Both measurement and simulation fall faster at the higher
+  current, in about the Qoss/I proportion. The measurement is 23–35% slower.
+  - Possible causes: switch-node capacitance the bench omits (inductor
+    winding, PCB, probe), or measurement bandwidth.
+  - This is not evidence against the device model until those layers are
+    measured separately (G4).
+- **Plateau.** In simulation it is dead time + 1.1 ns. The measured 8.7 ns
+  would mean an effective dead time of about 7.6 ns rather than the nominal 10.
+  - That is within the RC setting's tolerance plus the driver's delay mismatch
+    (1.5 ns typical, 6 ns maximum).
+  - The measured plateau is deeper than simulated. The cause is unresolved:
+    the level offset, the probe, or ground-path voltage are candidates.
+- **Rise time and ringing.** If the simulated edge were exact, the
+  measurement system's own rise time would be about 2.3 ns, roughly 150 MHz
+  bandwidth. That is close to the 130 MHz ringing.
+  - A 130 MHz ring with one COSS (304 pF) would need 4.8 nH, an order of
+    magnitude above the swept range.
+  - Hypothesis: EPC's waveform is dominated by its measurement path. It is
+    untested until our probes are characterised on a known edge (G4).
+  - Overshoot is not compared: a 150 MHz system would suppress a 450 MHz ring.
+- **Not yet tested.** The 0 A case (Fig. 12) needs a negative valley current
+  and is not simulated yet.
+
+**Next (G3).**
+1. Choose the layout revision.
+2. Pick a parasitic-extraction tool and check it on a known-answer geometry.
+3. Extract the power and gate loops from the matching layout.
+4. Rerun this bench with the extracted values.
