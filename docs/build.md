@@ -67,9 +67,30 @@ Use a new output directory for each run. The adapter keeps the exact
 netlist, copies and hashes every model library the netlist loads, and retains
 the LTspice log, the `.raw` waveforms, the parsed `result.json` and the
 provenance record. A netlist may load only libraries passed with `--library`,
-referenced by bare file name. LTspice can exit with status 0 after an error,
-so `completed` requires a parsed `.raw` file or `.meas` result and a log
-without errors. Acceptance belongs to a separate fixed evaluator. Missing
+referenced by bare file name. A supplied library that itself loads other
+files is rejected.
+
+A run is `completed` only when all of these hold:
+- LTspice exits with status 0;
+- it writes a finite, parseable `.raw` file with at least one point;
+- the log has no unrecovered failure;
+- every `.meas` declared in the netlist has a value;
+- the log's "Files loaded" list names only the bench and the supplied
+  libraries.
+
+Otherwise the run is `failed`, with every reason in its message. The log rules
+come from real LTspice 26.1.1 output:
+- Setup errors appear as `bench.cir(3): This sub-circuit name is not
+  defined.`, without the word "error".
+- A failed operating-point method followed by a successful one (for example
+  Newton, then Gmin stepping) is a normal recovery, not an error.
+- Only declared `.meas` names count as measurements; lines such as
+  `temp = 27` do not.
+- Unclassified lines (for example `Changing Tseed`) are kept as notices in the
+  provenance record.
+
+In batch mode LTspice 26.1.1 does not load its own standard component
+libraries: an undefined `1N4148` fails as an undefined model. Acceptance belongs to a separate fixed evaluator. Missing
 tools, malformed data and timeouts do not establish a physical specification
 failure. SPICE input is trusted executable simulator input, not a sandboxed
 upload format.
@@ -415,46 +436,81 @@ low-overdrive point is less affected.
 `scripts/epc2204_baseline.py` runs the unmodified `EPC2204` subcircuit from
 EPC's LTspice library (version 1.105, 10 June 2026) at the conditions of the
 datasheet's electrical-characteristics table (datasheet revised 26 November
-2024). Its comparison rules are fixed in the script before any run:
-- rows with datasheet limits are reported as inside or outside them;
-- typical-only rows get a ratio and are flagged for review outside ±25%. This
-  is a screening aid, not an acceptance tolerance.
+2024). Its comparison rules are fixed in the script:
+- limit compliance and deviation from the typical value are reported
+  separately. Being inside a datasheet limit does not show accuracy.
+- A row is flagged for review when it is outside a limit or more than ±25%
+  from the typical value. The band is a screening aid, not an acceptance
+  tolerance.
 
+All benches use `.options reltol=1e-6` (see the gate-charge finding below).
 The script writes [the baseline report](../results/gan/epc2204-baseline.json)
-and [simulated curves](../results/gan/epc2204-model-curves.json) (output and
-transfer characteristics, COSS against VDS) for the later comparison with
-digitized datasheet curves.
+and [simulated curves](../results/gan/epc2204-model-curves.json): output and
+transfer characteristics, COSS against VDS, and the VGS–QG gate-charge curve.
+These are for the later comparison with digitized datasheet curves.
 
-Result, 28 September 2026: all 11 benches complete without LTspice warnings.
+Result, 28 September 2026 (second revision): all 14 benches complete.
 
-| Quantity | Model | Datasheet typ (limits) | Outcome |
-|---|---|---|---|
-| RDS(on), 5 V, 16 A | 4.40 mΩ | 4.4 (max 6) mΩ | inside limits |
-| VGS(th), 4 mA | 1.17 V | 1.1 (0.8–2.5) V | inside limits |
-| VSD, 0.5 A | 1.61 V | 1.6 V | near typical |
-| CISS / CRSS / COSS at 50 V | 644.5 / 2.31 / 304.8 pF | 644 (max 851) / 2.3 / 304 (max 456) pF | inside limits / near typical |
-| COSS(ER) / COSS(TR), 0–50 V | 401.4 / 501.6 pF | 401 / 501 pF | near typical |
-| QOSS, 50 V | 25.1 nC | 25 (max 38) nC | inside limits |
-| QG, 50 V, 16 A, 5 V | 3.82 nC | 5.7 (max 7.4) nC | inside the max, but 0.67 of typical |
-| QGS / QGD / QG(TH) | 1.35 / 0.64 / 0.73 nC | 1.8 / 0.8 / 1.0 nC | 0.75 / 0.80 / 0.73 of typical; QG(TH) flagged |
+| Quantity | Model | Datasheet typ (limits) | Deviation from typ | Review |
+|---|---|---|---|---|
+| RDS(on), 5 V, 16 A | 4.40 mΩ | 4.4 (max 6) mΩ | 0.0% | no |
+| VGS(th), 4 mA | 1.17 V | 1.1 (0.8–2.5) V | +6.4% | no |
+| VSD, 0.5 A | 1.61 V | 1.6 V | +0.3% | no |
+| CISS / CRSS / COSS at 50 V | 644.5 / 2.31 / 304.8 pF | 644 (max 851) / 2.3 / 304 (max 456) pF | +0.1 / +0.6 / +0.3% | no |
+| COSS(ER) / COSS(TR), 0–50 V | 401.4 / 501.6 pF | 401 / 501 pF | +0.1 / +0.1% | no |
+| QOSS, 50 V | 25.1 nC | 25 (max 38) nC | +0.3% | no |
+| QG, 50 V, 16 A, 5 V | 5.65 nC | 5.7 (max 7.4) nC | −0.8% | no |
+| QGS | 1.35 nC | 1.8 nC | −24.9% | no (at the band edge) |
+| QGD | 0.65 nC | 0.8 nC | −18.6% | no |
+| QG(TH) | 0.73 nC | 1.0 nC | −27.5% | yes |
 
-- Output charge integrated from the small-signal COSS curve agrees with a
-  large-signal 0 → 50 V ramp to 0.002% (declared tolerance 2%). The model's
-  capacitance and charge descriptions are therefore consistent in LTspice.
-- RDS(on) rises by a factor of 1.70 from 25 °C to 125 °C in the model. The
-  datasheet's normalized-RDS(on) curve has not been digitized yet.
-- The static and capacitance values sit within 0.1–6.4% of the typicals.
-  That suggests the model was fitted to these table conditions; it is not
-  independent validation.
-- The gate-charge shortfall is the one discrepancy to classify under the
-  Stage 1 rule: model, test-condition mismatch, or bench definition. The
-  bench's plateau boundaries (1% clamp current, VDS = 5 V) are its own,
-  because EPC does not state its extraction definitions. The next step is to
-  digitize datasheet Fig. 7 (gate charge) and compare the whole VGS–QG curve.
-- The first gate-charge run started with the gate floating near 1.95 V
-  through the model's convergence resistors, above threshold. A 100 kΩ
-  hold-down resistor and charge integration at the gate terminal fixed it
-  (initial VGS 0.046 V).
+**Gate-charge finding.** The first baseline reported QG = 3.8 nC (−33%). That
+was a simulation artifact.
+- *Cause:* with LTspice's default `reltol` (1e-3), the transient loses gate
+  charge once the transistor is on. QG fell to 2.5 nC at a 0.02 ns step and
+  2.45 nC at 2 mA drive. Changing the integration method, `chgtol` or the
+  solver did not help; `reltol=1e-6` did.
+- *Now:* QG = 5.652 nC. Tightening to 1e-7 changes it by 3e-9 (relative).
+  QG from the model's own charge equations, with parameters read from the
+  local library, between the simulated start and VGS = 5 V states, is
+  5.647 nC (0.1% agreement, declared tolerance 1%). A small-signal check at
+  VGS = 3–4.5 V gives about 1085 pF, matching the equations' 1.085 nC per
+  volt there.
+- *Separate probe:* LTspice honours charge expressions that depend on other
+  nodes' voltages; a known-answer probe gave exactly 2.000 mA.
+- *What remains:* QGS, QGD and QG(TH) are 19–28% below the typicals under
+  both the transient and the equations, so this is a real model-to-datasheet
+  difference. It is not classified. Candidates are EPC's extraction
+  definitions (not stated), test conditions, or the model's
+  sub-threshold/plateau charge. QGD depends strongly on where the plateau is
+  taken to end: 0.38 / 0.65 / 1.00 nC for VDS = 10 / 5 / 1 V. No model
+  tuning is justified.
+
+Gate-charge bench self-checks, all recorded in the report:
+- *Starting bias:* VGS 0.046 V, VDS 50.0 V, 16 A in the clamp diode, the
+  transistor off.
+- *Gate-current balance:* residual under 0.7 nA against a 10 mA drive.
+- *Integration resolution:* halving the samples changes QG by 2e-6.
+- *Drain transition:* at VGS = 5 V, VDS is 0.070 V and the transistor carries
+  16 A.
+- *Plateau:* about 2.05 V.
+- *Drive current:* the declared check (10 mA against 2 mA, 0.5% tolerance)
+  **fails** at +0.57%. A diagnostic added afterwards integrates the model's
+  gate-leakage current: 6.6 pC at 10 mA, 35 pC at 2 mA. With leakage removed,
+  the stored charge agrees to 0.06%. The difference is therefore leakage
+  during the slower test, not a charge error.
+
+Other results:
+- *COSS consistency:* output charge integrated from the small-signal COSS
+  curve agrees with a 0 → 50 V transient ramp to 0.002% (tolerance 2%).
+- *Temperature:* RDS(on) rises by a factor of 1.70 from 25 °C to 125 °C in
+  the model. The datasheet curve has not been digitized.
+- *Not independent validation:* the close agreement in resistance,
+  capacitance, output charge and total gate charge may reflect the quantities
+  EPC fitted the model to.
 
 These are model-to-datasheet consistency results. Datasheet values are
-vendor-described, and nothing here is a hardware measurement.
+vendor-described, and nothing here is a hardware measurement. The first
+revision of this report used one combined outcome that called QG
+"inside-datasheet-limits" only because it was below the maximum. It was
+replaced after review.

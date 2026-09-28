@@ -1,10 +1,13 @@
 """LTspice batch adapter: write the bench, run it, parse the waveforms and log.
 
 As with the other adapters, the simulator is an untrusted external program.
-LTspice can exit with status 0 after an error, so success requires a parsed
-``.raw`` file and a log without errors.  Every model library the netlist
-loads must be passed explicitly; it is copied into the run directory and
-hashed, so a run never depends on files outside its own evidence.
+A run is ``completed`` only when all of these hold: LTspice exits with status
+0; it writes a finite, parseable ``.raw`` file; its log has no unrecovered
+failure; every ``.meas`` the netlist declares has a value; and the log's
+"Files loaded" list contains only the bench and the libraries passed in.
+Supplied libraries are copied into the run directory and hashed.  Libraries
+that load further files are rejected, so the loaded-file check covers every
+model dependency.
 """
 from __future__ import annotations
 
@@ -28,9 +31,22 @@ _STANDARD_PATHS = (
     Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "ADI" / "LTspice" / "LTspice.exe",
 )
 _INCLUDE = re.compile(r"^\s*\.(?:include|inc|lib)\s+(.+?)\s*$", re.I | re.M)
-_ERROR = re.compile(r"(?:^|\b)(?:error|fatal|singular matrix|time step too small|"
-                    r"convergence failed|analysis failed|unknown (?:subcircuit|parameter|device))",
-                    re.I)
+# Failure wording observed in LTspice 26.1.1 logs.  Setup errors are reported
+# as "<file>(<line>): <message>" without the word "error".
+_LOCATED = re.compile(r"\.(?:cir|net|lib|sub|inc|include|asc)\(\d+\):", re.I)
+_FATAL = re.compile(r"error|fatal|singular matrix|time ?step too small|abort|undefined|not defined|"
+                    r"unknown|cannot|can't|could not|not found|no such|illegal|invalid|"
+                    r"convergence failed|analysis failed|iteration limit|\bfail", re.I)
+# Operating-point searches that fail are routinely recovered by the next method.
+_OP_FAILED = re.compile(r"(?:newton iteration|stepping|pseudo[- ]?transient.*|homotopy.*) failed", re.I)
+_OP_RECOVERED = re.compile(r"succeeded in finding|found by inspection|analysis succeeded", re.I)
+_MEAS_FAILED = re.compile(r"""^measurement\s+"?(\w+)"?\s+fail'?ed""", re.I)
+_MEAS_DECL = re.compile(r"^\s*\.meas(?:ure)?\s+(?:(?:ac|dc|op|tran|tf|noise)\s+)?(\w+)", re.I | re.M)
+_ANALYSIS = re.compile(r"^\s*\.(?:op|dc|ac|tran|tf|noise)\b", re.I | re.M)
+_WARNING = re.compile(r"^warning|might lead to|too small|too large|ignored", re.I)
+_NOTICE_SKIP = re.compile(r"^(?:ltspice \S+ for|circuit:|start time:|solver =|maximum thread|tnom =|temp =|"
+                          r"method =|total elapsed|total iterations|options:|files loaded:|\.step\b|"
+                          r"starting (?:gmin|source)|direct newton iteration succeeded)", re.I)
 _FLOAT = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
 
 
@@ -224,35 +240,86 @@ def _step_starts(axis: list[Any], is_time: bool) -> list[int]:
     return [0]
 
 
-def parse_log(text: str) -> dict[str, Any]:
-    """Extract measurements, failed measurements, errors and warnings from an LTspice log."""
+def declared_measurements(netlist_text: str) -> list[str]:
+    """Names of the ``.meas`` statements in a netlist, lower-cased."""
+    return [m.group(1).lower() for m in _MEAS_DECL.finditer(netlist_text)]
+
+
+def parse_log(text: str, declared: Sequence[str] = ()) -> dict[str, Any]:
+    """Classify an LTspice log.
+
+    Only names in ``declared`` (the netlist's ``.meas`` statements) are read as
+    measurements, so log metadata such as ``temp = 27`` is never mistaken for
+    a result.  A failed operating-point method counts as an error unless a
+    later line reports that a search succeeded.  Lines that fit no category
+    are kept as notices for inspection.
+    """
+    wanted = {d.lower() for d in declared}
     measurements: dict[str, list[float]] = {}
     failed: list[str] = []
+    failed_names: set[str] = set()
     errors: list[str] = []
     warnings: list[str] = []
-    step = 0
+    notices: list[str] = []
+    files: list[str] = []
+    pending_op: str | None = None
+    table: str | None = None
+    in_files = False
     for raw_line in text.splitlines():
         line = raw_line.strip()
         if not line:
+            in_files = False
+            table = None
             continue
         low = line.lower()
-        m = re.match(r"^(\w+):\s*(?:.*?=\s*)?(" + _FLOAT + r")(?:\s|$)", line)
-        m2 = re.match(r"^(\w+)\s*=\s*(" + _FLOAT + r")(?:\s|$)", line)
-        if re.match(r"^measurement \S+ fail", low) or re.search(r"fail'?ed", low):
+        if low.startswith("files loaded:"):
+            in_files = True
+            continue
+        if in_files and re.match(r"^(?:[a-z]:\\|\\\\|/)", line, re.I):
+            files.append(line)
+            continue
+        in_files = False
+        mf = _MEAS_FAILED.match(line)
+        if mf:
             failed.append(line)
-        elif m and not low.startswith(("total elapsed", "solver", "tnom", "temp", "method",
-                                       "matrix", "thread", "direct newton", "gmin", "source stepping")):
-            measurements.setdefault(m.group(1).lower(), []).append(float(m.group(2)))
-        elif m2:
-            measurements.setdefault(m2.group(1).lower(), []).append(float(m2.group(2)))
-        if low.startswith("warning"):
-            warnings.append(line)
-        elif _ERROR.search(low) and "fail" not in low.split(":")[0]:
+            failed_names.add(mf.group(1).lower())
+            continue
+        mt = re.match(r"^measurement:\s*(\w+)", line, re.I)
+        if mt and mt.group(1).lower() in wanted:
+            table = mt.group(1).lower()
+            continue
+        if table and re.match(r"^\d+\s+(" + _FLOAT + r")", line):
+            measurements.setdefault(table, []).append(float(line.split()[1]))
+            continue
+        mm = (re.match(r"^(\w+):\s*(?:[^=]*=\s*)?(" + _FLOAT + r")(?:\s|$)", line)
+              or re.match(r"^(\w+)\s*=\s*(" + _FLOAT + r")(?:\s|$)", line))
+        if mm and mm.group(1).lower() in wanted:
+            measurements.setdefault(mm.group(1).lower(), []).append(float(mm.group(2)))
+            continue
+        if _OP_FAILED.search(line):
+            pending_op = line
+            continue
+        if _OP_RECOVERED.search(line):
+            pending_op = None
+            continue
+        if _NOTICE_SKIP.match(line):
+            continue
+        if _LOCATED.search(line) or (_FATAL.search(line) and not _WARNING.search(line)):
             errors.append(line)
-        if low.startswith(".step"):
-            step += 1
-    return {"measurements": measurements, "failed_measurements": failed,
-            "errors": errors, "warnings": warnings, "steps": step}
+        elif _WARNING.search(line):
+            warnings.append(line)
+        else:
+            notices.append(line)
+    if pending_op:
+        errors.append(f"unrecovered operating-point failure: {pending_op}")
+    missing = sorted(wanted - set(measurements) - failed_names)
+    return {"measurements": measurements, "failed_measurements": failed, "missing_measurements": missing,
+            "errors": errors, "warnings": warnings, "notices": notices, "files_loaded": files}
+
+
+def nested_dependencies(library_text: str) -> list[str]:
+    """``.include``/``.lib`` statements inside a supplied library (rejected by the runner)."""
+    return [m.group(0).strip() for m in _INCLUDE.finditer(library_text)]
 
 
 def _referenced_libraries(netlist_text: str) -> list[str]:
@@ -269,8 +336,9 @@ def run_ltspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
 
     ``libraries`` lists every model file the netlist loads with ``.lib`` or
     ``.include``; references must be bare file names matching those files.
-    Measurements combine ``.meas`` results from the log with the waveform
-    traces of the first ``.raw`` output; ``result_path`` points at the raw file.
+    Measurements combine declared ``.meas`` results from the log with the
+    waveform traces of the ``.raw`` output; ``result_path`` points at the raw
+    file.  Every reason a run is not ``completed`` is joined into ``message``.
     """
     if not isinstance(timeout_s, (int, float)) or not math.isfinite(timeout_s) or not 0 < timeout_s <= 600:
         raise ValueError("timeout_s must be finite and in (0, 600]")
@@ -316,6 +384,14 @@ def run_ltspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
             return finish("failed", "unresolved", None, started,
                           message=f"netlist loads {ref!r}, which is not a supplied library file name")
     for name, p in supplied.items():
+        nested = nested_dependencies(p.read_text(encoding="utf-8", errors="replace"))
+        if nested:
+            return finish("failed", "unresolved", None, started,
+                          message=f"library {name} loads further files ({nested[0]!r}); "
+                                  "nested dependencies are not supported")
+    if not _ANALYSIS.search(text):
+        return finish("failed", "unresolved", None, started, message="netlist has no analysis statement")
+    for name, p in supplied.items():
         shutil.copyfile(p, out / name)
         base["libraries"][name] = {"source": str(p.resolve()), "sha256": _sha256(out / name)}
     if exe is None:
@@ -332,30 +408,47 @@ def run_ltspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
     if not log_path.exists():
         return finish("failed", "unresolved", p.returncode, started, message="LTspice wrote no log")
     base["log_sha256"] = _sha256(log_path)
-    log = parse_log(read_text_auto(log_path))
-    base.update(log_errors=log["errors"], log_warnings=log["warnings"],
-                failed_measurements=log["failed_measurements"])
-    header = read_text_auto(log_path).splitlines()[:3]
-    base["log_header"] = [h.strip() for h in header if h.strip()]
-    measurements: dict[str, list[float]] = dict(log["measurements"])
-    if raw_path.exists():
+    log_text = read_text_auto(log_path)
+    declared = declared_measurements(text)
+    log = parse_log(log_text, declared)
+    base.update(declared_measurements=declared, log_errors=log["errors"], log_warnings=log["warnings"],
+                log_notices=log["notices"], failed_measurements=log["failed_measurements"],
+                missing_measurements=log["missing_measurements"], files_loaded=log["files_loaded"])
+    base["log_header"] = [h.strip() for h in log_text.splitlines()[:3] if h.strip()]
+    measurements: dict[str, list[Any]] = dict(log["measurements"])
+    problems: list[str] = []
+    if p.returncode != 0:
+        problems.append(f"LTspice exited with status {p.returncode}")
+    if log["errors"]:
+        problems.append("log reports: " + "; ".join(log["errors"][:3]))
+    if log["failed_measurements"] or log["missing_measurements"]:
+        problems.append("declared measurements without values: "
+                        + ", ".join(log["missing_measurements"] + log["failed_measurements"]))
+    allowed = {netlist_path.name.lower(), *(n.lower() for n in supplied)}
+    run_dir = os.path.normcase(str(out.resolve()))
+    if not log["files_loaded"]:
+        problems.append("log has no 'Files loaded' list; dependencies cannot be verified")
+    for f in log["files_loaded"]:
+        fp = Path(f)
+        if os.path.normcase(str(fp.parent)) != run_dir or fp.name.lower() not in allowed:
+            problems.append(f"undeclared file loaded: {f}")
+    if not raw_path.exists():
+        problems.append("no waveform (.raw) output")
+    else:
         base["raw_sha256"] = _sha256(raw_path)
         try:
             raw = parse_raw(raw_path)
         except (ValueError, KeyError, struct.error) as exc:
-            return finish("failed", "unresolved", p.returncode, started, measurements,
-                          message=f"unparseable raw output: {exc}")
-        base.update(raw_plotname=raw.plotname, raw_flags=list(raw.flags), raw_points=len(raw.values[raw.axis]),
-                    raw_steps=raw.n_steps)
-        for name, trace in raw.values.items():
-            if name in measurements:
-                continue
-            measurements[name] = trace
-    if log["errors"]:
-        return finish("failed", "unresolved", p.returncode, started, measurements,
-                      message="LTspice log reports errors: " + "; ".join(log["errors"][:3]))
-    if not measurements:
-        return finish("failed", "unresolved", p.returncode, started, message="no raw traces or measurements parsed")
+            problems.append(f"unparseable raw output: {exc}")
+        else:
+            base.update(raw_plotname=raw.plotname, raw_flags=list(raw.flags),
+                        raw_points=len(raw.values[raw.axis]), raw_steps=raw.n_steps)
+            if not raw.values[raw.axis]:
+                problems.append("waveform output has no points")
+            for name, trace in raw.values.items():
+                measurements.setdefault(name, trace)
+    if problems:
+        return finish("failed", "unresolved", p.returncode, started, measurements, message="; ".join(problems))
     (out / "result.json").write_text(json.dumps(
         {k: ([[c.real, c.imag] for c in v] if v and isinstance(v[0], complex) else v)
          for k, v in measurements.items()}, allow_nan=False), encoding="utf-8")
