@@ -522,3 +522,52 @@ vendor-described, and nothing here is a hardware measurement. The first
 revision of this report used one combined outcome that called QG
 "inside-datasheet-limits" only because it was below the maximum. It was
 replaced after review.
+
+### Gate-charge curve against datasheet Figure 7
+
+EPC's datasheet figures are vector drawings, so they can be read exactly
+rather than traced from an image.
+
+- **Digitizing.** `scripts/digitize_datasheet_figure.py` reads the plotted
+  polyline and calibrates the axes by fitting the tick-label positions. It
+  needs PyMuPDF, which runs under WSL; Windows Smart App Control blocks it on
+  the host.
+
+  ```sh
+  python3 scripts/digitize_datasheet_figure.py --page 3 --region 330 295 600 500 \
+    --curve-color 0 0.47 0.29 --x-name qg_nC --y-name vgs_V \
+    --figure "Figure 7: Gate Charge (ID = 16 A, VDS = 50 V)" \
+    --output results/gan/epc2204-fig7-digitized.json
+  python scripts/compare_epc2204_gate_charge.py
+  ```
+
+  [Figure 7](../results/gan/epc2204-fig7-digitized.json) has 25 vertices.
+  Tick-label calibration residuals are 0.015 nC and 0.034 V, and the frame
+  corners map to 0–5.99 nC and 0–4.99 V. The trace's half line width
+  corresponds to about 0.03 V.
+- **Comparison rule.** The rule in `scripts/compare_epc2204_gate_charge.py`
+  is: model VGS within ±0.10 V of the datasheet VGS at every vertex's charge.
+  It was chosen after the datasheet coordinates were extracted, but before
+  any model comparison. The model curve is shifted by 0.028 nC for the
+  bench's 0.046 V starting gate voltage.
+- **Result, 28 September 2026:** [pass](../results/gan/epc2204-fig7-comparison.json).
+  The worst difference is 0.014 V, at the knee after the plateau.
+
+| Feature (same algorithm for both) | Model | Datasheet curve | Datasheet table |
+|---|---|---|---|
+| Plateau voltage | 2.06 V | 2.04 V | — |
+| Plateau start (plateau-based QGS) | 1.37 nC | 1.39 nC | QGS 1.8 nC |
+| Plateau width, ±0.05 V band | 1.03 nC | 1.00 nC | QGD 0.8 nC |
+| Charge at VGS = 1.17 V (model VGS(th)) | 0.75 nC | 0.75 nC | QG(TH) 1.0 nC |
+| Charge at VGS = 5 V | 5.66 nC | 5.67 nC | QG 5.7 nC |
+
+- **What it shows.** The unmodified model reproduces the curve EPC drew. The
+  subcharge differences reported against the table also appear between EPC's
+  own curve and its own table. So the table's QGS, QGD and QG(TH) use boundary
+  definitions or data that are not stated and are not reproduced by
+  plateau-based extraction from the published curve. They are no longer
+  evidence of a model discrepancy. They remain unresolved as extracted values,
+  and EPC's definitions would be needed to settle them.
+- **Limits.** The close fit may reflect that EPC fitted the model to this
+  curve, so it is consistency, not independent validation. Both sides are
+  vendor material; no hardware has been measured.
