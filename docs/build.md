@@ -528,51 +528,56 @@ replaced after review.
 
 ### Gate-charge curve against datasheet Figure 7
 
-EPC's datasheet figures are vector drawings, so they can be read exactly
-rather than traced from an image.
+EPC's datasheet figures are vector drawings, so their curves can be read
+exactly rather than traced from an image.
 
 - **Digitizing.** `scripts/digitize_datasheet_figures.py` reads every plotted
-  curve on datasheet pages 2–3 and calibrates the axes by fitting the
-  tick-label positions. It needs PyMuPDF, which runs under WSL; Windows Smart
-  App Control blocks it on the host.
+  curve on datasheet pages 2–3. It needs PyMuPDF, which runs under WSL;
+  Windows Smart App Control blocks it on the host.
 
   ```sh
   python3 scripts/digitize_datasheet_figures.py   # under WSL
   python scripts/compare_epc2204_gate_charge.py
   ```
 
-  Figure 7 in [the digitized figures](../results/gan/epc2204-datasheet-figures.json)
-  has 25 vertices.
-  Tick-label calibration residuals are 0.015 nC and 0.034 V, and the frame
-  corners map to 0–5.99 nC and 0–4.99 V. The trace's half line width
-  corresponds to about 0.03 V.
+  Revision 2 calibrates each axis from the plot's own geometry:
+  - the plot frame (the dark stroked rectangle);
+  - grid lines found in a 600 dpi render (PyMuPDF does not return them as
+    drawings).
+
+  Each tick label is paired with its nearest line, and the fit uses the line
+  positions. Text boxes sit up to 3.3 pt off their ticks, so the label
+  positions only choose the line. Points are clipped to the frame.
+  `tests/test_digitize_figures.py` pins this; it runs under WSL.
+
+  Revision 1 fitted the axes to text-box centres and clipped to the label
+  range. See the correction note below.
 - **Comparison rule.** The rule in `scripts/compare_epc2204_gate_charge.py`
   is: model VGS within ±0.10 V of the datasheet VGS at every vertex's charge.
-  It was chosen after the datasheet coordinates were extracted, but before
-  any model comparison. The model curve is shifted by 0.028 nC for the
+  It was chosen after the datasheet coordinates were first extracted, but
+  before any model comparison. The model curve is shifted by 0.028 nC for the
   bench's 0.046 V starting gate voltage.
-- **Result, 28 September 2026:** [pass](../results/gan/epc2204-fig7-comparison.json).
-  The worst difference is 0.014 V, at the knee after the plateau.
+- **Result (digitizer revision 2):** [pass](../results/gan/epc2204-fig7-comparison.json).
+  The worst difference is 0.018 V, at the plateau onset.
 
 | Feature (same algorithm for both) | Model | Datasheet curve | Datasheet table |
 |---|---|---|---|
-| Plateau voltage | 2.06 V | 2.04 V | — |
-| Plateau start (plateau-based QGS) | 1.37 nC | 1.39 nC | QGS 1.8 nC |
-| Plateau width, ±0.05 V band | 1.03 nC | 1.00 nC | QGD 0.8 nC |
-| Charge at VGS = 1.17 V (model VGS(th)) | 0.75 nC | 0.75 nC | QG(TH) 1.0 nC |
+| Plateau voltage | 2.06 V | 2.05 V | — |
+| Plateau start (plateau-based QGS) | 1.37 nC | 1.40 nC | QGS 1.8 nC |
+| Plateau width, ±0.05 V band | 1.03 nC | 1.01 nC | QGD 0.8 nC |
+| Charge at VGS = 1.17 V (model VGS(th)) | 0.75 nC | 0.76 nC | QG(TH) 1.0 nC |
 | Charge at VGS = 5 V | 5.66 nC | 5.67 nC | QG 5.7 nC |
 
-- **What it shows.** The unmodified model reproduces the curve EPC drew. The
-  subcharge differences reported against the table also appear between EPC's
-  own curve and its own table. So the table's QGS, QGD and QG(TH) use boundary
-  definitions or data that are not stated and are not reproduced by
-  plateau-based extraction from the published curve. They are no longer
-  evidence of a model discrepancy. They remain unresolved as extracted values,
-  and EPC's definitions would be needed to settle them.
+- **What it shows.** The unmodified model reproduces the gate-charge curve EPC
+  drew. Under plateau-based boundaries, EPC's curve does not reproduce EPC's
+  table values for QGS, QGD and QG(TH). The table may use different
+  definitions, or come from different source data (for example, a different
+  measurement or device population). This comparison cannot tell which. These
+  remain unresolved extracted-value differences; they are not evidence of a
+  model error.
 - **Limits.** The close fit may reflect that EPC fitted the model to this
   curve, so it is consistency, not independent validation. Both sides are
   vendor material; no hardware has been measured.
-
 ### Other datasheet curves (Figures 1–6, 8, 9)
 
 ```sh
@@ -602,53 +607,58 @@ python scripts/compare_epc2204_curves.py
   | 6 (QOSS / EOSS) | 5% + 0.4 nC / 5% + 0.016 µJ |
   | 9 (normalized RDS(on)) | 0.03 |
 
-- **Curve assignment.** The PDF has no legend swatches, so curve colours are
-  assigned by physical ordering rules that do not use the values under test:
+- **Curve assignment.** Labels come from the legends, which have coloured
+  swatches. PyMuPDF does not return the swatches as drawings, so the digitizer
+  samples each swatch's colour from a render and matches it to a curve (colour
+  distance at most 0.05). For Fig. 6 it reads the direction of the two arrows
+  that point each curve to its axis.
+
+  Independently, physical ordering rules assign the same labels without using
+  the values under test:
   - more current at higher VGS;
   - less current and more resistance at 125 °C;
   - higher drain current reaches a given RDS(on) at higher VGS;
   - CISS > COSS > CRSS;
   - charge is concave in voltage.
 
-  The blue/red pair means 25/125 °C consistently in Figs. 2, 4 and 8.
+  A figure whose legend and ordering disagree is marked unresolved. They agree
+  in every figure.
 
-[Result, 28 September 2026](../results/gan/epc2204-curve-comparison.json):
-22 of 23 curves pass at every compared point.
+[Result (digitizer revision 2), 28 September 2026](../results/gan/epc2204-curve-comparison.json):
+all 23 curves pass at every compared point.
 
-| Figure | Curves | Outcome | Worst error / allowed |
-|---|---|---|---|
-| 1 Output characteristics, 25 °C | VGS 2, 3, 4, 5 V | pass | 0.25–0.49 |
-| 2 Transfer, VDS = 3 V | 25, 125 °C | pass | 0.77, 0.78 |
-| 3 RDS(on) vs VGS | 8, 16, 24, 32 A | pass | 0.33–0.38 |
-| 4 RDS(on) vs VGS, 16 A | 25, 125 °C | pass | 0.40, 0.16 |
-| 5a/5b Capacitances | CISS, COSS, CRSS | pass | 0.03–0.43 |
-| 6 Output charge | QOSS | pass | 0.61 |
-| 6 Stored energy | EOSS | **fail** (63% of points within) | 1.79 at 9 V |
-| 8 Reverse conduction | 25, 125 °C | pass | 0.93, 0.92 |
-| 9 Normalized RDS(on) | 0–150 °C | pass | 0.11 |
+| Figure | Curves | Worst error / allowed |
+|---|---|---|
+| 1 Output characteristics, 25 °C | VGS 2, 3, 4, 5 V | 0.06–0.16 |
+| 2 Transfer, VDS = 3 V | 25, 125 °C | 0.15, 0.16 |
+| 3 RDS(on) vs VGS | 8, 16, 24, 32 A | 0.07–0.09 |
+| 4 RDS(on) vs VGS, 16 A | 25, 125 °C | 0.03, 0.04 |
+| 5a/5b Capacitances | CISS, COSS, CRSS | 0.01–0.03 |
+| 6 Output charge / stored energy | QOSS, EOSS | 0.08, 0.07 |
+| 8 Reverse conduction | 25, 125 °C | 0.23, 0.21 |
+| 9 Normalized RDS(on) | 0–150 °C | 0.03 |
 
-**EOSS failure.** The failure is confined to low voltage: the model is 8× the
-drawn curve at 9 V, 1.25× at 20 V and 1.04× at 50 V. EPC's drawn EOSS curve
-(four Bezier segments) starts at 7.3 V with zero energy.
+**Correction (digitizer revision 1).** The first comparison reported
+- 22 of 23 passes;
+- an EOSS failure below about 28 V;
 
-A diagnostic added after the failure integrates EPC's own Fig. 5a COSS curve,
-without the model:
+and attributed the failure to EPC's drawing of Fig. 6. That was wrong: the
+failure came from our digitizer. Revision 1 fitted the axes to tick-label text
+centres, which sit about 2.3 pt from the Fig. 6 grid lines. It then clipped
+points to the label range, which removed valid low-energy points. The owner's
+review found this. With frame and grid calibration:
+- EPC's energy curve starts at the origin;
+- it passes the unchanged tolerance.
+
+The Fig. 5a/Fig. 6 cross-check now agrees within about 1–3%. It integrates
+EPC's own Fig. 5a COSS curve, without the model:
 
 | VDS | Fig. 6 as drawn | From EPC's Fig. 5a COSS | Model |
 |---|---|---|---|
-| 10 V | 0.010 µJ | 0.039 µJ | 0.039 µJ |
-| 20 V | 0.100 µJ | 0.126 µJ | 0.127 µJ |
-| 50 V | 0.48 µJ | 0.50 µJ | 0.50 µJ |
-
-EPC's capacitance figure and the model agree; EPC's drawn energy curve
-disagrees with both at low voltage. The evidence therefore points to the
-drawing of Fig. 6 as the main cause, not the model. The declared check stays
-recorded as failed.
+| 10 V | 0.040 µJ | 0.039 µJ | 0.039 µJ |
+| 50 V | 0.503 µJ | 0.501 µJ | 0.502 µJ |
 
 **Limits.**
-- The worst ratios in Figs. 2 and 8 (0.77–0.93) occur where the curves are
-  steep. There, tick-label calibration residuals of 0.01–0.04 V move the
-  current noticeably.
 - All comparisons are against vendor-drawn typical curves. The model was
   probably fitted to them, so agreement is consistency, not independent
   validation.

@@ -12,14 +12,17 @@ or compared. They are screening tolerances on vendor "typical" curves:
 the model's simulated range. For the log-scale capacitance figure the rule is
 |log10(model/datasheet)| <= 0.05.
 
-The PDF has no legend swatches, so curve colours are assigned by physical
-ordering rules that do not use the values under test. Each rule is checked
-here, and the figure is marked unresolved if its rule does not hold.
+Curve labels come from the legends. The digitizer samples each legend
+swatch's colour from a render of the page, and reads the Fig. 6 arrows for
+axis assignment. The physical ordering rules below, which do not use the
+values under test, give an independent assignment. A figure whose legend and
+ordering disagree is marked unresolved.
 """
 import bisect
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -87,6 +90,35 @@ def compare(points, model_x, model_y, tol, transform=None):
             "points": rows}
 
 
+PARSERS = {
+    "1": lambda t: (lambda m: f"VGS={m.group(1)}V" if m else None)(re.search(r"(\d)\s*V\b", t)),
+    "2": lambda t: (lambda m: f"{m.group(1)}C" if m else None)(re.search(r"(\d+)\s*˚C", t)),
+    "3": lambda t: (lambda m: f"ID={m.group(1)}A" if m else None)(re.search(r"ID\s*=\s*(\d+)\s*A", t)),
+    "5": lambda t: next((k for k in ("COSS", "CISS", "CRSS") if k in t.split()), None),
+}
+PARSERS["4"] = PARSERS["8"] = PARSERS["2"]
+
+
+def check_legend(res, fig, parser):
+    """Compare the ordering-based assignment with the legend swatches."""
+    seen = {}
+    for text, m in fig.get("legend", {}).items():
+        key = parser(text)
+        if key:
+            seen.setdefault(key, set()).add(tuple(m["curve_color"]))
+    legend = {k: next(iter(v)) for k, v in seen.items() if len(v) == 1}
+    rows = {}
+    for label, c in res["curves"].items():
+        rows[label] = {"ordering_colour": c["color"], "legend_colour": list(legend[label]) if label in legend else None,
+                       "agree": label in legend and tuple(legend[label]) == tuple(c["color"])}
+    ok = all(r["agree"] for r in rows.values())
+    res["legend_check"] = {"agree": ok, "curves": rows,
+                           "ambiguous_legend_keys": sorted(k for k, v in seen.items() if len(v) > 1)}
+    if not ok:
+        for c in res["curves"].values():
+            c["outcome"] = "unresolved"
+
+
 def main():
     figs = json.loads(FIGS.read_text())["figures"]
     base = json.loads(BASE.read_text())["curves"]
@@ -101,6 +133,7 @@ def main():
     for vgs, c in zip((5, 4, 3, 2), order):
         m = base["output_25C"][f"vgs_{vgs}V"]
         res["curves"][f"VGS={vgs}V"] = dict(compare(pts(c), m["vds_V"], m["id_A"], TOL["1"]), color=c["color"])
+    check_legend(res, f, PARSERS["1"])
     results["Figure 1"] = res
 
     # Figure 2: transfer at VDS = 3 V; the 125 C curve carries less current at VGS = 5 V (or ends lower).
@@ -112,6 +145,7 @@ def main():
     for t, c in ((25, cold), (125, hot)):
         m = base[f"transfer_vds3V_{t}C"]
         res["curves"][f"{t}C"] = dict(compare(pts(c), m["vgs_V"], m["id_A"], TOL["2"]), color=c["color"])
+    check_legend(res, f, PARSERS["2"])
     results["Figure 2"] = res
 
     # Figure 3: RDS(on) vs VGS; a higher drain current reaches the plot top at higher VGS.
@@ -121,6 +155,7 @@ def main():
     for i_d, c in zip((8, 16, 24, 32), order):
         m = extra["rds_vs_vgs_25C"][f"id_{i_d}A"]
         res["curves"][f"ID={i_d}A"] = dict(compare(pts(c), m["vgs_V"], m["rds_mohm"], TOL["3"]), color=c["color"])
+    check_legend(res, f, PARSERS["3"])
     results["Figure 3"] = res
 
     # Figure 4: RDS(on) vs VGS at 16 A; 125 C has the higher resistance at VGS = 5 V.
@@ -131,6 +166,7 @@ def main():
     m125 = extra["rds_vs_vgs_125C_16A"]
     res["curves"]["25C"] = dict(compare(pts(cold), m25["vgs_V"], m25["rds_mohm"], TOL["4"]), color=cold["color"])
     res["curves"]["125C"] = dict(compare(pts(hot), m125["vgs_V"], m125["rds_mohm"], TOL["4"]), color=hot["color"])
+    check_legend(res, f, PARSERS["4"])
     results["Figure 4"] = res
 
     # Figures 5a/5b: CISS > COSS > CRSS at 50 V.
@@ -145,6 +181,7 @@ def main():
         res = {"assignment_rule": f"CISS > COSS > CRSS at VDS = {common:.1f} V (largest VDS all curves reach)", "curves": {}}
         for name, c in zip(("CISS", "COSS", "CRSS"), order):
             res["curves"][name] = dict(compare(pts(c), *model5[name], TOL[num]), color=c["color"])
+        check_legend(res, f, PARSERS["5"])
         results[f"Figure {num}"] = res
 
     # Figure 6: QOSS (left axis, nC) is concave in VDS; EOSS (right axis, uJ) is not.
@@ -163,7 +200,12 @@ def main():
         dv = v[i] - v[i - 1]
         q.append(q[-1] + 0.5 * (c_f[i] + c_f[i - 1]) * dv)
         e.append(e[-1] + 0.5 * (c_f[i] * v[i] + c_f[i - 1] * v[i - 1]) * dv)
+    arrows = {tuple(round(v, 1) for v in json.loads(k)): d for k, d in f.get("arrows", {}).items()}
+    colour_dir = lambda c: arrows.get(tuple(round(v, 1) for v in c["color"]))
+    arrow_ok = colour_dir(q_curve) == "left" and colour_dir(e_curve) == "right"
     res = {"assignment_rule": f"QOSS(20 V)/QOSS({end:.1f} V) exceeds the same ratio for EOSS (charge is concave)",
+           "legend_check": {"agree": arrow_ok, "method": "figure arrows: QOSS curve points to the left (nC) axis, EOSS to the right (uJ) axis",
+                            "arrows": f.get("arrows")},
            "model_method": "trapezoid integration of the small-signal COSS curve from 0 V", "curves": {}}
     res["curves"]["QOSS"] = dict(compare(pts(q_curve, "y_left"), v, [x * 1e9 for x in q], TOL["6q"]), color=q_curve["color"])
     res["curves"]["EOSS"] = dict(compare(pts(e_curve, "y_right"), v, [x * 1e6 for x in e], TOL["6e"]), color=e_curve["color"])
@@ -179,7 +221,12 @@ def main():
         dv = vx[i] - vx[i - 1]
         qd.append(qd[-1] + 0.5 * (cx[i] + cx[i - 1]) * dv * 1e-3)            # pF*V -> nC
         ed.append(ed[-1] + 0.5 * (cx[i] * vx[i] + cx[i - 1] * vx[i - 1]) * dv * 1e-6)  # pF*V^2 -> uJ
-    diag = {"added_after_the_declared_check_failed": True,
+    if not arrow_ok:
+        for c in res["curves"].values():
+            c["outcome"] = "unresolved"
+    diag = {"added_after_the_first_declared_check_failed": True,
+            "note": ("In revision 1 the EOSS failure came from our digitizer's text-based axis calibration, not "
+                     "from EPC's drawing. Kept as a vendor-internal consistency check between Figs. 5a and 6."),
             "method": "trapezoid integration of the digitized Fig. 5a COSS curve (EPC's own data), no model involved",
             "rows": []}
     for vv in (5, 10, 15, 20, 30, 50, 75, 95):
@@ -204,6 +251,7 @@ def main():
     for t, c in ((25, cold), (125, hot)):
         m = extra[f"reverse_{t}C"]
         res["curves"][f"{t}C"] = dict(compare(pts(c), m["vsd_V"], m["isd_A"], TOL["8"]), color=c["color"])
+    check_legend(res, f, PARSERS["8"])
     results["Figure 8"] = res
 
     # Figure 9: normalized RDS(on) vs temperature (single curve).
@@ -214,6 +262,7 @@ def main():
                            "model_note": "model points at 0, 25, ..., 150 C, linearly interpolated"}
 
     # Colour consistency: blue/red must mean 25/125 C in every temperature figure.
+    legend_agreement = {name: r.get("legend_check", {}).get("agree") for name, r in results.items()}
     temp_colors = {name: {k: tuple(v["color"]) for k, v in r["curves"].items()}
                    for name, r in results.items() if name in ("Figure 2", "Figure 4", "Figure 8")}
     consistent = len({(c["25C"], c["125C"]) for c in temp_colors.values()}) == 1
@@ -232,6 +281,8 @@ def main():
               "tolerances": {k: {"relative": v[0], "absolute": v[1], "unit": v[2]} for k, v in TOL.items()},
               "tolerance_timing": "fixed before these figures were digitized or compared (Fig. 7 is compared separately)",
               "temperature_colour_consistency": {"consistent": consistent, "colours": temp_colors},
+              "legend_agreement": legend_agreement,
+              "digitizer_revision": 2,
               "summary": summary, "figures": results}
     OUTPUT.write_text(json.dumps(report, indent=1) + "\n")
     for k, s in summary.items():
@@ -239,6 +290,7 @@ def main():
         print(f"{k:24s} {s['outcome']:13s} n={s['points']:3d} within={s['fraction_within'] if s['fraction_within'] is None else round(s['fraction_within'],3)} "
               f"worst={'-' if w is None else round(w, 2)} at x={s['worst_at_x']}")
     print("temperature colours consistent:", consistent)
+    print("legend agreement:", legend_agreement)
 
 
 if __name__ == "__main__":

@@ -293,7 +293,7 @@ envelope expansion are removed last.
 Status, 28 September 2026:
 
 - **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
-- **G2** is open. The datasheet-table baseline runs with convergence and equation checks. The gate-charge curve (Fig. 7) matches within 0.014 V, and the table's subcharge differences are traced to the table's own boundary definitions. All other datasheet curves are compared: 22 of 23 pass pre-declared tolerances. The Fig. 6 EOSS failure at low voltage traces to EPC's drawn curve disagreeing with EPC's own capacitance data. Every discrepancy now has a classification; awaiting owner review to close G2.
+- **G2** is open, awaiting owner review. The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances. The table's QGS/QGD/QG(TH) values remain unresolved: EPC's own curve does not reproduce them, and they may use different definitions or different source data.
 
 G1 and G2 can proceed in simulation while G0's lab inventory is completed. No
 hardware is energized before G4's test plan and interlocks are approved.
