@@ -1,0 +1,264 @@
+{
+  "schema": "epc2204-datasheet-baseline/1",
+  "scope": "Unmodified EPC2204 vendor model in LTspice compared with the datasheet table. Datasheet values are vendor-described typical/limit values, not our measurements; agreement here is model-to-datasheet consistency, not hardware validation.",
+  "run_outcome": "completed",
+  "failed_benches": {},
+  "evaluator_sha256": "864719538a25f55a5b34cbbdd7aca176fc29d7e49bbacec6b66e5d893176ea16",
+  "model": {
+    "library": "EPCGaNLibrary.lib",
+    "library_sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+    "archive_sha256": "107611b7510e4e7d374a1baa646ecf432dd50a81150eb2470900f3b2cdbf1c65",
+    "subcircuit": "EPC2204",
+    "modified": false
+  },
+  "tool": {
+    "name": "ltspice",
+    "available": true,
+    "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+    "version": "26.1.1.0",
+    "capabilities": [
+      "batch",
+      "raw-binary",
+      "raw-ascii",
+      "op",
+      "dc",
+      "ac",
+      "tran",
+      "meas",
+      "step"
+    ],
+    "reason": null
+  },
+  "comparison_rules": {
+    "limits": "inside/outside datasheet min-max",
+    "typical_only_screening_band": 0.25,
+    "screening_meaning": "flags values for review; not an acceptance tolerance"
+  },
+  "datasheet_table": {
+    "rds_on": {
+      "unit": "ohm",
+      "typ": 0.0044,
+      "max": 0.006,
+      "conditions": "VGS = 5 V, ID = 16 A",
+      "model": 0.004399544816760949,
+      "ratio_to_typ": 0.999896549263852,
+      "outcome": "inside-datasheet-limits"
+    },
+    "vgs_th": {
+      "unit": "V",
+      "min": 0.8,
+      "typ": 1.1,
+      "max": 2.5,
+      "conditions": "VDS = VGS, ID = 4 mA",
+      "model": 1.1704008953104652,
+      "ratio_to_typ": 1.0640008139186046,
+      "outcome": "inside-datasheet-limits"
+    },
+    "vsd": {
+      "unit": "V",
+      "typ": 1.6,
+      "conditions": "IS = 0.5 A, VGS = 0 V (defined by design)",
+      "model": 1.6051449157072555,
+      "ratio_to_typ": 1.0032155723170346,
+      "outcome": "near-typical"
+    },
+    "ciss": {
+      "unit": "F",
+      "typ": 6.44e-10,
+      "max": 8.51e-10,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 6.445307088724277e-10,
+      "ratio_to_typ": 1.000824082100043,
+      "outcome": "inside-datasheet-limits"
+    },
+    "crss": {
+      "unit": "F",
+      "typ": 2.3e-12,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 2.313634589722458e-12,
+      "ratio_to_typ": 1.0059280824880252,
+      "outcome": "near-typical"
+    },
+    "coss": {
+      "unit": "F",
+      "typ": 3.04e-10,
+      "max": 4.56e-10,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 3.0476976028366555e-10,
+      "ratio_to_typ": 1.0025321061962684,
+      "outcome": "inside-datasheet-limits"
+    },
+    "coss_er": {
+      "unit": "F",
+      "typ": 4.01e-10,
+      "conditions": "VDS = 0 to 50 V, VGS = 0 V",
+      "model": 4.014239629580144e-10,
+      "ratio_to_typ": 1.00105726423445,
+      "outcome": "near-typical"
+    },
+    "coss_tr": {
+      "unit": "F",
+      "typ": 5.01e-10,
+      "conditions": "VDS = 0 to 50 V, VGS = 0 V",
+      "model": 5.016265359230393e-10,
+      "ratio_to_typ": 1.0012505707046693,
+      "outcome": "near-typical"
+    },
+    "qg": {
+      "unit": "C",
+      "typ": 5.7e-09,
+      "max": 7.4e-09,
+      "conditions": "VDS = 50 V, VGS = 5 V, ID = 16 A",
+      "model": 3.815202355112368e-09,
+      "ratio_to_typ": 0.6693337465109418,
+      "outcome": "inside-datasheet-limits"
+    },
+    "qgs": {
+      "unit": "C",
+      "typ": 1.8e-09,
+      "conditions": "VDS = 50 V, ID = 16 A",
+      "model": 1.351385711148272e-09,
+      "ratio_to_typ": 0.7507698395268178,
+      "outcome": "near-typical"
+    },
+    "qgd": {
+      "unit": "C",
+      "typ": 8e-10,
+      "conditions": "VDS = 50 V, ID = 16 A",
+      "model": 6.431406024212907e-10,
+      "ratio_to_typ": 0.8039257530266134,
+      "outcome": "near-typical"
+    },
+    "qg_th": {
+      "unit": "C",
+      "typ": 1e-09,
+      "conditions": "VDS = 50 V, ID = 16 A",
+      "model": 7.251234437031426e-10,
+      "ratio_to_typ": 0.7251234437031426,
+      "outcome": "review"
+    },
+    "qoss": {
+      "unit": "C",
+      "typ": 2.5e-08,
+      "max": 3.8e-08,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 2.5081326796151965e-08,
+      "ratio_to_typ": 1.0032530718460786,
+      "outcome": "inside-datasheet-limits"
+    }
+  },
+  "informational": {
+    "rds_on_125C": 0.007463179865370652,
+    "rds_on_ratio_125C_to_25C": 1.6963527310684894
+  },
+  "checks_and_definitions": {
+    "capacitance_sign_check": "CISS and CRSS use signed currents; a negative value indicates a sign-convention error",
+    "ac_integrated": {
+      "qoss_C": 2.5080907502349315e-08,
+      "eoss_J": 5.017592571617875e-07,
+      "points": 401,
+      "method": "trapezoid of small-signal COSS over 0..50 V, 0.25 V spacing"
+    },
+    "transient": {
+      "qoss_C": 2.5081326796151965e-08,
+      "eoss_J": 5.01779953697518e-07,
+      "method": "integral of drain-source current over a 1 us 0 -> 50 V ramp"
+    },
+    "ac_vs_transient": {
+      "qoss_relative_difference": 1.6717369302581743e-05,
+      "eoss_relative_difference": 4.124623867084201e-05,
+      "tolerance": 0.02,
+      "purpose": "checks that the model's small-signal and large-signal output charge agree in LTspice",
+      "outcome": "pass"
+    },
+    "gate_charge_initial_vgs_V": 0.045718416571617126,
+    "gate_charge_definitions": {
+      "qg": "charge delivered into the gate terminal (Ix(x1:gatein)) when VGS reaches 5 V",
+      "qg_th": "gate charge when VGS reaches the model's VGS(th) from the vgs_th bench",
+      "qgs": "gate charge when the clamp-diode current falls below 1% of 16 A (FET carries the load)",
+      "qgd": "additional charge until VDS falls to 5 V (10% of 50 V)",
+      "note": "QGS/QGD/QG(TH) boundary definitions are the bench's; EPC's exact extraction definitions are not stated"
+    }
+  },
+  "evidence_directory": "runs\\epc2204-baseline-ff0e9fc0363b43f29fa441f1c9651771",
+  "runs": {
+    "rds_on_25C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7650000000139698,
+      "warnings": [],
+      "netlist_sha256": "6ac13c14528c1dd45194d90b68f9069ffec4fe03ad3d948e749c39102da8ca2f"
+    },
+    "rds_on_125C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7810000000754371,
+      "warnings": [],
+      "netlist_sha256": "883604e96d569e1649c1edf3d73530c423faa74afe0d63881569257443412761"
+    },
+    "vgs_th": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7660000000614673,
+      "warnings": [],
+      "netlist_sha256": "9710fa44281301c2df9360438a4dedb5c48a49eae6953374dcb208a51acf7b3a"
+    },
+    "vsd": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.765999999945052,
+      "warnings": [],
+      "netlist_sha256": "9024c22ad2f1b0cc24676dd832640cf8316676e0acad4ee7a3971aea19e76b53"
+    },
+    "caps_gate_ac": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7820000000065193,
+      "warnings": [],
+      "netlist_sha256": "a5f9fba315358f0a95817cd2921b69897f600c7b4fbbc301654e0b4059902455"
+    },
+    "coss_curve_ac": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 19.766000000061467,
+      "warnings": [],
+      "netlist_sha256": "5ed19452d58ff7d650f68c2e0636af7e4be6ececefd937b22b0a8cd1fbc3136c"
+    },
+    "qoss_tran": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.734000000054948,
+      "warnings": [],
+      "netlist_sha256": "631717b72ab75b23ce80dda7d8f9c45e59df1d714967547dbc34aa41ed5b4b52"
+    },
+    "gate_charge_tran": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 1.0,
+      "warnings": [],
+      "netlist_sha256": "a0bff26d2e8615717dea0aa925f6378d05055b7d8aea7ba74fa121aba160ba60"
+    },
+    "output_curves_25C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7040000000270084,
+      "warnings": [],
+      "netlist_sha256": "0e92b3a4db2d4865947435326c55d8af21b2c82754a5c3b82cdcf1366cc87ad7"
+    },
+    "transfer_curve_25C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7190000000409782,
+      "warnings": [],
+      "netlist_sha256": "486327b483b75a4a45fb9810d6b16816046f42f75eb8cf4c66079257ed991ec3"
+    },
+    "transfer_curve_125C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.765999999945052,
+      "warnings": [],
+      "netlist_sha256": "400154c99bac070df34c3e54f5c3fbdfc6b7f5ac4a92e34cfed6f65d51a97b8e"
+    }
+  },
+  "curves_file": "results\\gan\\epc2204-model-curves.json"
+}

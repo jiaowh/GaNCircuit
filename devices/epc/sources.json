@@ -1,0 +1,48 @@
+{
+  "schema": "vendor-sources/1",
+  "retrieved": "2026-09-28",
+  "local_directory": "vendor/epc (git-ignored; files are not redistributed in this repository)",
+  "terms": "Library header: '(C) Copyright Efficient Power Conversion Corporation. All rights reserved.' No separate license for redistribution was found. Keep files local; this record gives source URLs and checksums for replay.",
+  "files": [
+    {
+      "name": "EPCGaNLibrary.zip",
+      "url": "https://epc-co.com/epc/documents/spice-files/LTSPICE/EPCGaNLibrary.zip",
+      "linked_from": "https://epc-co.com/epc/products/gan-fets-and-ics/epc2204",
+      "sha256": "107611b7510e4e7d374a1baa646ecf432dd50a81150eb2470900f3b2cdbf1c65",
+      "contents": {
+        "EPCGaNLibrary.lib": {
+          "library_version": "1.105 (06/10/2026)",
+          "epc2204_added": "1.68 (08/13/2020)",
+          "subcircuit": "EPC2204 gatein drainin sourcein",
+          "note": "EPC2204A (added 1.92) is textually identical apart from its name",
+          "sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069"
+        }
+      }
+    },
+    {
+      "name": "EPC2204_V1_PSPICE.net",
+      "url": "https://epc-co.com/epc/documents/spice-files/PSPICE/EPC2204_V1_PSPICE.net",
+      "sha256": "8b29678d765e946153844a66dfb4f2d3211c563f18b755f0968aa736e6cb5ece",
+      "note": "Defines subcircuit EPC2204A (not EPC2204); header says 'Adapted for Simplis' (1.01, 12/02/2022). Not used by the LTspice benches."
+    },
+    {
+      "name": "EPC2204_datasheet.pdf",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/EPC2204_datasheet.pdf",
+      "revision": "Revised November 26, 2024",
+      "sha256": "8cb4533d1e60656c24eacbf1848aa0e46116fb08c52fae3513b07493fd4b3a59"
+    },
+    {
+      "name": "EPC2204_Thermal_SPICE_Model_for_web.pdf",
+      "url": "https://epc-co.com/epc/documents/models/thermal/EPC2204%20Thermal%20SPICE%20Model%20for%20web.pdf",
+      "sha256": "2907774446b3e6dbbad61576293f0b76c9f6902ed9af245a3e52fc3cb16f44f6"
+    }
+  ],
+  "also_linked_not_downloaded": [
+    "https://epc-co.com/epc/documents/spice-files/TSPICE/EPC2204_V0_TSPICE.sp",
+    "https://epc-co.com/epc/documents/KiCad/EPC-KiCad-Library.zip",
+    "https://epc-co.com/epc/documents/altium-files/EPC Altium Library.zip",
+    "https://epc-co.com/epc/documents/STEP/D0133.step",
+    "https://epc-co.com/epc/Portals/0/epc/documents/models/plecs/EPC-plecs-library.zip"
+  ],
+  "access_note": "EPC pages refuse requests without a browser-like User-Agent header (HTTP 403)."
+}

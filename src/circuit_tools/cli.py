@@ -7,7 +7,8 @@ import json
 from pathlib import Path
 import sys
 
-from .adapters import discover_capabilities, run_ngspice
+from .adapters import discover_capabilities
+from .ltspice import run_ltspice
 from .core import ArtifactStore, Circuit, CircuitPatch, RevisionConflict, ValidationError
 from .nmos_data import NMOSDataset
 from .nmos_metrics import dc_secants
@@ -35,19 +36,24 @@ def main(argv=None):
     patch.add_argument("patch", help="JSON with expected_revision and upsert/remove/connect")
     netlist = commands.add_parser("netlist")
     netlist.add_argument("artifact")
-    simulate = commands.add_parser("simulate")
+    simulate = commands.add_parser("simulate", help="Run a trusted LTspice netlist in batch mode")
     simulate.add_argument("netlist", help="Trusted local SPICE input")
     simulate.add_argument("--output", required=True, help="New run directory")
-    simulate.add_argument("--executable", default="ngspice")
-    simulate.add_argument("--timeout", type=float, default=30)
-    simulate.add_argument("--result-file", default="measurements.dat")
+    simulate.add_argument("--library", action="append", default=[],
+                          help="Model file loaded by the netlist with .lib/.include (repeatable)")
+    simulate.add_argument("--executable", default=None, help="LTspice executable (default: discovered)")
+    simulate.add_argument("--timeout", type=float, default=60)
     args = parser.parse_args(argv)
+    store = None
     try:
         if args.command == "capabilities":
             result = {k: asdict(v) for k, v in discover_capabilities().items()}
         elif args.command == "simulate":
-            result = asdict(run_ngspice(Path(args.netlist), args.output,
-                executable=args.executable, timeout_s=args.timeout, result_file=args.result_file))
+            run = run_ltspice(Path(args.netlist), args.output, libraries=args.library,
+                              executable=args.executable, timeout_s=args.timeout)
+            result = asdict(run)
+            # Full traces stay in the run directory; print their names only.
+            result["measurements"] = sorted(run.measurements)
             print(json.dumps(result, indent=2, allow_nan=False))
             return 0 if result["status"] == "completed" and result["measurements"] else 2
         elif args.command == "nmos-import":
@@ -96,3 +102,6 @@ def main(argv=None):
     except (OSError, ValueError, TypeError, KeyError, RevisionConflict) as exc:
         print(json.dumps({"status": "failed", "message": str(exc)}), file=sys.stderr)
         return 2
+    finally:
+        if store is not None:
+            store.close()

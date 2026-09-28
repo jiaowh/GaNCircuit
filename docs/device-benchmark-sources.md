@@ -66,8 +66,11 @@ Recorded 28 September 2026. This is the active application in
 replaces CoolGaN as the primary commercial track. CoolGaN remains an
 alternative.
 
-This record comes from a web check of EPC PDFs and documentation. No EPC files
-have been downloaded into the project or run locally.
+This record comes from a web check of EPC PDFs and documentation. On 28 September
+2026 the EPC2204 LTspice library, PSpice file, datasheet and thermal-model
+note were downloaded into the git-ignored `vendor/epc/`, with checksums in
+`devices/epc/sources.json`. The LTspice model has been run; see
+docs/build.md "EPC2204 vendor-model baseline".
 
 - **Board–FET pairing.** EPC90121 uses the EPC2050: 350 V, 4 A, onsemi
   NCP51820 driver ([QSG Rev 1.0](https://epc-co.com/epc/Portals/0/epc/documents/guides/EPC90121_qsg.pdf)).

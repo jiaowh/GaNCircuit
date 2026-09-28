@@ -1,22 +1,41 @@
 # Building and running the first slice
 
-This is a development foundation for the active toolset plan. The library has no
-mandatory runtime dependencies beyond Python 3.10+. Circuit simulations require
-ngspice. Commands below run from the repository root in Linux or WSL.
+The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
+simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
+on 28 September 2026 when LTspice became the project simulator. GaN and
+LTspice commands run natively on Windows from the repository root. The paused
+DEVSIM device fixture still runs under Linux or WSL (see the later sections).
 
 ```sh
-PYTHONPATH=src python3 -m unittest discover -s tests -v
-PYTHONPATH=src python3 -m circuit_tools capabilities
-PYTHONPATH=src python3 -m circuit_tools circuit-create examples/divider.json
-python3 scripts/verify_circuit_fixtures.py --executable .tools/ngspice/usr/bin/ngspice
-python3 scripts/verify_diode_bridge.py --executable .tools/ngspice/usr/bin/ngspice
+PYTHONPATH=src python -m pytest -q tests
+PYTHONPATH=src python -m circuit_tools capabilities
+PYTHONPATH=src python -m circuit_tools circuit-create examples/divider.json
+PYTHONPATH=src python scripts/verify_ltspice_fixtures.py
+PYTHONPATH=src python scripts/verify_diode_bridge.py
+PYTHONPATH=src python scripts/epc2204_baseline.py
 ```
 
-On this Windows host, `scripts/bootstrap-ngspice.ps1` downloads and verifies the
-Ubuntu 24.04 amd64 ngspice 42 package, then unpacks it inside `.tools/`. It does
-not install a system package. WSL needs the shared libraries required by that
-Ubuntu binary. On another Linux platform, install a compatible ngspice and omit
-the `--executable` argument.
+### LTspice installation
+
+Install LTspice from the
+[official Analog Devices download](https://ltspice.analog.com/software/LTspice64.msi).
+On this host it was installed on 28 September 2026 from an MSI whose Authenticode
+signature is valid (Analog Devices International UC), SHA-256
+`249ebde3c84e01f4ce5b5ff78c6c7588f049bac85ae1635f968cfdbe4f4ecd03`, with
+`msiexec /i LTspice64.msi /qn`. That installs per-user without administrator
+rights, at `%LOCALAPPDATA%\Programs\ADI\LTspice\LTspice.exe`, version
+26.1.1.0. The adapter finds that path, `C:\Program Files\ADI\LTspice`, the
+`LTSPICE_EXE` environment variable, or an explicit `--executable`. An explicit
+path never falls back to another installation.
+
+### Vendor model files
+
+EPC files live in `vendor/epc/`, which git ignores because the library is
+"all rights reserved". `devices/epc/sources.json` records each URL, retrieval
+date and SHA-256. EPC's server rejects requests without a browser-like
+User-Agent. `scripts/epc2204_baseline.py` refuses to run if the downloaded
+`EPCGaNLibrary.zip` does not match the recorded checksum, and it extracts the
+`.lib` file itself.
 
 Build and install with `python3 -m pip install .` in a virtual environment.
 For an offline build, supply setuptools and wheel locally and use
@@ -40,25 +59,43 @@ numeric values; it does not prove full circuit connectivity or model validity.
 Model definitions and analysis commands belong in the simulation fixture.
 
 ```sh
-PYTHONPATH=src python3 -m circuit_tools simulate examples/divider.cir \
-  --output runs/my-divider --executable .tools/ngspice/usr/bin/ngspice
+PYTHONPATH=src python -m circuit_tools simulate bench.cir --library EPCGaNLibrary.lib \
+  --output runs/my-bench
 ```
 
-Use a new output directory for each run. The adapter retains the exact input,
-stdout, stderr, simulator log, raw measurements and provenance. It ignores
-ngspice startup files and currently accepts self-contained netlists only.
-SPICE input is trusted executable simulator input, not a sandboxed upload format.
-`completed` means the process completed; acceptance belongs to a separate fixed
-evaluator. Missing tools, malformed data, and timeouts do not establish a
-physical specification failure. The CLI succeeds only when measurements exist.
+Use a new output directory for each run. The adapter keeps the exact
+netlist, copies and hashes every model library the netlist loads, and retains
+the LTspice log, the `.raw` waveforms, the parsed `result.json` and the
+provenance record. A netlist may load only libraries passed with `--library`,
+referenced by bare file name. LTspice can exit with status 0 after an error,
+so `completed` requires a parsed `.raw` file or `.meas` result and a log
+without errors. Acceptance belongs to a separate fixed evaluator. Missing
+tools, malformed data and timeouts do not establish a physical specification
+failure. SPICE input is trusted executable simulator input, not a sandboxed
+upload format.
+
+Raw-file notes established by the fixtures:
+- Traces are float32 unless `.options numdgt` is above 6, which makes LTspice
+  store float64. Float32 limits absolute agreement to about 1e-7 relative.
+- LTspice sorts `.ac list` frequencies.
+- When each `.step` has a single AC point, the file is indexed by the stepped
+  parameter instead of frequency.
 
 ## Evidence and limitations
 
-The fixed circuit evaluator checks a 2 V equal-resistor divider against 1 V,
-and an 11-point custom native SPICE diode model against the Shockley equation
-at 300 K. It records the evaluator hash, simulator binary hash, input hash,
-raw measurements, tolerances and outcomes. This checks native `.model` loading;
-it does not qualify Verilog-A/OSDI or a TCAD-derived model.
+The [LTspice fixture report](../results/toolset/ltspice-fixtures.json) checks
+the adapter against analytical answers:
+- a resistive divider (`.op`);
+- an RC step response (trace and `.meas`);
+- RC magnitude and phase at the corner frequency (complex AC);
+- a nested DC sweep split into its steps (float64 traces);
+- an 11-point Shockley diode at 300 K;
+- binary against ASCII output of the same bench.
+
+All pass with LTspice 26.1.1. The first run failed two checks because of
+evaluator assumptions (frequency ordering, and a float32 tolerance), which were
+corrected as noted above. A comparison with an interactive GUI run of the same
+bench, part of the adoption gate, has not been done.
 
 The diode bridge in `circuit_tools.models` fits log current against voltage,
 binds the result to a dataset and device revision, checks a disjoint holdout,
@@ -68,8 +105,9 @@ Those tests are software evidence, not physical-device validation.
 
 The [executed bridge replay](../results/toolset/diode-bridge.json) additionally
 fits real native-SPICE diode observations and simulates the exported model.
-Its maximum current discrepancy was about 0.031%, below the fixed 0.2%
-fixture tolerance. This still uses a native-SPICE source device, not TCAD.
+It now runs through LTspice. Its maximum current discrepancy is about 0.032%
+(0.031% previously under ngspice), below the fixed 0.2% fixture tolerance.
+This still uses a native-SPICE source device, not TCAD.
 
 The [device reference report](../results/device-reference/latest.json) records
 successful executions of the official diode and planar MOS examples. Run
@@ -366,8 +404,57 @@ so the bias current carries roughly 3% mesh uncertainty. With gm/Id = 7.2 /V, a
 10 mV threshold shift moves Id by about 7%, so the circuit should set Vgs for
 the target Vout from the fitted model rather than fixing 0.6 V.
 
-Not yet done: a compact model fitted over the operating region, ngspice
+Not yet done: a compact model fitted over the operating region, circuit-simulator
 simulation of the amplifier with that model, a direct-TCAD load-line check,
 and dynamic behavior. Constant mobility without velocity saturation or
 mobility degradation makes strong-inversion currents optimistic; the chosen
 low-overdrive point is less affected.
+
+## EPC2204 vendor-model baseline (Stage 1, first slice)
+
+`scripts/epc2204_baseline.py` runs the unmodified `EPC2204` subcircuit from
+EPC's LTspice library (version 1.105, 10 June 2026) at the conditions of the
+datasheet's electrical-characteristics table (datasheet revised 26 November
+2024). Its comparison rules are fixed in the script before any run:
+- rows with datasheet limits are reported as inside or outside them;
+- typical-only rows get a ratio and are flagged for review outside ±25%. This
+  is a screening aid, not an acceptance tolerance.
+
+The script writes [the baseline report](../results/gan/epc2204-baseline.json)
+and [simulated curves](../results/gan/epc2204-model-curves.json) (output and
+transfer characteristics, COSS against VDS) for the later comparison with
+digitized datasheet curves.
+
+Result, 28 September 2026: all 11 benches complete without LTspice warnings.
+
+| Quantity | Model | Datasheet typ (limits) | Outcome |
+|---|---|---|---|
+| RDS(on), 5 V, 16 A | 4.40 mΩ | 4.4 (max 6) mΩ | inside limits |
+| VGS(th), 4 mA | 1.17 V | 1.1 (0.8–2.5) V | inside limits |
+| VSD, 0.5 A | 1.61 V | 1.6 V | near typical |
+| CISS / CRSS / COSS at 50 V | 644.5 / 2.31 / 304.8 pF | 644 (max 851) / 2.3 / 304 (max 456) pF | inside limits / near typical |
+| COSS(ER) / COSS(TR), 0–50 V | 401.4 / 501.6 pF | 401 / 501 pF | near typical |
+| QOSS, 50 V | 25.1 nC | 25 (max 38) nC | inside limits |
+| QG, 50 V, 16 A, 5 V | 3.82 nC | 5.7 (max 7.4) nC | inside the max, but 0.67 of typical |
+| QGS / QGD / QG(TH) | 1.35 / 0.64 / 0.73 nC | 1.8 / 0.8 / 1.0 nC | 0.75 / 0.80 / 0.73 of typical; QG(TH) flagged |
+
+- Output charge integrated from the small-signal COSS curve agrees with a
+  large-signal 0 → 50 V ramp to 0.002% (declared tolerance 2%). The model's
+  capacitance and charge descriptions are therefore consistent in LTspice.
+- RDS(on) rises by a factor of 1.70 from 25 °C to 125 °C in the model. The
+  datasheet's normalized-RDS(on) curve has not been digitized yet.
+- The static and capacitance values sit within 0.1–6.4% of the typicals.
+  That suggests the model was fitted to these table conditions; it is not
+  independent validation.
+- The gate-charge shortfall is the one discrepancy to classify under the
+  Stage 1 rule: model, test-condition mismatch, or bench definition. The
+  bench's plateau boundaries (1% clamp current, VDS = 5 V) are its own,
+  because EPC does not state its extraction definitions. The next step is to
+  digitize datasheet Fig. 7 (gate charge) and compare the whole VGS–QG curve.
+- The first gate-charge run started with the gate floating near 1.95 V
+  through the model's convergence resistors, above threshold. A 100 kΩ
+  hold-down resistor and charge integration at the gate terminal fixed it
+  (initial VGS 0.046 V).
+
+These are model-to-datasheet consistency results. Datasheet values are
+vendor-described, and nothing here is a hardware measurement.

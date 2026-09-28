@@ -198,11 +198,11 @@ unknowns. Then fabricate and measure our layout.
 ## 5. Simulator selection and adapter
 
 Choose the simulator from the selected vendor model and the available
-licenses. Do not convert the vendor model to ngspice.
+licenses. Do not convert the vendor model to another simulator's syntax.
 
 | Candidate | Status |
 |---|---|
-| LTspice | First candidate if the selected EPC model supports it. Free, with command-line batch execution, so simulations run without the GUI. The switches `-b` (batch run producing a `.raw` file), `-Run`, `-ascii` (ASCII `.raw`) and `-netlist` are documented in a community mirror of LTspice's help ([ltwiki](https://ltwiki.org/LTspiceHelp/LTspiceHelp/Command_Line_Switches.htm)). Confirm them against the installed version's own help at G1. Not yet installed on the Windows host. |
+| LTspice | **Selected, 28 September 2026** (version 26.1.1; EPC publishes an LTspice library containing the EPC2204). First candidate if the selected EPC model supports it. Free, with command-line batch execution, so simulations run without the GUI. The switches `-b` (batch run producing a `.raw` file), `-Run`, `-ascii` (ASCII `.raw`) and `-netlist` are documented in a community mirror of LTspice's help ([ltwiki](https://ltwiki.org/LTspiceHelp/LTspiceHelp/Command_Line_Switches.htm)). Confirm them against the installed version's own help at G1. Not yet installed on the Windows host. |
 | PSpice | Valid for EPC's PSpice model, subject to the available installation and license. |
 | Spectre | Valid with the matching model and a simulator license; runs from the command line without the ADE GUI. |
 
@@ -234,8 +234,8 @@ Reuse:
 - the parsed-output rule for simulator results;
 - the CLI.
 
-Keep the ngspice adapter and its tests as the reference implementation of the
-runner interface. The DEVSIM and NMOS scripts and results stay as a paused
+The ngspice adapter was removed on 28 September 2026 after the LTspice adapter
+passed the same known-answer role (it remains in git history). The DEVSIM and NMOS scripts and results stay as a paused
 fixture. They are not prerequisites and are not extended for GaN.
 
 New artifact types:
@@ -289,6 +289,11 @@ envelope expansion are removed last.
 | G4 Stock-board measurement | Approved test plan; interlocks verified; double-pulse and efficiency measurements on the unmodified EPC board | Measurement-chain characterization; first per-layer error budget |
 | G5 Own layout | KiCad revision driven by G3–G4 results; checks; human review; fabrication | Connectivity, DRC and review sign-off |
 | G6 Closure | Own board measured; back-fit; closure report; checkpoint log | End-to-end run with a record of which checkpoints needed a human |
+
+Status, 28 September 2026:
+
+- **G1** is mostly met: LTspice 26.1.1 is installed and pinned, and the adapter passes its known-answer fixtures and runs the unmodified vendor model. Still missing: the comparison with an interactive GUI run.
+- **G2** has started: the datasheet-table baseline runs. Still missing: digitized curves, and classification of the gate-charge discrepancy.
 
 G1 and G2 can proceed in simulation while G0's lab inventory is completed. No
 hardware is energized before G4's test plan and interlocks are approved.

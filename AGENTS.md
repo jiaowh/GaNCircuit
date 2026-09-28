@@ -17,7 +17,9 @@ Rules from the owner's refinements that every session must keep:
 
 Provisional target (owner, 28 September 2026): EPC9097 board with EPC2204 FETs (100 V). EPC90121/EPC2050 (350 V) is the alternative. Never mix one board's measurements or driver with the other's model. The immediate deliverable is the unmodified EPC2204 model running through an LTspice adapter, with parsed results and a reproducible bench.
 
-Simulator: choose the one that suits the selected vendor model and the available licenses. LTspice is the first candidate if the model supports it; PSpice and Spectre are also valid. ngspice is not a project requirement. Add the chosen simulator as an adapter behind the existing runner interface: it writes the test bench, launches the simulator, reads waveforms and reports measurements. Do not convert the vendor model to ngspice. As of 28 September 2026, the Windows host has no LTspice, PSpice, Spectre or KiCad installation, and the existing ngspice/DEVSIM tooling runs under WSL.
+Simulator: choose the one that suits the selected vendor model and the available licenses. LTspice is the first candidate if the model supports it; PSpice and Spectre are also valid. ngspice is not a project requirement. Add the chosen simulator as an adapter behind the existing runner interface: it writes the test bench, launches the simulator, reads waveforms and reports measurements. Do not convert the vendor model to another simulator's syntax.
+
+Status, 28 September 2026: LTspice 26.1.1 is installed per-user and `src/circuit_tools/ltspice.py` is the circuit adapter. `scripts/verify_ltspice_fixtures.py` passes; `scripts/epc2204_baseline.py` runs the unmodified EPC2204 model against the datasheet table (see docs/build.md). ngspice has been removed from the code and the host at the owner's request. EPC files live in the git-ignored `vendor/epc/`, recorded in `devices/epc/sources.json`. Open Stage 1 items: classify the gate-charge shortfall (QG 3.8 nC against 5.7 typical), digitize the datasheet curves, and compare one bench with an interactive LTspice run. The DEVSIM fixture runs under WSL; KiCad, PSpice and Spectre are not installed.
 
 ## Paused silicon fixture
 
@@ -25,7 +27,7 @@ The DEVSIM/ngspice silicon NMOS work was an assistant-selected development fixtu
 
 - The upstream `gmsh_mos2d` reference is retired as an amplifier candidate and kept as a numerical regression fixture (weak gate control, gm/gds ≈ 0.063 on the sampled grid). Do not spend sessions verifying it or proving its failure mechanism.
 - `devices/planar-nmos-lc1.json` (L = 1 µm, 10 nm oxide, 3.3 V) is built by `scripts/planar_nmos.py` and analyzed by `scripts/analyze_planar_nmos.py`. Its common-source point (Vgs 0.6 V, W 23.9 µm, RD 16.5 kΩ, 100 µA) gives Av ≈ −11 from device-simulator derivatives, checked on three meshes. These are simulated results under constant-mobility physics; see docs/build.md "Generated planar NMOS".
-- Possible follow-up if the fixture resumes: fit a DC model over the amplifier region with a predeclared holdout, simulate the stage in ngspice, compare with direct device-simulator load-line points, then make one circuit-driven device change. The IRDS comparison remains deferred.
+- Possible follow-up if the fixture resumes: fit a DC model over the amplifier region with a predeclared holdout, simulate the stage in LTspice, compare with direct device-simulator load-line points, then make one circuit-driven device change. The IRDS comparison remains deferred.
 
 ## Working preferences
 
