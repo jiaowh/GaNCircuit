@@ -689,6 +689,19 @@ stackup and the 2024 test-point report). The other is 4-layer, "B5239 Rev
 2.0" (the Gerber zip, 2023). Both carry the same 38 nets. Parasitic extraction
 must use the revision of the board under test, which is not yet known.
 
+The ODB++ component data do not match the EPC9097 BOM for the power stage.
+All 107 reference designators match, but:
+- Q1 and Q2 are listed as EPC2619, not EPC2204;
+- the gate resistors are 4.7 Ω on and 1 Ω off, not 1 Ω and 0 Ω;
+- U80 is a uP1966A, not a uP1966E.
+
+The Q1/Q2 footprint is EPC's D0133 package (2.50 × 1.50 mm), whose STEP model
+EPC links from the EPC2204 product page. The 6-layer file therefore looks like
+the same design with a different population, but whether its copper matches a
+shipped EPC9097 is not established. The Rev 2.0 layout PDF names R80–R83
+without values. Details are in `devices/epc/sources.json`
+(`odb_population_vs_bom`). The simulation uses the BOM's values.
+
 **Bench.** `scripts/epc9097_switching.py` runs a buck double pulse with two
 unmodified EPC2204 models at the conditions of EPC's published waveforms:
 48 V → 12 V, 1 MHz, 2.2 µH, 10 ns dead time. It is converter-equivalent: Q1

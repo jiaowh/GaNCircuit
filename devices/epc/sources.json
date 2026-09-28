@@ -73,7 +73,22 @@
        "sha256": "82d82a017f2e2b002289d94a8dadd7c1b4eebc7773221b4371543a42e68850ce",
        "note": "No SPICE model is linked from the uP1966E product page; the driver is modelled behaviourally from this datasheet."}
     ],
-    "revision_conflict": "EPC publishes two layouts: 6-layer (ODB++, landing-page stackup, 2024 test-point report) and 4-layer B5239 Rev 2.0 (Gerber zip, 2023). Which one the purchased board uses is unresolved; check the board's silkscreen revision or ask EPC. Parasitic extraction must use the same revision as the board under test."
+    "revision_conflict": "EPC publishes two layouts: 6-layer (ODB++, landing-page stackup, 2024 test-point report) and 4-layer B5239 Rev 2.0 (Gerber zip, 2023). Which one the purchased board uses is unresolved; check the board's silkscreen revision or ask EPC. Parasitic extraction must use the same revision as the board under test. The revision behind EPC's published QSG waveforms is a separate question; the two need not match.",
+    "odb_population_vs_bom": {
+      "checked": "2026-09-28",
+      "same_reference_designators": 107,
+      "same_part_numbers": 67,
+      "substantive_differences": {
+        "Q1, Q2": "ODB++ EPC2619; BOM EPC2204",
+        "R80, R82 (turn-on gate)": "ODB++ ERJ-2GEJ4R7X (4.7 ohm); BOM RC0402FR-071RL (1 ohm)",
+        "R81, R83 (turn-off gate)": "ODB++ RC0402FR-071RL (1 ohm); BOM RMCF0402ZT0R00 (0 ohm)",
+        "U80": "ODB++ uP1966A; BOM uP1966E"
+      },
+      "other_differences": "generic versus full part numbers, and optional parts marked EMPTY in the ODB++",
+      "footprint": "Q1/Q2 use package D0133CT44M, 2.50 x 1.50 mm; EPC links D0133.step from the EPC2204 product page",
+      "interpretation": "the 6-layer ODB++ looks like the same design with a different transistor and gate-resistor population; its copper carries the EPC2204 footprint. Whether its copper matches a shipped EPC9097 is not established.",
+      "rev2_layout_pdf": "names R80-R83 but gives no values or transistor part number"
+    }
   },
   "also_linked_not_downloaded": [
     "https://epc-co.com/epc/documents/spice-files/TSPICE/EPC2204_V0_TSPICE.sp",
