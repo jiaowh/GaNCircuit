@@ -34,6 +34,10 @@ _INCLUDE = re.compile(r"^\s*\.(?:include|inc|lib)\s+(.+?)\s*$", re.I | re.M)
 # Failure wording observed in LTspice 26.1.1 logs.  Setup errors are reported
 # as "<file>(<line>): <message>" without the word "error".
 _LOCATED = re.compile(r"\.(?:cir|net|lib|sub|inc|include|asc)\(\d+\):", re.I)
+# Terminal solver failures take precedence over the generic warning phrases below
+# (for example "too small" in "Time step too small").
+_TERMINAL = re.compile(r"time ?step too small|singular matrix|convergence failed|analysis failed|"
+                       r"abort|iteration limit|simulation (?:failed|stopped)", re.I)
 _FATAL = re.compile(r"error|fatal|singular matrix|time ?step too small|abort|undefined|not defined|"
                     r"unknown|cannot|can't|could not|not found|no such|illegal|invalid|"
                     r"convergence failed|analysis failed|iteration limit|\bfail", re.I)
@@ -304,7 +308,8 @@ def parse_log(text: str, declared: Sequence[str] = ()) -> dict[str, Any]:
             continue
         if _NOTICE_SKIP.match(line):
             continue
-        if _LOCATED.search(line) or (_FATAL.search(line) and not _WARNING.search(line)):
+        if (_TERMINAL.search(line) or _LOCATED.search(line)
+                or (_FATAL.search(line) and not _WARNING.search(line))):
             errors.append(line)
         elif _WARNING.search(line):
             warnings.append(line)

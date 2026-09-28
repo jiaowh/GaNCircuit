@@ -82,6 +82,9 @@ Otherwise the run is `failed`, with every reason in its message. The log rules
 come from real LTspice 26.1.1 output:
 - Setup errors appear as `bench.cir(3): This sub-circuit name is not
   defined.`, without the word "error".
+- Terminal solver failures ("Time step too small", "Singular matrix",
+  "Iteration limit reached") take precedence over warning phrases such as
+  "too small". A second review found this gap.
 - A failed operating-point method followed by a successful one (for example
   Newton, then Gmin stepping) is a normal recovery, not an error.
 - Only declared `.meas` names count as measurements; lines such as
@@ -471,6 +474,8 @@ was a simulation artifact.
   2.45 nC at 2 mA drive. Changing the integration method, `chgtol` or the
   solver did not help; `reltol=1e-6` did.
 - *Now:* QG = 5.652 nC. Tightening to 1e-7 changes it by 3e-9 (relative).
+  That shows insensitivity to further `reltol` tightening at the chosen time
+  step, not absolute accuracy at that level.
   QG from the model's own charge equations, with parameters read from the
   local library, between the simulated start and VGS = 5 V states, is
   5.647 nC (0.1% agreement, declared tolerance 1%). A small-signal check at
@@ -479,8 +484,9 @@ was a simulation artifact.
 - *Separate probe:* LTspice honours charge expressions that depend on other
   nodes' voltages; a known-answer probe gave exactly 2.000 mA.
 - *What remains:* QGS, QGD and QG(TH) are 19–28% below the typicals under
-  both the transient and the equations, so this is a real model-to-datasheet
-  difference. It is not classified. Candidates are EPC's extraction
+  both the transient and the equations. These are unresolved differences in
+  extracted values, not established model errors, until EPC's boundary
+  definitions are matched. Candidates are EPC's extraction
   definitions (not stated), test conditions, or the model's
   sub-threshold/plateau charge. QGD depends strongly on where the plateau is
   taken to end: 0.38 / 0.65 / 1.00 nC for VDS = 10 / 5 / 1 V. No model
@@ -497,8 +503,9 @@ Gate-charge bench self-checks, all recorded in the report:
 - *Drive current:* the declared check (10 mA against 2 mA, 0.5% tolerance)
   **fails** at +0.57%. A diagnostic added afterwards integrates the model's
   gate-leakage current: 6.6 pC at 10 mA, 35 pC at 2 mA. With leakage removed,
-  the stored charge agrees to 0.06%. The difference is therefore leakage
-  during the slower test, not a charge error.
+  the stored charge agrees to 0.06%. This diagnostic evidence supports
+  leakage as the main cause; it does not conclusively resolve the
+  difference.
 
 Other results:
 - *COSS consistency:* output charge integrated from the small-signal COSS
@@ -509,7 +516,8 @@ Other results:
   capacitance, output charge and total gate charge may reflect the quantities
   EPC fitted the model to.
 
-These are model-to-datasheet consistency results. Datasheet values are
+The equation comparison checks numerical consistency with the vendor
+model. These are model-to-datasheet consistency results. Datasheet values are
 vendor-described, and nothing here is a hardware measurement. The first
 revision of this report used one combined outcome that called QG
 "inside-datasheet-limits" only because it was below the maximum. It was

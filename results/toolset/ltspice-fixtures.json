@@ -21,7 +21,7 @@
   },
   "scope": "Known-answer circuits for the LTspice batch adapter; no vendor-model or device claim",
   "outcome": "pass",
-  "evidence_directory": "runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba",
+  "evidence_directory": "runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3",
   "checks": [
     {
       "fixture": "divider_op",
@@ -29,7 +29,7 @@
         "status": "completed",
         "outcome": "unresolved",
         "returncode": 0,
-        "duration_s": 0.5,
+        "duration_s": 0.48400000005494803,
         "measurements": [
           "i(r1)",
           "i(r2)",
@@ -37,11 +37,11 @@
           "v(out)",
           "v(supply)"
         ],
-        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op",
-        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\bench.cir",
-        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\bench.log",
-        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\bench.raw",
-        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\provenance.json",
+        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op",
+        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\bench.cir",
+        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\bench.log",
+        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\bench.raw",
+        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\provenance.json",
         "provenance": {
           "simulator": "ltspice",
           "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
@@ -54,11 +54,11 @@
           "command": [
             "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
             "-b",
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\bench.cir"
           ],
           "libraries": {},
           "returncode": 0,
-          "log_sha256": "a6b3f4c26967f5e935089a93c8ca3e54b3465ff2f537dee0a26dd10c5c000c95",
+          "log_sha256": "77ade8833033b414f61f307410c283b0f9df692da08cc45990516bb69dff0ab8",
           "declared_measurements": [],
           "log_errors": [],
           "log_warnings": [],
@@ -66,14 +66,14 @@
           "failed_measurements": [],
           "missing_measurements": [],
           "files_loaded": [
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\bench.cir"
           ],
           "log_header": [
             "LTspice 26.1.1 for Windows",
-            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\divider_op\\bench.cir",
-            "Start Time: Mon Sep 28 11:30:00 2026"
+            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\divider_op\\bench.cir",
+            "Start Time: Mon Sep 28 11:37:47 2026"
           ],
-          "raw_sha256": "b2419fec43b9251cfe0fd131cb5f756aaadca8c509651cceb8a8337af077a1e1",
+          "raw_sha256": "cc25d413076e8d482c6b6f184149923e30e955c42b310c6fa924cb62e1994ccf",
           "raw_plotname": "Operating Point",
           "raw_flags": [
             "real"
@@ -105,7 +105,7 @@
         "status": "completed",
         "outcome": "unresolved",
         "returncode": 0,
-        "duration_s": 0.5310000000754371,
+        "duration_s": 0.5320000000065193,
         "measurements": [
           "i(c1)",
           "i(r1)",
@@ -115,11 +115,11 @@
           "v(out)",
           "vtau"
         ],
-        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran",
-        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\bench.cir",
-        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\bench.log",
-        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\bench.raw",
-        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\provenance.json",
+        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran",
+        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\bench.cir",
+        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\bench.log",
+        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\bench.raw",
+        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\provenance.json",
         "provenance": {
           "simulator": "ltspice",
           "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
@@ -132,11 +132,11 @@
           "command": [
             "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
             "-b",
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\bench.cir"
           ],
           "libraries": {},
           "returncode": 0,
-          "log_sha256": "9ffa0c7011d403873718dac0d4f08552a24c5070969911fd459a0f29415dd9b3",
+          "log_sha256": "ed3fa7240f8b70e053df8b60cf1eacf43f8151e6fb1bf0b911467f56369d8a87",
           "declared_measurements": [
             "vtau"
           ],
@@ -146,14 +146,14 @@
           "failed_measurements": [],
           "missing_measurements": [],
           "files_loaded": [
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\bench.cir"
           ],
           "log_header": [
             "LTspice 26.1.1 for Windows",
-            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran\\bench.cir",
-            "Start Time: Mon Sep 28 11:30:01 2026"
+            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran\\bench.cir",
+            "Start Time: Mon Sep 28 11:37:48 2026"
           ],
-          "raw_sha256": "c7a759163e94e303cf55b1ee85b90bae375303a1907379b287adef202f1961c3",
+          "raw_sha256": "64ba1af79f6a8154379fb75a8a128dc797ad3f3f51a7a9297f290f956ec0cb7e",
           "raw_plotname": "Transient Analysis",
           "raw_flags": [
             "real",
@@ -194,7 +194,7 @@
         "status": "completed",
         "outcome": "unresolved",
         "returncode": 0,
-        "duration_s": 0.4839999999385327,
+        "duration_s": 0.5,
         "measurements": [
           "frequency",
           "i(c1)",
@@ -203,11 +203,11 @@
           "v(in)",
           "v(out)"
         ],
-        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac",
-        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\bench.cir",
-        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\bench.log",
-        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\bench.raw",
-        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\provenance.json",
+        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac",
+        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\bench.cir",
+        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\bench.log",
+        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\bench.raw",
+        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\provenance.json",
         "provenance": {
           "simulator": "ltspice",
           "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
@@ -220,11 +220,11 @@
           "command": [
             "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
             "-b",
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\bench.cir"
           ],
           "libraries": {},
           "returncode": 0,
-          "log_sha256": "84ca58502a32b11f3e4ff67090bc855b57452214646d48c7ef66c1a334c4ff13",
+          "log_sha256": "c73ec0e8b7290a206519beb3923eeff94185fec9d123ce54d2783844e8c7e5b8",
           "declared_measurements": [],
           "log_errors": [],
           "log_warnings": [],
@@ -232,14 +232,14 @@
           "failed_measurements": [],
           "missing_measurements": [],
           "files_loaded": [
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\bench.cir"
           ],
           "log_header": [
             "LTspice 26.1.1 for Windows",
-            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_ac\\bench.cir",
-            "Start Time: Mon Sep 28 11:30:02 2026"
+            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_ac\\bench.cir",
+            "Start Time: Mon Sep 28 11:37:49 2026"
           ],
-          "raw_sha256": "0bdd1bd48201d9bc0957bbfb4ecfa0d74e7cd22199c119ff62657820a64ec265",
+          "raw_sha256": "3a3c3d838c180b8ce91649b6e563628ecc7d0fe3854e510c35b74c0665705821",
           "raw_plotname": "AC Analysis",
           "raw_flags": [
             "complex",
@@ -283,7 +283,7 @@
         "status": "completed",
         "outcome": "unresolved",
         "returncode": 0,
-        "duration_s": 0.46799999999348074,
+        "duration_s": 0.4690000000409782,
         "measurements": [
           "i(r1)",
           "i(va)",
@@ -292,11 +292,11 @@
           "v(b)",
           "va"
         ],
-        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc",
-        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\bench.cir",
-        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\bench.log",
-        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\bench.raw",
-        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\provenance.json",
+        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc",
+        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\bench.cir",
+        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\bench.log",
+        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\bench.raw",
+        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\provenance.json",
         "provenance": {
           "simulator": "ltspice",
           "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
@@ -309,11 +309,11 @@
           "command": [
             "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
             "-b",
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\bench.cir"
           ],
           "libraries": {},
           "returncode": 0,
-          "log_sha256": "59b0df5ec626536138973a416ea275ebd0d5ed52d15b08f91e4ba11c90e67493",
+          "log_sha256": "8e32f52f256eaa1a43f2f38bba92f56a73d03351ec378958e5bf314f70a13332",
           "declared_measurements": [],
           "log_errors": [],
           "log_warnings": [],
@@ -321,14 +321,14 @@
           "failed_measurements": [],
           "missing_measurements": [],
           "files_loaded": [
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\bench.cir"
           ],
           "log_header": [
             "LTspice 26.1.1 for Windows",
-            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\nested_dc\\bench.cir",
-            "Start Time: Mon Sep 28 11:30:03 2026"
+            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\nested_dc\\bench.cir",
+            "Start Time: Mon Sep 28 11:37:49 2026"
           ],
-          "raw_sha256": "543480a816af220963e2a74c6e00306a4f47fc52478e9705040e3bedc843b461",
+          "raw_sha256": "1bc3285970452d06b71998e7d7103b20962efbe6407ab599abb8876e5d241421",
           "raw_plotname": "DC transfer characteristic",
           "raw_flags": [
             "real",
@@ -378,11 +378,11 @@
           "v(anode)",
           "v1"
         ],
-        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc",
-        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\bench.cir",
-        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\bench.log",
-        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\bench.raw",
-        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\provenance.json",
+        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc",
+        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\bench.cir",
+        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\bench.log",
+        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\bench.raw",
+        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\provenance.json",
         "provenance": {
           "simulator": "ltspice",
           "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
@@ -395,11 +395,11 @@
           "command": [
             "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
             "-b",
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\bench.cir"
           ],
           "libraries": {},
           "returncode": 0,
-          "log_sha256": "452d2368edfa07787513ecd47aad13d9566ce073b05c29e13cee59b5979a554b",
+          "log_sha256": "6a335b6e26728b0aecc8c575e76e8c31a1f86f644181b6f34d63101f582b11f4",
           "declared_measurements": [],
           "log_errors": [],
           "log_warnings": [],
@@ -409,14 +409,14 @@
           "failed_measurements": [],
           "missing_measurements": [],
           "files_loaded": [
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\bench.cir"
           ],
           "log_header": [
             "LTspice 26.1.1 for Windows",
-            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\diode_dc\\bench.cir",
-            "Start Time: Mon Sep 28 11:30:04 2026"
+            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\diode_dc\\bench.cir",
+            "Start Time: Mon Sep 28 11:37:50 2026"
           ],
-          "raw_sha256": "6ee4126e5790757a4ab4d160e288fef00c385dced822aa1e66640cc27aecc262",
+          "raw_sha256": "6c611771af1ab74606c43e9ffa46a2b0bfdf125062e90b394e22810d99047455",
           "raw_plotname": "DC transfer characteristic",
           "raw_flags": [
             "real",
@@ -449,7 +449,7 @@
         "status": "completed",
         "outcome": "unresolved",
         "returncode": 0,
-        "duration_s": 0.75,
+        "duration_s": 0.734000000054948,
         "measurements": [
           "i(c1)",
           "i(r1)",
@@ -459,11 +459,11 @@
           "v(out)",
           "vtau"
         ],
-        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii",
-        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\bench.cir",
-        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\bench.log",
-        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\bench.raw",
-        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\provenance.json",
+        "artifact_dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii",
+        "netlist_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\bench.cir",
+        "log_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\bench.log",
+        "result_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\bench.raw",
+        "provenance_path": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\provenance.json",
         "provenance": {
           "simulator": "ltspice",
           "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
@@ -477,11 +477,11 @@
             "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
             "-b",
             "-ascii",
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\bench.cir"
           ],
           "libraries": {},
           "returncode": 0,
-          "log_sha256": "28a88126d6bdca7fdafa4821d127c34a7eceab68dc15094542144590b729c561",
+          "log_sha256": "f35a880c42e39adf2e6d77edd0266dd0ed0a699cbbb934bf8b45cfeeda7a3977",
           "declared_measurements": [
             "vtau"
           ],
@@ -493,14 +493,14 @@
           "failed_measurements": [],
           "missing_measurements": [],
           "files_loaded": [
-            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\bench.cir"
+            "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\bench.cir"
           ],
           "log_header": [
             "LTspice 26.1.1 for Windows",
-            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-96bbb264877f4f3e9fabdc446b40f9ba\\rc_tran_ascii\\bench.cir",
-            "Start Time: Mon Sep 28 11:30:04 2026"
+            "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\ltspice-fixtures-41706cca480443148eea9998fc08ddb3\\rc_tran_ascii\\bench.cir",
+            "Start Time: Mon Sep 28 11:37:51 2026"
           ],
-          "raw_sha256": "44543ff5f1c07e09029de2a5911d8aab7033c9fd42d1dc6dfe54f0c79c14a840",
+          "raw_sha256": "84052e24f1f14bbb4df3f50f30d33993d35d6adb4b0d7d0f3d572b3c7e6db86d",
           "raw_plotname": "Transient Analysis",
           "raw_flags": [
             "real",

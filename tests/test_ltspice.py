@@ -171,6 +171,18 @@ class LogAndRunnerTests(unittest.TestCase):
                 self.assertEqual(r.status, "failed")
                 self.assertIn(expected, r.message)
 
+    def test_terminal_solver_failures_beat_warning_phrases(self):
+        # Regression: "too small" is also a warning phrase; the terminal failure must win.
+        for phrase in ("Time step too small; initial breakpoint: 1e-9", "Timestep too small",
+                       "Singular matrix: check node x", "Iteration limit reached"):
+            with self.subTest(phrase):
+                self.assertEqual(len(parse_log(phrase + "\n")["errors"]), 1)
+                r = self.run_fake(FakeLTspice(body="va: V(a)=1\n" + phrase))
+                self.assertEqual(r.status, "failed")
+        # A genuine warning phrase alone is still a warning.
+        log = parse_log("dd: Emission coefficient, N=0.01, too small, this might lead to numerical problems.\n")
+        self.assertEqual((len(log["errors"]), len(log["warnings"])), (0, 1))
+
     def test_nested_library_dependency_rejected(self):
         d = Path(tempfile.mkdtemp())
         lib = d / "outer.lib"

@@ -295,19 +295,19 @@
       "note": "QGS/QGD/QG(TH) boundary definitions are the bench's; EPC's exact extraction definitions are not stated"
     }
   },
-  "evidence_directory": "runs\\epc2204-baseline-439245d9238d4a9d8e217d0c040f3b84",
+  "evidence_directory": "runs\\epc2204-baseline-49b0f16ef1b64d8ba6e35289abe50015",
   "runs": {
     "rds_on_25C": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.7349999999860302,
+      "duration_s": 0.7339999999385327,
       "warnings": [],
       "netlist_sha256": "1613c02c3571cc79eaa40b4d50de0de34bbf9a4a049b6656569d0d80f8528084"
     },
     "rds_on_125C": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.7349999999860302,
+      "duration_s": 0.75,
       "warnings": [],
       "netlist_sha256": "99bb24214510dd328b4465d85881a5db1c63c14e545f9d3b16955cc784117b5a"
     },
@@ -328,70 +328,70 @@
     "caps_gate_ac": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.734000000054948,
+      "duration_s": 0.7189999999245629,
       "warnings": [],
       "netlist_sha256": "a7bb6e16eacb64e255c692eb588fae5f3db2f3a29dae3c6ea347bd4d728e516e"
     },
     "coss_curve_ac": {
       "status": "completed",
       "message": null,
-      "duration_s": 17.390999999945052,
+      "duration_s": 17.31200000003446,
       "warnings": [],
       "netlist_sha256": "08ae435839d86af51693834576ea47136c9a1d99ba309c1b8c03010c8811bf1c"
     },
     "qoss_tran": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.75,
+      "duration_s": 0.7970000000204891,
       "warnings": [],
       "netlist_sha256": "b9735a018107c8fb5b6de1e192db52e081deb9426055e9a3cbe8620c7e8ce61a"
     },
     "gate_charge_tran": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.9849999999860302,
+      "duration_s": 1.0160000000614673,
       "warnings": [],
       "netlist_sha256": "c259da9f8a77e9be430b85cc0146b1f9c9f2d120523a2d8f94e614ca20375a7d"
     },
     "gate_charge_tran_2mA": {
       "status": "completed",
       "message": null,
-      "duration_s": 1.4689999999245629,
+      "duration_s": 1.5,
       "warnings": [],
       "netlist_sha256": "a047dd87f8f1f77cefb58482516a5aab2e472466d5e79c83282c41ed37f62de1"
     },
     "gate_charge_tran_reltol1e-7": {
       "status": "completed",
       "message": null,
-      "duration_s": 1.015999999945052,
+      "duration_s": 1.0160000000614673,
       "warnings": [],
       "netlist_sha256": "7807b4d18d034b5699ddc4b36aa8ef97f5ddd897037a0979a3f6f41cba98efde"
     },
     "gate_charge_tran_default_reltol": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.9679999999934807,
+      "duration_s": 0.9690000000409782,
       "warnings": [],
       "netlist_sha256": "1acd9879e4ae019dbd81ada6849e7a97268f6d5a6a2882e7f6bb97ab679dee1a"
     },
     "output_curves_25C": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.734000000054948,
+      "duration_s": 0.75,
       "warnings": [],
       "netlist_sha256": "2d11eef6fa76ff582633d4fb57c926731c379bd25415169ed2568533958c6176"
     },
     "transfer_curve_25C": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.6870000000344589,
+      "duration_s": 0.7339999999385327,
       "warnings": [],
       "netlist_sha256": "1b8cd5e532d5cda31b06634650ce14d0aaab32ec8e094a750754b9ea60c8ba62"
     },
     "transfer_curve_125C": {
       "status": "completed",
       "message": null,
-      "duration_s": 0.7339999999385327,
+      "duration_s": 0.7190000000409782,
       "warnings": [],
       "netlist_sha256": "3738d5fd8fffcf528e91fe400d3dc991f6889b6a8fab3eb783d76a21b354c20f"
     }
