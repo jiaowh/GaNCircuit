@@ -293,9 +293,10 @@ envelope expansion are removed last.
 Status, 28 September 2026:
 
 - **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
-- **G2** is open, awaiting owner review. The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances. The table's QGS/QGD/QG(TH) values remain unresolved: EPC's own curve does not reproduce them, and they may use different definitions or different source data.
+- **G2** is accepted for stock-board simulation, with a documented exception (owner review, 28 September 2026). The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances (worst point uses 22.8% of its allowed error). The reviewer independently reproduced the extraction, the comparisons and the 88 tests under WSL. **Exception:** the table's QGS/QGD/QG(TH) values remain unresolved (not classified): EPC's own curve does not reproduce them, and they may use different definitions or different source data. Total QG matches. The unmodified model is preserved as the baseline; no tuning is justified. Revisit these subcharges during switching measurements (G4).
+- **G3** is in progress: stock EPC9097 schematic, gate driver and layout parasitics.
 
-G1 and G2 can proceed in simulation while G0's lab inventory is completed. No
+G1–G3 can proceed in simulation while G0's lab inventory is completed. No
 hardware is energized before G4's test plan and interlocks are approved.
 
 ## 9. Open decisions for the project owner
