@@ -292,7 +292,7 @@ envelope expansion are removed last.
 
 Status, 28 September 2026:
 
-- **G1** is open. LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures, runs the unmodified vendor model, and, after review, rejects failed runs it previously reported as completed. Still missing: the comparison with an interactive GUI run.
+- **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
 - **G2** is open. The datasheet-table baseline runs with convergence and equation checks. The gate-charge curve (Fig. 7) matches within 0.014 V, and the table's subcharge differences are traced to the table's own boundary definitions. Still missing: the other datasheet curves.
 
 G1 and G2 can proceed in simulation while G0's lab inventory is completed. No

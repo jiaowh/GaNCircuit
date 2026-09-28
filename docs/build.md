@@ -118,8 +118,11 @@ the adapter against analytical answers:
 
 All pass with LTspice 26.1.1. The first run failed two checks because of
 evaluator assumptions (frequency ordering, and a float32 tolerance), which were
-corrected as noted above. A comparison with an interactive GUI run of the same
-bench, part of the adoption gate, has not been done.
+corrected as noted above. On 28 September 2026 the project owner opened the EPC2204 RDS(on) bench in
+LTspice's interactive window. All seven operating-point values matched the
+batch run to the window's 6 significant figures
+([record](../results/toolset/ltspice-gui-check.json)). Only one
+operating-point bench was compared this way.
 
 The diode bridge in `circuit_tools.models` fits log current against voltage,
 binds the result to a dataset and device revision, checks a disjoint holdout,
