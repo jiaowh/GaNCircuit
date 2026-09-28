@@ -836,3 +836,61 @@ extracted).**
 4. Extract the power and gate paths, including their return paths.
 5. Rerun the switching comparison with those parasitics. The unmodified
    transistor model is preserved.
+
+## FastHenry inductance extraction: tool qualification (G3)
+
+FastHenry 3.0.1 is the candidate extraction tool. It is MIT's original solver,
+with FastFieldSolvers' 64-bit Linux fixes
+([ediloren/FastHenry2](https://github.com/ediloren/FastHenry2), branch `master`,
+commit `363e43e`).
+
+- **Licence.** MIT's 1994 licence permits "internal, noncommercial" use and
+  prohibits distribution without MIT's written consent. The source and binary
+  therefore stay in the git-ignored `.tools/FastHenry2`. Owner confirmation of
+  this use is pending.
+- **Build** (Ubuntu 24.04 under WSL, gcc 13.3). `-fcommon` restores the
+  pre-GCC-10 linking of shared globals that this old code needs; no other flag
+  changes.
+
+  ```sh
+  cd .tools && git clone https://github.com/ediloren/FastHenry2.git && cd FastHenry2
+  git checkout 363e43ed57ad3b9affa11cba5a86624fad0edaa9
+  ./config x64 && make fasthenry CFLAGS='-O -DFOUR -m64 -fcommon'
+  sha256sum bin/fasthenry   # bcd646263ac24d6e724ac6f3c11101be1fb42d5bf8e0d80884e53505d7a7e299 on this host
+  ```
+
+- **Qualification.** `python scripts/fasthenry_known_answer.py` runs on
+  Windows and calls FastHenry through `wsl`. Tolerances were declared in the
+  script before the first run. Each case uses three meshes, and the two finest
+  must agree within 1%.
+
+[Result, 28 September 2026](../results/gan/fasthenry-known-answer.json):
+
+| Case | FastHenry (finest mesh) | Reference | Error | Declared check |
+|---|---|---|---|---|
+| A: bar 10 × 1 × 0.035 mm, 1 Hz, partial self-inductance | 6.978 nH | 6.969 nH (Grover) | +0.13% | pass (1%) |
+| B: go-and-return bars 5 mm apart, 1 Hz | 10.646 nH | 10.635 nH, 2(L − M) (Grover) | +0.10% | pass (1%) |
+| C: plates 10 mm wide, 0.127 mm gap, 35 µm Cu, 100 MHz, per length | 16.27 nH/m | 15.51 nH/m (Palmer, perfect conductors) | +4.9% | **fail** (3%) |
+| D(i): same plates, 1 GHz | 15.73 nH/m | 15.76 nH/m (Palmer, gap + one skin depth) | −0.19% | pass (3%) |
+| D(ii): ratio 1 GHz / 100 MHz | 0.96638 | 0.96618, (h + δ₁)/(h + δ₂) | +0.02% | pass (1%) |
+
+Inductance per unit length is the difference between 20 mm and 10 mm loops,
+which removes end and port effects. Mesh changes between the two finest meshes
+are 0.06–0.26%.
+
+- **Case C.** C failed its declared check, and the failure is kept in the
+  report. Diagnosis after the failure: the reference was incomplete, not the
+  tool. Palmer's formula assumes perfect conductors, but at 100 MHz copper
+  carries current in a 6.6 µm skin depth. That adds internal inductance of
+  about δ/h = 5.2%.
+- **Case D.** D was declared after that diagnosis and before it was run. Its
+  frequency dependence is a prediction with nothing fitted. With the skin
+  correction, C's own value is −0.12% from the corrected reference;
+  this is recorded as a diagnostic, not a pass.
+- **Mesh lesson for extraction.** At 1 GHz the coarsest mesh (9 × 3
+  filaments) is 2.5% off. Filaments must resolve the skin depth, so every
+  board extraction needs its own mesh-refinement check.
+- **Scope.** This qualifies FastHenry for straight conductors and thin-
+  dielectric plane pairs like the EPC9097 power loop. It does not yet cover
+  vias, plane meshing with holes, or the EPC2204's solder-bar connections.
+  Those need their own checks when the board geometry uses them.
