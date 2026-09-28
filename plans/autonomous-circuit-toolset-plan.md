@@ -1,8 +1,97 @@
 # An agent toolset for semiconductor-device and circuit co-design
 
+> **Superseded as the implementation priority on 28 September 2026** by the
+> [GaN half-bridge pipeline plan](gan-halfbridge-pipeline-plan.md). The
+> contracts in sections 3–6 (state, identity, result semantics, evidence,
+> execution) still apply. The NMOS/amplifier demonstration and the IRDS
+> comparison are paused fixtures.
+
+## Priority correction: GaN application and simulator choice
+
+The project owner clarified that GaN has been the intended application target;
+the silicon NMOS work was an assistant-selected tool-development fixture.
+Preserve the generated NMOS and executed results, but completion of the NMOS
+amplifier is not a prerequisite for the GaN project. This correction supersedes
+the first-demonstration ordering in the older sections below.
+
+The active application is a commercial GaN FET and half-bridge reference board:
+establish the vendor model/reference-circuit baseline, incorporate layout and
+parasitics, and compare with approved physical measurements. Choose the
+simulator using the selected vendor model, automation support and available
+licenses. LTspice, PSpice and Spectre are candidates alongside ngspice; extend
+the runner interface for the chosen engine rather than treating ngspice
+compatibility as a gate. The immediate selection step is to identify the exact
+EPC device/board and demonstrate a vendor-model test bench in a supported
+simulator. Existing NMOS and circuit tooling remain reusable development work.
+
 11 September 2026. Active project direction. Implementation started 14 September 2026: the Python core/CLI, ngspice fixtures, diode fitting fixture, and official DEVSIM diode/MOS reference executions are available. See [build status](../docs/build.md). The complete co-design demonstration and release gates below remain unfinished; descriptions of the starting point are historical.
 
+16 September 2026 checkpoint: diode local-refinement and 2D resistor
+current-normalization checks pass. The fourth uniform planar-MOS mesh brings
+the last drain-current change to 0.184%, below the fixed 1% endpoint tolerance.
+Local-refinement attempts were rejected; the successful uniform run uses a
+pinned local OpenBLAS runtime, cross-checked on an identical mesh. Proceed to
+NMOS DC characterization and bias-domain/slope qualification before accepting
+model-bridge evidence. The first nine-point 300 K DC grid completed with a
+predeclared six-point training set and three-point held-out gate slice;
+the level-2/3 comparison now passes at all nine biases and for six finite-span
+secants (maximum drain-current change 0.1872%). Central secants also pass a
+three-step bias-spacing check on level 2. Smaller-stencil mesh accuracy and
+continuous-domain accuracy remain unresolved. The baseline gm/gds ratio near
+0.063 suggests revisiting physical geometry or operating bias before targeting
+amplifier gain. Infineon CoolGaN is recorded as a
+candidate commercial reference track in the benchmark notes; it does not
+replace the active custom planar-NMOS milestone.
+
+28 September 2026 checkpoint: the upstream MOS example is retired as the
+amplifier candidate (weak gate control, gm/gds ≈ 0.063 on the sampled grid)
+and kept as a numerical regression fixture. Backlog item 5 has started: a
+planar NMOS (`devices/planar-nmos-lc1.json`) is generated from one
+specification with DEVSIM's internal mesher, swept, and given a mesh-checked
+common-source operating point (estimated Av ≈ −11). The detailed IRDS
+comparison below is deferred until the loop through a fitted model and
+ngspice amplifier works; basic electrostatics set this device revision.
+
 ## 1. Objective and priorities
+
+### Near-term decision: focused IRDS comparison
+
+Added 28 September 2026 at the project owner's request. Use the International
+Roadmap for Devices and Systems (IRDS) to choose meaningful device targets
+and guide the next physical-device revision toward the amplifier demonstration.
+Keep this a bounded design input; the working device-to-amplifier loop remains
+the main milestone.
+
+1. Select and record one relevant device class, roadmap edition, target year,
+   and exact source table/row. Start from the
+   [IEEE IRDS editions index](https://irds.ieee.org/editions/) and inspect the
+   applicable chapter. The inspected
+   [2024 More Moore chapter](https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf)
+   includes logic and analog specifications; it is a starting source, not a
+   claim that the latest edition or final comparison profile has been selected.
+2. Produce a compact comparison table with: metric, roadmap target, our result,
+   units, device architecture/dimensions, bias and temperature conditions,
+   extraction method, evidence status, and remaining gap. Match current-width
+   normalization explicitly. Mark incompatible definitions or device classes
+   as not directly comparable rather than reporting a misleading ratio.
+3. Initially consider structure/dimensions, operating voltage, on/off currents,
+   threshold voltage, subthreshold slope, and relevant analog quantities such
+   as gm, gds and gm/gds. Our current narrow DC grid supports local current and
+   secant diagnostics only; standardized on/off and threshold/subthreshold
+   extraction still require suitable sweeps. Add capacitance, speed and energy
+   comparisons only when their required models and evidence exist.
+4. Use the relevant gaps to select a concrete geometry, doping or operating-bias
+   change, then evaluate its effect on amplifier gain, power and operating
+   range. The present reference-device gm/gds near 0.063 motivates this decision;
+   it is not an IRDS performance ranking under matched conditions.
+
+Deliverable: a short, sourced comparison and a justified next device-design
+experiment. Roadmap projections are engineering targets, not measured-device
+ground truth or validation of our simulator. Preserve the distinctions between
+numerical verification, roadmap comparison, model-fit validation and physical
+device validation described in the benchmark notes.
+
+### Core objective
 
 Build a reusable engineering environment that a capable general-purpose AI agent can use to **design semiconductor devices, connect them into circuits, simulate both levels, inspect failures, and iterate toward an executable specification**. Custom semiconductor-device design and circuit co-design are in scope from the first working demonstration, as requested by the project owner.
 
@@ -16,11 +105,11 @@ Priority order:
 4. Broader device physics, circuit classes, and physical implementation.
 5. Research studies of which tools, models, and search policies improve outcomes.
 
-This plan supersedes the implementation priority in [FINAL-PLAN.md](FINAL-PLAN.md). Its fidelity/ranking experiment becomes an optional consumer of the toolset. Its fixed topologies, 29 corners, 250-draw endpoint, model roster, and resource estimates are not defaults for this new programme. Preserve the old protocol and results for reproducibility.
+This plan supersedes the implementation priority in the earlier `FINAL-PLAN.md`. Its fidelity/ranking experiment becomes an optional consumer of the toolset. Its fixed topologies, 29 corners, 250-draw endpoint, model roster, and resource estimates are not defaults for this new programme. The old plan, protocol and pilot results are preserved in git history at commit `79b80fa`.
 
 ## 2. Starting point and scope
 
-The repository currently contains plans, a paper collection, numerical protocol/budget checks, and an input-presence checker. [The recorded preflight](../results/pilot/preflight.json) reports missing simulator/PDK/reference inputs and zero circuit simulations. No TCAD adapter, device model bridge, circuit editor, simulation service, or autonomous design loop is implemented here. That recorded preflight concerns the old pilot; the new stack needs its own environment check.
+The repository currently contains plans, a paper collection, numerical protocol/budget checks, and an input-presence checker. The recorded pilot preflight (`results/pilot/preflight.json`, now in git history) reported missing simulator/PDK/reference inputs and zero circuit simulations. No TCAD adapter, device model bridge, circuit editor, simulation service, or autonomous design loop is implemented here. That recorded preflight concerns the old pilot; the new stack needs its own environment check.
 
 Three operations must have distinct representations and validation:
 

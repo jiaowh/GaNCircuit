@@ -1,15 +1,26 @@
-# Autonomous semiconductor-device and circuit design tools
+# Agent-driven GaN power-electronics pipeline
+
+**Active direction (28 September 2026):** an agent-driven pipeline for a commercial EPC GaN FET and its half-bridge development board: datasheet → vendor model → layout-aware simulation → automated measurement → closure report. See the [GaN half-bridge pipeline plan](plans/gan-halfbridge-pipeline-plan.md). No GaN stage is implemented yet. The first gates are confirming the target board and FET with their source terms, then adding a batch adapter for the selected simulator (LTspice is the first candidate) and running the unmodified vendor model against the datasheet.
+
+The work below built reusable infrastructure: immutable revisions, artifact provenance, result semantics and a bounded simulator runner. It also built a silicon NMOS/DEVSIM development fixture, which is now paused. That history is kept for reference.
+
+## Earlier work: device and circuit co-design tools
 
 This project is developing tools that general-purpose AI agents can use to design semiconductor devices, connect circuits, run simulations, inspect results, and iterate. **Custom device design and circuit co-design are in scope from the first working demonstration.**
 
-Read the [active toolset plan](plans/autonomous-circuit-toolset-plan.md) for the architecture, proposed operations, implementation sequence, and evaluation gates. The recommended first target is a custom planar NMOS and a simple amplifier, with independent device-to-circuit validation. The [reference notes](plans/autonomous-toolset-reference-notes.md) connect the decisions to local papers and upstream tools.
+The [co-design toolset plan](plans/autonomous-circuit-toolset-plan.md) describes the architecture, proposed operations, implementation sequence, and evaluation gates. The recommended first target is a custom planar NMOS and a simple amplifier, with independent device-to-circuit validation. The [reference notes](plans/autonomous-toolset-reference-notes.md) connect the decisions to local papers and upstream tools.
 
 Current status: the first implementation slice is available as a Python library and CLI. It includes immutable circuit revisions, artifact storage, a bounded ngspice adapter, and a validity-aware diode fitting fixture. Real ngspice divider and custom-diode checks pass; see [build instructions and scope](docs/build.md) and the [executed circuit report](results/toolset/circuit-fixtures.json). The complete physical NMOS-to-amplifier co-design loop is still under construction. Legacy preflight results describe the earlier pilot only.
 
-- `papers/`: reference literature and historical index.
-- [Public device benchmark sources](docs/device-benchmark-sources.md): diode/MOSFET reference data, provenance limits, and validation sequence for future sessions.
-- `plans/autonomous-circuit-toolset-plan.md`: active direction, dated 11 September 2026.
-- `protocol/`, `pilot-inputs/`, `results/`: preserved earlier fidelity/ranking pilot specification, numerical checks, and readiness results.
-- `plans/FINAL-PLAN.md` and `archive/`: earlier research direction, superseded in priority by the toolset plan.
+The first [NMOS DC characterization](results/device-reference/nmos-dc-characterization.json) collected all nine points at 300 K over Vgs/Vds = 0.45, 0.50, and 0.55 V, with a predeclared six-point training set and three-point held-out gate slice. The [two-mesh grid comparison](results/device-reference/nmos-characterization-comparison.json) passes all 36 terminal-current and six finite-span slope checks; the maximum drain-current change is 0.1872%. A [central slope step-size check](results/device-reference/nmos-step-size-comparison.json) also passes on the coarser mesh. The CLI now imports immutable NMOS datasets and computes secants. These checks cover sampled simulated behavior; continuous-domain, model, circuit, and physical-device validation remain unfinished. See [characterization replay and limits](docs/build.md#nmos-dc-characterization).
 
-The official DEVSIM diode and planar MOS scripts now complete, with [finite-current and conservation checks](results/device-reference/audit.json). The next release gate is mesh/current-normalization qualification, followed by the NMOS characterization/model bridge and independent amplifier validation.
+**Generated device (28 September 2026).** The upstream MOS reference is retired as the amplifier candidate: its gate barely controls the current (gm/gds ≈ 0.063). A replacement planar NMOS is now generated from one [parameter specification](devices/planar-nmos-lc1.json) (1 µm gate, 10 nm oxide, n+ poly, 3.3 V). Its simulated curves show clear turn-off (79.5 mV/dec, Ion/Ioff 4e7), saturation, and gm/gds of 70–240 at mid-supply. A common-source operating point (Vgs 0.6 V, W 23.9 µm, RD 16.5 kΩ, 100 µA) gives an estimated gain of −11, checked on three meshes. The fitted model and ngspice amplifier simulation are the next steps. See [generated planar NMOS](docs/build.md#generated-planar-nmos-candidate-lc1).
+
+- `papers/`: reference literature and historical index.
+- [Public device benchmark sources](docs/device-benchmark-sources.md): diode/MOSFET reference data, candidate Infineon CoolGaN resources, provenance limits, and validation sequence for future sessions.
+- `plans/gan-halfbridge-pipeline-plan.md`: active direction, dated 28 September 2026.
+- `plans/autonomous-circuit-toolset-plan.md`: co-design toolset plan (11 September 2026); its contracts are reused, and its NMOS demonstration is paused.
+- `results/`: executed toolset and device-reference reports.
+- Older `plans/` files and `archive/`: earlier PhD-plan history, superseded by the toolset plan. The earlier fidelity/ranking pilot (`FINAL-PLAN.md`, `protocol/`, `pilot-inputs/`, pilot results) was removed from the working tree and remains in git history at commit `79b80fa`.
+
+The official DEVSIM diode and planar MOS scripts complete, with [finite-current and conservation checks](results/device-reference/audit.json). A [diode junction-refinement check](results/device-reference/qualification.json) passes at 0.5 V, and a [known-answer 2D resistor fixture](results/device-reference/current-normalization.json) checks the A/cm current convention. The [four-mesh planar-MOS endpoint check](results/device-reference/planar-mos-openblas-qualification.json) now passes: the last drain-current change is 0.184%, below the fixed 1% tolerance. [Runtime comparison](results/device-reference/math-runtime-comparison.json) confirms agreement on the same mesh after adopting local OpenBLAS. See [replay instructions and limits](docs/build.md#optimized-math-runtime-and-mos-endpoint-check). Next: expose physical device revisions, select an amplifier operating region, validate its model bridge, and perform independent circuit checks. Endpoint mesh agreement alone does not validate that full workflow.
