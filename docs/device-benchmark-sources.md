@@ -123,6 +123,7 @@ Downloaded to the git-ignored `vendor/literature/`, with URLs, checksums and ter
 simulation), WP010 (PCB layout), WP009 (parasitics), EPC's layout-techniques webinar slides,
 Reusch and Strydom on paralleling, a DTU IAS 2020 accepted manuscript on GaN power-loop
 inductance, and Nexperia's switching-evaluation note. Reuse terms are not established; cite them,
-do not redistribute. Four IEEE papers (subscription), two open-access MDPI papers (automated
-download refused) and one dead NCSU link are recorded but not downloaded. These are vendor
+do not redistribute. The two open-access MDPI papers (CC BY) were added by browser download. Four IEEE papers
+(subscription, not available) and one dead NCSU link are recorded but not used. Reading notes:
+[gan-layout-literature-notes.md](gan-layout-literature-notes.md). These are vendor
 descriptions and published methods; none validates our extraction or bench.

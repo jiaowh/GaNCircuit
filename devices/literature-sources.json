@@ -52,38 +52,46 @@
    "url": "https://www.nexperia.com/dam/jcr:30a865a1-bd3f-49f5-a414-fd6f26b710c3/Switching%20evaluation%20of%20fast%20GaN%20devices.pdf",
    "sha256": "f525b195f9e81499b99e1934c51543ceb1339d19fb5df8d9e2f4f6ab4da50078",
    "pages": 20
+  },
+  {
+   "file": "electronics-15-03079.pdf",
+   "title": "Mistri, Elangovan, Hsiao, Kuo, A Review of Double-Pulse Test Techniques for GaN Power Devices in High-Frequency Power Converters, Electronics 2026, 15, 3079",
+   "url": "https://doi.org/10.3390/electronics15143079",
+   "sha256": "46a3ebb710530d95ce5c1d3f9d309747ec4156acdc008742b985cbe268a1248d",
+   "pages": 31,
+   "retrieved": "2026-09-29 (browser download by the user)",
+   "licence": "CC BY 4.0 (stated on the article)"
+  },
+  {
+   "file": "energies-19-00383.pdf",
+   "title": "Chen, Chiu, Chen, Yang, Liu, Parasitic Inductance Assessment of E-GaN DPT Circuit Through Finite Element Analysis, Energies 2026, 19, 383",
+   "url": "https://doi.org/10.3390/en19020383",
+   "sha256": "7f1f885ccd31f97c99a86f4029930e3b3c34f7ec06c4b2c7b671c9c7a1814338",
+   "pages": 20,
+   "retrieved": "2026-09-29 (browser download by the user)",
+   "licence": "CC BY 4.0 (stated on the article)"
   }
  ],
  "not_downloaded": [
   {
    "title": "PCB Layout Parasitics Extraction of a GaN Half-Bridge: Simulation and Experimental Validation",
    "url": "https://ieeexplore.ieee.org/document/10264516/",
-   "reason": "IEEE Xplore, subscription"
+   "reason": "IEEE Xplore, subscription; not available to the user either (29 September 2026)"
   },
   {
    "title": "Calculation and Experiment of Stray Inductance of PCB Double-Pulse Test Circuit Based on Three-Dimensional Simulation",
    "url": "https://ieeexplore.ieee.org/document/9786727/",
-   "reason": "IEEE Xplore, subscription"
+   "reason": "IEEE Xplore, subscription; not available to the user either (29 September 2026)"
   },
   {
    "title": "PCB Layout Evaluation of GaN HEMT Power Loop",
    "url": "https://ieeexplore.ieee.org/document/10395175/",
-   "reason": "IEEE Xplore, subscription"
+   "reason": "IEEE Xplore, subscription; not available to the user either (29 September 2026)"
   },
   {
    "title": "Research of PCB Parasitic Inductance in the GaN Transistor Power Loop",
    "url": "https://ieeexplore.ieee.org/document/8760312",
-   "reason": "IEEE Xplore, subscription"
-  },
-  {
-   "title": "A Review of Double-Pulse Test Techniques for GaN Power Devices in High-Frequency Power Converters (Electronics 2026)",
-   "url": "https://www.mdpi.com/2079-9292/15/14/3079",
-   "reason": "open access (MDPI) but the site returned 403 to automated download; needs a browser download"
-  },
-  {
-   "title": "Parasitic Inductance Assessment of E-GaN DPT Circuit Through Finite Element Analysis (Energies 2026)",
-   "url": "https://doi.org/10.3390/en19020383",
-   "reason": "open access (MDPI) but the site returned 403 to automated download; needs a browser download"
+   "reason": "IEEE Xplore, subscription; not available to the user either (29 September 2026)"
   },
   {
    "title": "Aberg et al., Estimation and Minimization of Power Loop Inductance (APEC 2018)",

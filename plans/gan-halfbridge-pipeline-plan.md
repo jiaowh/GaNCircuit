@@ -439,6 +439,14 @@ Updated 29 September 2026 (owner review of the via check):
    time, temperature and measurement assumptions stay fixed across extraction variants.
    Spend qualification or mesh refinement where the sensitivity changes a decision.
 
+4. Literature review (29 September 2026, docs/gan-layout-literature-notes.md) adds items to the
+   sensitivity study: an EPC2302 package-inductance case (value unknown, stated as an assumption,
+   because the vendor model has none); a switch-node capacitance estimate from the Gerber plane
+   overlaps (FastHenry gives L and R only); and a declared digitization of QSG Fig. 9, compared
+   only after passing the simulation through a stated probe/scope response. G4 candidate isolating
+   experiments: loop L from ringing frequency with known Coss and a known added capacitance,
+   probe characterization, and the stock board with and without Cm.
+
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a
 request requires an explicit instruction. No simulation sensitivity result alone
