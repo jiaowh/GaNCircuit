@@ -203,7 +203,7 @@ benchmark only. The owner deferred the finer mesh on 29 September 2026.
 |---|---|---|---|
 | A: top + mid-layer 1, Ci (three via representations) | 0.49–0.50 nH | 54.5–54.9 V | 0.20 GHz |
 | I: all copper, Ci | 0.30 nH | 40.0 V | 0.27 GHz |
-| B: all copper, Ci + Cm | 0.28 nH (0.27 with the gap via representation) | 35.7 V | 0.28 GHz |
+| B: all copper, Ci + Cm | 0.28 nH (0.27 gap, 0.26 pad via representation) | 35.7 V | 0.28 GHz |
 | ideal copper | — | 2.1 V | 1.15 GHz |
 | EPC's measurement (QSG Fig. 9, by eye) | — | about 7 V | about 0.6 GHz |
 
