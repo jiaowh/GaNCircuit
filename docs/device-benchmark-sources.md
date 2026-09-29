@@ -115,3 +115,14 @@ docs/build.md "EPC2204 vendor-model baseline".
   EPC publishes an FEA-derived three-stage thermal RC model for the EPC2204.
   A published format does not show that our runner executes the model
   correctly; that is gate G1.
+
+## Board-level GaN layout and switching literature (retrieved 29 September 2026)
+
+Downloaded to the git-ignored `vendor/literature/`, with URLs, checksums and terms in
+[`devices/literature-sources.json`](../devices/literature-sources.json): EPC AN005 (device-model
+simulation), WP010 (PCB layout), WP009 (parasitics), EPC's layout-techniques webinar slides,
+Reusch and Strydom on paralleling, a DTU IAS 2020 accepted manuscript on GaN power-loop
+inductance, and Nexperia's switching-evaluation note. Reuse terms are not established; cite them,
+do not redistribute. Four IEEE papers (subscription), two open-access MDPI papers (automated
+download refused) and one dead NCSU link are recorded but not downloaded. These are vendor
+descriptions and published methods; none validates our extraction or bench.

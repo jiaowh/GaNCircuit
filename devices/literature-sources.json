@@ -1,0 +1,94 @@
+{
+ "schema": "literature-sources/1",
+ "retrieved": "2026-09-29",
+ "location": "vendor/literature/ (git-ignored)",
+ "terms": "Publicly downloadable; reuse terms not established. EPC and Nexperia documents are vendor copyright; the DTU file is an accepted manuscript under DTU Orbit's general-rights notice (personal study and research). Keep outside git; cite, do not redistribute.",
+ "files": [
+  {
+   "file": "EPC_AN005_Circuit_Simulations_Using_Device_Models.pdf",
+   "title": "EPC AN005, Circuit Simulation Using EPC Device Models (2019)",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/product-training/Circuit_Simulations_Using_Device_Models.pdf",
+   "sha256": "706da83656af9c47e2e5d311e02e739f7f0eb534487c45d9867c4531c70c358e",
+   "pages": 12
+  },
+  {
+   "file": "EPC_WP010_Optimizing_PCB_Layout.pdf",
+   "title": "EPC WP010, Optimizing PCB Layout (2019)",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/papers/Optimizing%20PCB%20Layout%20with%20eGaN%20FETs.pdf",
+   "sha256": "3c1b9cc8c35dd869cb3bf14c6388ac6ac341b0add67af0d7dbe13ea6e769c051",
+   "pages": 6
+  },
+  {
+   "file": "EPC_WP009_Impact_of_Parasitics_on_Performance.pdf",
+   "title": "EPC WP009, Impact of Parasitics on Performance (2020)",
+   "url": "https://epc-co.com/epc/portals/0/epc/documents/papers/Impact%20of%20Parasitcs%20on%20Performance.pdf",
+   "sha256": "ccffb884b887405b655f0b911ad5ee63f691b1d04c18914ab2d92855a34f6f1c",
+   "pages": 5
+  },
+  {
+   "file": "EPC_High_Performance_Layout_Techniques.pdf",
+   "title": "EPC How2GaN webinar slides, High-Performance Layout Techniques to Maximize GaN Device Performance",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/presentations/High-Performance%20Layout%20Techniques%20to%20Maximize%20GaN%20Device%20Performance.pdf",
+   "sha256": "cb474e5ec8be7d7940a2241155f193c5a7dba53fc133d181d06788ec77e662ee",
+   "pages": 22
+  },
+  {
+   "file": "EPC_Paralleling_High_Speed_GaN_Reusch.pdf",
+   "title": "Reusch and Strydom, Improving Performance of High Speed GaN Transistors Operating in Parallel for High Current Applications (EPC)",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/presentations/EPC_Paralleling_High_Speed_GAN_Reusch.pdf",
+   "sha256": "404eecd951c4e460bfa9933d8ce3399535e395aa3937ef41a2e38fc70ff8247a",
+   "pages": 8
+  },
+  {
+   "file": "DTU_IAS2020_PCB_Parasitic_Inductance_GaN_Power_Loop.pdf",
+   "title": "Research of power loop layout and parasitic inductance in GaN transistor implementation, IAS 2020 accepted version (DTU Orbit)",
+   "url": "https://backend.orbit.dtu.dk/ws/portalfiles/portal/236953218/IAS_accepted_PCB_for_GaN_2020.pdf",
+   "sha256": "13db72cd776fffe7dbc8e2f438b4df7f1bfcc9c4290a6fac94fc835a44e98bcc",
+   "pages": 11
+  },
+  {
+   "file": "Nexperia_Switching_Evaluation_Fast_GaN.pdf",
+   "title": "Nexperia, Switching evaluation of fast GaN devices (September 2021)",
+   "url": "https://www.nexperia.com/dam/jcr:30a865a1-bd3f-49f5-a414-fd6f26b710c3/Switching%20evaluation%20of%20fast%20GaN%20devices.pdf",
+   "sha256": "f525b195f9e81499b99e1934c51543ceb1339d19fb5df8d9e2f4f6ab4da50078",
+   "pages": 20
+  }
+ ],
+ "not_downloaded": [
+  {
+   "title": "PCB Layout Parasitics Extraction of a GaN Half-Bridge: Simulation and Experimental Validation",
+   "url": "https://ieeexplore.ieee.org/document/10264516/",
+   "reason": "IEEE Xplore, subscription"
+  },
+  {
+   "title": "Calculation and Experiment of Stray Inductance of PCB Double-Pulse Test Circuit Based on Three-Dimensional Simulation",
+   "url": "https://ieeexplore.ieee.org/document/9786727/",
+   "reason": "IEEE Xplore, subscription"
+  },
+  {
+   "title": "PCB Layout Evaluation of GaN HEMT Power Loop",
+   "url": "https://ieeexplore.ieee.org/document/10395175/",
+   "reason": "IEEE Xplore, subscription"
+  },
+  {
+   "title": "Research of PCB Parasitic Inductance in the GaN Transistor Power Loop",
+   "url": "https://ieeexplore.ieee.org/document/8760312",
+   "reason": "IEEE Xplore, subscription"
+  },
+  {
+   "title": "A Review of Double-Pulse Test Techniques for GaN Power Devices in High-Frequency Power Converters (Electronics 2026)",
+   "url": "https://www.mdpi.com/2079-9292/15/14/3079",
+   "reason": "open access (MDPI) but the site returned 403 to automated download; needs a browser download"
+  },
+  {
+   "title": "Parasitic Inductance Assessment of E-GaN DPT Circuit Through Finite Element Analysis (Energies 2026)",
+   "url": "https://doi.org/10.3390/en19020383",
+   "reason": "open access (MDPI) but the site returned 403 to automated download; needs a browser download"
+  },
+  {
+   "title": "Aberg et al., Estimation and Minimization of Power Loop Inductance (APEC 2018)",
+   "url": "https://www.freedm.ncsu.edu/wp-content/uploads/2018/03/B.-Aberg-APEC-2018.pdf",
+   "reason": "link returned 404"
+  }
+ ]
+}
