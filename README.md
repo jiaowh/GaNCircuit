@@ -103,7 +103,11 @@ Its predictions don't match reality yet, and the next job is to find out why.
    model and the probe. Spend refinement effort only where a result would change a decision.
 4. **Plan the hardware stage:** decide whether to buy an EPC90133, list the lab equipment, and design experiments
    that isolate each source of error (for example, measuring loop inductance from ringing with a known added capacitor).
-5. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
+5. **Add capacitance extraction with FasterCap.** Qualify it on known answers (a parallel-plate capacitor with
+   fringing, a microstrip line), then replace the rough ~135 pF switch-node estimate with an extracted value. Today's
+   bench shows that estimate changes the spike by only about 1 V, so this matters more for switching losses and for our own
+   board than for closing the current gap.
+6. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
 
 Gate G3 (stock-board simulation) stays open until the gap with the measurement is explained or bounded.
 
@@ -118,6 +122,7 @@ Gate G3 (stock-board simulation) stays open until the gap with the measurement i
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
 | DEVSIM | device simulator for the paused silicon NMOS fixture (WSL) | paused |
+| **FasterCap** | capacitance extraction between conductors (switch-node, VIN and GND copper), the companion to FastHenry | planned, not installed; LGPL 2.1+ per its README, [source](https://github.com/ediloren/FasterCap). Must pass known-answer checks before board use |
 | KiCad | our own board design (Stage 2, later) | not installed |
 | PSpice, Spectre | alternative simulators | not installed; ngspice was removed |
 
@@ -205,5 +210,4 @@ See [build notes](docs/build.md#epc90133-exploratory-extraction-and-switching-se
   revisions, artifact provenance, result semantics and a bounded simulator runner. Its device and results are kept. See
   [generated planar NMOS](docs/build.md#generated-planar-nmos-candidate-lc1) and the
   [co-design toolset plan](plans/autonomous-circuit-toolset-plan.md).
-- Earlier research-plan documents were removed from the working tree and remain in git history at commit `9a8e25b`.
-  The earlier fidelity/ranking pilot remains at commit `79b80fa`.
+
