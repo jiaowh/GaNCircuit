@@ -94,9 +94,12 @@ Its predictions don't match reality yet, and the next job is to find out why.
 
 ## What's next
 
-1. **Finish the sensitivity runs** already running or queued: the remaining via representation on the full board,
-   a finer extraction mesh, and bench cases for package inductance, switch-node capacitance, a periodic buck run (to
-   show the simplified double-pulse test matches EPC's continuous operation) and a numerical-accuracy check.
+1. **Finish the sensitivity runs.** Done: the numerical-accuracy check passes, and switch-node capacitance changes the
+   spike by only about 1 V. Still open:
+   - the package-inductance cases produced numerical spikes and need a finer time step or damping before they can be read;
+   - the periodic buck run, which would show the simplified double-pulse test matches EPC's continuous operation,
+     exceeds LTspice's 600 s limit;
+   - one via representation and a finer extraction mesh are still running.
 2. **Digitize EPC's measured waveform** (QSG Fig. 9) with a method declared in advance, instead of reading it by eye.
    Compare it only after passing the simulation through a stated probe/oscilloscope response.
 3. **Test the candidate causes one at a time:** missing damping, package inductance, board capacitance, the gate-driver
@@ -107,7 +110,13 @@ Its predictions don't match reality yet, and the next job is to find out why.
    fringing, a microstrip line), then replace the rough ~135 pF switch-node estimate with an extracted value. Today's
    bench shows that estimate changes the spike by only about 1 V, so this matters more for switching losses and for our own
    board than for closing the current gap.
-6. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
+6. **Complete the parasitic set in the extraction interface.** The draft
+   [parasitic extraction and Agent 2 stop criteria](plans/Layout%20Parasitic%20Extraction%20and%20Agent%202%20Stop%20Criteria.docx),
+   adopted with corrections in the [plan](plans/gan-halfbridge-pipeline-plan.md), lists seven "must" parasitics.
+   The power-loop three (L_d, L_sw, L_s) are extracted. Common-source inductance, the two gate-loop inductances and
+   switch-node capacitance are not yet extracted. The values go into one `parasitics.inc` file that the simulation reads,
+   with the coupling between segments kept.
+7. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
 
 Gate G3 (stock-board simulation) stays open until the gap with the measurement is explained or bounded.
 

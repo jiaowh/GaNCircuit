@@ -335,6 +335,23 @@ timing correction; driver, dead time, 25 °C and an ideal probe fixed):
   inductance of 50 and 150 pH per terminal (assumed), and a switch-node capacitance of 135 pF to GND and 2 pF to
   VIN (parallel-plate overlap from the Gerbers, no fringing).
 
+Test runs 3–4 (29 September 2026, later the same day):
+- B with gap vias: loop L 0.271 nH (−4% from mid). The via representation stays minor on the full board.
+- Numerical check, run on A because B exceeds the 600 s limit: halving maxstep and dividing reltol by 10 changes
+  every metric by less than 1% (ringing frequency −0.02%, damping +0.9%). **Pass.**
+- Switch-node capacitance, 135 pF on B: overshoot 35.7 → 34.6 V, ringing 283 → 266 MHz, tf 4.08 → 4.22 ns.
+  This is too small to explain the gap to Fig. 9.
+- **Package inductance (50 and 150 pH per terminal, on A): numerically unresolved, so do not use.** With the package
+  inductors, V(SW) shows single-timestep spikes, up to about 90 V, while it should be flat at the bus voltage. These are either
+  numerical artefacts or a resonance the 20 ps step does not resolve. The printed metrics (tr 1.54/3.0 ns, overshoot 36/24 V,
+  a non-monotonic tf of 7.0/4.0 ns) are contaminated by them. Next: a finer step or a damping resistance across the package
+  inductors, and a check that the spikes are gone before any metric is read.
+- On B, the package and periodic cases exceeded the adapter's 600 s limit and were moved to A.
+- The periodic-buck case (3 periods of 4 µs at a 20 ps maximum step) also exceeded 600 s on A. The double pulse is
+  therefore still not shown to be equivalent to Fig. 9's continuous operation. Options: raise the adapter's limit
+  (a change to the accepted G1 adapter), use a coarser step away from the edges, or use fewer, shorter periods at a matched
+  steady state. Test 4's report: `results/gan/epc90133-switching-test4.json` (its package cases are unusable, as above).
+
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
 on 28 September 2026 when LTspice became the project simulator. GaN and
