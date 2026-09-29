@@ -1,103 +1,209 @@
-# Agent-driven GaN power-electronics pipeline
+# GaNCircuit: an agent-driven GaN power-electronics pipeline
 
-## Current target and next deliverable
+## The goal
 
-The owner selected **EPC90133/EPC2302** on 28 September 2026. EPC lists a
-100 V device-rated, 40 A half bridge with two EPC2302s and the uP1966E driver.
-The quick-start guide lists an 80 V maximum bus input under its stated conditions;
-these ratings are not an approved project test envelope.
-The EPC2302 datasheet, EPC90133 guide and schematic are downloaded locally,
-with checksums in [the new source record](devices/epc/epc90133-sources.json).
-The existing vendor LTspice library contains EPC2302, but it has not yet been
-run or qualified for this target. BOM/Gerber retrieval and revision/population
-checks remain open. EPC lists Altium files on request.
+The project is building a mostly automated way to go from a transistor's datasheet to a tested circuit
+board. The transistor is the **EPC2302**, a fast power switch made from gallium nitride (GaN). The board
+is EPC's **EPC90133**, which uses two of these switches to chop a 48 V supply into pulses, the basic
+building block of power converters. The long-term aim is for software, with AI agents helping, to
+predict how the board will behave. We then check that prediction against real measurements and use what
+we learn to design a better board.
 
-The unmodified EPC2302 model now runs through the LTspice adapter, and a
-[table baseline](results/gan/epc2302-baseline.json) compares it with the datasheet.
-Every row with a datasheet limit is inside it. Capacitances, output charge and RDS(on) are within
-0.2–7% of typical, and total gate charge is 4% low. The table's gate-charge sub-values
-(QGD −34%, QG(TH) −31%) remain unresolved, and their cause is not established.
-The model also reproduces all 24 digitized datasheet curves in Figs. 1–6 and 8–10
-([comparison](results/gan/epc2302-curve-comparison.json)). The margins are so small that
-EPC probably drew these curves from the same model, so they show that our runner is faithful,
-not that the model matches hardware. The gate-charge curve, Fig. 7, does **not** match
-([comparison](results/gan/epc2302-fig7-comparison.json)): the model's Miller plateau
-is 24% narrower, and its charge after the plateau is about 1.2 nC (8%) low. The cause is not
-established, and no model tuning follows. The owner reviewed this on 28 September 2026. The unmodified model is a provisional baseline for board simulation; Fig. 7 and the sub-charges stay open, and switching times or losses that depend on gate charge are not validated.
-The EPC90133 BOM and Gerbers (board B5253 Rev 2.0, 8 copper layers) are retrieved,
-and an [audit](results/gan/epc90133-board-audit.json) cross-checks them with the stackup,
-schematic and guide. See [build notes](docs/build.md#epc2302-datasheet-curves-g2-curve-slice).
-A tested Gerber reader now turns the EPC90133 files into inspectable geometry: copper on all
-eight layers, drills and nets ([summary](results/gan/epc90133-geometry.json), renders in
-`results/gan/epc90133-geometry/`). It finds VIN, GND and SW as separate nets, and it shows
-the power loop the datasheet describes, returning through the GND plane on mid-layer 1.
-A [BOM-based schematic](devices/epc/epc90133-schematic.json) of the power stage matches the BOM
-part for part, and its LTspice netlist passes a static-state check. That check shows the circuit is
-connected as drawn; it is not a switching prediction. The schematic's uP1966A label, where the BOM says
-uP1966E, stays recorded. So does a design-folder name that mentions EPC2301.
-The FastHenry via/return check at the board's stack ([result](results/gan/fasthenry-via-cavity.json)) **fails its declared mesh criterion**: absolute inductances still move 1.2–1.5% between the two finest meshes. It stays recorded as failed. What passed is narrow: the *difference* in spreading inductance between two closed benchmark cavities at 100 MHz matches the analytic answer within 2.5%, and errors common to both can cancel in a difference. That does not qualify arbitrary board planes, holes or via arrays. Both via values lie inside their bracket; the declared representation uncertainty is the bracket width (about 23.5 and 33.7 pH for the two cavities), and even that applies to the benchmark geometry, not to every board via.
-Owner decision (29 September 2026): defer the fourth mesh and proceed with exploratory board extraction.
-Step 1 is done: an [annotated power-loop overlay](results/gan/epc90133-power-loop.json)
-(renders in `results/gan/epc90133-power-loop/`) checks both EPC2302 footprints against the datasheet
-land pattern (pins, orientation, pin nets: pass). It locates the 7 top-side Ci and 10 bottom-side Cm capacitors
-and groups the loop's vias by the layers they actually connect, and it fixes the extraction ports. It shows two stacked loops
-(top layer over mid-layer 1, and a second through G5, G6 and the bottom layer via Cm). It also shows that the return
-plane under both FETs is slotted by SW via clearances. That is a plane-hole case not yet qualified.
-Steps 2–3 now run end to end, as exploratory work (interim results in
-[build notes](docs/build.md#epc90133-exploratory-extraction-and-switching-sensitivity-g3-steps-23-interim)).
-The via representation changes neither the extracted loop inductance (under 2%) nor the switching predictions.
-The extra copper layers and the Cm capacitors do: 0.50 → 0.28 nH, and rise overshoot 55 → 36 V. No variant resembles
-EPC's measured Fig. 9 (about 7 V at about 0.6 GHz against 36 V at 0.28 GHz), so the gap is probably not the loop
-inductance alone; the candidates are untested. [Literature notes](docs/gan-layout-literature-notes.md)
-add missing package inductance, switch-node capacitance and the probe response as cases to test.
-Originally planned next: exploratory extractions under explicit, alternative geometry assumptions; and a switching
-sensitivity bench that shows which assumptions change the predictions, to decide where qualification is worth
-the effort. Those simulations carry the Fig. 7 gate-charge limitation.
-Retain the accepted LTspice adapter and FastHenry checks. The previous
-EPC2204/EPC9097 evidence below is historical and does not validate the new pair.
+The work splits into three stages:
+1. **The transistor on its own:** does our simulation of the chip behave like the datasheet says?
+2. **The board:** does our simulation of the chip on its actual circuit board behave like the real board?
+3. **Real measurements:** testing actual hardware safely and comparing it with the predictions.
 
-**Active direction (28 September 2026):** an agent-driven pipeline for a commercial EPC GaN FET and its half-bridge development board: datasheet → vendor model → layout-aware simulation → automated measurement → closure report. See the [GaN half-bridge pipeline plan](plans/gan-halfbridge-pipeline-plan.md). Selected target: EPC90133 board with EPC2302 FETs (owner decision, 28 September 2026).
+```mermaid
+flowchart LR
+    DS["EPC2302 datasheet"] --> M["Vendor model<br/>in LTspice"]
+    M -->|"Stage 1: compare<br/>with datasheet graphs"| CHK1{{"24 of 25 match"}}
+    G["EPC90133 layout files<br/>(8 copper layers)"] --> GEO["Board geometry,<br/>nets, footprints"]
+    GEO --> FH["FastHenry:<br/>loop inductance"]
+    M --> SW["Switching simulation"]
+    FH --> SW
+    SW -->|"Stage 2: compare with<br/>EPC's measured waveform"| CHK2{{"does not match yet"}}
+    SW -.->|"Stage 3 (not started)"| HW["Measurements on<br/>real hardware"]
+```
 
-**Historical EPC9097/EPC2204 results, retained as reference.** The first piece of Stage 1 works. LTspice 26.1.1 runs in batch mode behind the project's runner interface. [Known-answer checks](results/toolset/ltspice-fixtures.json) pass: operating point, transient, AC, nested sweeps, a diode, and binary/ASCII output. The unmodified EPC2204 vendor model runs at the datasheet's table conditions, and a [baseline report](results/gan/epc2204-baseline.json) compares it with the datasheet. Resistance, capacitances, output charge and total gate charge come out within 0.1–6.4% of the datasheet typicals. The first run reported gate charge 33% low, which turned out to be an LTspice accuracy-setting artifact; it is fixed, and the result is checked against the model's own equations. The model also matches every datasheet curve EPC drew ([gate charge](results/gan/epc2204-fig7-comparison.json), [all other curves](results/gan/epc2204-curve-comparison.json)): 23 of 23 curves pass pre-declared tolerances, with legend labels verified. An earlier reported failure (Fig. 6 stored energy) came from our digitizer's axis calibration, and was found and fixed after review. The table's gate-charge sub-values (QGS, QGD, QG(TH)) are not reproduced by EPC's own curve under plateau-based boundaries, so they remain unresolved; they may use different definitions or different source data. The owner accepted this model baseline (gate G2) for board simulation, with those subcharges recorded as an open exception to revisit during switching measurements. Now in progress: simulation of the stock EPC9097 board (gate G3). A [switching bench](results/gan/epc9097-switching-ideal-layout.json) simulates the board's half bridge: two unmodified EPC2204 models, the board's gate resistors and capacitors, and a behavioural gate driver calibrated to its datasheet (EPC publishes no driver model). It runs at the conditions of EPC's published waveforms, with the power-loop inductance swept because it has not yet been extracted from the layout. The sweep shows why extraction matters. In this simplified bench, the switch node peaks at 52 V with 0.2 nH but 96 V with 0.8 nH from a 48 V bus, against a 100 V rating. That is a sensitivity result, not a safe operating limit: gate-loop and common-source inductance are omitted and the driver is approximate. EPC's measured waveforms are [digitized and compared](results/gan/epc9097-switching-vs-qsg.json). The switching-node fall time, which mainly tests the device, follows the expected trend with current but is 23–35% slower in EPC's measurement. The dead-time plateau, which mainly tests the driver timing, is 2.4 ns shorter. Candidate causes are known but untested. The source of the 130 MHz ringing in EPC's screenshots, and of their slower rise, is unidentified. The power loop, the bus network, the probe path and parasitics the bench omits are all candidates. EPC publishes two layout revisions of the board. Both stay candidates until evidence links one to our board, or to EPC's measurements, which need not match. G3 stays open until the matching layout's parasitics are extracted. Not yet done: layout and parasitics, and any hardware measurement. See [the EPC2204 baseline](docs/build.md#epc2204-vendor-model-baseline-stage-1-first-slice). ngspice has been removed; LTspice is the circuit simulator.
+The full plan, including its checkpoints (gates G0–G6) and safety rules, is in
+[plans/gan-halfbridge-pipeline-plan.md](plans/gan-halfbridge-pipeline-plan.md).
 
-The work below built reusable infrastructure: immutable revisions, artifact provenance, result semantics and a bounded simulator runner. It also built a silicon NMOS/DEVSIM development fixture, which is now paused. That history is kept for reference.
+## What we've done
 
-## Adopted workflow methods and next work
+### Stage 1: the transistor (mostly done)
+- EPC provides a simulation model of the EPC2302. We showed it runs correctly in our circuit simulator,
+  LTspice ([table comparison](results/gan/epc2302-baseline.json)).
+- We compared it with 25 graphs from the datasheet. 24 match closely
+  ([comparison](results/gan/epc2302-curve-comparison.json)). They match so closely that EPC probably drew them
+  from the same model, so this shows our simulation runs the model faithfully, not that the model matches real parts.
+- One graph doesn't match: the one showing how much electric charge it takes to switch the transistor on
+  ([Fig. 7 comparison](results/gan/epc2302-fig7-comparison.json)). We haven't worked out why.
+- Because of that mismatch, we don't yet trust simulated switching speeds or energy losses. The owner accepted the
+  unmodified model as a provisional baseline for Stage 2 (gate G2, 28 September 2026). The model is not tuned.
 
-The [active plan](plans/gan-halfbridge-pipeline-plan.md) incorporates the
-[V1 workflow review](docs/gan-workflow-methods-review.md): explicit stage handoffs,
-bounded layout optimization, guarded model tuning, predictions frozen before
-fabrication, held-out measurements and evaluation of agent effort/reliability
-against a baseline. These are planned capabilities; the full autonomous loop
-has not been demonstrated. EPC90133/EPC2302 is now selected; EPC9097/EPC2204
-is retained as historical reference work.
+### Stage 2: the board (tools built, results not trusted yet)
+- **We can read the board's layout.** EPC publishes the manufacturing files: copper shapes on 8 stacked layers,
+  plus about 450 drilled holes (vias) that connect the layers. Our software turns these into a map of which copper
+  belongs to which part of the circuit ([geometry](results/gan/epc90133-geometry.json)). It checks that the transistors'
+  pads are in the right places ([power-loop overlay](results/gan/epc90133-power-loop.json), pictures in
+  `results/gan/epc90133-power-loop/`).
 
-Reusable FastHenry qualification covers tested bars and plane pairs, with failed case C
-and subsequent passing check D kept separate. Vias, plane holes and solder-bar
-connections remain outside that qualification. The historical EPC9097 6-layer ODB++ population
-(EPC2619, 4.7/1 ohm gate resistors, uP1966A) differs from the simulation BOM.
-Keep geometry, fitted parts and measurement-board identities separate. Reuse
-the extraction methods after identifying the selected EPC90133 geometry.
-Internal-only FastHenry use is recorded in `95b0fad`; its restrictive MIT-authored
-terms are not the standard MIT License. See [build notes](docs/build.md#fasthenry-inductance-extraction-tool-qualification-g3).
+  ![Top layer of the EPC90133 power stage: VIN in red, switch node in green, ground in blue, with the two transistors (Q1, Q2), the Ci capacitor row and the via groups](results/gan/epc90133-power-loop/top.png)
 
-## Earlier implementation history
+  *Top copper layer around the two transistors, drawn from EPC's files. Red is the input supply (VIN), green the switch
+  node (SW), blue ground (GND). The numbered rectangles are the transistor pins; dots are vias. The arrows show the
+  switching current's path: from the capacitors (top) through Q1 and Q2, then down through vias to the ground plane below.*
 
-This project is developing tools that general-purpose AI agents can use to design semiconductor devices, connect circuits, run simulations, inspect results, and iterate. **Custom device design and circuit co-design are in scope from the first working demonstration.**
+  ![Cross-sections through the board showing all eight copper layers and the vias under Q2](results/gan/epc90133-power-loop/sections.png)
 
-The [co-design toolset plan](plans/autonomous-circuit-toolset-plan.md) describes the architecture, proposed operations, implementation sequence, and evaluation gates. The recommended first target is a custom planar NMOS and a simple amplifier, with independent device-to-circuit validation. The [reference notes](plans/autonomous-toolset-reference-notes.md) connect the decisions to local papers and upstream tools.
+  *Side views cut through the board (height exaggerated). Each row of colour is one copper layer, and vertical bars
+  are vias. The switch-node vias pass through holes in the ground layers, leaving slots in the return path.*
 
-Current status: the first implementation slice is available as a Python library and CLI. It includes immutable circuit revisions, artifact storage, a bounded simulator adapter (ngspice at the time, since replaced by LTspice), and a validity-aware diode fitting fixture; see [build instructions and scope](docs/build.md). The complete physical NMOS-to-amplifier co-design loop is still under construction. Legacy preflight results describe the earlier pilot only.
+- **We can calculate the board's hidden effects.** Copper paths act like tiny unwanted coils (inductance). When the
+  switch flips in about a nanosecond, these tiny coils cause voltage spikes and ringing. A tool called FastHenry calculates
+  them from the copper shapes. We found that the deeper copper layers matter a lot, while the fine details of how vias are
+  modelled barely matter. That saved us from spending hours refining the wrong thing.
+- **We can simulate the switching.** The board's calculated inductances go into the circuit simulation alongside the
+  transistor models. That lets us predict the voltage waveform when the switch flips.
 
-The first [NMOS DC characterization](results/device-reference/nmos-dc-characterization.json) collected all nine points at 300 K over Vgs/Vds = 0.45, 0.50, and 0.55 V, with a predeclared six-point training set and three-point held-out gate slice. The [two-mesh grid comparison](results/device-reference/nmos-characterization-comparison.json) passes all 36 terminal-current and six finite-span slope checks; the maximum drain-current change is 0.1872%. A [central slope step-size check](results/device-reference/nmos-step-size-comparison.json) also passes on the coarser mesh. The CLI now imports immutable NMOS datasets and computes secants. These checks cover sampled simulated behavior; continuous-domain, model, circuit, and physical-device validation remain unfinished. See [characterization replay and limits](docs/build.md#nmos-dc-characterization).
+### What doesn't work yet
+- **The prediction doesn't match EPC's measured waveform.** We predict a voltage spike about 36 V above the 48 V supply;
+  EPC's measurement shows about 7 V. Our ringing is also slower than theirs (about 0.28 GHz against 0.6 GHz).
 
-**Generated device (28 September 2026).** The upstream MOS reference is retired as the amplifier candidate: its gate barely controls the current (gm/gds ≈ 0.063). A replacement planar NMOS is now generated from one [parameter specification](devices/planar-nmos-lc1.json) (1 µm gate, 10 nm oxide, n+ poly, 3.3 V). Its simulated curves show clear turn-off (79.5 mV/dec, Ion/Ioff 4e7), saturation, and gm/gds of 70–240 at mid-supply. A common-source operating point (Vgs 0.6 V, W 23.9 µm, RD 16.5 kΩ, 100 µA) gives an estimated gain of −11, checked on three meshes. The fitted model and ngspice amplifier simulation are the next steps. See [generated planar NMOS](docs/build.md#generated-planar-nmos-candidate-lc1).
+  ![Simulated switch-node voltage for each board variant at turn-on and turn-off](results/gan/epc90133-switching-waveforms.png)
 
-- `papers/`: reference literature and historical index.
-- [Public device benchmark sources](docs/device-benchmark-sources.md): diode/MOSFET reference data, candidate Infineon CoolGaN resources, provenance limits, and validation sequence for future sessions.
-- `plans/gan-halfbridge-pipeline-plan.md`: active direction, dated 28 September 2026.
-- `plans/autonomous-circuit-toolset-plan.md`: co-design toolset plan (11 September 2026); its contracts are reused, and its NMOS demonstration is paused.
-- `results/`: executed toolset and device-reference reports.
-- Earlier research-plan history (superseded by the toolset plan) was removed from the working tree and remains in git history at commit `9a8e25b`. The earlier fidelity/ranking pilot (`FINAL-PLAN.md`, `protocol/`, `pilot-inputs/`, pilot results) was removed from the working tree and remains in git history at commit `79b80fa`.
+  *Simulated switch-node voltage when the top transistor turns on (left) and off (right), for each extraction variant.
+  With no board inductance (blue) the edge is almost clean. With the extracted copper, the voltage rings far above the
+  48 V supply. Adding more of the board (orange → green → yellow) lowers the spike but does not reach the ~55 V peak read
+  from EPC's measurement (dashed line). The turn-off edge barely depends on the layout.*
+- **We know some pieces are missing:**
+  - the inductance inside the transistor's package;
+  - some capacitance between copper layers;
+  - the energy losses that calm the ringing in real life;
+  - how EPC's measuring probe affected their recording.
+- The published papers we gathered ([notes](docs/gan-layout-literature-notes.md)) back these up as likely causes.
+  We haven't yet proved which ones actually explain the gap.
 
-The official DEVSIM diode and planar MOS scripts complete, with [finite-current and conservation checks](results/device-reference/audit.json). A [diode junction-refinement check](results/device-reference/qualification.json) passes at 0.5 V, and a [known-answer 2D resistor fixture](results/device-reference/current-normalization.json) checks the A/cm current convention. The [four-mesh planar-MOS endpoint check](results/device-reference/planar-mos-openblas-qualification.json) now passes: the last drain-current change is 0.184%, below the fixed 1% tolerance. [Runtime comparison](results/device-reference/math-runtime-comparison.json) confirms agreement on the same mesh after adopting local OpenBLAS. See [replay instructions and limits](docs/build.md#optimized-math-runtime-and-mos-endpoint-check). Next: expose physical device revisions, select an amplifier operating region, validate its model bridge, and perform independent circuit checks. Endpoint mesh agreement alone does not validate that full workflow.
+### Stage 3: real hardware (not started)
+- We have no board and have made no measurements. That comes later, with safety hardware that works independently
+  of the software.
+
+**In one sentence:** we have a working chain of tools that goes from the manufacturer's files to a predicted waveform.
+Its predictions don't match reality yet, and the next job is to find out why.
+
+## What's next
+
+1. **Finish the sensitivity runs** already running or queued: the remaining via representation on the full board,
+   a finer extraction mesh, and bench cases for package inductance, switch-node capacitance, a periodic buck run (to
+   show the simplified double-pulse test matches EPC's continuous operation) and a numerical-accuracy check.
+2. **Digitize EPC's measured waveform** (QSG Fig. 9) with a method declared in advance, instead of reading it by eye.
+   Compare it only after passing the simulation through a stated probe/oscilloscope response.
+3. **Test the candidate causes one at a time:** missing damping, package inductance, board capacitance, the gate-driver
+   model and the probe. Spend refinement effort only where a result would change a decision.
+4. **Plan the hardware stage:** decide whether to buy an EPC90133, list the lab equipment, and design experiments
+   that isolate each source of error (for example, measuring loop inductance from ringing with a known added capacitor).
+5. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
+
+Gate G3 (stock-board simulation) stays open until the gap with the measurement is explained or bounded.
+
+## Tools
+
+| Tool | What it does here | Status |
+|---|---|---|
+| Python 3.10+ with numpy, scipy, Pillow, matplotlib | glue, analysis, geometry, plots | in use |
+| `circuit_tools` (this repo, `src/`) | runner interface, artifact store, LTspice adapter, Gerber reader | in use; 95 tests |
+| **LTspice 26.1.1** | circuit simulation of the vendor model and board (batch mode on Windows) | qualified (gate G1) |
+| **FastHenry 3.0.1** | inductance/resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory. Internal-only use; not redistributed (licence note below) |
+| PyMuPDF | reads datasheets and digitizes their graphs | in use |
+| openpyxl, xlrd | read EPC's BOM and stackup files | in use |
+| DEVSIM | device simulator for the paused silicon NMOS fixture (WSL) | paused |
+| KiCad | our own board design (Stage 2, later) | not installed |
+| PSpice, Spectre | alternative simulators | not installed; ngspice was removed |
+
+EPC files, papers and FastHenry itself are not in git: they live in the git-ignored `vendor/` and `.tools/`,
+with sources, dates and checksums recorded in `devices/`. FastHenry's MIT-authored notice is restrictive and is not the
+standard MIT License; internal use was confirmed by the owner (commit `95b0fad`).
+
+## Repository layout
+
+- `src/circuit_tools/`: the library (LTspice adapter, Gerber/drill reader, revisions, artifacts, CLI).
+- `scripts/`: one script per study, each with its specification in its docstring (for example
+  `epc2302_baseline.py`, `read_epc90133_geometry.py`, `epc90133_power_loop.py`, `epc90133_extract.py`,
+  `epc90133_switching.py`).
+- `devices/`: source records (URLs, dates, checksums, terms) and transcribed schematics.
+- `results/`: committed result reports; failed runs are kept alongside with `-failed` in the name.
+- `docs/`: [build and replay notes](docs/build.md), [literature notes](docs/gan-layout-literature-notes.md),
+  [benchmark sources](docs/device-benchmark-sources.md), [workflow review](docs/gan-workflow-methods-review.md).
+- `plans/`: the active [pipeline plan](plans/gan-halfbridge-pipeline-plan.md) and the reused toolset plan.
+- `tests/`: unit and known-answer tests.
+- `vendor/`, `runs/`, `.tools/`: git-ignored vendor files, simulation scratch output and local tool builds.
+
+## How to run
+
+```sh
+PYTHONPATH=src python -m pytest -q tests                  # unit and known-answer tests
+PYTHONPATH=src python scripts/verify_ltspice_fixtures.py  # LTspice adapter checks
+PYTHONPATH=src python scripts/epc2302_baseline.py         # Stage 1: model vs datasheet table
+PYTHONPATH=src python scripts/epc90133_power_loop.py      # Stage 2: board geometry, footprints, ports
+PYTHONPATH=src python scripts/epc90133_extract.py B:m1:mid --jobs 3   # FastHenry extraction (about 2 h)
+PYTHONPATH=src python scripts/epc90133_switching.py       # switching sensitivity from all extractions
+```
+
+The vendor files must first be downloaded to `vendor/` as recorded in `devices/`. Details, expected results
+and known limits for every command are in [docs/build.md](docs/build.md).
+
+## Project rules
+
+- Record the source, retrieval date, checksum and reuse terms of every vendor file.
+- Keep the original vendor model as the baseline; tune it only when evidence isolates a discrepancy to the device,
+  and store any tuned model separately.
+- Declare checks and tolerances before running them, and keep failed runs.
+- A simulated sensitivity is not a safe operating limit. Hardware protection stays independent of any AI agent.
+
+## Detailed technical status
+
+**Stage 1 numbers.** Every datasheet-table row with a limit is inside it. Capacitances, output charge and RDS(on)
+are within 0.2–7% of typical, and total gate charge is 4% low. The gate-charge sub-values (QGD −34%, QG(TH) −31%) are
+unresolved. In Fig. 7 the model's Miller plateau is 24% narrower, and its charge after the plateau is about 1.2 nC (8%) low.
+Simulations keep `reltol=1e-6`: the default under-integrates gate charge. See
+[build notes](docs/build.md#epc2302-datasheet-curves-g2-curve-slice).
+
+**Board files.** BOM and Gerbers are board B5253 Rev 2.0, 8 copper layers
+([audit](results/gan/epc90133-board-audit.json)). The schematic labels the driver uP1966A where the BOM says uP1966E,
+and a design-folder name mentions EPC2301. Both stay recorded. A [BOM-based schematic](devices/epc/epc90133-schematic.json)
+passes a static connectivity check.
+
+**Power loop.** Two stacked loops exist: the top layer over mid-layer 1, and a second one through the lower layers to
+the bottom-side Cm capacitors. The return plane under both transistors is slotted by switch-node via clearances, a case
+that is not qualified.
+
+**Via check.** The FastHenry via/plane-pair benchmark ([result](results/gan/fasthenry-via-cavity.json)) fails its
+declared mesh criterion and stays recorded as failed. Only the spreading-inductance difference between two closed benchmark
+cavities passed. The declared via representation uncertainty is the bracket width (23.5/33.7 pH), and it applies to the
+benchmark only. The owner deferred the finer mesh on 29 September 2026.
+
+**Extraction and switching (exploratory, interim).**
+
+| Variant | Loop L | Rise overshoot | Ringing |
+|---|---|---|---|
+| A: top + mid-layer 1, Ci (three via representations) | 0.49–0.50 nH | 54.5–54.9 V | 0.20 GHz |
+| I: all copper, Ci | 0.30 nH | 40.0 V | 0.27 GHz |
+| B: all copper, Ci + Cm | 0.28 nH (0.27 with the gap via representation) | 35.7 V | 0.28 GHz |
+| ideal copper | — | 2.1 V | 1.15 GHz |
+| EPC's measurement (QSG Fig. 9, by eye) | — | about 7 V | about 0.6 GHz |
+
+See [build notes](docs/build.md#epc90133-exploratory-extraction-and-switching-sensitivity-g3-steps-23-interim).
+
+## History
+
+- **EPC9097/EPC2204 (paused reference).** The first target, kept as reference evidence. The LTspice adapter was
+  qualified on it, and the EPC2204 model matched all 23 datasheet curves. A switching bench swept the loop inductance
+  before any extraction. EPC publishes two layout revisions of that board, and neither is linked to a physical board.
+  See [build notes](docs/build.md#epc2204-vendor-model-baseline-stage-1-first-slice).
+- **Silicon NMOS/DEVSIM fixture (paused).** An earlier development fixture built the reusable infrastructure: immutable
+  revisions, artifact provenance, result semantics and a bounded simulator runner. Its device and results are kept. See
+  [generated planar NMOS](docs/build.md#generated-planar-nmos-candidate-lc1) and the
+  [co-design toolset plan](plans/autonomous-circuit-toolset-plan.md).
+- Earlier research-plan documents were removed from the working tree and remain in git history at commit `9a8e25b`.
+  The earlier fidelity/ranking pilot remains at commit `79b80fa`.
