@@ -11,6 +11,9 @@ Consistency checks fixed before the first run:
 * VIN, GND and SW must be three distinct nets (a merge means a reader or via error);
 * each probe must land on copper;
 * both FET footprints must connect to VIN/SW (Q1) and SW/GND (Q2) through their pads.
+  This third check was declared but missing from the first run's report; it is
+  implemented, with the footprint dimensions, in scripts/epc90133_power_loop.py
+  (29 September 2026).
 
 Outputs: results/gan/epc90133-geometry.json (layer areas, drills, nets touched
 by the power stage) and PNG renders in results/gan/epc90133-geometry/ for
@@ -22,6 +25,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 import numpy as np
 from PIL import Image
@@ -46,11 +50,8 @@ PROBES = {
 POWER_STAGE = (14.0, 20.0, 34.0, 40.0)  # mm window holding Q1, Q2, Ci1-Ci7 and U80
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-geometry.json")
-    ap.add_argument("--renders", type=Path, default=ROOT / "results/gan/epc90133-geometry")
-    args = ap.parse_args()
+def load_board():
+    """Rasterized layers, drills and copper connectivity, with VIN/GND/SW named from the probes."""
     zip_path = ROOT / "vendor/epc/epc90133/EPC90133 Development Board Gerbers.zip"
     if hashlib.sha256(zip_path.read_bytes()).hexdigest() != ZIP_SHA:
         raise SystemExit("Gerber zip checksum differs from devices/epc/epc90133-sources.json")
@@ -92,7 +93,7 @@ def main():
                 touched.append((e, ids.pop()))
         for (e1, i1), (e2, i2) in zip(touched, touched[1:]):
             union((e1, i1), (e2, i2))
-        via_rows.append({"x": h.x, "y": h.y, "d": h.diameter, "layers": [e for e, _ in touched]})
+        via_rows.append({"x": h.x, "y": h.y, "d": h.diameter, "layers": [e for e, _ in touched], "islands": touched})
 
     probes = {}
     for name, (e, x, y) in PROBES.items():
@@ -105,6 +106,19 @@ def main():
     def net_of(e, x, y):
         lab = int(labels[e][pixel(x, y)])
         return net_name.get(find((e, lab)), "other") if lab else "none"
+
+    return SimpleNamespace(grids=grids, holes=holes, labels=labels, counts=counts, find=find, pixel=pixel,
+                           via_rows=via_rows, probes=probes, distinct=distinct, net_name=net_name, net_of=net_of)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-geometry.json")
+    ap.add_argument("--renders", type=Path, default=ROOT / "results/gan/epc90133-geometry")
+    args = ap.parse_args()
+    b = load_board()
+    grids, holes, labels, counts, find, pixel = b.grids, b.holes, b.labels, b.counts, b.find, b.pixel
+    via_rows, probes, distinct, net_name, net_of = b.via_rows, b.probes, b.distinct, b.net_name, b.net_of
 
     # Layer coverage of each named net inside the power-stage window.
     x0, y0, x1, y1 = POWER_STAGE

@@ -234,6 +234,54 @@ through 48 Ω. Its report is kept (`epc90133-schematic-check-run1-failed.json`).
 a 2 µs off interval, gives 24.000 V and passes. This shows the netlist is connected as drawn.
 It makes no switching claim.
 
+### EPC90133 power-loop geometry and ports (G3 extraction, step 1)
+
+```sh
+PYTHONPATH=src python scripts/epc90133_power_loop.py   # results/gan/epc90133-power-loop.json, renders in results/gan/epc90133-power-loop/
+```
+
+Step 1 of the exploratory extraction the owner set on 29 September 2026. The script identifies the loop
+and fixes the ports; it extracts nothing. Paste openings only locate the parts. A contact is the solder-mask
+opening on copper, because the EPC2302 land is mask defined and fab note 7 makes the mask 1:1 with the Gerber.
+Component windows are rasterized at 5 µm. Checks C1–C5 were declared in the docstring before the first run.
+
+Result (run 3): C2–C5 pass; C1 fails, for a board reason that does not affect the contacts.
+- **EPC2302 footprints.** Q1 and Q2 each have seven contacts in the datasheet orientation (fit RMS 0.011 mm,
+  next-best orientation 0.25 mm). Pin centres lie within 0.021 mm of the land pattern, and every contact is
+  mask-defined all round. The nets match the pin functions: Q1 drains on VIN and sources on SW, Q2 drains on
+  SW and sources on GND. The two gates are on separate nets. The mask openings are 0.075 mm wider than EPC's
+  recommended land pattern (0.375 vs 0.30 mm; 0.475 vs 0.40 mm), and the lengths match within 0.015 mm. I read the
+  aperture widths in the Gerber header before writing the check, so this is a finding, not a blind test.
+- **C1 (paste on mask-open copper) fails.** On the outer pins 1, 2 and 7 the stencil opening is a full rounded
+  rectangle, while the mask stays closed between the side-flank notches, so 16–20% of each opening prints on
+  mask-covered copper. The board's stencil also differs from the datasheet stencil drawing (one opening per long pin, not two).
+- **Capacitors.** Ci1–Ci7 (0603 pads, 1.45 mm pad pitch) lie in a top-side row. Cm1–Cm10 (0805 pads, 1.95 mm)
+  lie on the bottom directly beneath and extend further right. Each capacitor has one VIN and one GND contact.
+- **Two stacked loops.** Top loop: Ci → top VIN copper → Q1 → SW → Q2 → 35 GND vias (13 in Q2's source pins,
+  22 in a row just below Q2) → mid-layer 1 → GND vias beside the Ci row → Ci. Second loop: G5, G6 and the
+  bottom layer repeat the VIN/SW pours, and Cm returns through them to Q1's drain vias. All vias run top to bottom.
+- **Via layers.** Q1's source vias and Q2's drain vias (SW) bond only to the top, G5, G6 and bottom layers.
+  They pass through mid-layers 1–4 on slot pads inside long clearances in the GND planes. Q1's drain-pin vias
+  (VIN) also pass through those planes. So the return plane directly under both FETs is slotted and perforated,
+  a plane-hole case that is not qualified. Q1 pin 2's vias also bond to mid-layer 1, where the datasheet
+  places the high-side gate return. Kelvin candidates: the pin 2 via nearest the gate (0.45/0.49 mm from pin 2's gate end).
+- **Ports.** Each net is one conductor with a reference terminal (VIN: Q1.D, SW: Q2.D, GND: Q2.S). A branch
+  port runs from each other terminal to it: every Ci/Cm VIN and GND pad, and Q1.S. A single FastHenry run then
+  gives the coupled matrix of all branches, including mutual terms between nets, rather than one loop number.
+  Baseline junction: each terminal's nodes inside its contacts are one equipotential; the alternative is centroid nodes.
+  Not modelled: the EPC2302 package and internal metallization (the vendor model has no package inductance) and
+  capacitor ESL/ESR, which the bench states separately.
+- **Fabrication facts used.** Vias up to 0.010 in are filled with non-conductive material and plated over (IPC-4761
+  type VII), with barrel plating of at least 20 µm (the actual thickness is not given). Mask and layer
+  registration are each within 0.003 in.
+
+Run history. Run 1 failed C2 and C5 because my component windows also held neighbouring parts' contacts
+(its report is kept as `epc90133-power-loop-run1-failed.json`). Contacts cut by a window edge are now dropped,
+with the windows unchanged. Run 2's via labels were wrong: per-via disks counted slot pads as functional,
+and keying groups on the contact split via pairs. Run 3 measures distance from the hull of the joined vias.
+Limits: component positions come from paste and silkscreen, not a placement file, and the 1-mil board raster
+does not resolve sub-pitch copper. Ci/Cm reference designators follow the silkscreen order read from the renders.
+
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
 on 28 September 2026 when LTspice became the project simulator. GaN and

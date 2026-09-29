@@ -37,8 +37,13 @@ connected as drawn; it is not a switching prediction. The schematic's uP1966A la
 uP1966E, stays recorded. So does a design-folder name that mentions EPC2301.
 The FastHenry via/return check at the board's stack ([result](results/gan/fasthenry-via-cavity.json)) **fails its declared mesh criterion**: absolute inductances still move 1.2–1.5% between the two finest meshes. It stays recorded as failed. What passed is narrow: the *difference* in spreading inductance between two closed benchmark cavities at 100 MHz matches the analytic answer within 2.5%, and errors common to both can cancel in a difference. That does not qualify arbitrary board planes, holes or via arrays. Both via values lie inside their bracket; the declared representation uncertainty is the bracket width (about 23.5 and 33.7 pH for the two cavities), and even that applies to the benchmark geometry, not to every board via.
 Owner decision (29 September 2026): defer the fourth mesh and proceed with exploratory board extraction.
-Next: an annotated overlay of the actual power loop (copper paths, return planes, via groups, footprint
-check, ports); exploratory extractions under explicit, alternative geometry assumptions; and a switching
+Step 1 is done: an [annotated power-loop overlay](results/gan/epc90133-power-loop.json)
+(renders in `results/gan/epc90133-power-loop/`) checks both EPC2302 footprints against the datasheet
+land pattern (pins, orientation, pin nets: pass). It locates the 7 top-side Ci and 10 bottom-side Cm capacitors
+and groups the loop's vias by the layers they actually connect, and it fixes the extraction ports. It shows two stacked loops
+(top layer over mid-layer 1, and a second through G5, G6 and the bottom layer via Cm). It also shows that the return
+plane under both FETs is slotted by SW via clearances. That is a plane-hole case not yet qualified.
+Next: exploratory extractions under explicit, alternative geometry assumptions; and a switching
 sensitivity bench that shows which assumptions change the predictions, to decide where qualification is worth
 the effort. Those simulations carry the Fig. 7 gate-charge limitation.
 Retain the accepted LTspice adapter and FastHenry checks. The previous
