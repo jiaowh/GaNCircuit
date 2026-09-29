@@ -385,7 +385,8 @@ Status, 28 September 2026 (updated after the EPC90133/EPC2302 selection):
 
 - **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
 - **G2, EPC2204 historical result:** accepted for the EPC9097 stock-board simulation, with a documented exception (owner review, 28 September 2026). The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances (worst point uses 22.8% of its allowed error). The reviewer independently reproduced the extraction, comparisons and 88 tests under WSL. **Exception:** table QGS/QGD/QG(TH) values remain unresolved because EPC's own curve does not reproduce them; they may use different definitions or source data. Total QG matches. No tuning is justified. This result is not EPC2302 validation.
-- **G2, EPC2302:** open. Inventory the EPC model and datasheet sources, record provenance and terms, run the unmodified model in LTspice, and compare the datasheet table and curves with declared tolerances.
+- **G2, EPC2302:** provisional baseline for G3 (owner review, 28 September 2026). The unmodified model runs in LTspice; limited table rows are inside their limits and QG is 4% low; 24 digitized curves in Figs. 1–6 and 8–10 pass. Fig. 7 gate charge fails its declared checks, and the table QGD/QG(TH) are unresolved. No tuning is justified; gate-charge-dependent switching times and losses must not be labelled validated.
+- **G3, EPC90133:** open. BOM/Gerbers (B5253 Rev 2.0) are audited, the Gerber reader gives copper, drills and nets, and a BOM-based schematic passes a static check. The FastHenry via/plane-pair check fails its mesh criterion and stays recorded as failed; owner decision (29 September 2026): defer the fourth mesh and extract exploratorily, then use prediction sensitivity to choose further qualification.
 - **G3, EPC9097 historical work:** paused for the selected target. The prior switching bench and layout investigation remain historical sensitivity evidence and do not block EPC90133 work.
   - *Done:* the board files are recorded with checksums and terms. A double-pulse bench runs two unmodified EPC2204 models with a datasheet-calibrated behavioural uP1966E driver (no vendor driver model exists), at EPC's published 48 V → 12 V, 1 MHz conditions, with the loop inductance swept.
   - *Comparison:* EPC's published switch-node screenshots are digitized and compared diagnostically ([docs](../docs/build.md#epc9097-switching-bench-g3-before-layout-extraction)).
@@ -420,19 +421,25 @@ hardware is energized before G4's test plan and interlocks are approved.
 
 ## 10. Immediate work and dependencies
 
-- Record existing FastHenry A/B and replacement D passes and the retained C
-  failure. Qualification is limited to the tested bars and plane pairs; vias,
-  holes and solder-bar connections are not yet covered. Each extraction needs
-  its own mesh-refinement and frequency-range evidence.
-- Inventory EPC90133/EPC2302 source files, model availability and reuse terms;
-  do not imply listed files have been downloaded. Run the unmodified EPC2302
-  LTspice smoke test, then its datasheet table and curve comparisons.
-- Identify the EPC90133 revision and actual population before board extraction;
-  separately resolve the published measurement-board identity before claiming a
-  matched vendor comparison. Record the available layout data and determine
-  whether its geometry and stackup support the planned extraction.
-- Prepare an EPC request for unresolved board or editable Altium details. Sending
-  a request requires an explicit instruction; none has been sent here.
-- After extraction and its refinement checks, rerun switching predictions and
-  proceed through G4's measurement-chain and hardware approvals. No simulation
-  sensitivity result alone establishes a safe test envelope.
+Updated 29 September 2026 (owner review of the via check):
+
+1. Annotated power-loop overlay of the stock EPC90133: component contacts located
+   from paste layers and checked against copper, solder-mask openings and the EPC2302
+   footprint (dimensions, orientation, gate/source/drain mapping); copper paths,
+   return planes, via groups with their connected layers, and exact extraction ports.
+2. Exploratory FastHenry extraction with explicit geometry assumptions: variant A
+   (top layer and mid-layer 1, Ci only), an intermediate variant (additional copper,
+   Ci only) and variant B (all copper, Ci and Cm), with explicit alternative via and
+   junction representations. Keep return paths and mutual coupling in the extracted
+   network. Two meshes are a sensitivity check, not proof of convergence. Capacitor
+   capacitance, ESR and ESL assumptions stay explicit and separate from copper geometry.
+3. Switching sensitivity: a double-pulse bench with the current matched at each edge,
+   and, for a direct comparison with QSG Fig. 9 (continuous 250 kHz buck operation), a
+   periodic buck bench or demonstrated equivalent switching conditions. Driver, dead
+   time, temperature and measurement assumptions stay fixed across extraction variants.
+   Spend qualification or mesh refinement where the sensitivity changes a decision.
+
+G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
+Physical board identity, lab inventory and any EPC request remain open; sending a
+request requires an explicit instruction. No simulation sensitivity result alone
+establishes a safe test envelope.

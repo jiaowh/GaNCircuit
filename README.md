@@ -35,9 +35,12 @@ A [BOM-based schematic](devices/epc/epc90133-schematic.json) of the power stage 
 part for part, and its LTspice netlist passes a static-state check. That check shows the circuit is
 connected as drawn; it is not a switching prediction. The schematic's uP1966A label, where the BOM says
 uP1966E, stays recorded. So does a design-folder name that mentions EPC2301.
-The FastHenry via/return check at the board's stack ([result](results/gan/fasthenry-via-cavity.json)) **fails its declared mesh criterion**: absolute inductances still move 1.2–1.5% between the two finest meshes. Plane spreading and return match the analytic answer within 2.5% and are converged. The explicit via adds about 8 pH per via, inside the physical bracket but not yet converged.
-Next: decide on a fourth, finer via mesh (several hours), mesh the power-stage geometry for extraction,
-then run extracted-parasitic simulations. Those simulations will carry the Fig. 7 gate-charge limitation.
+The FastHenry via/return check at the board's stack ([result](results/gan/fasthenry-via-cavity.json)) **fails its declared mesh criterion**: absolute inductances still move 1.2–1.5% between the two finest meshes. It stays recorded as failed. What passed is narrow: the *difference* in spreading inductance between two closed benchmark cavities at 100 MHz matches the analytic answer within 2.5%, and errors common to both can cancel in a difference. That does not qualify arbitrary board planes, holes or via arrays. Both via values lie inside their bracket; the declared representation uncertainty is the bracket width (about 23.5 and 33.7 pH for the two cavities), and even that applies to the benchmark geometry, not to every board via.
+Owner decision (29 September 2026): defer the fourth mesh and proceed with exploratory board extraction.
+Next: an annotated overlay of the actual power loop (copper paths, return planes, via groups, footprint
+check, ports); exploratory extractions under explicit, alternative geometry assumptions; and a switching
+sensitivity bench that shows which assumptions change the predictions, to decide where qualification is worth
+the effort. Those simulations carry the Fig. 7 gate-charge limitation.
 Retain the accepted LTspice adapter and FastHenry checks. The previous
 EPC2204/EPC9097 evidence below is historical and does not validate the new pair.
 

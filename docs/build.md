@@ -158,12 +158,20 @@ Result (28 September 2026). Declared outcome: **fail**, on the mesh criterion.
 - Mesh: the absolute values change by 1.47% and 1.23% from the middle to the fine mesh (limit 1%), so
   they have not converged. The E1 difference changes by only 0.58%. The unconverged part is what cancels
   in E1: the via, its junctions and the pads.
-- E1: FastHenry 19.65 pH against the 19.18 pH reference, +2.45% (tolerance 3%). Plane spreading and
-  return between the planes at this stack agree with the analytic answer, and that difference is mesh-converged.
-- E2: both values lie inside the bracket, at 34% and 25% of its width. On the fine mesh the via
-  representation adds about 8 pH per via (L − L_low: 7.9 and 8.4 pH) over the ideal cavity, and it
-  was still falling with refinement. Until a finer mesh converges, extractions must carry the
-  bracket, or at least about 8 pH per via, as a representation uncertainty.
+- E1: FastHenry 19.65 pH against the 19.18 pH reference, +2.45% (tolerance 3%). This validates only
+  the difference in spreading inductance between these two closed cavities at 100 MHz, and that
+  difference is mesh-stable. Errors common to both cavities can cancel in it, so it does not qualify
+  arbitrary board planes, plane holes or via arrays.
+- E2: both values lie inside the bracket, at 34% and 25% of its width, and were still falling with
+  refinement. L − L_low (7.9 and 8.4 pH) is the distance from the lower analytic reference, not an
+  uncertainty bound. As the specification declares, the representation uncertainty is the bracket
+  width: 23.5 pH (1.5 mm cavity) and 33.7 pH (3.0 mm cavity). Even those widths are specific to the
+  benchmark geometry; they are not proven bounds for board vias. A board via array cannot be
+  estimated by dividing a single-via value by the via count, because arrangement and mutual coupling matter.
+
+Owner review (29 September 2026): the check stays recorded as failed; the fourth mesh is deferred.
+Board extraction proceeds as exploratory work under explicit geometry assumptions, and the
+sensitivity of circuit predictions to those assumptions decides where further qualification is worthwhile.
 
 Orchestration and solver notes, none of which change the geometry, meshes or tolerances. The first
 sequential driver was killed by a tool timeout. My first parallel resume read an empty `Zc.mat`: FastHenry
