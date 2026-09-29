@@ -23,6 +23,9 @@ Revision 2, 28 September 2026. Revision 1 fitted axes to text-box centres and
 clipped to the label range. That shifted Fig. 6 by about 2.3 pt and dropped
 valid low-energy points; review found it.
 
+Revision 3, 28 September 2026: exact duplicate tick labels are dropped before
+pairing (EPC2302 Fig. 2 draws its labels twice). EPC2204 output is unchanged.
+
 Requires PyMuPDF (runs under WSL on the project host):
 
     python3 scripts/digitize_datasheet_figures.py
@@ -130,6 +133,9 @@ def grid_lines(page, frame):
 
 def calibrate(labels, candidates, horizontal):
     """Pair tick labels with grid lines or frame edges and fit the axis."""
+    # Some figures draw their labels twice at the same place (EPC2302 Fig. 2);
+    # the duplicates would make the label spacing zero.
+    labels = list({(w[4], round(w[0], 1), round(w[1], 1)): w for w in labels}.values())
     centre = (lambda w: (w[0] + w[2]) / 2) if horizontal else (lambda w: (w[1] + w[3]) / 2)
     pos = sorted(centre(w) for w in labels)
     spacing = min(b - a for a, b in zip(pos, pos[1:]))

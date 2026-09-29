@@ -1,0 +1,312 @@
+{
+ "schema": "epc90133-geometry/1",
+ "source": {
+  "zip_sha256": "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1",
+  "board": "B5253 Rev 2.0",
+  "pitch_mm": 0.0254,
+  "board_mm": [
+   0.0,
+   0.0,
+   50.8,
+   50.8
+  ]
+ },
+ "evaluator_sha256": "7b140beac253fd0972d76e2c9cea2f9c4d206cfe358a96b158e90e6ad425c258",
+ "layers": {
+  "GTL": {
+   "copper_area_mm2": 2376.9,
+   "islands": 60
+  },
+  "G1": {
+   "copper_area_mm2": 2374.4,
+   "islands": 219
+  },
+  "G2": {
+   "copper_area_mm2": 2365.0,
+   "islands": 214
+  },
+  "G3": {
+   "copper_area_mm2": 2377.2,
+   "islands": 225
+  },
+  "G4": {
+   "copper_area_mm2": 2377.2,
+   "islands": 225
+  },
+  "G5": {
+   "copper_area_mm2": 2410.6,
+   "islands": 96
+  },
+  "G6": {
+   "copper_area_mm2": 2410.5,
+   "islands": 97
+  },
+  "GBL": {
+   "copper_area_mm2": 2366.6,
+   "islands": 70
+  }
+ },
+ "drills": {
+  "plated": 443,
+  "non_plated": 2,
+  "by_diameter_mm": {
+   "0.198": 210,
+   "0.254": 184,
+   "0.711": 12,
+   "1.016": 34,
+   "1.500": 2,
+   "3.000": 3
+  }
+ },
+ "probes": {
+  "VIN (TP2 pad)": {
+   "layer": "GTL",
+   "x": 18.3,
+   "y": 41.7,
+   "on_copper": true,
+   "net_id": "('G4', 140)"
+  },
+  "GND (TP1 pad)": {
+   "layer": "GTL",
+   "x": 26.4,
+   "y": 41.7,
+   "on_copper": true,
+   "net_id": "('GBL', 39)"
+  },
+  "SW (pour right of L1 label)": {
+   "layer": "GTL",
+   "x": 43.0,
+   "y": 27.9,
+   "on_copper": true,
+   "net_id": "('G4', 77)"
+  }
+ },
+ "checks": {
+  "VIN_GND_SW_distinct": true,
+  "all_probes_on_copper": true
+ },
+ "power_stage_window_mm": [
+  14.0,
+  20.0,
+  34.0,
+  40.0
+ ],
+ "power_stage_copper_mm2_by_net": {
+  "GTL": {
+   "GND": 112.41,
+   "SW": 116.55,
+   "other": 23.93,
+   "VIN": 116.35
+  },
+  "G1": {
+   "GND": 322.93,
+   "SW": 22.88,
+   "other": 3.39,
+   "VIN": 9.62
+  },
+  "G2": {
+   "GND": 333.49,
+   "SW": 13.11,
+   "other": 3.39,
+   "VIN": 9.62
+  },
+  "G3": {
+   "GND": 333.49,
+   "SW": 13.11,
+   "other": 3.39,
+   "VIN": 9.62
+  },
+  "G4": {
+   "GND": 333.49,
+   "SW": 13.11,
+   "other": 3.39,
+   "VIN": 9.62
+  },
+  "G5": {
+   "GND": 97.04,
+   "SW": 108.37,
+   "other": 3.39,
+   "VIN": 156.26
+  },
+  "G6": {
+   "GND": 97.14,
+   "SW": 108.38,
+   "other": 3.24,
+   "VIN": 156.22
+  },
+  "GBL": {
+   "GND": 123.7,
+   "SW": 115.83,
+   "other": 9.74,
+   "VIN": 112.1
+  }
+ },
+ "power_stage_vias": [
+  {
+   "net": "GND",
+   "diameter_mm": 0.198,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 68
+  },
+  {
+   "net": "SW",
+   "diameter_mm": 0.198,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 45
+  },
+  {
+   "net": "VIN",
+   "diameter_mm": 0.198,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 41
+  },
+  {
+   "net": "VIN",
+   "diameter_mm": 0.254,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 14
+  },
+  {
+   "net": "GND",
+   "diameter_mm": 0.254,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 14
+  },
+  {
+   "net": "SW",
+   "diameter_mm": 0.254,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 8
+  },
+  {
+   "net": "other",
+   "diameter_mm": 0.198,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 4
+  },
+  {
+   "net": "GND",
+   "diameter_mm": 1.016,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 2
+  },
+  {
+   "net": "SW",
+   "diameter_mm": 1.016,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 1
+  },
+  {
+   "net": "other",
+   "diameter_mm": 1.016,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 1
+  },
+  {
+   "net": "GND",
+   "diameter_mm": 3.0,
+   "layers": [
+    "GTL",
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "GBL"
+   ],
+   "count": 1
+  }
+ ],
+ "renders": "results\\gan\\epc90133-geometry"
+}

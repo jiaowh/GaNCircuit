@@ -1,0 +1,273 @@
+{
+ "schema": "epc90133-board-audit/1",
+ "scope": "Consistency of EPC's published EPC90133 files with each other; not the identity of a physical board.",
+ "evaluator_sha256": "31747353b619c3fdc0d3f8e2f642de02397c684a82ce3985d7426e0f7a8fd0c3",
+ "board_numbers": {
+  "gerber_files": [
+   "B5253_Rev2_0"
+  ],
+  "quick_start_guide": [
+   "B5253"
+  ]
+ },
+ "copper": {
+  "gerber_copper_layers": [
+   {
+    "extension": "GTL",
+    "description": "Top Layer"
+   },
+   {
+    "extension": "G1",
+    "description": "Mid-Layer 1"
+   },
+   {
+    "extension": "G2",
+    "description": "Mid-Layer 2"
+   },
+   {
+    "extension": "G3",
+    "description": "Mid-Layer 3"
+   },
+   {
+    "extension": "G4",
+    "description": "Mid-layer 4"
+   },
+   {
+    "extension": "G5",
+    "description": "Mid-Layer 5"
+   },
+   {
+    "extension": "G6",
+    "description": "Mid-Layer 6"
+   },
+   {
+    "extension": "GBL",
+    "description": "Bottom Layer"
+   }
+  ],
+  "stackup_copper_layers": 8,
+  "stackup": [
+   {
+    "name": "Top Solder",
+    "material": "Solder Resist",
+    "thickness": "0.70mil",
+    "dielectric_constant": "3.5"
+   },
+   {
+    "name": "Top Layer",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric 1",
+    "material": "FR370-HR",
+    "thickness": "5.00mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Mid-Layer 1",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric2",
+    "material": "FR370-HR",
+    "thickness": "5.00mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Mid-Layer 2",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric3",
+    "material": "FR370-HR",
+    "thickness": "7.20mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Mid-Layer 3",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric 4",
+    "material": "FR370-HR",
+    "thickness": "5.00mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Mid-layer 4",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric 5",
+    "material": "FR370-HR",
+    "thickness": "7.20mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Mid-Layer 5",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric 6",
+    "material": "FR370-HR",
+    "thickness": "5.00mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Mid-Layer 6",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Dielectric 7",
+    "material": "FR370-HR",
+    "thickness": "5.00mil",
+    "dielectric_constant": "4.8"
+   },
+   {
+    "name": "Bottom Layer",
+    "material": "Copper",
+    "thickness": "2.80mil",
+    "dielectric_constant": null
+   },
+   {
+    "name": "Bottom Solder",
+    "material": "Solder Resist",
+    "thickness": "0.70mil",
+    "dielectric_constant": "3.5"
+   }
+  ],
+  "stackup_height": "Height : 63.20mil",
+  "consistent": true
+ },
+ "reference_designators": {
+  "bom_fitted": 90,
+  "bom_optional": 14,
+  "layout_components": 117,
+  "bom_not_in_layout": [
+   "Cout",
+   "J32"
+  ],
+  "layout_not_in_bom": [
+   "FD1",
+   "FD2",
+   "FD3",
+   "J22",
+   "J33",
+   "LB1",
+   "LB2",
+   "LB8",
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S5",
+   "S6",
+   "S9"
+  ]
+ },
+ "switching_parts": {
+  "Q1": {
+   "bom": {
+    "description": "100 V, 1.9 mΩ",
+    "manufacturer": "EPC",
+    "part_number": "EPC2302"
+   },
+   "schematic_text_before_ref": "EPC2302"
+  },
+  "Q2": {
+   "bom": {
+    "description": "100 V, 1.9 mΩ",
+    "manufacturer": "EPC",
+    "part_number": "EPC2302"
+   },
+   "schematic_text_before_ref": "EPC2302"
+  },
+  "U80": {
+   "bom": {
+    "description": "80 V Half Bridge eGaN Driver",
+    "manufacturer": "Upi",
+    "part_number": "uP1966E"
+   },
+   "schematic_text_before_ref": "uP1966A"
+  },
+  "Q60": {
+   "bom": {
+    "description": "100 V 3300 mΩ 0.5A",
+    "manufacturer": "EPC",
+    "part_number": "EPC2038"
+   },
+   "schematic_text_before_ref": "100 V 3300 mΩ 0.5 A"
+  },
+  "R80": {
+   "bom": {
+    "description": "RES SMD 1 Ω 1% 1/16 W 0402",
+    "manufacturer": "Yageo",
+    "part_number": "RC0402FR-071RL"
+   },
+   "schematic_text_before_ref": "1 1/16 W"
+  },
+  "R81": {
+   "bom": {
+    "description": "RES 0 Ω JUMPER 1/16 W 0402",
+    "manufacturer": "Stackpole",
+    "part_number": "RMCF0402ZT0R00"
+   },
+   "schematic_text_before_ref": "0E 1/16 W"
+  },
+  "R82": {
+   "bom": {
+    "description": "RES SMD 1 Ω 1% 1/16 W 0402",
+    "manufacturer": "Yageo",
+    "part_number": "RC0402FR-071RL"
+   },
+   "schematic_text_before_ref": "1 1/16 W"
+  },
+  "R83": {
+   "bom": {
+    "description": "RES 0 Ω JUMPER 1/16 W 0402",
+    "manufacturer": "Stackpole",
+    "part_number": "RMCF0402ZT0R00"
+   },
+   "schematic_text_before_ref": "0E 1/16 W"
+  },
+  "R70": {
+   "bom": {
+    "description": "RES SMD 2.2 Ω 5% 1/10 W 0402",
+    "manufacturer": "Panasonic",
+    "part_number": "ERJ-2GEJ2R2X"
+   },
+   "schematic_text_before_ref": "2.2 0.1 W"
+  },
+  "R75": {
+   "bom": {
+    "description": "RES SMD 2.2 Ω 5% 1/10 W 0402",
+    "manufacturer": "Panasonic",
+    "part_number": "ERJ-2GEJ2R2X"
+   },
+   "schematic_text_before_ref": "2.2 0.1 W"
+  }
+ },
+ "driver_labels": {
+  "bom": "uP1966E",
+  "schematic": [
+   "uP1966A"
+  ],
+  "quick_start_guide": [
+   "uP1966E"
+  ]
+ }
+}

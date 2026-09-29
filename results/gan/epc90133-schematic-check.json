@@ -1,0 +1,222 @@
+{
+ "schema": "epc90133-schematic-check/1",
+ "scope": "Netlist connectivity and static states only; no switching-time or loss claim.",
+ "evaluator_sha256": "bc5dff6bafedd921e933f7f6de6bd0454490a7ca5419442f33dd5be1ad86c18f",
+ "schematic_sha256": "5e81e1f1b1b915063639d6fba5bd767c0b089aa2281ac0702c28a0498254099f",
+ "bom_check": {
+  "all_match": true,
+  "rows": [
+   {
+    "ref": "Q1",
+    "schematic_json": "EPC2302",
+    "bom": "EPC2302",
+    "match": true
+   },
+   {
+    "ref": "Q2",
+    "schematic_json": "EPC2302",
+    "bom": "EPC2302",
+    "match": true
+   },
+   {
+    "ref": "R80",
+    "schematic_json": "RC0402FR-071RL",
+    "bom": "RC0402FR-071RL",
+    "match": true
+   },
+   {
+    "ref": "R81",
+    "schematic_json": "RMCF0402ZT0R00",
+    "bom": "RMCF0402ZT0R00",
+    "match": true
+   },
+   {
+    "ref": "R82",
+    "schematic_json": "RC0402FR-071RL",
+    "bom": "RC0402FR-071RL",
+    "match": true
+   },
+   {
+    "ref": "R83",
+    "schematic_json": "RMCF0402ZT0R00",
+    "bom": "RMCF0402ZT0R00",
+    "match": true
+   },
+   {
+    "ref": "Ci1",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Ci2",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Ci3",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Ci4",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Ci5",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Ci6",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Ci7",
+    "schematic_json": "HMK107C7224KAHTE",
+    "bom": "HMK107C7224KAHTE",
+    "match": true
+   },
+   {
+    "ref": "Cm1",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm2",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm3",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm4",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm5",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm6",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm7",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm8",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm9",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "Cm10",
+    "schematic_json": "08051C105K4Z2A",
+    "bom": "08051C105K4Z2A",
+    "match": true
+   },
+   {
+    "ref": "C81",
+    "schematic_json": "CC0402KRX7R8BB104",
+    "bom": "CC0402KRX7R8BB104",
+    "match": true
+   },
+   {
+    "ref": "C80",
+    "schematic_json": "C1005X5R1A475K050BC",
+    "bom": "C1005X5R1A475K050BC",
+    "match": true
+   },
+   {
+    "ref": "U80",
+    "schematic_json": "uP1966E",
+    "bom": "uP1966E",
+    "match": true
+   }
+  ]
+ },
+ "label_discrepancies": [
+  {
+   "ref": "U80",
+   "schematic": "uP1966A",
+   "bom": "uP1966E",
+   "quick_start_guide": "uP1966E",
+   "treatment": "simulated as uP1966E from its datasheet; the label difference is unresolved (EPC9097's schematic shows the same one)"
+  },
+  {
+   "ref": "Q1, Q2",
+   "schematic": "100 V, 19 mOhm",
+   "bom": "EPC2302, 100 V, 1.9 mOhm",
+   "datasheet": "1.4 mOhm typ, 1.8 mOhm max",
+   "treatment": "EPC2302 vendor model; the schematic value looks like a typo"
+  },
+  {
+   "ref": "design folder",
+   "drill_layer_pair_file": "EPC90133 (Die EPC2301) ... EPC90133 - 80V 1_9 mE EPC2301\\Rev2_0",
+   "bom": "EPC2302",
+   "treatment": "recorded; its meaning is unknown"
+  }
+ ],
+ "run": {
+  "status": "completed",
+  "message": null,
+  "evidence": "runs\\epc90133-schematic-202ae87bb5944c00a909ba35fd33c79f\\static_states"
+ },
+ "states": {
+  "low_side_on": {
+   "t_s": 1.1e-07,
+   "v_sw": 0.0006695548596397885,
+   "vgs_high": 5.780798321520586e-07,
+   "vgs_low": 4.998307563075986
+  },
+  "both_off": {
+   "t_s": 2.1e-06,
+   "v_sw": 23.999990463256836,
+   "vgs_high": 0.0,
+   "vgs_low": 3.166458901194377e-07
+  },
+  "high_side_on": {
+   "t_s": 2.21e-06,
+   "v_sw": 47.99932861328125,
+   "vgs_high": 4.998310565212954,
+   "vgs_low": 5.780721573466357e-07
+  }
+ },
+ "checks": {
+  "low_side_on_sw_below_1V": true,
+  "both_off_sw_at_midpoint": true,
+  "high_side_on_sw_above_47V": true,
+  "low_gate_at_5V_when_on": true,
+  "high_gate_at_5V_when_on": true
+ },
+ "outcome": "pass"
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "board-schematic/1",
+  "board": "EPC90133, PCB B5253 Rev 2.0",
+  "transcribed": "2026-09-28",
+  "sources": {
+    "connectivity": "EPC90133 QSG v1.0 Figs. 13-15 (schematic pages 10-12), vendor/epc/epc90133/EPC90133_Schematic.pdf",
+    "values": "EPC90133BOM.xlsx (checked by scripts/epc90133_schematic.py against the recorded file)",
+    "precedence": "BOM part numbers set values; schematic labels are checked against them and differences are recorded, not resolved"
+  },
+  "label_discrepancies": [
+    {"ref": "U80", "schematic": "uP1966A", "bom": "uP1966E", "quick_start_guide": "uP1966E",
+     "treatment": "simulated as uP1966E from its datasheet; the label difference is unresolved (EPC9097's schematic shows the same one)"},
+    {"ref": "Q1, Q2", "schematic": "100 V, 19 mOhm", "bom": "EPC2302, 100 V, 1.9 mOhm", "datasheet": "1.4 mOhm typ, 1.8 mOhm max",
+     "treatment": "EPC2302 vendor model; the schematic value looks like a typo"},
+    {"ref": "design folder", "drill_layer_pair_file": "EPC90133 (Die EPC2301) ... EPC90133 - 80V 1_9 mE EPC2301\\Rev2_0",
+     "bom": "EPC2302", "treatment": "recorded; its meaning is unknown"}
+  ],
+  "default_population_notes": [
+    "No synchronous-boot option (QSG default): R77 fitted, R60 and D77 empty, so the driver supply net labelled '4.7 V' equals VCC (5 V).",
+    "D1, D2, C70, C75, J1, J2, J32, R11, R22, L1, Cout are optional or user-fitted and are not part of the stock board."
+  ],
+  "nets": {
+    "VIN": "bus input, Ci1-Ci7 and Cm1-Cm10 top terminals, Q1 drain",
+    "GND": "power ground: Q2 source, capacitor returns, mid-layer 1 return plane",
+    "SW": "switch node: Q1 source, Q2 drain",
+    "VGu": "Q1 gate", "VGl": "Q2 gate",
+    "VGuH": "U80 high-side pull-up output", "VGuL": "U80 high-side pull-down output",
+    "VGlH": "U80 low-side pull-up output", "VGlL": "U80 low-side pull-down output",
+    "VSWN": "U80 high-side return, tied to SW",
+    "5VHS1": "U80 high-side supply (bootstrap)",
+    "VDRV": "U80 VDD, the net labelled '4.7 V' (5 V in the default population)"
+  },
+  "components": [
+    {"ref": "Q1", "kind": "gan_fet", "model": "EPC2302", "pins": {"gate": "VGu", "drain": "VIN", "source": "SW"}, "bom_part": "EPC2302"},
+    {"ref": "Q2", "kind": "gan_fet", "model": "EPC2302", "pins": {"gate": "VGl", "drain": "SW", "source": "GND"}, "bom_part": "EPC2302"},
+    {"ref": "R80", "kind": "resistor", "value": 1.0, "pins": ["VGuH", "VGu"], "bom_part": "RC0402FR-071RL"},
+    {"ref": "R81", "kind": "resistor", "value": 0.0, "pins": ["VGuL", "VGu"], "bom_part": "RMCF0402ZT0R00"},
+    {"ref": "R82", "kind": "resistor", "value": 1.0, "pins": ["VGlH", "VGl"], "bom_part": "RC0402FR-071RL"},
+    {"ref": "R83", "kind": "resistor", "value": 0.0, "pins": ["VGlL", "VGl"], "bom_part": "RMCF0402ZT0R00"},
+    {"ref": "Ci1-Ci7", "kind": "capacitor", "count": 7, "value": 220e-9, "rating": "100 V X7S 0603", "pins": ["VIN", "GND"],
+     "bom_part": "HMK107C7224KAHTE", "note": "HF loop capacitors; DC-bias derating not applied"},
+    {"ref": "Cm1-Cm10", "kind": "capacitor", "count": 10, "value": 1e-6, "rating": "100 V X7R 0805", "pins": ["VIN", "GND"],
+     "bom_part": "08051C105K4Z2A", "note": "intermediate capacitors; DC-bias derating not applied"},
+    {"ref": "C81", "kind": "capacitor", "value": 100e-9, "rating": "25 V X7R 0402", "pins": ["5VHS1", "VSWN"], "bom_part": "CC0402KRX7R8BB104"},
+    {"ref": "C80", "kind": "capacitor", "value": 4.7e-6, "rating": "10 V X5R 0402", "pins": ["VDRV", "GND"], "bom_part": "C1005X5R1A475K050BC"},
+    {"ref": "U80", "kind": "gate_driver", "model": "uP1966E (behavioural, datasheet-calibrated)", "bom_part": "uP1966E",
+     "pins": {"VDD": "VDRV", "GND": "GND", "BST": "5VHS1", "SWN": "VSWN", "UH": "VGuH", "UL": "VGuL", "LH": "VGlH", "LL": "VGlL"}}
+  ],
+  "transcribed_not_simulated": {
+    "parts": ["Q60 EPC2038", "D60 CD0603-Z5V1", "D61 SDM03U40-7", "D63 SDM03U40-7", "C60", "C61", "C62", "R62", "R63", "R77", "R78"],
+    "reason": "synchronous bootstrap supply for 5VHS1; the bench uses an ideal floating high-side supply as the EPC9097 bench did. Diode orientations in this network were not confirmed from the drawing."
+  }
+}

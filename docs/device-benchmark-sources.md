@@ -61,6 +61,24 @@ downloaded, imported, or validated in this project by this assessment.
 
 ## EPC GaN half-bridge track (active)
 
+### Selected EPC90133 and EPC2302 track
+
+Owner decision, 28 September 2026: **EPC90133/EPC2302 replaces EPC9097/EPC2204**
+as the active target. The [board page](https://epc-co.com/epc/products/evaluation-boards/epc90133)
+identifies two EPC2302s, EPC2038 bootstrap augmentation and a uP1966E driver;
+it lists the QSG, schematic, BOM, Gerbers and Altium files on request.
+ODB++ and a separate stackup link were not listed on the checked page; their
+availability remains unconfirmed. The [device page](https://epc-co.com/epc/products/gan-fets-and-ics/epc2302)
+lists LTspice, PSpice and Spectre models and a 3 x 5 mm package.
+
+The datasheet, QSG and schematic were downloaded and checksummed in
+`devices/epc/epc90133-sources.json`. EPC2302 is present in the existing vendor
+LTspice library; no new-target model simulation or qualification is claimed.
+The first task is its unmodified-model smoke run and datasheet baseline, followed
+by board-source consistency and parasitic work. Preserve old evidence separately.
+
+### Historical EPC9097 and EPC90121 assessment
+
 Recorded 28 September 2026. This is the active application in
 [the GaN pipeline plan](../plans/gan-halfbridge-pipeline-plan.md), and it
 replaces CoolGaN as the primary commercial track. CoolGaN remains an

@@ -1,5 +1,231 @@
 # Building and running the first slice
 
+## Active target switch on 28 September 2026
+
+The owner selected **EPC90133/EPC2302**. The EPC2204/EPC9097 commands and results
+below remain reproducible reference work, not the current target's acceptance.
+See [source inventory](../devices/epc/epc90133-sources.json) and the
+[active plan](../plans/gan-halfbridge-pipeline-plan.md).
+
+Downloaded: EPC2302 datasheet (29 April 2026), EPC90133 QSG v1.0
+(6 September 2022), and schematic. All three open as PDFs; files remain outside git.
+The unmodified library at `vendor/epc/ltspice/EPCGaNLibrary.lib` contains
+`.subckt EPC2302 gatein drainin sourcein`. Presence is not execution or validation:
+the EPC2302 smoke run, table/curve baseline and board bench remain to be built.
+Use new result paths and the new part's actual test conditions; do not overwrite
+EPC2204 results or transplant EPC9097 component values and parasitics.
+
+The LTspice adapter qualification remains useful. FastHenry checks qualify only
+the geometries already tested; EPC2302 uses a 3 x 5 mm QFN package, so the old
+bare-die solder-bar assumptions do not transfer. Obtain/audit the new BOM,
+Gerbers, stackup and population before extraction. No physical board ownership,
+board purchase, EPC contact or hardware operation is implied by this switch.
+
+### EPC2302 vendor model baseline (G2, table slice)
+
+```sh
+PYTHONPATH=src python scripts/epc2302_baseline.py
+```
+
+Writes `results/gan/epc2302-baseline.json` and `results/gan/epc2302-model-curves.json`;
+netlists, logs and raw files go to the git-ignored `runs/epc2302-baseline-*`.
+The script checks the library archive against `devices/epc/sources.json`, and the extracted
+library and the datasheet (revised 29 April 2026) against `devices/epc/epc90133-sources.json`.
+It leaves `scripts/epc2204_baseline.py` unchanged and imports its interpolation, parameter
+and charge-equation helpers. They apply because the EPC2302 subcircuit has the same structure
+as EPC2204; only parameter values differ. The table's min/typ/max columns were read by word position
+on datasheet page 2. Test conditions are EPC2302's own: RDS(on) at 50 A, VGS(th) at 14 mA,
+gate charge with a 50 A load at 50 V. The gate drive is 40 mA nominal and 8 mA for sensitivity,
+the same 5:1 ratio used for EPC2204.
+
+Result (28 September 2026): the unmodified model runs in LTspice. All 13 table rows are
+produced, and every row with a datasheet limit is inside it. Deviation from typical:
+RDS(on) −1.4%, CISS +1.2%, CRSS +7.2%, COSS −0.6%, COSS(ER) −2.5%, COSS(TR) and QOSS +0.2%,
+QG −4.2%, VGS(th) +16% (1.51 V vs 1.3 V), VSD +22% (1.83 V vs 1.5 V, "defined by design").
+The model's `rg_value` equals the datasheet RG (0.5 Ω). RDS(on) rises ×1.77 from 25 °C to 125 °C
+(informational). Two rows exceed the 25% screening band: QGD −34% and QG(TH) −31%.
+QGS is −17%. EPC2204 had the same sub-charge pattern, which also remained unresolved. The cause is not established.
+Boundary definitions are one possible explanation, not a demonstrated one. QGD depends strongly
+on the bench's end point: 0.8, 1.5 and 2.6 nC for VDS ending at 10, 5 and 1 V. QG(TH) is
+taken at the model's own threshold, 0.2 V above the datasheet typical. A higher threshold
+moves the charge endpoint later, so it cannot explain why the model's QG(TH) is low.
+
+Self-checks, all passing: AC-integrated and transient QOSS/EOSS agree to 5e-5.
+Transient QG agrees with the model's charge equations to 0.1%. QG changes by 4e-8 from reltol
+1e-6 to 1e-7. Drive current: raw terminal QG differs by 0.76% between 40 mA and 8 mA. After
+subtracting the model's own gate leakage along each trajectory, the stored charge differs by
+0.34%. That is stable within the 0.5% tolerance, not unchanged. This criterion was declared
+before the first run, using EPC2204's leakage finding.
+The default reltol gives QG 16.4 nC (−25%), so EPC2204's under-integration artifact recurs,
+and EPC2302 benches must keep `reltol=1e-6`. On the first run the direct 125 °C RDS(on)
+operating point failed to converge (Gmin and source stepping). The adapter reported the failure.
+Both RDS(on) benches now sweep the drain current from 0 to 50 A, and the 25 °C value is unchanged.
+After review, the reltol convergence outcome treats only a missing value as a failure;
+previously an exact-zero change would also have failed.
+
+### EPC2302 datasheet curves (G2, curve slice)
+
+```sh
+python scripts/digitize_datasheet_figures.py --pdf vendor/epc/epc90133/EPC2302_datasheet.pdf \
+    --output results/gan/epc2302-datasheet-figures.json --pages 3 4
+PYTHONPATH=src python scripts/epc2302_curve_benches.py
+python scripts/compare_epc2302_gate_charge.py      # Fig. 7
+python scripts/compare_epc2302_curves.py           # Figs. 1-6, 8-10
+```
+
+Digitizer revision 3 drops exact duplicate tick labels, because EPC2302 Fig. 2 draws its labels twice.
+EPC2204's output is byte-identical under revision 3, including when rerun on the Windows host.
+Every EPC2302 axis paired all its labels with grid lines. Scope: Figs. 1–10, the electrical curves.
+Figs. 11 (safe operating area) and 12 (thermal response) are not model outputs.
+Fig. 6 has no legend or arrows. Its QOSS/EOSS assignment is checked by integrating V dQ along
+the digitized charge curve: this gives 5.279 µJ against the drawn energy curve's 5.273 µJ at 100 V.
+Tolerances were fixed after digitizing and before any model comparison. They follow the EPC2204 rule:
+5% of the datasheet value plus 1% of the axis full scale. Log capacitance: 0.05 decade.
+Fig. 9: 0.03. Fig. 10: 0.01, because its whole curve moves by only about 0.025. The RDS(on)-against-VGS
+benches first failed to converge with 25–100 A forced. They now ramp the drain current from 0 at each VGS,
+and at 5 V they reproduce the baseline's 1.380/2.441 mΩ exactly.
+
+Result: all 24 curves in Figs. 1–6 and 8–10 pass. Legend or ordering assignments agree
+everywhere, and blue/red mean 25/125 °C in every temperature figure. The worst point uses 1–16% of its
+allowed error. EPC2204's margins were similarly small. Agreement this close suggests these
+typical curves may have been drawn from this model, or from a shared source. If so, they show that our runner
+reproduces EPC's model, not that the model matches hardware.
+
+Fig. 7 (gate charge, ID = 50 A, VDS = 50 V) fails its declared checks. The vertical VGS error
+reaches 0.27 V at the plateau exit (tolerance 0.10 V). The horizontal charge check fails at 3.0 and
+3.5 V, where the model is 1.25 and 1.21 nC low. Below the plateau the model is 5–7% low. Its plateau
+is 2.19 nC wide against 2.87 nC on EPC's curve, at 2.40 V against 2.37 V. At the 4.98 V endpoint the comparator uses, the model has 22.4 nC
+and EPC's curve 23.6 nC. EPC's curve value is close to its table QG (23 nC typical), and the axes fit to 0.007 nC;
+the 0.27 V failure is far larger than that. Axis-fit residual is not a complete digitization-uncertainty estimate. EPC2204's Fig. 7 matched its model to 0.018 V, so
+unlike EPC2204 this drawn curve is not a replay of the library model. Why is not established.
+The comparator's model offset (charge from 0 V to the bench's 0.146 V start) first used EPC2204's
+initial-slope estimate: 0.34 nC. The model's charge equations give 0.47 nC, so the equation value
+replaced it after the first run. Both fail; the report keeps both.
+Threshold charge, reported at both thresholds as the owner asked. At 1.3 V: model 4.15 nC, EPC curve 4.44 nC.
+At 1.506 V: model 4.83 nC, EPC curve 5.16 nC. The table QG(TH) is 6.3 nC, and EPC's own curve
+reaches it at neither threshold. EPC's curve has its plateau start at 8.4 nC (table QGS 8.9) and width 2.87 nC (table QGD 2.3).
+No model tuning follows from this: the discrepancy is between the vendor's model and the vendor's
+drawing, and nothing isolates it to the device. G2 disposition (owner review, 28 September 2026): the unmodified model is a provisional baseline for G3. Fig. 7 and the table sub-charges stay open, and gate-charge-dependent switching times and losses must not be labelled validated.
+
+### EPC90133 board files (G3 preparation)
+
+```sh
+python scripts/audit_epc90133_board_files.py   # writes results/gan/epc90133-board-audit.json
+```
+
+The board page lists only the BOM, the Gerber zip, the quick-start guide and the schematic; there is no
+ODB++ or test-point report. The editable Altium design is offered through "Ask a GaN Expert". It is
+optional and not requested. The Gerbers are board **B5253 Rev 2.0**, dated 18 January 2022.
+The quick-start guide names PCB B5253. One published layout was found; that does not prove no other revision exists.
+The Gerbers have 8 copper layers, matching the included stackup: 2.8 mil copper, dielectrics
+5/5/7.2/5/7.2/5/5 mil FR370-HR (εr 4.8), 63.2 mil in total. All BOM parts appear in the
+layout PDF except the optional J32 (MMCX) and the "TBD" Cout. The guide still describes J32 as the
+switch-node MMCX, and its measurement-point photo is labelled EPC90132.
+The layout's extra parts are fiducials, the unpopulated J22/J33 holes, LB labels and S items.
+BOM, schematic and guide agree on EPC2302, EPC2038, 1 Ω/0 Ω gate resistors and 2.2 Ω R70/R75.
+The schematic labels U80 uP1966A, while the BOM and guide say uP1966E; EPC9097 had the same discrepancy.
+The schematic prints "19 mΩ" for Q1/Q2, where the BOM says 1.9 mΩ.
+Datasheet page 6 describes the board's layout: the power loop returns on mid-layer 1 directly
+beneath the FETs, and the gate return uses a Kelvin via beside the source. Extraction therefore
+needs qualified vias. The guide's Fig. 9 is a measured waveform: 48 V → 13.8 V, 20 A, 250 kHz,
+2.2 µH, fall time 3.7 ns and rise time 1.7 ns. These are candidate G3 comparison conditions.
+None of this identifies a physical board that we have.
+
+### Via and plane-pair return check in FastHenry (G3 preparation)
+
+```sh
+python scripts/fasthenry_via_cavity.py --jobs 3 --precond diag   # results/gan/fasthenry-via-cavity.json
+```
+
+The specification was fixed in the script's docstring before the first run. Geometry: a closed square
+plane pair at the B5253 stack between the top layer and mid-layer 1 (71 µm copper, 127 µm gap), with a
+return wall of explicit vertical segments and one explicit 0.25 mm square via on ideal pads. Ports sit
+at the via's bottom pad, and the frequency is 100 MHz. Plates are explicit segment grids, the form the
+board reader will emit. E1, the declared known answer: L(3 mm) − L(1.5 mm) = µ0(h+δ)/2π · ln(D2/D1).
+In this difference the via, its junctions and the square-coax constant cancel; tolerance 3%.
+E2, a bracket rather than a known answer: FastHenry places the via between plate mid-planes, so
+the true value lies between the gap-only and full-segment values. Mesh criterion: the fine and
+middle meshes agree within 1% for each L and for the E1 difference.
+
+Result (28 September 2026). Declared outcome: **fail**, on the mesh criterion.
+
+| Mesh (pitch, filaments through t) | L, 1.5 mm cavity | L, 3.0 mm cavity |
+|---|---|---|
+| w/2, 3 | 54.599 pH | 74.904 pH |
+| w/4, 5 | 52.872 pH | 72.636 pH |
+| w/6, 7 | 52.094 pH | 71.742 pH |
+
+- Mesh: the absolute values change by 1.47% and 1.23% from the middle to the fine mesh (limit 1%), so
+  they have not converged. The E1 difference changes by only 0.58%. The unconverged part is what cancels
+  in E1: the via, its junctions and the pads.
+- E1: FastHenry 19.65 pH against the 19.18 pH reference, +2.45% (tolerance 3%). Plane spreading and
+  return between the planes at this stack agree with the analytic answer, and that difference is mesh-converged.
+- E2: both values lie inside the bracket, at 34% and 25% of its width. On the fine mesh the via
+  representation adds about 8 pH per via (L − L_low: 7.9 and 8.4 pH) over the ideal cavity, and it
+  was still falling with refinement. Until a finer mesh converges, extractions must carry the
+  bracket, or at least about 8 pH per via, as a representation uncertainty.
+
+Orchestration and solver notes, none of which change the geometry, meshes or tolerances. The first
+sequential driver was killed by a tool timeout. My first parallel resume read an empty `Zc.mat`: FastHenry
+creates the file when it starts, so the check now looks for an impedance matrix. The reused `run_fasthenry`
+30-minute limit killed the fine 3 mm case, so the via script now has its own runner with no limit.
+Preconditioners: on the finished fine 1.5 mm case, `-p diag` gave the default's impedance to every printed digit
+(0.00107254 + 0.0327315j Ω; 187 s against 759 s), and `-p seg` agreed within one unit in the last digit
+(1640 s). `diag` was used for both 3 mm cases, and the report records each case's preconditioner.
+A parallel default-preconditioner run of the middle 3 mm case ended without a result, so no second
+comparison is available. The fine 3 mm case took 150k filaments and 54 minutes.
+
+Scope, unchanged from the specification: this does not qualify antipads, via arrays, Kelvin vias,
+multi-layer vias, open plane edges or thin barrels. A converged E2 would need a fourth mesh, of roughly
+340k filaments and several hours on this host, declared before it runs.
+
+### EPC90133 geometry reader and nets (G3 preparation)
+
+```sh
+PYTHONPATH=src python scripts/read_epc90133_geometry.py   # results/gan/epc90133-geometry.json and renders
+```
+
+`src/circuit_tools/gerber.py` rasterizes RS-274X copper at a chosen pitch and reads Excellon drills.
+It supports the subset Altium used here: linear and multi-quadrant arcs, C/R/O apertures,
+macro primitives 1/4/20/21, regions and dark/clear polarity. Everything else raises an error
+rather than being dropped. `tests/test_gerber.py` checks known areas for each construct.
+The reader runs at 1 mil (25.4 µm) pitch on the 50.8 mm board. Its render reproduces the silkscreen
+"EPC90133 Rev. 2.0 / 80 V max. VIN" and the component placement shown in the guide.
+The drill layer-pair file shows all 445 holes are through-holes, top to bottom; 394 of them are 0.198/0.254 mm vias.
+The same file's design path names "EPC90133 (Die EPC2301) ... 80V 1_9 mE EPC2301 ... Rev2_0",
+while the BOM, schematic and guide say EPC2302. This is recorded; what it means is unknown.
+
+Connectivity: copper islands per layer, joined by each plated hole where copper surrounds its rim.
+The check fixed before the first run passes: the VIN (TP2), GND (TP1) and SW probe points are three distinct nets.
+Around the power stage, layers 1–4 below the top are almost entirely GND, and layers 5–6 carry VIN
+and SW pours. The top-layer net render (`results/gan/epc90133-geometry/GTL-power-stage.png`) shows the loop
+the datasheet describes. Ci1–Ci7 bridge the VIN pour and a GND strip. Q1's fingers interleave VIN and SW,
+and Q2's interleave SW and GND. Q2's source returns through vias to the GND plane on mid-layer 1.
+Inner layers keep pads on non-connecting vias inside their clearances; that is why mid-layer 1 has 219 islands.
+Limits: a raster at 25 µm resolves clearances but not sub-pitch features. Component positions come
+from the render, not a placement file. Nothing here is yet meshed for FastHenry.
+
+### EPC90133 BOM-based schematic (G3 preparation)
+
+```sh
+PYTHONPATH=src python scripts/epc90133_schematic.py   # results/gan/epc90133-schematic-check.json
+```
+
+`devices/epc/epc90133-schematic.json` transcribes the power stage from QSG Figs. 13–15. Its values are
+set by the BOM, and the script checks every part number against the recorded BOM file (all match).
+It records three label discrepancies: U80 is uP1966A on the schematic but uP1966E in the BOM and guide;
+Q1/Q2 are labelled "19 mΩ"; the design folder names EPC2301. The default population ties the driver
+net labelled "4.7 V" to VCC (5 V). The synchronous bootstrap (Q60 EPC2038, D60/D61/D63 and so on) is
+transcribed but not simulated. Its diode orientations were not confirmed, and the bench uses an ideal 5 V high-side
+supply across C81. The uP1966E output stages reuse the EPC9097 bench's behavioural model, which is
+calibrated to the uP1966E datasheet rather than to any EPC9097 measurement.
+Static-state check, with a 48 V bus and a 48 Ω load from SW to 24 V: low side on gives SW 0.0007 V;
+high side on gives 47.999 V; gates are at 4.998 V. Run 1 sampled the both-off state 30 ns after turn-off
+and failed at 2.4 V: my bench design ignored the time needed to recharge both FETs' output capacitance
+through 48 Ω. Its report is kept (`epc90133-schematic-check-run1-failed.json`). The revised check,
+a 2 µs off interval, gives 24.000 V and passes. This shows the netlist is connected as drawn.
+It makes no switching claim.
+
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
 on 28 September 2026 when LTspice became the project simulator. GaN and
@@ -861,7 +1087,13 @@ commit `363e43e`).
   prohibits distribution without MIT's written consent. The source and binary
   therefore stay in the git-ignored `.tools/FastHenry2`. The owner confirmed on
   28 September 2026 that the project uses it internally and does not
-  distribute it. Each user builds their own copy with the steps below.
+  distribute it (commit `95b0fad`). These are restrictive MIT-authored terms,
+  not the standard permissive MIT License. The notice was checked in the pinned
+  local `src/fasthenry/induct.h` and the
+  [upstream source](https://github.com/ediloren/FastHenry2/blob/master/src/fasthenry/induct.h).
+  Separate builds do not by themselves establish permission for broader partner
+  or commercial use; that scope needs a separate institutional determination.
+  Keep source and binaries out of teaching repositories and shared artifacts.
 - **Build** (Ubuntu 24.04 under WSL, gcc 13.3). `-fcommon` restores the
   pre-GCC-10 linking of shared globals that this old code needs; no other flag
   changes.
@@ -893,8 +1125,8 @@ which removes end and port effects. Mesh changes between the two finest meshes
 are 0.06–0.26%.
 
 - **Case C.** C failed its declared check, and the failure is kept in the
-  report. Diagnosis after the failure: the reference was incomplete, not the
-  tool. Palmer's formula assumes perfect conductors, but at 100 MHz copper
+  report. The subsequent diagnosis points to an incomplete reference rather
+  than a tool error. Palmer's formula assumes perfect conductors, but at 100 MHz copper
   carries current in a 6.6 µm skin depth. That adds internal inductance of
   about δ/h = 5.2%.
 - **Case D.** D was declared after that diagnosis and before it was run. Its
@@ -908,3 +1140,16 @@ are 0.06–0.26%.
   dielectric plane pairs like the EPC9097 power loop. It does not yet cover
   vias, plane meshing with holes, or the EPC2204's solder-bar connections.
   Those need their own checks when the board geometry uses them.
+
+**Current handoff.** Committed A/B/D results supersede the earlier message
+that the replacement check had not run. This documentation update makes no
+claim of a fresh solver run. Prepare via qualification and geometry readers
+for each layout candidate independently. Board extraction waits for the
+physical board's identity and fitted population; a matched comparison against
+EPC additionally needs the measurement-board identity. Editable Altium files
+help geometry conversion but do not alone establish fitted components.
+
+The [active plan](../plans/gan-halfbridge-pipeline-plan.md) and
+[V1 review record](gan-workflow-methods-review.md) specify the adopted layout
+search, stage handoffs and blind validation. These are future work; they do
+not alter executed results or justify tuning the vendor model.

@@ -30,10 +30,10 @@ loops can close on their own.
 
 The owner's review of *AI Agents for GaN Power Electronics Workflow and
 Methods V1* is incorporated below; see the [review record](../docs/gan-workflow-methods-review.md).
-The document's EPC90133/EPC2302 pairing is an additional, unverified candidate,
-not a selection or an instruction to replace EPC9097/EPC2204. A change of
-platform requires its own source, model and board qualification. Existing
-LTspice tools remain reusable; EPC2204 results do not validate another FET.
+The owner's decision now selects EPC90133 with EPC2302 as the active target.
+The EPC9097/EPC2204 work below remains historical evidence and reusable tooling;
+it does not qualify EPC2302. The new target requires its own source, model and
+board qualification. Existing LTspice tools remain reusable.
 Commercial transistor dimensions remain fixed; the design variables are the
 surrounding circuit and PCB layout.
 
@@ -66,11 +66,30 @@ recipe, and fitting electrical curves cannot recover one.
 
 ## 3. Target device, board and source terms
 
-**To be selected at gate G0.** The owner's notes cite EPC90121 resources and
-EPC2204 models. They belong to different boards. EPC's quick-start guides and
-datasheets, checked 28 September 2026, give two candidate pairs:
+**Selected target: EPC90133 with EPC2302.** This owner decision completes the
+platform choice at G0. Source-file inventory, terms, physical board identity,
+lab inventory and the KiCad route remain unresolved. EPC's official EPC90133
+page lists a 100 V, 40 A half-bridge with two EPC2302 plus an EPC2038, a uP1966E
+driver, schematic, BOM, Gerbers and a quick-start guide; editable Altium files
+are available on request. No ODB++ stackup link is listed. EPC's EPC2302 product
+page lists an LTspice model and a 3 x 5 mm package. These page listings do not
+establish that files have been downloaded, their reuse terms, board revision or
+physical-board identity.
 
-| | EPC9097 + EPC2204 | EPC90121 + EPC2050 |
+Download status: the EPC2302 datasheet (29 April 2026), EPC90133 QSG v1.0
+(6 September 2022) and schematic are downloaded, readable and checksummed in
+[the target source record](../devices/epc/epc90133-sources.json). The existing
+unmodified LTspice library contains `EPC2302 gatein drainin sourcein`; it has
+not yet been executed for this target. BOM/Gerber retrieval and consistency
+checks remain open. The QSG lists an 80 V maximum bus input under its stated
+conditions; the device's 100 V rating is not a project-approved operating limit.
+
+Sources: [EPC90133](https://epc-co.com/epc/products/evaluation-boards/epc90133),
+[EPC2302](https://epc-co.com/epc/products/gan-fets-and-ics/epc2302).
+
+Prior candidates and work remain in the record:
+
+| | EPC9097 + EPC2204 (historical) | EPC90121 + EPC2050 (not selected) |
 |---|---|---|
 | Rating | 100 V, 20 A half-bridge | 350 V, 4 A half-bridge |
 | FETs | Two EPC2204 (100 V, 6 mΩ max) plus one EPC2038 | Two EPC2050 |
@@ -91,26 +110,23 @@ publishes a separate thermal RC-network model for the EPC2204. That per-part
 model availability has not yet been checked for the EPC2050.
 
 The EPC2204 is a passivated bare die with solder bars. Its footprint and
-assembly therefore need care in the layout stage.
+assembly therefore needed care in the historical layout work. EPC2302 uses a
+3 x 5 mm package, whose footprint and assembly still need to be checked for the
+selected design.
 
-**Owner decision, 28 September 2026: EPC9097 with EPC2204 is the provisional
-first target.** Its lower voltage makes it a more manageable start, subject to
-the actual test envelope and equipment. Its published resources also include
-ODB++ data, the layer stackup and a test-point report, which help the layout
-stage. EPC90121 with EPC2050 remains the alternative, if the lab already
-supports it or its published measurements prove decisive. Do not combine one
-board's measurements or gate driver with the other board's device model.
-According to the owner, both EPC landing pages offer the Altium files on
-request.
+Do not combine one board's measurements or gate driver with another board's
+device model. The EPC90133 page lists the uP1966E driver, matching the selected
+board; its listed Gerbers do not by themselves establish a KiCad design or
+stackup.
 
-Immediate deliverable: the unmodified EPC2204 model running through an
-LTspice adapter, with parsed results and a reproducible test bench. The lab
-inventory and the Altium request proceed in parallel and do not block
-simulator setup.
+Immediate deliverable: inventory and record the unmodified EPC2302 model and
+all EPC90133 source files and terms, then demonstrate the model running through
+the LTspice adapter. G1 is retained from adapter qualification; the EPC2302
+model smoke run and datasheet baseline checks are open at G2. Board simulation
+and measurement follow only after the source files, layout and population are
+identified.
 
-That initial simulator/model deliverable is complete (G1 and G2 status below).
-The current deliverable is the stock-board simulation with identified layout,
-population and extracted parasitics. The 6-layer ODB++ lists EPC2619,
+Historical EPC9097 work used a 6-layer ODB++ layout listing EPC2619,
 4.7 ohm turn-on / 1 ohm turn-off resistors and uP1966A; the published BOM used
 by our bench specifies EPC2204, 1 ohm / 0 ohm and uP1966E. The 4-layer Rev 2.0
 Gerbers do not establish part values. Preserve separate records for geometry,
@@ -118,7 +134,8 @@ population and measurement identity. Neither candidate is established as our
 physical board or the board used for EPC's screenshots. Editable Altium files
 alone would not establish the fitted population or measurement-board identity.
 
-Selection criteria:
+Selection criteria (used for the completed platform selection and retained for
+future changes):
 
 1. A vendor model in a format our selected simulator runs (section 5).
 2. A downloadable schematic, BOM and Gerber set.
@@ -276,7 +293,7 @@ licenses. Do not convert the vendor model to another simulator's syntax.
 
 | Candidate | Status |
 |---|---|
-| LTspice | **Selected, 28 September 2026** (version 26.1.1; EPC publishes an LTspice library containing the EPC2204). First candidate if the selected EPC model supports it. Free, with command-line batch execution, so simulations run without the GUI. The switches `-b` (batch run producing a `.raw` file), `-Run`, `-ascii` (ASCII `.raw`) and `-netlist` are documented in a community mirror of LTspice's help ([ltwiki](https://ltwiki.org/LTspiceHelp/LTspiceHelp/Command_Line_Switches.htm)). Confirm them against the installed version's own help at G1. Not yet installed on the Windows host. |
+| LTspice | **Selected, 28 September 2026** (version 26.1.1; EPC lists LTspice models for EPC2204 and EPC2302). Free, with command-line batch execution, so simulations run without the GUI. The switches `-b` (batch run producing a `.raw` file), `-Run`, `-ascii` (ASCII `.raw`) and `-netlist` are documented in a community mirror of LTspice's help ([ltwiki](https://ltwiki.org/LTspiceHelp/LTspiceHelp/Command_Line_Switches.htm)). Installed and accepted at G1; the GUI/batch comparison is recorded below. The EPC2302 model itself still needs a smoke run. |
 | PSpice | Valid for EPC's PSpice model, subject to the available installation and license. |
 | Spectre | Valid with the matching model and a simulator license; runs from the command line without the ADE GUI. |
 
@@ -356,7 +373,7 @@ envelope expansion are removed last.
 
 | Gate | Deliverable | Acceptance |
 |---|---|---|
-| G0 Target and sources | Confirmed FET/board pair; provenance and terms record; KiCad route; instrument and license inventory | Owner approves |
+| G0 Target and sources | Confirmed FET/board pair; provenance and terms record; KiCad route; instrument and license inventory | Owner approves target; record remaining source and lab items |
 | G1 Simulator adapter | Selected simulator installed and pinned; adapter with known-answer and vendor-model runs | Adoption gate in section 5 |
 | G2 Model baseline | Stage 1 comparison of the unmodified model against the digitized datasheet | Declared tolerances; every discrepancy classified |
 | G3 Stock-board simulation | Reference schematic simulated with parasitics extracted from the stock layout | Extraction known-answer check; switching predictions with stated assumptions |
@@ -364,17 +381,18 @@ envelope expansion are removed last.
 | G5 Own layout | KiCad revision driven by G3–G4 results; checks; human review; fabrication | Connectivity, DRC, declared EM cross-check and review sign-off; blind predictions frozen before fabrication |
 | G6 Closure | Own board measured; back-fit; closure report; checkpoint log | Score frozen predictions on held-out measurements; preserve first score; report agent performance and human interventions against a baseline |
 
-Status, 28 September 2026:
+Status, 28 September 2026 (updated after the EPC90133/EPC2302 selection):
 
 - **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
-- **G2** is accepted for stock-board simulation, with a documented exception (owner review, 28 September 2026). The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances (worst point uses 22.8% of its allowed error). The reviewer independently reproduced the extraction, the comparisons and the 88 tests under WSL. **Exception:** the table's QGS/QGD/QG(TH) values remain unresolved (not classified): EPC's own curve does not reproduce them, and they may use different definitions or different source data. Total QG matches. The unmodified model is preserved as the baseline; no tuning is justified. Revisit these subcharges during switching measurements (G4).
-- **G3** is in progress: stock EPC9097 schematic, gate driver and layout parasitics.
+- **G2, EPC2204 historical result:** accepted for the EPC9097 stock-board simulation, with a documented exception (owner review, 28 September 2026). The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances (worst point uses 22.8% of its allowed error). The reviewer independently reproduced the extraction, comparisons and 88 tests under WSL. **Exception:** table QGS/QGD/QG(TH) values remain unresolved because EPC's own curve does not reproduce them; they may use different definitions or source data. Total QG matches. No tuning is justified. This result is not EPC2302 validation.
+- **G2, EPC2302:** open. Inventory the EPC model and datasheet sources, record provenance and terms, run the unmodified model in LTspice, and compare the datasheet table and curves with declared tolerances.
+- **G3, EPC9097 historical work:** paused for the selected target. The prior switching bench and layout investigation remain historical sensitivity evidence and do not block EPC90133 work.
   - *Done:* the board files are recorded with checksums and terms. A double-pulse bench runs two unmodified EPC2204 models with a datasheet-calibrated behavioural uP1966E driver (no vendor driver model exists), at EPC's published 48 V → 12 V, 1 MHz conditions, with the loop inductance swept.
   - *Comparison:* EPC's published switch-node screenshots are digitized and compared diagnostically ([docs](../docs/build.md#epc9097-switching-bench-g3-before-layout-extraction)).
   - *Owner review, 28 September 2026:* useful as a sensitivity study; G3 stays open until the matching layout's parasitics are extracted.
   - *Open:* EPC publishes two layouts (6-layer ODB++ and 4-layer Rev 2.0 Gerbers). Identify our board's revision and, separately, the revision behind EPC's published waveforms; they need not match. Both files stay candidates until evidence connects one to the board or the measurements. Then verify the extraction tool on a known geometry, extract the power and gate paths including return paths, and rerun the comparison.
   - *Sensitivity, not a limit:* in the simplified bench the switch node reaches 96 V from 48 V at 0.8 nH. With gate-loop and common-source inductance omitted, an approximate driver and assumed capacitors, this prioritises extraction; it does not set a safe envelope or a margin below 100 V.
-  - *Extraction tool:* FastHenry 3.0.1 is built locally (MIT licence: internal noncommercial use, no redistribution; owner confirmed on 28 September 2026 that the project uses it internally and does not distribute it). It passes its known-answer checks for bars and a thin-dielectric plane pair ([docs](../docs/build.md#fasthenry-inductance-extraction-tool-qualification-g3)). One declared check failed because its reference omitted skin effect; the replacement check was declared before running and passes. Vias and plane holes are not yet qualified.
+  - *Extraction tool:* FastHenry 3.0.1 is built locally (MIT licence: internal noncommercial use, no redistribution; owner confirmed on 28 September 2026 that the project uses it internally and does not distribute it). It passes its known-answer checks for bars and a thin-dielectric plane pair ([docs](../docs/build.md#fasthenry-inductance-extraction-tool-qualification-g3)). The original perfect-conductor reference check remains failed; a later skin-effect diagnosis motivated a replacement check declared before its run, which passes. Vias and plane holes are not yet qualified.
   - *Unidentified:* the source of EPC's 130 MHz ringing (power loop, bus network or probe path), and the cause of the slower measured rise. Measurement-path dominance is one candidate. The effective dead time inferred from the plateau (about 7.6 ns) depends on the driver model.
 
 G1–G3 can proceed in simulation while G0's lab inventory is completed. No
@@ -382,23 +400,22 @@ hardware is energized before G4's test plan and interlocks are approved.
 
 ## 9. Open decisions for the project owner
 
-1. Confirm the provisional EPC9097/EPC2204 target once the test envelope and
-   equipment are known.
+1. Selected: EPC90133/EPC2302. Resolve source-file inventory and terms, physical
+   board identity, lab inventory, and the KiCad route before board extraction.
 2. Available licenses (PSpice, Spectre) and whether LTspice may be installed
    on the lab and development hosts.
 3. Lab inventory: oscilloscope and probe bandwidth, isolated or differential
    probes, current sensing, supplies, electronic load, temperature control.
 4. Whether to request EPC's Altium files, and the budget for fabricating
    boards.
-5. Whether an EPC9097 is owned or will be purchased; its silkscreen revision,
+5. Whether an EPC90133 is owned or will be purchased; its silkscreen revision,
    fitted population and any vendor confirmation. Identify separately the board
    and population used for EPC's published measurements. No ownership is assumed.
-6. FastHenry use scope and institutional terms review for students, partners and
-   any commercial collaboration. The restrictive MIT-authored notice is not the
+6. FastHenry use beyond the internal-only scope recorded in `95b0fad`, including
+   partner or commercial collaboration. The restrictive MIT-authored notice is not the
    standard MIT License; keep source/binaries out of git. Separate local builds
-   do not by themselves settle whether a use is permitted.
-7. Final platform selection including the V1 document's EPC90133/EPC2302 candidate;
-   no switch is currently authorized. Define I-1/I-2/I-3 schemas, layout variables,
+   do not by themselves settle whether a broader use is permitted.
+7. Define I-1/I-2/I-3 schemas, layout variables,
    held-out validation conditions and whether board-performance improvement is required.
 
 ## 10. Immediate work and dependencies
@@ -407,15 +424,15 @@ hardware is energized before G4's test plan and interlocks are approved.
   failure. Qualification is limited to the tested bars and plane pairs; vias,
   holes and solder-bar connections are not yet covered. Each extraction needs
   its own mesh-refinement and frequency-range evidence.
-- Prepare the via known-answer specification and candidate-specific geometry
-  readers for supply, switch-node and ground copper, seven loop capacitors,
-  Q1/Q2, gate paths and return paths. Keep the 4-layer and 6-layer candidates separate.
-- Link the chosen layout and actual population to our board before board extraction;
+- Inventory EPC90133/EPC2302 source files, model availability and reuse terms;
+  do not imply listed files have been downloaded. Run the unmodified EPC2302
+  LTspice smoke test, then its datasheet table and curve comparisons.
+- Identify the EPC90133 revision and actual population before board extraction;
   separately resolve the published measurement-board identity before claiming a
-  matched vendor comparison. Continue parsing and qualification preparation while
-  those identities are open; do not silently combine the ODB++ population and BOM.
-- Prepare an EPC request covering both identities and editable Altium sources.
-  Sending a request requires an explicit instruction; none has been sent here.
+  matched vendor comparison. Record the available layout data and determine
+  whether its geometry and stackup support the planned extraction.
+- Prepare an EPC request for unresolved board or editable Altium details. Sending
+  a request requires an explicit instruction; none has been sent here.
 - After extraction and its refinement checks, rerun switching predictions and
   proceed through G4's measurement-chain and hardware approvals. No simulation
   sensitivity result alone establishes a safe test envelope.

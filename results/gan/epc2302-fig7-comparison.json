@@ -1,0 +1,313 @@
+{
+  "schema": "epc2302-fig7-comparison/1",
+  "scope": "Unmodified EPC2302 model (LTspice, reltol 1e-6) against the vendor-drawn typical gate-charge curve. Model-to-datasheet consistency only; not a hardware measurement.",
+  "evaluator_sha256": "e69b705da3c759b5978fbb06ffa999ee3d4622f2547dfc394d1cf7af706cc983",
+  "inputs": {
+    "epc2302-model-curves.json": "ab0d7bbfa07f9a5b3ceeacd2b495c6c73cefe6a2f7f02c6304cf335490ab0776",
+    "epc2302-datasheet-figures.json": "837116e896df82faa557b9f04f9675407cef3992a0c0af24d0a8d39590a6c9d1",
+    "epc2302-baseline.json": "a6546383969a312e96e7ff401899d0130ba75255af9192c24f0578954d00abc6"
+  },
+  "figure_conditions": "ID = 50 A, VDS = 50 V (read from the plot)",
+  "model_charge_offset_nC": {
+    "used": 0.4735133271054505,
+    "method": "model charge equations, VGS 0 -> bench start state",
+    "initial_slope_estimate_first_run": 0.3403869970482687,
+    "change_timing": "replaced after the first run's declared checks failed; both checks failed with either offset"
+  },
+  "tolerance_timing": "fixed after the datasheet curve was digitized, before any model comparison",
+  "vertical_check": {
+    "definition": "|VGS_model(Q) - VGS_datasheet(Q)| at every datasheet vertex",
+    "tolerance_V": 0.1,
+    "vertices_compared": 24,
+    "vertices_total": 26,
+    "fraction_within": 0.16666666666666666,
+    "worst": {
+      "q_nC": 12.461317618097247,
+      "vgs_datasheet_V": 2.58020855979127,
+      "vgs_model_V": 2.8510606124630864,
+      "difference_V": 0.27085205267181633
+    },
+    "outcome": "fail"
+  },
+  "horizontal_check": {
+    "definition": "charge at which each curve first reaches VGS, off the plateau",
+    "tolerance": {
+      "relative": 0.05,
+      "absolute_nC": 0.25
+    },
+    "rows": [
+      {
+        "vgs_V": 1.0,
+        "q_datasheet_nC": 3.4076194505107154,
+        "q_model_nC": 3.1752224629657024,
+        "difference_nC": -0.23239698754501292,
+        "allowed_nC": 0.42038097252553575,
+        "outcome": "pass"
+      },
+      {
+        "vgs_V": 1.5,
+        "q_datasheet_nC": 5.1408386835831985,
+        "q_model_nC": 4.808013348667405,
+        "difference_nC": -0.33282533491579347,
+        "allowed_nC": 0.5070419341791599,
+        "outcome": "pass"
+      },
+      {
+        "vgs_V": 2.0,
+        "q_datasheet_nC": 7.049431488911035,
+        "q_model_nC": 6.521448623775825,
+        "difference_nC": -0.5279828651352103,
+        "allowed_nC": 0.6024715744455518,
+        "outcome": "pass"
+      },
+      {
+        "vgs_V": 3.0,
+        "q_datasheet_nC": 14.43829727577425,
+        "q_model_nC": 13.183563828535759,
+        "difference_nC": -1.2547334472384915,
+        "allowed_nC": 0.9719148637887125,
+        "outcome": "fail"
+      },
+      {
+        "vgs_V": 3.5,
+        "q_datasheet_nC": 16.749868942237196,
+        "q_model_nC": 15.538635438100732,
+        "difference_nC": -1.2112335041364641,
+        "allowed_nC": 1.0874934471118598,
+        "outcome": "fail"
+      },
+      {
+        "vgs_V": 4.0,
+        "q_datasheet_nC": 19.05651429902142,
+        "q_model_nC": 17.862049345802905,
+        "difference_nC": -1.1944649532185139,
+        "allowed_nC": 1.202825714951071,
+        "outcome": "pass"
+      },
+      {
+        "vgs_V": 4.5,
+        "q_datasheet_nC": 21.359328837411226,
+        "q_model_nC": 20.178045619771318,
+        "difference_nC": -1.1812832176399084,
+        "allowed_nC": 1.3179664418705614,
+        "outcome": "pass"
+      }
+    ],
+    "outcome": "fail"
+  },
+  "features": {
+    "model": {
+      "plateau_vgs_V": 2.400364637374878,
+      "plateau_start_nC": 7.889186139642377,
+      "plateau_end_nC": 10.07586069006364,
+      "plateau_width_nC": 2.1866745504212632,
+      "q_at_vgs_5V_nC": 22.40700452388161,
+      "q_at_vgs_th_nC": {
+        "datasheet VGS(th) (1.300 V)": 4.15128175044079,
+        "model VGS(th) (1.506 V)": 4.827082891800544
+      },
+      "definitions": {
+        "plateau": "VGS within 0.05 V of the flattest 0.8 nC stretch",
+        "q_at_vgs_5V": "first charge where VGS reaches 4.98 V",
+        "q_at_vgs_th": "first charge where VGS reaches the stated threshold"
+      }
+    },
+    "datasheet_curve": {
+      "plateau_vgs_V": 2.3651996187057356,
+      "plateau_start_nC": 8.433769001706786,
+      "plateau_end_nC": 11.300855340322904,
+      "plateau_width_nC": 2.8670863386161187,
+      "q_at_vgs_5V_nC": 23.570030794265442,
+      "q_at_vgs_th_nC": {
+        "datasheet VGS(th) (1.300 V)": 4.439649658223839,
+        "model VGS(th) (1.506 V)": 5.1613786144788545
+      },
+      "definitions": {
+        "plateau": "VGS within 0.05 V of the flattest 0.8 nC stretch",
+        "q_at_vgs_5V": "first charge where VGS reaches 4.98 V",
+        "q_at_vgs_th": "first charge where VGS reaches the stated threshold"
+      }
+    }
+  },
+  "datasheet_table_nC": {
+    "qg_nC": 23.0,
+    "qgs_nC": 8.9,
+    "qgd_nC": 2.3,
+    "qg_th_nC": 6.3,
+    "vgs_th_V": 1.3
+  },
+  "table_vs_curve_observation": {
+    "table_qg_th_nC": 6.3,
+    "datasheet_curve_q_at_thresholds_nC": {
+      "datasheet VGS(th) (1.300 V)": 4.439649658223839,
+      "model VGS(th) (1.506 V)": 5.1613786144788545
+    },
+    "model_q_at_thresholds_nC": {
+      "datasheet VGS(th) (1.300 V)": 4.15128175044079,
+      "model VGS(th) (1.506 V)": 4.827082891800544
+    },
+    "table_qgs_nC": 8.9,
+    "datasheet_curve_plateau_start_nC": 8.433769001706786,
+    "table_qgd_nC": 2.3,
+    "datasheet_curve_plateau_width_nC": 2.8670863386161187,
+    "note": "Observation only. Where EPC's curve and EPC's table disagree under these boundaries, the cause (definitions, source data, or something else) is not established by this comparison."
+  },
+  "vertices": [
+    {
+      "q_nC": -0.0067921002714612655,
+      "vgs_datasheet_V": 3.831284162814086e-05,
+      "vgs_model_V": null,
+      "difference_V": null
+    },
+    {
+      "q_nC": 3.9884771254185054,
+      "vgs_datasheet_V": 1.1701128911851955,
+      "vgs_model_V": 1.250109879714602,
+      "difference_V": 0.07999698852940651
+    },
+    {
+      "q_nC": 4.891650452444793,
+      "vgs_datasheet_V": 1.4301255552467023,
+      "vgs_model_V": 1.5252608824451637,
+      "difference_V": 0.0951353271984614
+    },
+    {
+      "q_nC": 5.462335110696053,
+      "vgs_datasheet_V": 1.5901502620410772,
+      "vgs_model_V": 1.6957184372906011,
+      "difference_V": 0.10556817524952389
+    },
+    {
+      "q_nC": 5.94186217648457,
+      "vgs_datasheet_V": 1.720171869656145,
+      "vgs_model_V": 1.835594828260386,
+      "difference_V": 0.11542295860424101
+    },
+    {
+      "q_nC": 6.363308934232627,
+      "vgs_datasheet_V": 1.8301718152000799,
+      "vgs_model_V": 1.9555957217083175,
+      "difference_V": 0.12542390650823765
+    },
+    {
+      "q_nC": 6.801649149762802,
+      "vgs_datasheet_V": 1.9401712978475194,
+      "vgs_model_V": 2.0780341803270366,
+      "difference_V": 0.13786288247951717
+    },
+    {
+      "q_nC": 7.257341788490287,
+      "vgs_datasheet_V": 2.0502013316635876,
+      "vgs_model_V": 2.203971336042205,
+      "difference_V": 0.1537700043786172
+    },
+    {
+      "q_nC": 7.771690207278802,
+      "vgs_datasheet_V": 2.1701822514192015,
+      "vgs_model_V": 2.3455024475717314,
+      "difference_V": 0.17532019615252992
+    },
+    {
+      "q_nC": 8.433769001706786,
+      "vgs_datasheet_V": 2.320195432833269,
+      "vgs_model_V": 2.398267637052034,
+      "difference_V": 0.07807220421876515
+    },
+    {
+      "q_nC": 8.612853776209981,
+      "vgs_datasheet_V": 2.3601790433277614,
+      "vgs_model_V": 2.3952274007795262,
+      "difference_V": 0.03504835745176482
+    },
+    {
+      "q_nC": 10.367835139296623,
+      "vgs_datasheet_V": 2.3702201940837098,
+      "vgs_model_V": 2.473035064763831,
+      "difference_V": 0.1028148706801213
+    },
+    {
+      "q_nC": 10.856036651432191,
+      "vgs_datasheet_V": 2.380200705398895,
+      "vgs_model_V": 2.5505389617050915,
+      "difference_V": 0.17033825630619637
+    },
+    {
+      "q_nC": 11.127207540738091,
+      "vgs_datasheet_V": 2.3902117678827093,
+      "vgs_model_V": 2.596152564131048,
+      "difference_V": 0.20594079624833883
+    },
+    {
+      "q_nC": 11.300855340322904,
+      "vgs_datasheet_V": 2.4001922791978947,
+      "vgs_model_V": 2.626737305263199,
+      "difference_V": 0.22654502606530436
+    },
+    {
+      "q_nC": 11.527947897254784,
+      "vgs_datasheet_V": 2.420214404165523,
+      "vgs_model_V": 2.6681702029724006,
+      "difference_V": 0.24795579880687768
+    },
+    {
+      "q_nC": 11.688176254200137,
+      "vgs_datasheet_V": 2.4402059779645224,
+      "vgs_model_V": 2.6983013242967515,
+      "difference_V": 0.2580953463322291
+    },
+    {
+      "q_nC": 11.822836707016322,
+      "vgs_datasheet_V": 2.4601980146600155,
+      "vgs_model_V": 2.7241466902499383,
+      "difference_V": 0.26394867558992274
+    },
+    {
+      "q_nC": 11.934820737819024,
+      "vgs_datasheet_V": 2.480189588459015,
+      "vgs_model_V": 2.7459405927113987,
+      "difference_V": 0.2657510042523836
+    },
+    {
+      "q_nC": 12.156017354417322,
+      "vgs_datasheet_V": 2.520203287225643,
+      "vgs_model_V": 2.7895896572099828,
+      "difference_V": 0.26938636998433996
+    },
+    {
+      "q_nC": 12.461317618097247,
+      "vgs_datasheet_V": 2.58020855979127,
+      "vgs_model_V": 2.8510606124630864,
+      "difference_V": 0.27085205267181633
+    },
+    {
+      "q_nC": 12.897225316926928,
+      "vgs_datasheet_V": 2.67021646863971,
+      "vgs_model_V": 2.9404929702261313,
+      "difference_V": 0.27027650158642125
+    },
+    {
+      "q_nC": 13.650235751613252,
+      "vgs_datasheet_V": 2.830241175434085,
+      "vgs_model_V": 3.097890560862972,
+      "difference_V": 0.26764938542888705
+    },
+    {
+      "q_nC": 15.182170514428059,
+      "vgs_datasheet_V": 3.160240086272899,
+      "vgs_model_V": 3.4236437037366745,
+      "difference_V": 0.2634036174637755
+    },
+    {
+      "q_nC": 18.827711624247897,
+      "vgs_datasheet_V": 3.950321080799345,
+      "vgs_model_V": 4.208418106899102,
+      "difference_V": 0.2580970260997568
+    },
+    {
+      "q_nC": 23.663914936161447,
+      "vgs_datasheet_V": 5.000384651115164,
+      "vgs_model_V": null,
+      "difference_V": null
+    }
+  ]
+}
