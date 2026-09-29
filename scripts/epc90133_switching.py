@@ -327,13 +327,16 @@ def main():
         cases["ideal-copper"] = {"ext": REFERENCE, "ideal": True}
         cases[f"{REFERENCE}-esl0.5x"] = {"ext": REFERENCE, "esl_scale": 0.5}  # esl 0 (1 fF) stalled the solver
         cases[f"{REFERENCE}-esl2x"] = {"ext": REFERENCE, "esl_scale": 2.0}
-        for lp in L_PKG_CASES:
-            cases[f"{REFERENCE}-pkg{lp * 1e12:.0f}pH"] = {"ext": REFERENCE, "l_pkg": lp}
         cases[f"{REFERENCE}-csw"] = {"ext": REFERENCE, "c_sw": True}
         # On B the fine run exceeded the adapter's 600 s limit (sweep 1); the numerical check runs on A.
         if NUMERICAL_REF in exts:
             cases[f"{NUMERICAL_REF}-fine"] = {"ext": NUMERICAL_REF, "maxstep": MAXSTEP / 2, "reltol": RELTOL / 10}
-        cases[f"{REFERENCE}-periodic3"] = {"ext": REFERENCE, "periods": 3}
+            # Test 3: on B the package cases and the periodic case exceeded the adapter's 600 s limit, so they
+            # run on the smaller A network: the package cases as a screen, the periodic case as the check that
+            # the double pulse reproduces continuous-operation edges (it depends on the timing, not the network).
+            for lp in L_PKG_CASES:
+                cases[f"{NUMERICAL_REF}-pkg{lp * 1e12:.0f}pH"] = {"ext": NUMERICAL_REF, "l_pkg": lp}
+            cases[f"{NUMERICAL_REF}-periodic3"] = {"ext": NUMERICAL_REF, "periods": 3}
     results, slopes = {}, {}
     for name, c in cases.items():
         ext = exts[c["ext"]]
@@ -343,7 +346,7 @@ def main():
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle from the reference's measured slopes, started at the matching valley.
-            s_on, s_off = slopes[REFERENCE]
+            s_on, s_off = slopes[c["ext"]]
             duty = s_off / (s_on + s_off)
             timing = {"duty": duty, "i0": IOUT - s_on * duty / F_SW / 2}
             text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
@@ -387,12 +390,13 @@ def main():
                   f"Q1 Vds pk {f['q1_vds_peak_V']:.2f} V", flush=True)
         else:
             print(name, "failed:", runs[name]["message"], flush=True)
+    # Extraction variants are compared with the reference B; a modified case (ideal copper, ESL, package,
+    # switch-node capacitance, fine, periodic) is compared with the unmodified case of its own extraction.
     comparison = {}
-    if REFERENCE in results and results[REFERENCE]["metrics"]:
-        ref = flat(results[REFERENCE]["metrics"])
-        for name, r in results.items():
-            if name != REFERENCE and r["metrics"]:
-                comparison[name] = material(ref, flat(r["metrics"]))
+    for name, r in results.items():
+        base = REFERENCE if (name in exts or name == "ideal-copper") else r["parameters"]["ext"]
+        if name != base and r["metrics"] and base in results and results[base]["metrics"]:
+            comparison[name] = {"compared_with": base, **material(flat(results[base]["metrics"]), flat(r["metrics"]))}
     numerical = None
     fine = results.get(f"{NUMERICAL_REF}-fine")
     if fine and fine["metrics"] and NUMERICAL_REF in results and results[NUMERICAL_REF]["metrics"]:

@@ -447,6 +447,14 @@ Updated 29 September 2026 (owner review of the via check):
    experiments: loop L from ringing frequency with known Coss and a known added capacitance,
    probe characterization, and the stock board with and without Cm.
 
+5. Capacitance extraction (added 29 September 2026): FasterCap (FastFieldSolvers, FastCap2-compatible
+   input, multiple dielectric regions, automatic refinement, batch mode; LGPL 2.1 or later per its README,
+   https://github.com/ediloren/FasterCap). Before use: record version, source and checksum and read the
+   licence file itself; pass known-answer checks (parallel plates with fringing, microstrip over a ground
+   plane) with a declared refinement criterion; then extract SW/VIN/GND capacitances of the power stage
+   to replace the parallel-plate estimate (135 pF SW-GND). Its LGPL terms would also avoid FastHenry's
+   internal-only restriction for this part of the flow.
+
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a
 request requires an explicit instruction. No simulation sensitivity result alone
