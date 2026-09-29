@@ -221,6 +221,46 @@ field solvers. Adopt one only after it reproduces a known-answer geometry.
 Before designing our own board, simulate the stock EPC layout, so that a
 measured reference exists before any layout change.
 
+#### Parasitic extraction interface and Agent 2 stop criteria (draft v0.1, 29 September 2026)
+
+Source: [Layout Parasitic Extraction and Agent 2 Stop Criteria.docx](Layout%20Parasitic%20Extraction%20and%20Agent%202%20Stop%20Criteria.docx)
+(candidate platform EPC90133), adopted here with the corrections marked below.
+
+Parasitics to extract, all "Must":
+
+| Group | Parasitic | Location | Status (29 September 2026) |
+|---|---|---|---|
+| Power loop | L_d | decoupling capacitor (+) to high-side drain | extracted as the VIN branches (exploratory) |
+| Power loop | L_sw | high-side source to low-side drain | extracted as the SW branch (exploratory) |
+| Power loop | L_s | low-side source through return vias and inner plane to capacitor (−) | extracted as the GND branches (exploratory) |
+| Common source | L_cs (HS, LS) | source pad to Kelvin branch point | not extracted; Kelvin via candidates identified |
+| Gate loop | L_g | driver output through R_g to gate | not extracted |
+| Gate loop | L_ks | Kelvin source back to driver ground | not extracted |
+| Capacitance | C_sw-gnd | switch-node copper to ground | parallel-plate estimate only (135 pF); FasterCap planned |
+
+Five steps: (1) read the layout and stackup (KiCad for our own boards; the stock EPC90133 is read from its Gerbers);
+(2) cut out the power and gate loops and place ports on FET pads, capacitor pads and driver pins; (3) field-solve
+L and R (FastHenry) and C (FasterCap); (4) reduce the matrices to named segment values; (5) write them to a parameter
+file `parasitics.inc` that the LTspice bench includes, so that a new layout changes only that file.
+
+Corrections adopted with the draft:
+- **Keep the coupling.** Partial inductances do not add up to the loop inductance without their mutual terms, and on this
+  board they are large (VIN and GND paths 0.13 mm apart). `parasitics.inc` carries the segment values *and* the coupling
+  between them (the current bench's K elements). Agent 2 may rank segments by their contribution, but it must
+  simulate with the full coupled network.
+- **Stop only on resolvable improvement.** The draft stops at "less than 1% improvement over 5 consecutive
+  iterations". An improvement counts only if it exceeds the declared extraction and simulation uncertainty (today the
+  via representation alone moves the loop inductance 2–4%, and the mesh is not shown to converge), within a declared
+  iteration and compute budget. Budget exhaustion without meeting targets is not success (rule below).
+- **Targets are relative to the EPC original under the same model:** overshoot lower, Eon + Eoff not higher, estimated
+  efficiency not lower. These are comparisons between layouts simulated with the same unvalidated model and must be labelled so;
+  switching energy carries the EPC2302 Fig. 7 gate-charge exception. The operating point must be one declared value: the
+  draft's efficiency case is 48 V → 12 V, while EPC's Fig. 9 is 48 V → 13.8 V, 20 A, 250 kHz.
+- **Tool identities.** The draft names FastHenry2 (the FastFieldSolvers distribution) and PyLTSpice. The qualified tools are
+  FastHenry 3.0.1 (internal-only licence) and the project's own LTspice adapter (G1). Changing either needs its licence
+  recorded and the known-answer checks rerun.
+- Human review approval stays a required stop condition (section 7).
+
 #### Layout optimization and stopping rules
 
 Keep the reference circuit topology fixed for the first layout demonstration.
