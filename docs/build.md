@@ -441,6 +441,100 @@ run 2 (the drifting duty cycle) kept as `epc90133-switching-periodic-run2-drift.
 A run. Each LTspice process uses up to 16 threads, and concurrent processes slow each other far more than the job
 count suggests. B cases run one at a time (`--jobs 1`).
 
+### EPC90133 switching test 5: candidate causes of the gap to Fig. 9 (G3 diagnosis)
+
+```sh
+PYTHONPATH=src python scripts/epc90133_switching.py --study causes --output results/gan/epc90133-switching-causes.json
+PYTHONPATH=src python scripts/epc90133_switching.py --study causes --only B-m1-mid-ms100 B-esr1-ms100 B-cgd \
+    --output results/gan/epc90133-switching-causes-2.json
+python scripts/compare_epc90133_fig9.py --sim results/gan/epc90133-switching-causes.json \
+    results/gan/epc90133-switching-causes-2.json          # results/gan/epc90133-fig9-comparison.json
+```
+
+The specification is in the switching script's docstring ("Test 5"). Each case changes one thing from the unmodified
+reference B-m1-mid. The comparison script passes every saved trace through zero-phase Gaussian scope responses
+(none, 2 GHz, 1 GHz, 500 MHz, 350 MHz) and measures it with the digitizer's own definitions. Its "resembles the
+measurement" criteria were fixed before the first comparison: rise and fall time within 25 %, overshoot within 3 V
+and within 0.05 of swing, frequency within 10 %, damping ratio within a factor 1.5. These are judgement criteria,
+not validation tolerances.
+
+Numerical controls (all pass):
+
+- the B package, combined and follow-up cases use a 100 ps maximum step, because 20 ps exceeded 600 s even with B
+  running alone. Against 20 ps it changes every metric by at most 1.3 %, on B without package inductance and on A
+  with it;
+- the package damping-resistor corner at 20 GHz instead of 10 GHz changes every metric by less than 0.4 %, except
+  the damping ratio (−8 %, below the 20 % materiality threshold);
+- every case: edge currents within tolerance and no spikes.
+
+Results through the digitizer's definitions, ideal probe (bandwidth effects below):
+
+| Case (one change from B) | tr (ns) | overshoot (V) | f (MHz) | ζ | tf (ns) | plateau |
+|---|---|---|---|---|---|---|
+| **QSG Fig. 9** | **1.68** | **5.7** | **264** | **0.077** | **3.63** | **7.1 ns, −2.5 V** |
+| B reference | 0.83 | 35.0 | 284 | 0.008 | 3.96 | 11.9 ns, −1.8 V |
+| package 50 pH per terminal | 1.67 | 21.3 | 223 | 0.017 | 3.91 | 11.3 ns, −1.8 V |
+| package 150 pH per terminal | 3.03 | 18.5 | 165 | 0.030 | 3.90 | 10.8 ns, −1.9 V |
+| copper resistance × 1.68 (skin effect to 282 MHz) | 0.83 | 35.0 | 284 | 0.008 | 3.96 | 11.9 ns, −1.8 V |
+| driver at datasheet maximum resistance | 1.00 | 22.9 | 288 | 0.008 | 4.09 | 10.8 ns, −1.7 V |
+| every capacitor ESR 0.3 Ω (damping probe) | 0.84 | 34.2 | 286 | 0.025 | 3.98 | 11.9 ns, −1.8 V |
+| combined: package 50 pH, copper × 1.68, driver maximum | 1.78 | 16.9 | 224 | 0.017 | 4.03 | 10.1 ns, −1.7 V |
+| every capacitor ESR 1 Ω (damping probe; 100 ps step) | 0.87 | 31.0 | 286 | 0.066 | 4.00 | 11.9 ns, −1.8 V |
+| gate-charge deficit: external 13.6 pF gate–drain per FET (100 ps step) | 0.91 | 29.0 | 284 | 0.008 | 4.00 | 11.9 ns, −1.8 V |
+
+(The damping ratio here comes from the digitizer's damped-cosine fit. The bench's own log-decrement value is slightly
+higher, for example 0.010 for B. The 1 Ω ESR case first exceeded 600 s at 20 ps and was rerun at 100 ps.)
+
+What this shows:
+
+- **No case, and no tried combination, resembles the measurement.** The fall time passes everywhere. The
+  frequency passes only for cases without package inductance, and the rise time only with it. Overshoot and damping
+  pass nowhere: the lowest overshoot is 14.3 V (combined, 350 MHz), and the highest damping ratio 0.030.
+- **Package inductance is the only tested change that reproduces the rise time** (50 pH: 1.67 ns). As common-source
+  inductance it slows the turn-on. It also lowers the ringing frequency (282 → 223 MHz), away from the measurement,
+  and tripling it barely lowers the overshoot further (21 → 18.5 V). The EPC2302 package inductance is not
+  published, so 50 pH remains an assumption.
+- **A weaker driver lowers the overshoot without moving the frequency** (35 → 23 V). This is the only tested change
+  that moves the waveform toward the measurement without a counter-effect. The real uP1966E output resistance is
+  unknown between typical and maximum.
+- **Frequency-dependent copper resistance is not the missing damping.** Scaling every branch resistance by 1.68
+  changes the damping by 7 %. The extracted loop resistance (2 mΩ at 100 MHz) is far below the roughly 70 mΩ that
+  the measured decay implies at this loop's impedance (L ≈ 0.28 nH, C ≈ 1.1 nF).
+- **Damping hardly limits the first overshoot.** Tripling ζ with 0.3 Ω ESR lowers the overshoot only 35 → 34 V. So
+  the overshoot gap needs a slower or softer turn-on, and the damping gap needs a separate loss. The source of that
+  loss is not identified: Coss or dielectric loss (absent from the vendor model), or the measurement path.
+- **Probe bandwidth alone is ruled out** under the Gaussian assumption. At 350 MHz the B overshoot drops only
+  35 → 27 V, with the frequency and damping unchanged. Reducing a 20 V ring to 5.7 V at 264 MHz needs about
+  140 MHz of bandwidth, which would by itself make the rise at least about 2.4 ns (measured 1.68 ns). A probe
+  ground-lead resonance is not a Gaussian and is not tested; it remains a candidate.
+- **The dead-time plateau disagrees independently of the layout.** Simulated 10–12 ns at −1.7 to −1.9 V, measured
+  7.1 ns at −2.5 V. The BOM populates R620/R625 with 120 Ω (checked 30 September 2026), which QSG Fig. 4 maps to
+  10 ns. That nominal value gives an 11.9 ns plateau in the bench, so the measurement suggests an effective dead
+  time of roughly 5 ns. The EPC9097 comparison showed the same direction (about 7.6 ns against a nominal 10 ns). The
+  driver timing model is therefore a candidate for both boards. The deeper measured plateau (−2.5 V against −1.8 V)
+  could be a real third-quadrant difference or a probe artefact; it is not resolved.
+- **Follow-up cases (declared in the script before their runs).** With 1 Ω ESR on every capacitor, the damping
+  reaches the measured level (ζ 0.066 against about 0.077), which puts the missing loss at roughly 60–70 mΩ of
+  equivalent loop resistance at 264 MHz. The overshoot stays at 31 V. That is not a claim that the capacitors have
+  1 Ω ESR; it only sizes the loss. The gate-charge candidate adds a linear 13.6 pF gate–drain capacitance per FET,
+  restoring the Miller charge that the model lacks in EPC2302 Fig. 7 (datasheet plateau 2.87 nC against the model's
+  2.19 nC at 50 V). It lowers the overshoot 35 → 29 V and slows the rise 0.83 → 0.91 ns: a real contribution but a
+  minor one, and linear where the real deficit is voltage dependent. The model stays unmodified.
+
+Figure: `python scripts/plot_epc90133_fig9.py --sim results/gan/epc90133-switching-causes.json
+results/gan/epc90133-switching-causes-2.json --cases B-m1-mid:none B-pkg50pH:none B-drvmax:none B-esr1-ms100:none`
+writes `results/gan/epc90133-fig9-overlay.png`. The falling edge matches closely. On the rising edge every
+simulated ring is 3–6 times the measured one.
+
+**Where this leaves G3.** Within the simulation, the overshoot gap needs a slower or softer turn-on of Q1, and the
+damping gap needs about 60–70 mΩ of loss that no modelled element supplies. The candidates that can still close
+them cannot be separated from EPC's single published waveform: the real driver strength and timing, the EPC2302
+package inductance, Coss or dielectric loss, and the unknown probe and probing point. Further simulation refinement
+(finer mesh, via representation, capacitance extraction) moves the result by a few percent, so it will not close a
+gap of this size. Separating these candidates needs our own measurements: a known probe on a known point, the
+ringing measured at several currents and bus voltages, dead time measured at the driver outputs, and the loop
+inductance measured from the ringing frequency with a known added capacitor. G3 stays open.
+
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
 on 28 September 2026 when LTspice became the project simulator. GaN and

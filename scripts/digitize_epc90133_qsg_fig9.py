@@ -187,8 +187,9 @@ def fit_ring(tr, settled, t_start, t_stop=25e-9):
     best = None
     for phi0 in np.linspace(0, 2 * np.pi, 8, endpoint=False):
         try:
-            p, _ = curve_fit(model, t, y, p0=[float(np.max(np.abs(y))), 5e-9, f0, phi0, 0.0],
-                             bounds=([0, 0.2e-9, 0.4 * f0, -10, -3], [40, 1e-6, 2.5 * f0, 10, 3]), maxfev=20000)
+            a0 = float(np.max(np.abs(y)))  # simulated rings reach 55 V; Fig. 9 about 6 V
+            p, _ = curve_fit(model, t, y, p0=[a0, 5e-9, f0, phi0, 0.0],
+                             bounds=([0, 0.2e-9, 0.4 * f0, -10, -3], [max(40.0, 2 * a0), 1e-6, 2.5 * f0, 10, 3]), maxfev=20000)
         except RuntimeError:
             continue
         rms = float(np.sqrt(np.mean((model(t, *p) - y) ** 2)))

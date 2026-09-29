@@ -125,6 +125,7 @@ def resembles(sim, meas):
     c["ring_frequency"] = r.get("ring_frequency_Hz") is not None and abs(r["ring_frequency_Hz"] / mr["ring_frequency_Hz"] - 1) <= CRITERIA["freq_rel"]
     c["damping"] = r.get("ring_damping_ratio") is not None and \
         1 / CRITERIA["damping_factor"] <= r["ring_damping_ratio"] / mr["ring_damping_ratio"] <= CRITERIA["damping_factor"]
+    c = {k: bool(v) for k, v in c.items()}
     c["all"] = all(c.values())
     return c
 
@@ -159,8 +160,8 @@ def main():
         rows[name] = {"usable": case.get("usable"), "parameters": case["parameters"], "bandwidths": per_bw}
     report = {
         "schema": "epc90133-fig9-comparison/1",
-        "inputs": {"fig9": str(args.fig9.relative_to(ROOT)), "fig9_sha256": hashlib.sha256(args.fig9.read_bytes()).hexdigest(),
-                   "sim": {str(f.relative_to(ROOT)): hashlib.sha256(f.read_bytes()).hexdigest() for f in args.sim}},
+        "inputs": {"fig9": args.fig9.resolve().relative_to(ROOT).as_posix(), "fig9_sha256": hashlib.sha256(args.fig9.read_bytes()).hexdigest(),
+                   "sim": {f.resolve().relative_to(ROOT).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest() for f in args.sim}},
         "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "criteria": CRITERIA, "measured": meas,
         "note": ("Diagnostic comparison, not an acceptance test: Fig. 9's probe and probing point are unknown and its "

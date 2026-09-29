@@ -41,6 +41,9 @@ The four IEEE papers found in the search were not available and are not used.
    be measured with small error, so the measurement chain can distort both the amplitude and the frequency.
    Fig. 9 should be digitized with a declared method, and any comparison should pass the simulated waveform through
    an assumed probe/scope response and state that assumption.
+   *Update, 30 September 2026:* done (docs/build.md, "QSG Fig. 9 digitized" and "test 5"). The by-eye reading was
+   wrong: Fig. 9 is two zoomed screenshots stitched together. The digitized ringing is 264 MHz, with 5.7 V
+   overshoot. Gaussian probe responses from 2 GHz down to 350 MHz do not close the gap.
 5. **Candidate isolating experiments for G4** (per-layer error budget, plan section 4):
    - loop inductance from the ringing frequency with known Coss at a low bus voltage (DTU), repeated
      with a known added capacitance to separate L from C;

@@ -68,6 +68,9 @@ other assumption held at the test 1-4 values:
   corner matters);
 * one combination of the physically motivated changes (package 50 pH, copper x1.68, driver maximum),
   exploratory.
+Added during test 5, before any B package result existed: the B package and combined cases use a 100 ps
+maximum step (20 ps exceeded the 600 s limit even with B run alone), checked on B without package and on A
+with package against 20 ps.
 Probe and oscilloscope bandwidth are applied afterwards to the saved traces by
 scripts/compare_epc90133_fig9.py. The gate-charge exception (EPC2302 Fig. 7: the model's Miller plateau is
 24% narrow) is not tested: the model stays unmodified.
@@ -159,7 +162,8 @@ def capacitor(tag, p, n, model, scale=1.0, esr=None):
 
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
-          l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK):
+          l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
+          c_gd=0.0):
     net, terms = network(ext, ideal, r_scale)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -232,6 +236,7 @@ Rbret bn {node(at + '.GND')} 1u"""
            "X1 gu p1d p1s EPC2302", "X2 gl p2d p2s EPC2302"] if l_pkg else
           ["X1 gu q1dd q1_s EPC2302", "X2 gl q2_d 0 EPC2302"]),
         *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
+        *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
         drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip(),
@@ -347,22 +352,38 @@ def material(ref, other):
 
 
 R_SKIN = math.sqrt(282e6 / 100e6)
+MAXSTEP_PKG = 100e-12
+C_GD_DEFICIT = (2.867 - 2.187) * 1e-9 / 50.0  # F; results/gan/epc2302-fig7-comparison.json plateau widths
 
 
 def cause_cases(exts):
     """Test 5 cases (see the module docstring); each names the case it is compared with."""
     b, a = "B-m1-mid", "A-m1-mid"
     cases = {b: {"ext": b}}
+    # Test 5: B with package inductors exceeded the 600 s limit at the 20 ps maximum step, even run alone.
+    # On A-pkg50pH a 100 ps maximum step changed every metric by at most 1.4% (damping ratio; the others
+    # under 0.1%) at a quarter of the run time. The package and combined cases on B use it; the check is
+    # repeated in the report on B without package (B-m1-mid-ms100) and on A with it (A-pkg50pH-ms100).
+    cases["B-m1-mid-ms100"] = {"ext": b, "maxstep": MAXSTEP_PKG, "base": b}
     for lp in L_PKG_CASES:
-        cases[f"B-pkg{lp * 1e12:.0f}pH"] = {"ext": b, "l_pkg": lp, "base": b}
+        cases[f"B-pkg{lp * 1e12:.0f}pH"] = {"ext": b, "l_pkg": lp, "maxstep": MAXSTEP_PKG, "base": b}
     cases["B-rskin"] = {"ext": b, "r_scale": R_SKIN, "base": b}
     cases["B-drvmax"] = {"ext": b, "r_src": R_SRC_MAX, "r_snk": R_SNK_MAX, "base": b}
     for esr in (0.3, 1.0):
         cases[f"B-esr{esr:g}"] = {"ext": b, "esr": esr, "base": b}
-    cases["B-combined"] = {"ext": b, "l_pkg": 50e-12, "r_scale": R_SKIN, "r_src": R_SRC_MAX, "r_snk": R_SNK_MAX, "base": b}
+    cases["B-combined"] = {"ext": b, "l_pkg": 50e-12, "r_scale": R_SKIN, "r_src": R_SRC_MAX, "r_snk": R_SNK_MAX,
+                           "maxstep": MAXSTEP_PKG, "base": b}
     cases[a] = {"ext": a}
     cases["A-pkg50pH"] = {"ext": a, "l_pkg": 50e-12, "base": a}
     cases["A-pkg50pH-r20GHz"] = {"ext": a, "l_pkg": 50e-12, "r_pkg_corner": 20e9, "base": "A-pkg50pH"}
+    cases["A-pkg50pH-ms100"] = {"ext": a, "l_pkg": 50e-12, "maxstep": MAXSTEP_PKG, "base": "A-pkg50pH"}
+    # Added after test 5 run 4 (declared here before their runs). B-esr1 exceeded 600 s at 20 ps; it reruns at
+    # the checked 100 ps step. B-cgd tests the gate-charge candidate without modifying the model: an external
+    # linear gate-drain capacitance on each FET restoring the Miller-charge deficit of EPC2302 Fig. 7
+    # (datasheet plateau 2.87 nC wide, model 2.19 nC, at VDS 50 V: 0.68 nC / 50 V = 13.6 pF). The real
+    # deficit is voltage dependent, so this is a sensitivity, not a correction.
+    cases["B-esr1-ms100"] = {"ext": b, "esr": 1.0, "maxstep": MAXSTEP_PKG, "base": "B-m1-mid-ms100"}
+    cases["B-cgd"] = {"ext": b, "c_gd": C_GD_DEFICIT, "maxstep": MAXSTEP_PKG, "base": "B-m1-mid-ms100"}
     missing = {c["ext"] for c in cases.values()} - set(exts)
     if missing:
         raise SystemExit(f"cause study needs extractions {sorted(missing)}")
@@ -436,7 +457,7 @@ def main():
                   maxstep=c.get("maxstep", MAXSTEP), reltol=c.get("reltol", RELTOL),
                   l_pkg=c.get("l_pkg", 0.0), c_sw=c.get("c_sw", False),
                   r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
-                  esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK))
+                  esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
