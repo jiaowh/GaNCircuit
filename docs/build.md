@@ -354,6 +354,93 @@ Test runs 3–4 (29 September 2026, later the same day):
   (a change to the accepted G1 adapter), use a coarser step away from the edges, or use fewer, shorter periods at a matched
   steady state. Test 4's report: `results/gan/epc90133-switching-test4.json` (its package cases are unusable, as above).
 
+### EPC90133 QSG Fig. 9 digitized (G3 comparison target)
+
+```sh
+python scripts/digitize_epc90133_qsg_fig9.py   # PyMuPDF, Windows host; results/gan/epc90133-qsg-fig9.json
+```
+
+Fig. 9 looks like one wide scope picture, but the PDF stores it as two raster screenshots side by side
+(xref 119, rising edge; xref 117, falling edge), with EPC's labels drawn over them as text. A 250 kHz on-time of
+about 1.15 µs cannot fit on a 10 ns/div screen, so these are two separate zoomed captures. The distance between
+the edges in the printed figure is not time. The method and checks are in the script's docstring. They were written
+after I viewed the images and before the first run. The grid pitch is detected per axis (the pixels are not square:
+31.8 px/div vertically, 50.7 px/div horizontally), with the trace masked out. Its flat parts had made a 1.5× pitch
+look best in a first probe. Zero volts is each panel's settled low level; only the rising panel carries a ground marker.
+
+| Check | Result |
+|---|---|
+| grid lines uniform (≤ 1.5 px), both panels' pitch within 1 % | pass (0.45 px; pitches equal) |
+| time scale: digitized edge against EPC's printed tr 1.7 ns / tf 3.7 ns (±0.4 ns) | pass (1.68 / 3.63 ns) |
+| volt scale: settled swing within 2 V of 48 V | **fail**: 45.8 V (rising), 44.5 V (falling) |
+| zero: ground marker within 1 V of the settled low level | pass (0.9 V) |
+
+The volt-scale failure is recorded, not tuned away. Either the displayed amplitude reads 5–7 % low (probe gain
+or attenuation setting), or the switch node's swing really was smaller than 48 V (for example, supply drop under
+load). Voltages are therefore also compared as a fraction of the swing. Time metrics do not depend on it.
+
+Measured (vendor-described; probe, bandwidth and probing point not stated):
+
+| Edge | Metric | Value |
+|---|---|---|
+| rising (Q1 turns on at the valley current) | 10–90 % rise | 1.68 ns |
+| | overshoot above settled level | 5.7 V (0.124 of swing) |
+| | ringing (damped-cosine fit, first crest to 25 ns) | 264 MHz, decay time 7.8 ns, damping ratio ≈ 0.077 |
+| | dead-time plateau before the rise | 7.1 ns at about −2.5 V (minimum −3.6 V) |
+| falling (Q1 turns off at the peak current) | 90–10 % fall | 3.63 ns |
+| | undershoot below settled level | 4.6 V, no ringing above pixel noise |
+
+**Correction to the earlier by-eye reading.** The by-eye values in the tables above (about 7 V, about 0.6 GHz)
+came from the stitched picture. The ringing is 264 MHz, not about 0.6 GHz. So extraction variants I (266 MHz) and
+B (282 MHz) do match the measured frequency, and the earlier statement that "no variant resembles the measurement"
+is wrong for frequency. The remaining gaps are the overshoot (B 36 V against 5.7 V), the rise time (0.83 against
+1.68 ns) and the damping (B damping ratio 0.010 against about 0.077, so the simulated ringing decays about 7.5
+times more slowly).
+
+### EPC90133 switching test 5: package spikes removed, periodic buck equivalence (G3)
+
+```sh
+PYTHONPATH=src python scripts/epc90133_switching.py --study periodic --output results/gan/epc90133-switching-periodic.json
+```
+
+**Package-inductance spikes.** In test 4 the time step collapsed to about 2×10⁻²⁰ s wherever the spikes appeared.
+They also appeared during the flat on-state, not only at edges. On the stored A-pkg50pH netlist I tried two remedies:
+
+- a resistor across each package inductor, R = 2π·10 GHz·L (3.1 Ω for 50 pH), removed every spike, with
+  trapezoidal or Gear integration;
+- Gear integration alone left 625 spikes.
+
+With the resistor, the two integration methods agree within 0.1 % on every metric. So the spikes were numerical,
+and test 4's 7.0 ns fall time was one of them. The clean result for A with 50 pH is: fall time 3.92 ns, rise time
+1.54 ns, overshoot 36.2 V, ringing 179 MHz, damping ratio 0.014. At the ringing frequency the resistor carries about
+3 % of the inductor current. Every case now runs a spike check (no sample more than 5 V from the mean of its
+neighbours); a case with spikes is marked unusable.
+
+**Periodic buck equivalence (A-m1-mid). Pass.** Previous starts failed:
+
+- run 1: an operating point with 11 A in the inductor and both FETs off;
+- test 4: a `uic` start, which stalled at 0.77 ps;
+- test 5, run 1: an operating point with the low-side FET on, found only by LTspice's pseudo-transient fallback
+  (which the adapter rightly reports as failed). A `.nodeset` guess did not help.
+
+The bench now starts like the double pulse, from the all-off, zero-current operating point. A first pulse ramps
+the inductor to the peak current, and three 250 kHz periods follow. The duty cycle from the double pulse's average
+slopes drifted −0.30 A per period, because the edges and dead times lose volt-seconds. One correction from that
+drift (duty cycle 0.2916 → 0.2952) gives:
+
+- valley currents 11.36, 11.34 and 11.34 A: spread 0.17 %, within the declared 2 %;
+- edge currents 28.91 A (at the peak) and 11.34 A (at the valley);
+- against the double pulse, every metric changes by less than 1.3 %: fall time +1.0 %, rise time −0.2 %,
+  overshoot +0.1 %, frequency 0.00 %, damping ratio +1.3 %.
+
+On A, the double pulse therefore reproduces continuous-operation edges at matched currents, which is a
+precondition for comparing its edges with Fig. 9. Reports: `results/gan/epc90133-switching-periodic.json`, with
+run 2 (the drifting duty cycle) kept as `epc90133-switching-periodic-run2-drift.json`.
+
+**Running B cases.** Six B cases in parallel all exceeded the 600 s limit, and so did two in parallel with one
+A run. Each LTspice process uses up to 16 threads, and concurrent processes slow each other far more than the job
+count suggests. B cases run one at a time (`--jobs 1`).
+
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
 on 28 September 2026 when LTspice became the project simulator. GaN and

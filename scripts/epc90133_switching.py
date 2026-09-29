@@ -45,6 +45,32 @@ damping ratio by more than 20%.
 Checks per case: the transient completes; the edge currents are within 2% (event A) and 5%
 (event B) of the lossless peak and valley. Numerical check on the reference: maxstep/2 and
 reltol/10 change no reported metric by more than 2%.
+
+Test 5, candidate causes of the gap to QSG Fig. 9 (--study causes; specification of 30 September 2026,
+written after digitizing Fig. 9 with scripts/digitize_epc90133_qsg_fig9.py and before the first run).
+The digitized measurement (vendor-described, probe unknown): rise 1.68 ns, overshoot 5.7 V above the
+settled level, ringing 264 MHz with a 7.8 ns decay time (damping ratio about 0.077), fall 3.63 ns,
+4.6 V undershoot, and a dead-time plateau of about 7 ns at about -2.5 V. The unmodified reference B gives
+0.83 ns, 36 V, 282 MHz and a damping ratio of 0.010. Each case changes one thing from its base, with every
+other assumption held at the test 1-4 values:
+* package inductance, 50 and 150 pH per drain and source terminal (assumed; the EPC2302 value is not
+  published), with the 10 GHz damping resistors; the gate drivers stay at the pads, so the source terms act
+  as common-source inductance;
+* frequency-dependent copper resistance: every branch resistance x sqrt(282 MHz / 100 MHz) = 1.68, the
+  skin-effect scaling from the 100 MHz extraction to the reference's ringing frequency (literature notes:
+  AC resistance about x3 per decade);
+* driver at the uP1966E datasheet maximum output resistance (1.4 ohm pull-up, 0.8 ohm pull-down);
+* damping requirement, not a physical model: every capacitor ESR raised from 10 mohm to 0.3 and 1 ohm.
+  Capacitor ESR carries no DC current, so these cases add loop resistance without changing conduction.
+  They show how much series resistance the measured decay implies and whether damping alone changes the
+  first overshoot; they do not identify its source (Coss loss, dielectric loss, probe);
+* checks on A: the package case, and its damping-resistor corner at 20 GHz (material change = the
+  corner matters);
+* one combination of the physically motivated changes (package 50 pH, copper x1.68, driver maximum),
+  exploratory.
+Probe and oscilloscope bandwidth are applied afterwards to the saved traces by
+scripts/compare_epc90133_fig9.py. The gate-charge exception (EPC2302 Fig. 7: the model's Miller plateau is
+24% narrow) is not tested: the model stays unmodified.
 """
 import argparse
 import glob
@@ -54,6 +80,7 @@ import math
 from pathlib import Path
 import sys
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 
@@ -62,8 +89,8 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from circuit_tools.ltspice import parse_raw, run_ltspice
 import epc2302_baseline as bl
-from epc9097_switching import (DRIVER_FALL, DRIVER_RISE, EDGE_GRID, R_SNK, R_SRC, SWITCH_MODELS, cross,
-                               drive_stage, driver_bench, edge_times, integral, interp, solve_edge, window)
+from epc9097_switching import (DRIVER_FALL, DRIVER_RISE, EDGE_GRID, R_SNK, R_SNK_MAX, R_SRC, R_SRC_MAX, SWITCH_MODELS,
+                               cross, drive_stage, driver_bench, edge_times, integral, interp, solve_edge, window)
 
 VIN, VOUT, IOUT, F_SW, L_OUT = 48.0, 13.8, 20.0, 250e3, 2.2e-6
 DUTY = VOUT / VIN
@@ -92,20 +119,29 @@ EXTRACTIONS = ROOT / "results/gan/epc90133-extraction"
 # (Gerber raster, er 4.8, no fringing): 135 pF to GND and 2 pF to VIN, placed at the FET terminals.
 L_PKG_CASES = (50e-12, 150e-12)
 C_SW = {"GND": 135e-12, "VIN": 2e-12}
+# Test 5 (30 September 2026). Test 4's package cases showed single-sample V(SW) spikes with the time step
+# collapsing to 2e-20 s. A resistor across each package inductor, R = 2 pi f_c L with f_c = 10 GHz, removed
+# every spike on A-pkg50pH with trapezoidal or Gear integration, and the two methods then agreed within 0.1%
+# on every metric; Gear alone left 625 spikes. At the 0.2-0.3 GHz ringing the resistor carries about 3% of
+# the inductor current. The corner is checked by a 20 GHz case. Every case now runs a spike check.
+R_PKG_CORNER_HZ = 10e9
+SPIKE_V = 5.0  # V: a sample more than this from the mean of its two neighbours is a spike
+TRACE_WINDOW = (-30e-9, 70e-9)  # s around each event, saved for the Fig. 9 comparison
+TRACE_STEP = 25e-12
 
 
 def node(t):
     return {"Q2.S": "0"}.get(t, t.replace(".", "_").lower())
 
 
-def network(ext, ideal=False):
+def network(ext, ideal=False, r_scale=1.0):
     """Branch inductors, resistances and couplings from an extraction report."""
     L = np.array(ext["L_H"])
     R = np.array(ext["R_ohm"])
     lines = [f"* extracted branch network: {ext['case']}"]
     names = []
     for k, p in enumerate(ext["ports"]):
-        lk, rk = (1e-12, 1e-4) if ideal else (L[k, k], R[k, k])
+        lk, rk = (1e-12, 1e-4) if ideal else (L[k, k], R[k, k] * r_scale)
         lines.append(f"Lb{k} {node(p['terminal'])} xb{k} {lk:.6g}")
         lines.append(f"Rb{k} xb{k} {node(p['reference'])} {rk:.6g}")
         names.append(f"Lb{k}")
@@ -117,18 +153,18 @@ def network(ext, ideal=False):
     return "\n".join(lines), [p["terminal"] for p in ext["ports"]]
 
 
-def capacitor(tag, p, n, model, scale=1.0):
-    return (f"C{tag} {p} x{tag}a {model['C']:.6g}\nR{tag} x{tag}a x{tag}b {model['ESR']:.6g}\n"
+def capacitor(tag, p, n, model, scale=1.0, esr=None):
+    return (f"C{tag} {p} x{tag}a {model['C']:.6g}\nR{tag} x{tag}a x{tag}b {esr if esr is not None else model['ESR']:.6g}\n"
             f"L{tag} x{tag}b {n} {max(model['ESL'] * scale, 1e-15):.6g}")
 
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
-          l_pkg=0.0, c_sw=False):
-    net, terms = network(ext, ideal)
+          l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK):
+    net, terms = network(ext, ideal, r_scale)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
     for c in caps:
-        lines.append(capacitor(c, node(f"{c}.VIN"), node(f"{c}.GND"), CAP_MODEL[c[:2]], esl_scale))
+        lines.append(capacitor(c, node(f"{c}.VIN"), node(f"{c}.GND"), CAP_MODEL[c[:2]], esl_scale, esr))
     m = CAP_MODEL["Cm"]
     if any(c.startswith("Cm") for c in caps):
         at = "Cm10"
@@ -144,7 +180,7 @@ Rbret bn {node(at + '.GND')} 1u"""
 Rsup bp bs {BUS['R_sup']:g}
 Lsup bs bc {BUS['L_sup']:g}
 Ccm bc xcm1 {N_CM * m['C']:.6g}
-Rcm xcm1 xcm2 {m['ESR'] / N_CM:.6g}
+Rcm xcm1 xcm2 {(esr if esr is not None else m['ESR']) / N_CM:.6g}
 Lcm xcm2 bn {max(m['ESL'] * esl_scale / N_CM, 1e-15):.6g}
 Rbus bc bx {BUS['R_bus']:g}
 Lbus bx {node(at + '.VIN')} {BUS['L_bus']:g}
@@ -163,44 +199,48 @@ Rbret bn {node(at + '.GND')} 1u"""
         times = {"t_off1": t_off1, "t_on2": t_on2, "t_end": t_end}
         l_ic = ""
     else:
-        # Periodic buck at a loss-corrected duty cycle, starting at the valley current.
+        # Periodic buck at a loss-corrected duty cycle.
+        # History: run 1 used .ic I(L1) with an operating-point solve, which failed on B (Gmin and source
+        # stepping: 11 A forced through the off FETs). Test 4 skipped the operating point (uic) with every
+        # VIN-side node at the bus voltage and the valley current in L1; on A it stalled at 0.77 ps with
+        # 1e-19 s steps (the model-internal nodes started at 0 V). In test 5 an operating point with the
+        # low-side FET on and .ic I(L1) was found only by LTspice's pseudo-transient fallback, after Newton,
+        # Gmin and source stepping failed (a .nodeset guess did not help), which the adapter reports as a
+        # failed run. The bench therefore starts like the double pulse, from the all-off, zero-current
+        # operating point: a first pulse ramps L1 to the peak current, then the converter runs `periods`
+        # full periods (off interval to the valley, then on). The last period is measured, and the valley
+        # currents of successive periods are reported as the periodicity check.
         T = 1 / F_SW
         duty = timing.get("duty", DUTY)
-        hi, lo = [], []
-        for k in range(periods):
-            t0 = t_on1 + k * T
+        t1 = timing["t1"]
+        hi, lo = [(t_on1, 1), (t_on1 + t1, 0)], [(t_on1 + t1 + DEAD, 1)]
+        starts = [t_on1 + t1 + (1 - duty) * T + k * T for k in range(periods)]
+        for t0 in starts:
+            lo.append((t0 - DEAD, 0))
             hi += [(t0, 1), (t0 + duty * T, 0)]
-            lo += [(t0 + duty * T + DEAD, 1), (t0 + T - DEAD, 0)]
-        t_end = t_on1 + periods * T + 50e-9  # run 1 ended before the last low-side edge
-        k = periods - 1
-        times = {"t_off1": t_on1 + k * T + duty * T, "t_on2": t_on1 + k * T, "t_end": t_end, "duty": duty,
-                 "period_starts_s": [t_on1 + j * T for j in range(periods)],
-                 "note": "last period: event B at its start, event A at the end of its on-time"}
-        # Run 1 used .ic I(L1) with an operating-point solve, which failed on B (Gmin and source stepping:
-        # 11 A forced through the off FETs). The transient now skips the operating point (uic) and sets the
-        # initial state explicitly: every VIN-side node at the bus voltage, all others at 0 V, and the valley
-        # current in L1. The first periods absorb the start-up; only the last period is measured.
-        vin_nodes = {"bp", "bs", "bc", "bx", "q1_d", "q1dd"} | ({"p1d"} if l_pkg else set())
-        for k, p in enumerate(ext["ports"]):
-            if p["reference"] == "Q1.D":
-                vin_nodes |= {node(p["terminal"]), f"xb{k}"}
-        l_ic = (f"\n.ic I(L1)={timing.get('i0', I_VALLEY):.6g} "
-                + " ".join(f"V({n})={VIN:g}" for n in sorted(vin_nodes)))
+            lo.append((t0 + duty * T + DEAD, 1))
+        t_end = starts[-1] + duty * T + 100e-9
+        times = {"t_off1": starts[-1] + duty * T, "t_on2": starts[-1], "t_end": t_end, "duty": duty,
+                 "period_starts_s": starts,
+                 "note": "last period: event B (valley turn-on) at its start, event A (peak turn-off) at the end of its on-time"}
+        l_ic = ""
     lines += [
         "Vq1d q1_d q1dd 0",
         *([f"Lp1d q1dd p1d {l_pkg:g}", f"Lp1s p1s q1_s {l_pkg:g}", f"Lp2d q2_d p2d {l_pkg:g}", f"Lp2s p2s 0 {l_pkg:g}",
+           *(f"Rp{n} {a} {b} {2 * math.pi * r_pkg_corner * l_pkg:.6g}"
+             for n, a, b in (("1d", "q1dd", "p1d"), ("1s", "p1s", "q1_s"), ("2d", "q2_d", "p2d"), ("2s", "p2s", "0"))),
            "X1 gu p1d p1s EPC2302", "X2 gl p2d p2s EPC2302"] if l_pkg else
           ["X1 gu q1dd q1_s EPC2302", "X2 gl q2_d 0 EPC2302"]),
         *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", R_SRC, R_SNK, R_GON, R_GOFF, t_end).rstrip(),
-        drive_stage("l", "0", VCC, lo, te_rise, te_fall, "gl", R_SRC, R_SNK, R_GON, R_GOFF, t_end).rstrip(),
+        drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip(),
+        drive_stage("l", "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip(),
         SWITCH_MODELS.rstrip(),
         ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})"),
         ".temp 25",
         f".options plotwinsize=0 reltol={reltol:g}",
-        f".tran 0 {t_end:.9g} 0 {maxstep:g}" + (" uic" if periods else ""),
+        f".tran 0 {t_end:.9g} 0 {maxstep:g}",
         ".end", ""]
     head = (f"* EPC90133 switching sensitivity, extraction {ext['case']}{' (ideal copper)' if ideal else ''}; "
             "generated by scripts/epc90133_switching.py\n.lib EPCGaNLibrary.lib\n")
@@ -242,6 +282,23 @@ def metrics(s, times, at):
                "q2_gate_peak_during_rise_V": max(v for _, v in window(t, gl, tb, tb + 60e-9))}
     return {"event_a_turn_off_at_peak": event_a, "event_b_turn_on_at_valley": event_b,
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
+
+
+def spikes(s):
+    """Single-sample V(SW) spikes (the test 4 artefact): count, and the smallest time step."""
+    t, v = np.array(s["time"]), np.array(s["v(q2_d)"])
+    d = v[1:-1] - 0.5 * (v[:-2] + v[2:])
+    return {"count": int(np.sum(np.abs(d) > SPIKE_V)), "threshold_V": SPIKE_V, "min_step_s": float(np.min(np.diff(t)))}
+
+
+def edge_traces(s, times):
+    """V(SW) (Q2 drain pad to Q2 source pad, ideal probe) resampled around both events."""
+    t, v = np.array(s["time"]), np.array(s["v(q2_d)"])
+    rel = np.arange(TRACE_WINDOW[0], TRACE_WINDOW[1] + TRACE_STEP / 2, TRACE_STEP)
+    return {"step_s": TRACE_STEP, "start_s": TRACE_WINDOW[0],
+            "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
+            "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
+            "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
 
 
 def ringing(ring, peak_t, hyst=0.5):
@@ -289,6 +346,29 @@ def material(ref, other):
     return out
 
 
+R_SKIN = math.sqrt(282e6 / 100e6)
+
+
+def cause_cases(exts):
+    """Test 5 cases (see the module docstring); each names the case it is compared with."""
+    b, a = "B-m1-mid", "A-m1-mid"
+    cases = {b: {"ext": b}}
+    for lp in L_PKG_CASES:
+        cases[f"B-pkg{lp * 1e12:.0f}pH"] = {"ext": b, "l_pkg": lp, "base": b}
+    cases["B-rskin"] = {"ext": b, "r_scale": R_SKIN, "base": b}
+    cases["B-drvmax"] = {"ext": b, "r_src": R_SRC_MAX, "r_snk": R_SNK_MAX, "base": b}
+    for esr in (0.3, 1.0):
+        cases[f"B-esr{esr:g}"] = {"ext": b, "esr": esr, "base": b}
+    cases["B-combined"] = {"ext": b, "l_pkg": 50e-12, "r_scale": R_SKIN, "r_src": R_SRC_MAX, "r_snk": R_SNK_MAX, "base": b}
+    cases[a] = {"ext": a}
+    cases["A-pkg50pH"] = {"ext": a, "l_pkg": 50e-12, "base": a}
+    cases["A-pkg50pH-r20GHz"] = {"ext": a, "l_pkg": 50e-12, "r_pkg_corner": 20e9, "base": "A-pkg50pH"}
+    missing = {c["ext"] for c in cases.values()} - set(exts)
+    if missing:
+        raise SystemExit(f"cause study needs extractions {sorted(missing)}")
+    return cases
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -296,6 +376,10 @@ def main():
     ap.add_argument("--cases", nargs="*", default=None, help="extraction names (e.g. A-m1-mid); default: all found")
     ap.add_argument("--no-extra", action="store_true", help="skip ideal, capacitor, numerical and periodic cases")
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic"), default="sensitivity",
+                    help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
+    ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
+    ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
     lib, _ = bl.library_path()
@@ -322,8 +406,15 @@ def main():
     files = sorted(glob.glob(str(EXTRACTIONS / "*.json")))
     exts = {Path(f).stem: json.loads(Path(f).read_text(encoding="utf-8")) for f in files}
     exts = {k: v for k, v in exts.items() if v.get("outcome") == "complete" and (args.cases is None or k in args.cases)}
-    cases = {k: {"ext": k} for k in exts}
-    if not args.no_extra and REFERENCE in exts:
+    if args.study == "periodic":
+        cases = {NUMERICAL_REF: {"ext": NUMERICAL_REF}, f"{NUMERICAL_REF}-periodic3": {"ext": NUMERICAL_REF, "periods": 3}}
+    elif args.study == "causes":
+        cases = cause_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+    else:
+        cases = {k: {"ext": k} for k in exts}
+    if args.study == "sensitivity" and not args.no_extra and REFERENCE in exts:
         cases["ideal-copper"] = {"ext": REFERENCE, "ideal": True}
         cases[f"{REFERENCE}-esl0.5x"] = {"ext": REFERENCE, "esl_scale": 0.5}  # esl 0 (1 fF) stalled the solver
         cases[f"{REFERENCE}-esl2x"] = {"ext": REFERENCE, "esl_scale": 2.0}
@@ -338,18 +429,32 @@ def main():
                 cases[f"{NUMERICAL_REF}-pkg{lp * 1e12:.0f}pH"] = {"ext": NUMERICAL_REF, "l_pkg": lp}
             cases[f"{NUMERICAL_REF}-periodic3"] = {"ext": NUMERICAL_REF, "periods": 3}
     results, slopes = {}, {}
-    for name, c in cases.items():
+
+    def run_case(name, c):
         ext = exts[c["ext"]]
         kw = dict(esl_scale=c.get("esl_scale", 1.0), ideal=c.get("ideal", False),
                   maxstep=c.get("maxstep", MAXSTEP), reltol=c.get("reltol", RELTOL),
-                  l_pkg=c.get("l_pkg", 0.0), c_sw=c.get("c_sw", False))
+                  l_pkg=c.get("l_pkg", 0.0), c_sw=c.get("c_sw", False),
+                  r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
+                  esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK))
         first = None
         if c.get("periods"):
-            # Loss-corrected duty cycle from the reference's measured slopes, started at the matching valley.
+            # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
             s_on, s_off = slopes[c["ext"]]
             duty = s_off / (s_on + s_off)
-            timing = {"duty": duty, "i0": IOUT - s_on * duty / F_SW / 2}
+            timing = {"duty": duty, "t1": I_PEAK / s_on}
             text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
+            # Test 5 run 1 (duty from the double pulse's average slopes) drifted by about -0.3 A per period
+            # (valleys 11.27, 10.95, 10.66 A): the edges and dead times lose volt-seconds that the average
+            # slopes miss. One correction from the measured drift, then the measured run.
+            raw0 = run(name + "-duty", text)
+            if raw0:
+                s0 = raw0.step(0)
+                v0 = [interp(s0["time"], s0["i(l1)"], t) for t in times["period_starts_s"]]
+                drift = (v0[-1] - v0[0]) / (len(v0) - 1)
+                timing = {**timing, "duty": duty - drift / ((s_on + s_off) / F_SW),
+                          "duty_run_valleys_A": v0, "duty_run_drift_A_per_period": drift}
+                text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
         else:
             # Run 1 of the first bench run missed the edge currents (-2.6% and -5.8%): losses reduce the
             # slopes. Each case therefore runs once at the lossless timing and once corrected from its slopes.
@@ -359,7 +464,7 @@ def main():
             if m0 is None:
                 results[name] = {"parameters": c, "metrics": None, "checks": None}
                 print(name, "timing run failed:", runs[name + "-timing"]["message"], flush=True)
-                continue
+                return
             ia = m0["event_a_turn_off_at_peak"]["inductor_current_A"]
             ib = m0["event_b_turn_on_at_valley"]["inductor_current_A"]
             s_on, s_off = ia / (times["t_off1"] - 20e-9), (ia - ib) / (times["t_on2"] - times["t_off1"])
@@ -368,18 +473,26 @@ def main():
             first = {"edge_currents_A": [ia, ib], "slopes_A_per_s": [s_on, s_off], "corrected_timing_s": timing}
             text, times, at = bench(ext, te_rise, te_fall, timing=timing, **kw)
         raw = run(name, text)
-        m = metrics(raw.step(0), times, at) if raw else None
+        s = raw.step(0) if raw else None
+        m = metrics(s, times, at) if raw else None
         if m and c.get("periods"):
-            s = raw.step(0)
-            m["periodicity"] = {"inductor_current_at_period_starts_A": [interp(s["time"], s["i(l1)"], t) for t in times["period_starts_s"]],
-                                "timing": timing}
+            valleys = [interp(s["time"], s["i(l1)"], t) for t in times["period_starts_s"]]
+            m["periodicity"] = {"inductor_current_at_period_starts_A": valleys, "timing": timing,
+                                "valley_spread_rel": (max(valleys) - min(valleys)) / (sum(valleys) / len(valleys)),
+                                "check": "valley currents of successive periods within 2%"}
         ok = None
+        spk = spikes(s) if s else None
         if m:
             ia, ib = m["event_a_turn_off_at_peak"]["inductor_current_A"], m["event_b_turn_on_at_valley"]["inductor_current_A"]
-            ok = {"edge_current_A_within_2pct": abs(ia / I_PEAK - 1) <= 0.02, "edge_current_B_within_5pct": abs(ib / I_VALLEY - 1) <= 0.05}
+            ok = {"edge_current_A_within_2pct": abs(ia / I_PEAK - 1) <= 0.02, "edge_current_B_within_5pct": abs(ib / I_VALLEY - 1) <= 0.05,
+                  "no_spikes": spk["count"] == 0}
+            if c.get("periods"):
+                ok["periodic_within_2pct"] = m["periodicity"]["valley_spread_rel"] <= 0.02
         results[name] = {"parameters": {k: v for k, v in c.items()}, "extraction_case": ext["case"], "timing_run": first,
                          "extraction_summary": ext.get("summary"), "times_s": times, "bus_attachment": at,
-                         "metrics": m, "checks": ok}
+                         "metrics": m, "checks": ok, "spikes": spk,
+                         "usable": bool(ok and all(ok.values())),
+                         "traces": edge_traces(s, times) if m else None}
         if m:
             f = flat(m)
             print(f"{name:22s} Ia {m['event_a_turn_off_at_peak']['inductor_current_A']:.2f} "
@@ -387,14 +500,30 @@ def main():
                   f"Ib {m['event_b_turn_on_at_valley']['inductor_current_A']:.2f} tr {f['sw_rise_time_10_90_s'] * 1e9 if f['sw_rise_time_10_90_s'] else float('nan'):.3f} ns "
                   f"peak {f['sw_peak_V']:.2f} V over {f['sw_overshoot_above_bus_V']:.2f} V "
                   f"f {(f['ringing_frequency_Hz'] or float('nan')) / 1e6:.1f} MHz zeta {f['ringing_damping_ratio'] or float('nan'):.3f} "
-                  f"Q1 Vds pk {f['q1_vds_peak_V']:.2f} V", flush=True)
+                  f"Q1 Vds pk {f['q1_vds_peak_V']:.2f} V spikes {spk['count']}", flush=True)
         else:
             print(name, "failed:", runs[name]["message"], flush=True)
+
+    def guarded(name, c):
+        try:
+            run_case(name, c)
+        except Exception as exc:  # record the failure; the other cases continue
+            results[name] = {"parameters": c, "metrics": None, "checks": None, "error": repr(exc)}
+            print(name, "error:", repr(exc), flush=True)
+
+    # Cases are independent except that a periodic case needs its extraction's slopes: run it afterwards.
+    plain = {k: c for k, c in cases.items() if not c.get("periods")}
+    with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+        list(pool.map(lambda kv: guarded(*kv), plain.items()))
+    for name, c in cases.items():
+        if c.get("periods"):
+            guarded(name, c)
+    results = {k: results[k] for k in cases if k in results}
     # Extraction variants are compared with the reference B; a modified case (ideal copper, ESL, package,
     # switch-node capacitance, fine, periodic) is compared with the unmodified case of its own extraction.
     comparison = {}
     for name, r in results.items():
-        base = REFERENCE if (name in exts or name == "ideal-copper") else r["parameters"]["ext"]
+        base = r["parameters"].get("base") or (REFERENCE if (name in exts or name == "ideal-copper") else r["parameters"]["ext"])
         if name != base and r["metrics"] and base in results and results[base]["metrics"]:
             comparison[name] = {"compared_with": base, **material(flat(results[base]["metrics"]), flat(r["metrics"]))}
     numerical = None
@@ -406,6 +535,7 @@ def main():
         numerical = {"relative_change": rel, "pass": all(abs(v) <= 0.02 for v in rel.values()) and len(rel) == len(keys)}
     report = {
         "schema": "epc90133-switching-sensitivity/1",
+        "study": args.study,
         "numerical_check": numerical,
         "scope": ("Sensitivity of simulated switching to exploratory extraction assumptions. Not a validated prediction: "
                   "the extraction is unqualified for plane holes and via arrays, the driver is behavioural, capacitor "
