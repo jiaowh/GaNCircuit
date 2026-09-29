@@ -1,0 +1,17 @@
+{
+  "schema": "nmos-grid-verification-policy/1",
+  "declared_date": "2026-09-16",
+  "mesh_levels": [2, 3],
+  "vgs_v": [0.45, 0.5, 0.55],
+  "vds_v": [0.45, 0.5, 0.55],
+  "temperature_k": 300.0,
+  "source_body_bias_v": 0.0,
+  "current_tolerance": {"relative": 0.01, "absolute_A_per_cm": 1e-10},
+  "secant_tolerance": {"relative": 0.01, "absolute_S_per_cm": 1e-8},
+  "planned_step_size_check": {"centre_vgs_v": 0.5, "centre_vds_v": 0.5, "half_spans_v": [0.05, 0.025, 0.0125], "relative": 0.01, "absolute_S_per_cm": 1e-8, "scope": "Successive central gm/gds secants at fixed mesh; qualifying mesh error for smaller stencils remains a separate check."},
+  "comparison_rule": "absolute difference <= absolute floor + relative tolerance * max(abs(coarse), abs(fine))",
+  "secants": "Centered drain-current differences: three gm estimates at fixed Vds, three gds estimates at fixed Vgs; each uses endpoints separated by 0.10 V.",
+  "required_evidence": ["matching device, physics, runtime and experiment", "different retained mesh hashes", "all scheduled points converged", "finite conserved terminal currents", "complete predeclared training and holdout split", "verified artifact hashes and dataset fingerprint"],
+  "acceptance_scope": "Mesh agreement at nine sampled biases and for six finite-span secants only.",
+  "unresolved_after_pass": ["derivative step-size accuracy", "continuous bias-domain accuracy", "compact-model validation", "independent circuit validation", "physical-device validation"]
+}

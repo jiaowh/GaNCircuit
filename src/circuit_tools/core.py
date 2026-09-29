@@ -80,6 +80,16 @@ class ArtifactStore:
         self.db.execute("CREATE TABLE IF NOT EXISTS artifacts (hash TEXT PRIMARY KEY, kind TEXT NOT NULL, parents TEXT NOT NULL, size INTEGER NOT NULL)")
         self.db.commit()
 
+    def close(self) -> None:
+        """Release the index file; Windows cannot delete a store while it is open."""
+        self.db.close()
+
+    def __enter__(self) -> "ArtifactStore":
+        return self
+
+    def __exit__(self, *exc: Any) -> None:
+        self.close()
+
     def put(self, kind: str, payload: Any, parents: Sequence[str] = ()) -> str:
         if not isinstance(kind, str) or not kind or not _NAME.fullmatch(kind):
             raise ValidationError("kind must be a safe non-empty name")

@@ -1,6 +1,6 @@
 # Papers index
 
-Maps every paper in this folder to the section of `phd-plan-v10.md` it supports. Built 6 September 2026 from a five-agent search (spine sources; layout/parasitics/yield; ML methodology; learned circuit models; device variability and compute-in-memory). 117 papers were added to the 39 already here. All files verified as PDFs; no paywalled copies were downloaded.
+Maps every paper in this folder to the section of the earlier research plan (v10; removed from the working tree, in git history at commit `9a8e25b`) it supports. Built 6 September 2026 from a five-agent search (spine sources; layout/parasitics/yield; ML methodology; learned circuit models; device variability and compute-in-memory). 117 papers were added to the 39 already here. All files verified as PDFs; no paywalled copies were downloaded.
 
 Filename convention for new files: `(YYYY) Short_Title arXivNNNN.NNNNN.pdf` or `(YYYY) Short_Title Venue.pdf`. Older files keep their original names.
 
@@ -117,7 +117,7 @@ Filename convention for new files: `(YYYY) Short_Title arXivNNNN.NNNNN.pdf` or `
 | (2015) Sloppiness_and_Emergent_Theories_Parameter_Identifiability arXiv1501.07668 | Why 20–40 device parameters are not identifiable from a dozen outputs | §4 offsets-as-input |
 | Why NNs cannot extrapolate physical laws arXiv2510.04102 (pre-existing) | | §5 |
 
-## 5. Gated bridge and CIM tile; supervisor group
+## 5. Gated bridge and CIM tile; Chai group papers
 
 | File | What it is | Plan section |
 |---|---|---|

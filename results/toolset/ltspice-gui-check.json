@@ -1,0 +1,25 @@
+{
+  "schema": "ltspice-gui-check/1",
+  "date": "2026-09-28",
+  "checked_by": "project owner (git user jiaowh), interactive LTspice window",
+  "purpose": "G1 adoption gate: the batch adapter reproduces an interactive (GUI) run of the same bench",
+  "tool": "LTspice 26.1.1 for Windows (per-user install)",
+  "bench": {
+    "run": "runs/epc2204-baseline-49b0f16ef1b64d8ba6e35289abe50015/rds_on_25C",
+    "netlist_sha256": "1613c02c3571cc79eaa40b4d50de0de34bbf9a4a049b6656569d0d80f8528084",
+    "library_sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+    "description": "EPC2204 RDS(on) operating point: VGS = 5 V, 16 A into the drain, 25 C, reltol 1e-6"
+  },
+  "comparison_rule": "every value shown in the GUI operating-point window equals the batch value rounded to the GUI's 6 significant figures",
+  "values": [
+    {"trace": "V(d)", "gui": 0.0703927, "batch": 0.07039271706817518},
+    {"trace": "V(g)", "gui": 5, "batch": 5.0},
+    {"trace": "I(Id)", "gui": 16, "batch": 16.0},
+    {"trace": "I(Vg)", "gui": -0.000167109, "batch": -0.0001671088975854218},
+    {"trace": "Ix(x1:drainin)", "gui": 16, "batch": 16.0},
+    {"trace": "Ix(x1:gatein)", "gui": 0.000167109, "batch": 0.0001671088975854218},
+    {"trace": "Ix(x1:sourcein)", "gui": -16.0002, "batch": -16.000167846679688}
+  ],
+  "outcome": "pass",
+  "limits": "One operating-point bench. Transient and AC analyses were not compared in the GUI; they are covered by the batch known-answer fixtures."
+}

@@ -1,0 +1,101 @@
+{
+  "schema": "vendor-sources/1",
+  "retrieved": "2026-09-28",
+  "local_directory": "vendor/epc (git-ignored; files are not redistributed in this repository)",
+  "terms": "Library header: '(C) Copyright Efficient Power Conversion Corporation. All rights reserved.' No separate license for redistribution was found. Keep files local; this record gives source URLs and checksums for replay.",
+  "files": [
+    {
+      "name": "EPCGaNLibrary.zip",
+      "url": "https://epc-co.com/epc/documents/spice-files/LTSPICE/EPCGaNLibrary.zip",
+      "linked_from": "https://epc-co.com/epc/products/gan-fets-and-ics/epc2204",
+      "sha256": "107611b7510e4e7d374a1baa646ecf432dd50a81150eb2470900f3b2cdbf1c65",
+      "contents": {
+        "EPCGaNLibrary.lib": {
+          "library_version": "1.105 (06/10/2026)",
+          "epc2204_added": "1.68 (08/13/2020)",
+          "subcircuit": "EPC2204 gatein drainin sourcein",
+          "note": "EPC2204A (added 1.92) is textually identical apart from its name",
+          "sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069"
+        }
+      }
+    },
+    {
+      "name": "EPC2204_V1_PSPICE.net",
+      "url": "https://epc-co.com/epc/documents/spice-files/PSPICE/EPC2204_V1_PSPICE.net",
+      "sha256": "8b29678d765e946153844a66dfb4f2d3211c563f18b755f0968aa736e6cb5ece",
+      "note": "Defines subcircuit EPC2204A (not EPC2204); header says 'Adapted for Simplis' (1.01, 12/02/2022). Not used by the LTspice benches."
+    },
+    {
+      "name": "EPC2204_datasheet.pdf",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/EPC2204_datasheet.pdf",
+      "revision": "Revised November 26, 2024",
+      "sha256": "8cb4533d1e60656c24eacbf1848aa0e46116fb08c52fae3513b07493fd4b3a59"
+    },
+    {
+      "name": "EPC2204_Thermal_SPICE_Model_for_web.pdf",
+      "url": "https://epc-co.com/epc/documents/models/thermal/EPC2204%20Thermal%20SPICE%20Model%20for%20web.pdf",
+      "sha256": "2907774446b3e6dbbad61576293f0b76c9f6902ed9af245a3e52fc3cb16f44f6"
+    }
+  ],
+  "board_files": {
+    "board": "EPC9097 (2 x EPC2204 half bridge, uP1966E driver)",
+    "retrieved": "2026-09-28",
+    "local_directory": "vendor/epc/epc9097",
+    "landing_page": "https://epc-co.com/epc/products/evaluation-boards/epc9097",
+    "terms": "Pages and files marked 'Copyright Efficient Power Conversion Corporation. All rights reserved.'; site links 'terms of use'. The QSG notice says the board is for evaluation only. No redistribution licence found; files stay local. Editable Altium files are listed as available on request.",
+    "files": [
+      {"name": "EPC9097_Schematic.pdf", "url": "https://epc-co.com/epc/documents/schematics/EPC9097_Schematic.pdf",
+       "sha256": "2791af270b011a14a615168b2446a20995526b67cf7bc6546b3405fb2514bdb5",
+       "note": "QSG Figs. 11-15, (c)2020. Labels the driver uP1966A; the BOM and QSG v3.0 say uP1966E."},
+      {"name": "EPC9097BOM.xlsx", "url": "https://epc-co.com/epc/documents/bill-of-materials/EPC9097BOM.xlsx",
+       "sha256": "0231fc5abeb428c9204000b7519248151fcfdee12a5e0c68f63362ff52654664"},
+      {"name": "EPC9097_qsg.pdf", "url": "https://epc-co.com/epc/documents/guides/EPC9097_qsg.pdf",
+       "revision": "Version 3.0, revised October 3, 2024",
+       "sha256": "4daa152684358d138102c3e6d8809ec41204a5c298eff96d96a59490e9f0c1d2",
+       "note": "Figs. 12-14: vendor-described switch-node and inductor-current waveforms, 48 V -> 12 V, 1 MHz, 2.2 uH, 10 ns dead time, 0/10/15 A. Fig. 15: efficiency and loss at 500 kHz and 1 MHz."},
+      {"name": "EPC9097 Development Board Gerbers.zip", "url": "https://epc-co.com/epc/documents/gerber-files/EPC9097%20Development%20Board%20Gerbers.zip",
+       "sha256": "c60db12a1448a5a155f2a6f4b7393b29ccb3b76da88a1e3ddb6c87f4ed7b1ad3",
+       "revision": "B5239 Rev 2.0, generated 2023-03-27",
+       "layers": "4 copper: Top, Mid-Layer 1, Mid-Layer 2, Bottom (included stackup: 2.8 mil Cu; 5 / 39 / 5 mil FR370-HR, er 4.8)"},
+      {"name": "EPC9097-ODB.zip", "url": "https://epc-co.com/epc/documents/odb/EPC9097-ODB.zip",
+       "sha256": "da45b964ea1c7cf5dd0604801cf6181449e3d563591371145f9c81376b1c91f6",
+       "revision": "Altium Designer 22.7.1 export, saved 2022-09-09; no revision label found",
+       "layers": "6 copper, net-annotated"},
+      {"name": "EPC9097-Stackup.xls", "url": "https://epc-co.com/epc/documents/stack-reports/EPC9097-Stackup.xls",
+       "sha256": "93ff4fd3cd61a4fa2c926ff0fc494c9d060f3415618d3c93de04ac9f59396fd8",
+       "layers": "6 copper, 2.76 mil each; dielectrics 5 / 9.7 / 15 / 9.7 / 5 mil FR370-HR, er 4.4; 61.76 mil total"},
+      {"name": "EPC9097-Test-Point-Report.zip", "url": "https://epc-co.com/epc/documents/reports/test-point/EPC9097-Test-Point-Report.zip",
+       "sha256": "470383d8b0f6620498fcd26ddafc2422c3d5468f0da821e5434c3e5cb858972d",
+       "note": "IPC-356 dated 2024-10-09, 6-layer stackup; same 38 net names as the Rev 2.0 report."},
+      {"name": "uP1966E_datasheet.pdf", "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/uP1966E_datasheet.pdf",
+       "local_path": "vendor/epc/uP1966E_datasheet.pdf",
+       "revision": "uP1966E_EPC-DS-F0000, Aug. 2021",
+       "sha256": "82d82a017f2e2b002289d94a8dadd7c1b4eebc7773221b4371543a42e68850ce",
+       "note": "No SPICE model is linked from the uP1966E product page; the driver is modelled behaviourally from this datasheet."}
+    ],
+    "revision_conflict": "EPC publishes two layouts: 6-layer (ODB++, landing-page stackup, 2024 test-point report) and 4-layer B5239 Rev 2.0 (Gerber zip, 2023). Which one the purchased board uses is unresolved; check the board's silkscreen revision or ask EPC. Parasitic extraction must use the same revision as the board under test. The revision behind EPC's published QSG waveforms is a separate question; the two need not match.",
+    "odb_population_vs_bom": {
+      "checked": "2026-09-28",
+      "same_reference_designators": 107,
+      "same_part_numbers": 67,
+      "substantive_differences": {
+        "Q1, Q2": "ODB++ EPC2619; BOM EPC2204",
+        "R80, R82 (turn-on gate)": "ODB++ ERJ-2GEJ4R7X (4.7 ohm); BOM RC0402FR-071RL (1 ohm)",
+        "R81, R83 (turn-off gate)": "ODB++ RC0402FR-071RL (1 ohm); BOM RMCF0402ZT0R00 (0 ohm)",
+        "U80": "ODB++ uP1966A; BOM uP1966E"
+      },
+      "other_differences": "generic versus full part numbers, and optional parts marked EMPTY in the ODB++",
+      "footprint": "Q1/Q2 use package D0133CT44M, 2.50 x 1.50 mm; EPC links D0133.step from the EPC2204 product page",
+      "interpretation": "the 6-layer ODB++ looks like the same design with a different transistor and gate-resistor population; its copper carries the EPC2204 footprint. Whether its copper matches a shipped EPC9097 is not established.",
+      "rev2_layout_pdf": "names R80-R83 but gives no values or transistor part number"
+    }
+  },
+  "also_linked_not_downloaded": [
+    "https://epc-co.com/epc/documents/spice-files/TSPICE/EPC2204_V0_TSPICE.sp",
+    "https://epc-co.com/epc/documents/KiCad/EPC-KiCad-Library.zip",
+    "https://epc-co.com/epc/documents/altium-files/EPC Altium Library.zip",
+    "https://epc-co.com/epc/documents/STEP/D0133.step",
+    "https://epc-co.com/epc/Portals/0/epc/documents/models/plecs/EPC-plecs-library.zip"
+  ],
+  "access_note": "EPC pages refuse requests without a browser-like User-Agent header (HTTP 403)."
+}

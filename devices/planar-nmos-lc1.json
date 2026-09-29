@@ -1,0 +1,42 @@
+{
+  "schema": "planar-nmos-spec/1",
+  "name": "lc1",
+  "purpose": "First generated long-channel planar NMOS candidate for a resistively loaded common-source stage. Starting hypothesis, not a qualified design.",
+  "temperature_k": 300.0,
+  "supply_v": 3.3,
+  "geometry_um": {
+    "gate_length": 1.0,
+    "oxide_thickness": 0.010,
+    "poly_thickness": 0.10,
+    "source_drain_length": 0.5,
+    "junction_depth": 0.10,
+    "body_depth": 0.5
+  },
+  "doping_cm3": {
+    "body_acceptors": 1e17,
+    "source_drain_donors": 1e20,
+    "gate_poly_donors": 1e20
+  },
+  "junction_grading_um": {
+    "lateral": 0.02,
+    "vertical": 0.02
+  },
+  "contacts": {
+    "gate": "ohmic contact on top of the n+ polysilicon gate region (sets the gate work function to n+ poly)",
+    "source": "top silicon surface from the left edge to the left gate edge",
+    "drain": "top silicon surface from the right gate edge to the right edge",
+    "body": "bottom silicon surface, full width"
+  },
+  "mesh_um": {
+    "scale": 1.0,
+    "surface": 0.001,
+    "junction_edge": 0.005,
+    "channel_centre": 0.02,
+    "junction_bottom": 0.005,
+    "body_bottom": 0.05,
+    "outer_edge": 0.02,
+    "oxide": 0.001,
+    "poly_top": 0.02
+  },
+  "physics": "DEVSIM simple_physics: constant mobility (mu_n 400, mu_p 200 cm^2/Vs), SRH, drift-diffusion, no velocity saturation, no field-dependent mobility, no gate tunneling, no interface charge"
+}

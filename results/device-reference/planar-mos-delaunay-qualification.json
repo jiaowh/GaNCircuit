@@ -1,0 +1,794 @@
+{
+  "schema": "device-reference-planar-mos-qualification/2",
+  "outcome": "unresolved",
+  "backend": {
+    "available": true,
+    "version": "2.11.0",
+    "python": "/usr/bin/python3",
+    "imported_physics": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/python_packages/simple_physics.py",
+    "imported_physics_sha256": "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f"
+  },
+  "provenance": {
+    "commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "expected_commit": "43b41ca845184c47e22b72d144db7e7db8509377",
+    "source_mesh_sha256": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+    "implementation_at_start": {
+      "qualify_planar_mos.py": "a01d0a77724bfda42f57e1677af641b558836ba776a9afae24036c7e7b34ae06",
+      "mesh_invariants.py": "481510ffe1c41dbfe2f30b5288d80ae66989ace518aa0286dff8dfc51c310d8f",
+      "refine_planar_mesh.py": "d87e78fc7b13dfec6cc4cf959babac4f71b74447a85c0bae3acdeb7e40fcf371",
+      "mesh_delaunay.py": "0c6f342a26fd208a5a4750129efb05097a32cf621fb17fb15e1c5221924e9b57"
+    },
+    "source_unchanged": true,
+    "evaluator_sha256": "a01d0a77724bfda42f57e1677af641b558836ba776a9afae24036c7e7b34ae06",
+    "script_sha256": "f3499a2b99b67358cec9cf506518157baa266499c7f1211c07e486a9b45f0e8d",
+    "construction_sha256": "f2ce0aaa1d96de6c97212c6c23758bada5d560968ece358cce90a2f758da6b2c",
+    "invariant_checker_sha256": "481510ffe1c41dbfe2f30b5288d80ae66989ace518aa0286dff8dfc51c310d8f",
+    "local_refiner_sha256": "d87e78fc7b13dfec6cc4cf959babac4f71b74447a85c0bae3acdeb7e40fcf371"
+  },
+  "mesh_policy": {
+    "refinements": 3,
+    "method": "surface-bands",
+    "invariants": [
+      {
+        "pass": true,
+        "checks": 15,
+        "failed_checks": 0,
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-20,
+        "baseline": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 2847,
+          "element_count": 5731,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 5,
+            "1:3": 100,
+            "1:4": 27,
+            "1:5": 27,
+            "1:6": 49
+          },
+          "triangle_counts": {
+            "2:7": 57,
+            "2:8": 1207,
+            "2:9": 4255
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.500000000000001e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999998e-11,
+            "2:8": 9.999999999999999e-11,
+            "2:9": 1.0000000000000028e-08
+          }
+        },
+        "refined": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 7244,
+          "element_count": 14608,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 10,
+            "1:3": 200,
+            "1:4": 54,
+            "1:5": 54,
+            "1:6": 98
+          },
+          "triangle_counts": {
+            "2:7": 96,
+            "2:8": 4428,
+            "2:9": 9664
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.5e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999998e-11,
+            "2:8": 1.0000000000000035e-10,
+            "2:9": 1.000000000000003e-08
+          }
+        },
+        "generation": {
+          "policy": {
+            "name": "interfaces-junctions-and-body-delaunay-v2",
+            "band_half_width_cm": 5e-07,
+            "horizontal_centres_cm": [
+              -1e-05,
+              0.0,
+              1e-05,
+              0.0001
+            ],
+            "vertical_junction_x_cm": [
+              4.5e-05,
+              5.5e-05
+            ],
+            "selection": "triangle bbox intersects an interface/junction/contact band; all three edges marked",
+            "transition": "shared-edge midpoint splits with one/two/three marked-edge templates",
+            "edge_cleanup": "Delaunay flips within regions; physical lines constrained"
+          },
+          "marked_edges": 4397,
+          "nodes": 7244,
+          "elements": 14608,
+          "edge_flips": 316
+        }
+      },
+      {
+        "pass": true,
+        "checks": 15,
+        "failed_checks": 0,
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-20,
+        "baseline": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 7244,
+          "element_count": 14608,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 10,
+            "1:3": 200,
+            "1:4": 54,
+            "1:5": 54,
+            "1:6": 98
+          },
+          "triangle_counts": {
+            "2:7": 96,
+            "2:8": 4428,
+            "2:9": 9664
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.5e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999998e-11,
+            "2:8": 1.0000000000000035e-10,
+            "2:9": 1.000000000000003e-08
+          }
+        },
+        "refined": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 22969,
+          "element_count": 46238,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 20,
+            "1:3": 400,
+            "1:4": 108,
+            "1:5": 108,
+            "1:6": 196
+          },
+          "triangle_counts": {
+            "2:7": 170,
+            "2:8": 16858,
+            "2:9": 28374
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.4999999999999955e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 1.0000000000000004e-10,
+            "2:8": 9.999999999999995e-11,
+            "2:9": 1.0000000000000025e-08
+          }
+        },
+        "generation": {
+          "policy": {
+            "name": "interfaces-junctions-and-body-delaunay-v2",
+            "band_half_width_cm": 5e-07,
+            "horizontal_centres_cm": [
+              -1e-05,
+              0.0,
+              1e-05,
+              0.0001
+            ],
+            "vertical_junction_x_cm": [
+              4.5e-05,
+              5.5e-05
+            ],
+            "selection": "triangle bbox intersects an interface/junction/contact band; all three edges marked",
+            "transition": "shared-edge midpoint splits with one/two/three marked-edge templates",
+            "edge_cleanup": "Delaunay flips within regions; physical lines constrained"
+          },
+          "marked_edges": 15725,
+          "nodes": 22969,
+          "elements": 46238,
+          "edge_flips": 566
+        }
+      },
+      {
+        "pass": true,
+        "checks": 15,
+        "failed_checks": 0,
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-20,
+        "baseline": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 22969,
+          "element_count": 46238,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 20,
+            "1:3": 400,
+            "1:4": 108,
+            "1:5": 108,
+            "1:6": 196
+          },
+          "triangle_counts": {
+            "2:7": 170,
+            "2:8": 16858,
+            "2:9": 28374
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.4999999999999955e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 1.0000000000000004e-10,
+            "2:8": 9.999999999999995e-11,
+            "2:9": 1.0000000000000025e-08
+          }
+        },
+        "refined": {
+          "physical_names": {
+            "1:1": "gate_contact",
+            "1:2": "gate_oxide_interface",
+            "1:3": "bulk_oxide_interface",
+            "1:4": "source_contact",
+            "1:5": "drain_contact",
+            "1:6": "body_contact",
+            "2:7": "gate",
+            "2:8": "oxide",
+            "2:9": "bulk"
+          },
+          "bbox": [
+            [
+              0.0,
+              0.0001
+            ],
+            [
+              -2e-05,
+              0.0001
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "node_count": 82781,
+          "element_count": 166234,
+          "line_counts": {
+            "1:1": 4,
+            "1:2": 40,
+            "1:3": 800,
+            "1:4": 216,
+            "1:5": 216,
+            "1:6": 392
+          },
+          "triangle_counts": {
+            "2:7": 394,
+            "2:8": 65702,
+            "2:9": 98470
+          },
+          "line_lengths": {
+            "1:1": 9.999999999999999e-06,
+            "1:2": 9.999999999999999e-06,
+            "1:3": 9.999999999999999e-06,
+            "1:4": 4.4999999999999955e-05,
+            "1:5": 4.5e-05,
+            "1:6": 0.0001
+          },
+          "triangle_areas": {
+            "2:7": 9.999999999999985e-11,
+            "2:8": 1.0000000000000144e-10,
+            "2:9": 9.999999999999334e-09
+          }
+        },
+        "generation": {
+          "policy": {
+            "name": "interfaces-junctions-and-body-delaunay-v2",
+            "band_half_width_cm": 5e-07,
+            "horizontal_centres_cm": [
+              -1e-05,
+              0.0,
+              1e-05,
+              0.0001
+            ],
+            "vertical_junction_x_cm": [
+              4.5e-05,
+              5.5e-05
+            ],
+            "selection": "triangle bbox intersects an interface/junction/contact band; all three edges marked",
+            "transition": "shared-edge midpoint splits with one/two/three marked-edge templates",
+            "edge_cleanup": "Delaunay flips within regions; physical lines constrained"
+          },
+          "marked_edges": 59812,
+          "nodes": 82781,
+          "elements": 166234,
+          "edge_flips": 1197
+        }
+      }
+    ],
+    "acceptance": "last adjacent pair; earlier comparisons retained"
+  },
+  "tolerances": {
+    "conservation_relative_current": 0.0001,
+    "mesh_relative_current": 0.01,
+    "mesh_absolute_current_A_per_cm": 1e-10
+  },
+  "execution_limits": {
+    "per_case_timeout_s": 600
+  },
+  "selected_mesh_sha256": null,
+  "current_definition": {
+    "unit": "A/cm",
+    "out_of_plane_width": "apply separately once",
+    "columns": [
+      "bias_V",
+      "electron_current_native",
+      "hole_current_native",
+      "total_current_native"
+    ]
+  },
+  "cases": [
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -4.766167188932759e-15,
+          -1.3239866306323395e-13,
+          -1.3716483025216672e-13
+        ],
+        "drain": [
+          0.5,
+          3.0187837064933305,
+          8.827025421179764e-17,
+          3.0187837064933305
+        ],
+        "gate": [
+          0.5,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "source": [
+          0.0,
+          -3.018783706493001,
+          -1.5025102616180933e-17,
+          -3.018783706493001
+        ]
+      },
+      "nodes": {
+        "gate": 39,
+        "bulk": 2249,
+        "oxide": 666
+      },
+      "relative_current_imbalance": 3.1858752093243227e-14,
+      "elapsed_s": 3.995877769999993,
+      "mesh_sha256": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+        "gmsh_mos2d_dd.dat": "c31b405a7f35b2ee999a1fe414fe8821e6e399189664ae90c0e7433e1016f405",
+        "gmsh_mos2d_out.msh": "e55692cfb87cfbfdcff14103e89e995f29f2019a6aae07d9a8dadd5b69f6707a",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "7198cb38bf1a0817ddeb3c424b5f807b47e3cc6413d5a43654201cdbd915ded5",
+        "gmsh_mos2d_potentialonly_1.vtu": "bef1a50647f238e813b3e7139fb59fdd202e67db3e37bdf2a1c4be9b0746580d",
+        "gmsh_mos2d_potentialonly_2.vtu": "9c43dcce5f70fc37bbe8d0fb9c0f15a58f50667c8bafb1653a846cce6c729038",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "deaadb4b713b92993e857b4119e350a36954650dc7b315f101e6b1d292616d96",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "528d907ae5d08a2e5dfca21197143273dd4f695ec93b9dde9e624ef87697fb7f"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-0/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-0/stderr.log"
+    },
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -6.71993596168275e-15,
+          -1.2662208345107708e-13,
+          -1.3334201941275983e-13
+        ],
+        "drain": [
+          0.5,
+          3.1961606186092806,
+          7.984556659246089e-17,
+          3.1961606186092806
+        ],
+        "gate": [
+          0.5,
+          -4.011946494884496e-12,
+          -2.0059732474422478e-32,
+          -4.011946494884496e-12
+        ],
+        "source": [
+          0.0,
+          -3.196160618609434,
+          -1.26260694325175e-17,
+          -3.196160618609434
+        ]
+      },
+      "nodes": {
+        "gate": 62,
+        "bulk": 5059,
+        "oxide": 2335
+      },
+      "relative_current_imbalance": 6.724473211178931e-13,
+      "elapsed_s": 9.67997200100001,
+      "mesh_sha256": "23ad3d22d9124589f305048ab186129754db095961736562a57ba4579f0cdb7d",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "23ad3d22d9124589f305048ab186129754db095961736562a57ba4579f0cdb7d",
+        "gmsh_mos2d_dd.dat": "6db005692c6c12bbd9e880a6551d8057fdebffe874af07cfe8be1ab4bfb6cb83",
+        "gmsh_mos2d_out.msh": "e05ea026942f0130fead47d0f3906150269918bbbb544fc2d5fa037379d77a8a",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "198db2410f6485a6eb0e90c8529d6da3bd77d71dc8f755c19a722e647db478bc",
+        "gmsh_mos2d_potentialonly_1.vtu": "004a635863a255ca6d742021437915d1972f72b5e7cc23cef841f5ead300aacc",
+        "gmsh_mos2d_potentialonly_2.vtu": "b1cb7a9131f4c8f028679186aa2bb2cc8725361a8a808da7261e0d4c16971548",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "97de4ef908434d1b27f835c1fec57ec88edd8a5aff0e24ef353b028a7f17842c",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "330e2fd72be1ea80dc344a4e93c792013424de58a5d8f970194a8752c1a1ea12"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-1/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-1/stderr.log"
+    },
+    {
+      "status": "completed",
+      "returncode": 0,
+      "solver_converged": true,
+      "solve_count": 9,
+      "contacts": {
+        "body": 0.0,
+        "drain": 0.5,
+        "gate": 0.5,
+        "source": 0.0
+      },
+      "contact_rows": {
+        "body": [
+          0.0,
+          -8.661683408340053e-15,
+          -1.215417992741554e-13,
+          -1.3020348268249545e-13
+        ],
+        "drain": [
+          0.5,
+          3.3340763741588004,
+          7.773320413080739e-17,
+          3.3340763741588004
+        ],
+        "gate": [
+          0.5,
+          -5.107097322528556e-12,
+          -2.553548661264278e-32,
+          -5.107097322528556e-12
+        ],
+        "source": [
+          0.0,
+          -3.334076374158082,
+          -1.1875723280311438e-17,
+          -3.334076374158082
+        ]
+      },
+      "nodes": {
+        "gate": 105,
+        "bulk": 14621,
+        "oxide": 8665
+      },
+      "relative_current_imbalance": 6.77663610032132e-13,
+      "elapsed_s": 44.92353109700002,
+      "mesh_sha256": "372a0f98413eaf07967163595ea205dd8c99827c19de91d3aeea68a86ac6b452",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "372a0f98413eaf07967163595ea205dd8c99827c19de91d3aeea68a86ac6b452",
+        "gmsh_mos2d_dd.dat": "119e786521e0e5efa3edca31d05d656e4e39f630178419ea1006b47aa03677d3",
+        "gmsh_mos2d_out.msh": "f9a4d34f7fa1fb5508fe53fe7edcdf275876189f8a9bf9ecd07383945826daa1",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "7a7ee382874c866bee3396780c55ec36bb7a1f8ba98cd33876b91a608c4edb71",
+        "gmsh_mos2d_potentialonly_1.vtu": "8bd5269f660e3245f3363ee9086d5b7dd5df119d81c86205771638d9cfbce382",
+        "gmsh_mos2d_potentialonly_2.vtu": "83478e8b8b9d7c2bb658c2eb6cc6378eee823f3f44cb8bb074b3143137b09c58",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "solve-info.json": "8b44238536700456ed43e478f22b0e9fcbae5fea8d177b71ca7d3219e6865607",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "1be7fc9de9ed550d8291f0d95c54fc7767aa358b90b8d2f17155155079b93708"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-2/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-2/stderr.log"
+    },
+    {
+      "status": "failed",
+      "returncode": -15,
+      "solver_converged": false,
+      "solve_count": 0,
+      "contacts": {},
+      "contact_rows": {
+        "body": [
+          0.0,
+          -7.611859115400145e-29,
+          3.252401866680269e-14,
+          3.2524018666802615e-14
+        ],
+        "drain": [
+          0.0,
+          -5.6286837158589707e-14,
+          2.9888897322796113e-31,
+          -5.6286837158589707e-14
+        ],
+        "gate": [
+          0.5,
+          -5.107097322528556e-12,
+          -2.553548661264278e-32,
+          -5.107097322528556e-12
+        ],
+        "source": [
+          0.0,
+          -4.3156078263243725e-14,
+          2.388150050462325e-31,
+          -4.3156078263243725e-14
+        ]
+      },
+      "nodes": {},
+      "relative_current_imbalance": 0.9875840352117372,
+      "elapsed_s": 92.86924073199998,
+      "mesh_sha256": "95bd6795a120348330b1eb3d95fd3adb6eaf1bcd8684a334d2b715af352b24f6",
+      "harness_sha256": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+      "artifacts": {
+        "gmsh_mos2d.msh": "95bd6795a120348330b1eb3d95fd3adb6eaf1bcd8684a334d2b715af352b24f6",
+        "gmsh_mos2d_out.msh": "01394f41438a3b2df477910e7e21c93fe477b57da8ebe24d560eb8c3a281f5b9",
+        "gmsh_mos2d_potentialonly.visit": "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+        "gmsh_mos2d_potentialonly.vtm": "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+        "gmsh_mos2d_potentialonly_0.vtu": "a4c7a8095fbbf8e05c4628c18b98dba763f884366e6c0a9e894d6c3182e3ee4a",
+        "gmsh_mos2d_potentialonly_1.vtu": "582924df103e9a0133fe12d1be24acdfdc4d7edbddb62045457dc1e13e77c895",
+        "gmsh_mos2d_potentialonly_2.vtu": "6f2ad708adc9b1de940526be43010cb69e40f00b8da35dad8ebe4b607ef976bf",
+        "harness.py": "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.log": "d1fe93db53142264fea0dce740430cd6bec9b093c386ba4382be285747957a25"
+      },
+      "stdout_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-3/stdout.log",
+      "stderr_log": "results/device-reference/planar-mos-qualification-work/79433add8df04fa29d80d45d0491b4bb/level-3/stderr.log"
+    }
+  ],
+  "mesh_comparisons": [
+    {
+      "levels": [
+        0,
+        1
+      ],
+      "outcome": "unresolved",
+      "currents": [
+        {
+          "contact": "gate",
+          "absolute_delta_A_per_cm": 4.011946494884496e-12,
+          "relative_delta": 0.04011946494884496,
+          "pass": true
+        },
+        {
+          "contact": "drain",
+          "absolute_delta_A_per_cm": 0.17737691211595008,
+          "relative_delta": 0.055496870552497655,
+          "pass": false
+        },
+        {
+          "contact": "source",
+          "absolute_delta_A_per_cm": 0.1773769121164328,
+          "relative_delta": 0.05549687055264603,
+          "pass": false
+        },
+        {
+          "contact": "body",
+          "absolute_delta_A_per_cm": 3.8228108394068856e-15,
+          "relative_delta": 3.8228108394068854e-05,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "levels": [
+        1,
+        2
+      ],
+      "outcome": "unresolved",
+      "currents": [
+        {
+          "contact": "gate",
+          "absolute_delta_A_per_cm": 1.0951508276440597e-12,
+          "relative_delta": 0.010951508276440597,
+          "pass": true
+        },
+        {
+          "contact": "drain",
+          "absolute_delta_A_per_cm": 0.13791575554951985,
+          "relative_delta": 0.04136550578698621,
+          "pass": false
+        },
+        {
+          "contact": "source",
+          "absolute_delta_A_per_cm": 0.1379157555486481,
+          "relative_delta": 0.041365505786733654,
+          "pass": false
+        },
+        {
+          "contact": "body",
+          "absolute_delta_A_per_cm": 3.1385367302643786e-15,
+          "relative_delta": 3.1385367302643784e-05,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "levels": [
+        2,
+        3
+      ],
+      "outcome": "unresolved",
+      "currents": []
+    }
+  ],
+  "claim_boundary": "Endpoint only at Vg=Vd=0.5 V, Vs=Vb=0 V, 300 K; no bias-domain, slope, or physical-device validation. Upstream oxide material label is Silicon; oxide equations are assigned by simple_physics."
+}

@@ -1,0 +1,722 @@
+{
+    "schema":  "device-reference-planar-mos-qualification/2",
+    "outcome":  "unresolved",
+    "backend":  {
+                    "available":  true,
+                    "version":  "2.11.0",
+                    "python":  "/usr/bin/python3",
+                    "imported_physics":  "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/python_packages/simple_physics.py",
+                    "imported_physics_sha256":  "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f"
+                },
+    "provenance":  {
+                       "commit":  "43b41ca845184c47e22b72d144db7e7db8509377",
+                       "expected_commit":  "43b41ca845184c47e22b72d144db7e7db8509377",
+                       "source_mesh_sha256":  "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+                       "evaluator_sha256":  "622f5ea042ba78564d0e8184ecd6a10e5b1cf31d9411086a21d41349ce586dee",
+                       "script_sha256":  "f3499a2b99b67358cec9cf506518157baa266499c7f1211c07e486a9b45f0e8d",
+                       "construction_sha256":  "f2ce0aaa1d96de6c97212c6c23758bada5d560968ece358cce90a2f758da6b2c",
+                       "invariant_checker_sha256":  "481510ffe1c41dbfe2f30b5288d80ae66989ace518aa0286dff8dfc51c310d8f",
+                       "local_refiner_sha256":  null
+                   },
+    "mesh_policy":  {
+                        "refinements":  3,
+                        "method":  "surface-bands",
+                        "invariants":  [
+                                           {
+                                               "pass":  true,
+                                               "checks":  15,
+                                               "failed_checks":  0,
+                                               "relative_tolerance":  1E-10,
+                                               "absolute_tolerance":  1E-20,
+                                               "baseline":  {
+                                                                "physical_names":  {
+                                                                                       "1:1":  "gate_contact",
+                                                                                       "1:2":  "gate_oxide_interface",
+                                                                                       "1:3":  "bulk_oxide_interface",
+                                                                                       "1:4":  "source_contact",
+                                                                                       "1:5":  "drain_contact",
+                                                                                       "1:6":  "body_contact",
+                                                                                       "2:7":  "gate",
+                                                                                       "2:8":  "oxide",
+                                                                                       "2:9":  "bulk"
+                                                                                   },
+                                                                "bbox":  [
+                                                                             [
+                                                                                 0.0,
+                                                                                 0.0001
+                                                                             ],
+                                                                             [
+                                                                                 -2E-05,
+                                                                                 0.0001
+                                                                             ],
+                                                                             [
+                                                                                 0.0,
+                                                                                 0.0
+                                                                             ]
+                                                                         ],
+                                                                "node_count":  2847,
+                                                                "element_count":  5731,
+                                                                "line_counts":  {
+                                                                                    "1:1":  4,
+                                                                                    "1:2":  5,
+                                                                                    "1:3":  100,
+                                                                                    "1:4":  27,
+                                                                                    "1:5":  27,
+                                                                                    "1:6":  49
+                                                                                },
+                                                                "triangle_counts":  {
+                                                                                        "2:7":  57,
+                                                                                        "2:8":  1207,
+                                                                                        "2:9":  4255
+                                                                                    },
+                                                                "line_lengths":  {
+                                                                                     "1:1":  9.9999999999999991E-06,
+                                                                                     "1:2":  9.9999999999999991E-06,
+                                                                                     "1:3":  9.9999999999999991E-06,
+                                                                                     "1:4":  4.500000000000001E-05,
+                                                                                     "1:5":  4.5E-05,
+                                                                                     "1:6":  0.0001
+                                                                                 },
+                                                                "triangle_areas":  {
+                                                                                       "2:7":  9.9999999999999978E-11,
+                                                                                       "2:8":  9.9999999999999991E-11,
+                                                                                       "2:9":  1.0000000000000028E-08
+                                                                                   }
+                                                            },
+                                               "refined":  {
+                                                               "physical_names":  {
+                                                                                      "1:1":  "gate_contact",
+                                                                                      "1:2":  "gate_oxide_interface",
+                                                                                      "1:3":  "bulk_oxide_interface",
+                                                                                      "1:4":  "source_contact",
+                                                                                      "1:5":  "drain_contact",
+                                                                                      "1:6":  "body_contact",
+                                                                                      "2:7":  "gate",
+                                                                                      "2:8":  "oxide",
+                                                                                      "2:9":  "bulk"
+                                                                                  },
+                                                               "bbox":  [
+                                                                            [
+                                                                                0.0,
+                                                                                0.0001
+                                                                            ],
+                                                                            [
+                                                                                -2E-05,
+                                                                                0.0001
+                                                                            ],
+                                                                            [
+                                                                                0.0,
+                                                                                0.0
+                                                                            ]
+                                                                        ],
+                                                               "node_count":  7244,
+                                                               "element_count":  14608,
+                                                               "line_counts":  {
+                                                                                   "1:1":  4,
+                                                                                   "1:2":  10,
+                                                                                   "1:3":  200,
+                                                                                   "1:4":  54,
+                                                                                   "1:5":  54,
+                                                                                   "1:6":  98
+                                                                               },
+                                                               "triangle_counts":  {
+                                                                                       "2:7":  96,
+                                                                                       "2:8":  4428,
+                                                                                       "2:9":  9664
+                                                                                   },
+                                                               "line_lengths":  {
+                                                                                    "1:1":  9.9999999999999991E-06,
+                                                                                    "1:2":  9.9999999999999991E-06,
+                                                                                    "1:3":  9.9999999999999991E-06,
+                                                                                    "1:4":  4.5E-05,
+                                                                                    "1:5":  4.5E-05,
+                                                                                    "1:6":  0.0001
+                                                                                },
+                                                               "triangle_areas":  {
+                                                                                      "2:7":  9.9999999999999978E-11,
+                                                                                      "2:8":  1.0000000000000035E-10,
+                                                                                      "2:9":  1.0000000000000035E-08
+                                                                                  }
+                                                           }
+                                           },
+                                           {
+                                               "pass":  true,
+                                               "checks":  15,
+                                               "failed_checks":  0,
+                                               "relative_tolerance":  1E-10,
+                                               "absolute_tolerance":  1E-20,
+                                               "baseline":  {
+                                                                "physical_names":  {
+                                                                                       "1:1":  "gate_contact",
+                                                                                       "1:2":  "gate_oxide_interface",
+                                                                                       "1:3":  "bulk_oxide_interface",
+                                                                                       "1:4":  "source_contact",
+                                                                                       "1:5":  "drain_contact",
+                                                                                       "1:6":  "body_contact",
+                                                                                       "2:7":  "gate",
+                                                                                       "2:8":  "oxide",
+                                                                                       "2:9":  "bulk"
+                                                                                   },
+                                                                "bbox":  [
+                                                                             [
+                                                                                 0.0,
+                                                                                 0.0001
+                                                                             ],
+                                                                             [
+                                                                                 -2E-05,
+                                                                                 0.0001
+                                                                             ],
+                                                                             [
+                                                                                 0.0,
+                                                                                 0.0
+                                                                             ]
+                                                                         ],
+                                                                "node_count":  7244,
+                                                                "element_count":  14608,
+                                                                "line_counts":  {
+                                                                                    "1:1":  4,
+                                                                                    "1:2":  10,
+                                                                                    "1:3":  200,
+                                                                                    "1:4":  54,
+                                                                                    "1:5":  54,
+                                                                                    "1:6":  98
+                                                                                },
+                                                                "triangle_counts":  {
+                                                                                        "2:7":  96,
+                                                                                        "2:8":  4428,
+                                                                                        "2:9":  9664
+                                                                                    },
+                                                                "line_lengths":  {
+                                                                                     "1:1":  9.9999999999999991E-06,
+                                                                                     "1:2":  9.9999999999999991E-06,
+                                                                                     "1:3":  9.9999999999999991E-06,
+                                                                                     "1:4":  4.5E-05,
+                                                                                     "1:5":  4.5E-05,
+                                                                                     "1:6":  0.0001
+                                                                                 },
+                                                                "triangle_areas":  {
+                                                                                       "2:7":  9.9999999999999978E-11,
+                                                                                       "2:8":  1.0000000000000035E-10,
+                                                                                       "2:9":  1.0000000000000035E-08
+                                                                                   }
+                                                            },
+                                               "refined":  {
+                                                               "physical_names":  {
+                                                                                      "1:1":  "gate_contact",
+                                                                                      "1:2":  "gate_oxide_interface",
+                                                                                      "1:3":  "bulk_oxide_interface",
+                                                                                      "1:4":  "source_contact",
+                                                                                      "1:5":  "drain_contact",
+                                                                                      "1:6":  "body_contact",
+                                                                                      "2:7":  "gate",
+                                                                                      "2:8":  "oxide",
+                                                                                      "2:9":  "bulk"
+                                                                                  },
+                                                               "bbox":  [
+                                                                            [
+                                                                                0.0,
+                                                                                0.0001
+                                                                            ],
+                                                                            [
+                                                                                -2E-05,
+                                                                                0.0001
+                                                                            ],
+                                                                            [
+                                                                                0.0,
+                                                                                0.0
+                                                                            ]
+                                                                        ],
+                                                               "node_count":  22965,
+                                                               "element_count":  46230,
+                                                               "line_counts":  {
+                                                                                   "1:1":  4,
+                                                                                   "1:2":  20,
+                                                                                   "1:3":  400,
+                                                                                   "1:4":  108,
+                                                                                   "1:5":  108,
+                                                                                   "1:6":  196
+                                                                               },
+                                                               "triangle_counts":  {
+                                                                                       "2:7":  170,
+                                                                                       "2:8":  16846,
+                                                                                       "2:9":  28378
+                                                                                   },
+                                                               "line_lengths":  {
+                                                                                    "1:1":  9.9999999999999991E-06,
+                                                                                    "1:2":  9.9999999999999991E-06,
+                                                                                    "1:3":  9.9999999999999991E-06,
+                                                                                    "1:4":  4.4999999999999955E-05,
+                                                                                    "1:5":  4.5E-05,
+                                                                                    "1:6":  0.0001
+                                                                                },
+                                                               "triangle_areas":  {
+                                                                                      "2:7":  1.0000000000000004E-10,
+                                                                                      "2:8":  9.9999999999999991E-11,
+                                                                                      "2:9":  1.0000000000000047E-08
+                                                                                  }
+                                                           }
+                                           },
+                                           {
+                                               "pass":  true,
+                                               "checks":  15,
+                                               "failed_checks":  0,
+                                               "relative_tolerance":  1E-10,
+                                               "absolute_tolerance":  1E-20,
+                                               "baseline":  {
+                                                                "physical_names":  {
+                                                                                       "1:1":  "gate_contact",
+                                                                                       "1:2":  "gate_oxide_interface",
+                                                                                       "1:3":  "bulk_oxide_interface",
+                                                                                       "1:4":  "source_contact",
+                                                                                       "1:5":  "drain_contact",
+                                                                                       "1:6":  "body_contact",
+                                                                                       "2:7":  "gate",
+                                                                                       "2:8":  "oxide",
+                                                                                       "2:9":  "bulk"
+                                                                                   },
+                                                                "bbox":  [
+                                                                             [
+                                                                                 0.0,
+                                                                                 0.0001
+                                                                             ],
+                                                                             [
+                                                                                 -2E-05,
+                                                                                 0.0001
+                                                                             ],
+                                                                             [
+                                                                                 0.0,
+                                                                                 0.0
+                                                                             ]
+                                                                         ],
+                                                                "node_count":  22965,
+                                                                "element_count":  46230,
+                                                                "line_counts":  {
+                                                                                    "1:1":  4,
+                                                                                    "1:2":  20,
+                                                                                    "1:3":  400,
+                                                                                    "1:4":  108,
+                                                                                    "1:5":  108,
+                                                                                    "1:6":  196
+                                                                                },
+                                                                "triangle_counts":  {
+                                                                                        "2:7":  170,
+                                                                                        "2:8":  16846,
+                                                                                        "2:9":  28378
+                                                                                    },
+                                                                "line_lengths":  {
+                                                                                     "1:1":  9.9999999999999991E-06,
+                                                                                     "1:2":  9.9999999999999991E-06,
+                                                                                     "1:3":  9.9999999999999991E-06,
+                                                                                     "1:4":  4.4999999999999955E-05,
+                                                                                     "1:5":  4.5E-05,
+                                                                                     "1:6":  0.0001
+                                                                                 },
+                                                                "triangle_areas":  {
+                                                                                       "2:7":  1.0000000000000004E-10,
+                                                                                       "2:8":  9.9999999999999991E-11,
+                                                                                       "2:9":  1.0000000000000047E-08
+                                                                                   }
+                                                            },
+                                               "refined":  {
+                                                               "physical_names":  {
+                                                                                      "1:1":  "gate_contact",
+                                                                                      "1:2":  "gate_oxide_interface",
+                                                                                      "1:3":  "bulk_oxide_interface",
+                                                                                      "1:4":  "source_contact",
+                                                                                      "1:5":  "drain_contact",
+                                                                                      "1:6":  "body_contact",
+                                                                                      "2:7":  "gate",
+                                                                                      "2:8":  "oxide",
+                                                                                      "2:9":  "bulk"
+                                                                                  },
+                                                               "bbox":  [
+                                                                            [
+                                                                                0.0,
+                                                                                0.0001
+                                                                            ],
+                                                                            [
+                                                                                -2E-05,
+                                                                                0.0001
+                                                                            ],
+                                                                            [
+                                                                                0.0,
+                                                                                0.0
+                                                                            ]
+                                                                        ],
+                                                               "node_count":  82749,
+                                                               "element_count":  166170,
+                                                               "line_counts":  {
+                                                                                   "1:1":  4,
+                                                                                   "1:2":  40,
+                                                                                   "1:3":  800,
+                                                                                   "1:4":  216,
+                                                                                   "1:5":  216,
+                                                                                   "1:6":  392
+                                                                               },
+                                                               "triangle_counts":  {
+                                                                                       "2:7":  394,
+                                                                                       "2:8":  65658,
+                                                                                       "2:9":  98450
+                                                                                   },
+                                                               "line_lengths":  {
+                                                                                    "1:1":  9.9999999999999991E-06,
+                                                                                    "1:2":  9.9999999999999991E-06,
+                                                                                    "1:3":  9.9999999999999991E-06,
+                                                                                    "1:4":  4.4999999999999955E-05,
+                                                                                    "1:5":  4.5E-05,
+                                                                                    "1:6":  0.0001
+                                                                                },
+                                                               "triangle_areas":  {
+                                                                                      "2:7":  9.9999999999999861E-11,
+                                                                                      "2:8":  1.0000000000000101E-10,
+                                                                                      "2:9":  9.9999999999993236E-09
+                                                                                  }
+                                                           }
+                                           }
+                                       ],
+                        "acceptance":  "last adjacent pair; earlier comparisons retained"
+                    },
+    "tolerances":  {
+                       "conservation_relative_current":  0.0001,
+                       "mesh_relative_current":  0.01,
+                       "mesh_absolute_current_A_per_cm":  1E-10
+                   },
+    "selected_mesh_sha256":  null,
+    "current_definition":  {
+                               "unit":  "A/cm",
+                               "out_of_plane_width":  "apply separately once",
+                               "columns":  [
+                                               "bias_V",
+                                               "electron_current_native",
+                                               "hole_current_native",
+                                               "total_current_native"
+                                           ]
+                           },
+    "cases":  [
+                  {
+                      "status":  "completed",
+                      "returncode":  0,
+                      "solver_converged":  true,
+                      "solve_count":  9,
+                      "contacts":  {
+                                       "body":  0.0,
+                                       "drain":  0.5,
+                                       "gate":  0.5,
+                                       "source":  0.0
+                                   },
+                      "contact_rows":  {
+                                           "body":  [
+                                                        0.0,
+                                                        -4.7661671889327592E-15,
+                                                        -1.3239866306323395E-13,
+                                                        -1.3716483025216672E-13
+                                                    ],
+                                           "drain":  [
+                                                         0.5,
+                                                         3.0187837064933305,
+                                                         8.8270254211797639E-17,
+                                                         3.0187837064933305
+                                                     ],
+                                           "gate":  [
+                                                        0.5,
+                                                        0.0,
+                                                        0.0,
+                                                        0.0
+                                                    ],
+                                           "source":  [
+                                                          0.0,
+                                                          -3.018783706493001,
+                                                          -1.5025102616180933E-17,
+                                                          -3.018783706493001
+                                                      ]
+                                       },
+                      "nodes":  {
+                                    "gate":  39,
+                                    "bulk":  2249,
+                                    "oxide":  666
+                                },
+                      "relative_current_imbalance":  3.1858752093243227E-14,
+                      "elapsed_s":  4.162390506000008,
+                      "mesh_sha256":  "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+                      "harness_sha256":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                      "artifacts":  {
+                                        "gmsh_mos2d.msh":  "df50002278d7ccf89e3bab106d095c8ec7e901c7daa3241347dddbb31589a24a",
+                                        "gmsh_mos2d_dd.dat":  "c31b405a7f35b2ee999a1fe414fe8821e6e399189664ae90c0e7433e1016f405",
+                                        "gmsh_mos2d_out.msh":  "e55692cfb87cfbfdcff14103e89e995f29f2019a6aae07d9a8dadd5b69f6707a",
+                                        "gmsh_mos2d_potentialonly.visit":  "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+                                        "gmsh_mos2d_potentialonly.vtm":  "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+                                        "gmsh_mos2d_potentialonly_0.vtu":  "7198cb38bf1a0817ddeb3c424b5f807b47e3cc6413d5a43654201cdbd915ded5",
+                                        "gmsh_mos2d_potentialonly_1.vtu":  "bef1a50647f238e813b3e7139fb59fdd202e67db3e37bdf2a1c4be9b0746580d",
+                                        "gmsh_mos2d_potentialonly_2.vtu":  "9c43dcce5f70fc37bbe8d0fb9c0f15a58f50667c8bafb1653a846cce6c729038",
+                                        "harness.py":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                                        "solve-info.json":  "deaadb4b713b92993e857b4119e350a36954650dc7b315f101e6b1d292616d96",
+                                        "stderr.log":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "stdout.log":  "528d907ae5d08a2e5dfca21197143273dd4f695ec93b9dde9e624ef87697fb7f"
+                                    },
+                      "stdout_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-0/stdout.log",
+                      "stderr_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-0/stderr.log"
+                  },
+                  {
+                      "status":  "completed",
+                      "returncode":  0,
+                      "solver_converged":  true,
+                      "solve_count":  9,
+                      "contacts":  {
+                                       "body":  0.0,
+                                       "drain":  0.5,
+                                       "gate":  0.5,
+                                       "source":  0.0
+                                   },
+                      "contact_rows":  {
+                                           "body":  [
+                                                        0.0,
+                                                        -6.9634073009704289E-15,
+                                                        -1.2367119701304849E-13,
+                                                        -1.3063460431401892E-13
+                                                    ],
+                                           "drain":  [
+                                                         0.5,
+                                                         3.191757399287535,
+                                                         8.1524700448971157E-17,
+                                                         3.191757399287535
+                                                     ],
+                                           "gate":  [
+                                                        0.5,
+                                                        -4.0119464948844963E-12,
+                                                        -2.0059732474422478E-32,
+                                                        -4.0119464948844963E-12
+                                                    ],
+                                           "source":  [
+                                                          0.0,
+                                                          -3.1917573992875146,
+                                                          -1.2910315570886555E-17,
+                                                          -3.1917573992875146
+                                                      ]
+                                       },
+                      "nodes":  {
+                                    "gate":  62,
+                                    "bulk":  5059,
+                                    "oxide":  2335
+                                },
+                      "relative_current_imbalance":  6.4574973593903142E-13,
+                      "elapsed_s":  10.148232807,
+                      "mesh_sha256":  "64838243d68a8fc76b634c8746a131dea4c30654313a28de9b3bf52a58919a8e",
+                      "harness_sha256":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                      "artifacts":  {
+                                        "gmsh_mos2d.msh":  "64838243d68a8fc76b634c8746a131dea4c30654313a28de9b3bf52a58919a8e",
+                                        "gmsh_mos2d_dd.dat":  "850c16a92cacee0ecfb6ea3a1c029b4522736ad802e963343cd1cebc6072d4af",
+                                        "gmsh_mos2d_out.msh":  "5cbb05a61dd100c7717b766179c865df2ba59e66e0b086757abe7e020626a21b",
+                                        "gmsh_mos2d_potentialonly.visit":  "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+                                        "gmsh_mos2d_potentialonly.vtm":  "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+                                        "gmsh_mos2d_potentialonly_0.vtu":  "524a844db7ace791007455ba80367ba4d36f98c6b39bfa10e08cef6cfbef1c73",
+                                        "gmsh_mos2d_potentialonly_1.vtu":  "7be5d6d057fcf63d0901a134a8c5965d0df107859c4e4bc2dc054faf5fe82188",
+                                        "gmsh_mos2d_potentialonly_2.vtu":  "e4060b7d5e2420380a576b8a6a4133e5e87fe0f9b9cf1b589790496c63d83e26",
+                                        "harness.py":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                                        "solve-info.json":  "118a0642e0667da5866903012bca23f1eaa93bff183b1e56a689d51961e8505a",
+                                        "stderr.log":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "stdout.log":  "e03f225c254579be55b8e9c3e4567795b1b353fd45b799e0040e45f1cbbae46e"
+                                    },
+                      "stdout_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-1/stdout.log",
+                      "stderr_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-1/stderr.log"
+                  },
+                  {
+                      "status":  "completed",
+                      "returncode":  0,
+                      "solver_converged":  true,
+                      "solve_count":  9,
+                      "contacts":  {
+                                       "body":  0.0,
+                                       "drain":  0.5,
+                                       "gate":  0.5,
+                                       "source":  0.0
+                                   },
+                      "contact_rows":  {
+                                           "body":  [
+                                                        0.0,
+                                                        -9.2558432787714221E-15,
+                                                        -1.359677180741195E-13,
+                                                        -1.4522356135289093E-13
+                                                    ],
+                                           "drain":  [
+                                                         0.5,
+                                                         3.2971779269035553,
+                                                         8.1237893965835387E-17,
+                                                         3.2971779269035553
+                                                     ],
+                                           "gate":  [
+                                                        0.5,
+                                                        -4.1724975241267687E-12,
+                                                        -2.0862487620633844E-32,
+                                                        -4.1724975241267687E-12
+                                                    ],
+                                           "source":  [
+                                                          0.0,
+                                                          -3.2971779269032204,
+                                                          -1.2038297979199377E-17,
+                                                          -3.2971779269032204
+                                                      ]
+                                       },
+                      "nodes":  {
+                                    "gate":  105,
+                                    "bulk":  14623,
+                                    "oxide":  8659
+                                },
+                      "relative_current_imbalance":  6.0398284677810914E-13,
+                      "elapsed_s":  45.34999991000001,
+                      "mesh_sha256":  "0ad3d5d81af5ec4767ca95d98a25730044ec6659b481a1bbcb142818c7c4f922",
+                      "harness_sha256":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                      "artifacts":  {
+                                        "gmsh_mos2d.msh":  "0ad3d5d81af5ec4767ca95d98a25730044ec6659b481a1bbcb142818c7c4f922",
+                                        "gmsh_mos2d_dd.dat":  "e402d26570e14982674e23273745eee742e247d8f11b876085e5872e759b936f",
+                                        "gmsh_mos2d_out.msh":  "51c51f6664306c3eb4a84531c4715e26e636d07bc801dcb67075fb6345fc1722",
+                                        "gmsh_mos2d_potentialonly.visit":  "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+                                        "gmsh_mos2d_potentialonly.vtm":  "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+                                        "gmsh_mos2d_potentialonly_0.vtu":  "706ec2cbbb2b9a319055b01b48a391d47ed7709e7d494a8a245ad52603196ccc",
+                                        "gmsh_mos2d_potentialonly_1.vtu":  "991a3163c2a2aeaea60d33cb07541d46b4b5a8235027ea99d1b98ecebf94a82a",
+                                        "gmsh_mos2d_potentialonly_2.vtu":  "fcbb6a2330679f9a0336a575e3f296926c168c0a450b6488d773ad4f06810075",
+                                        "harness.py":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                                        "solve-info.json":  "47fe4218ea2a32dc950d7b9e91cbc9dbc6fe128e62b46ed2065a4cb3514cc0d9",
+                                        "stderr.log":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "stdout.log":  "f807a209f51f17598e39ec0a83be9196b53655a7ea17c7a65bc7da0591873eff"
+                                    },
+                      "stdout_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-2/stdout.log",
+                      "stderr_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-2/stderr.log"
+                  },
+                  {
+                      "status":  "failed",
+                      "returncode":  -15,
+                      "solver_converged":  false,
+                      "solve_count":  0,
+                      "contacts":  {
+
+                                   },
+                      "contact_rows":  {
+                                           "body":  [
+                                                        0.0,
+                                                        -8.3098262193982958E-15,
+                                                        -9.3043755261706637E-14,
+                                                        -1.0135358148110493E-13
+                                                    ],
+                                           "drain":  [
+                                                         0.1,
+                                                         0.47825371939935013,
+                                                         7.2385815492558037E-17,
+                                                         0.4782537193993502
+                                                     ],
+                                           "gate":  [
+                                                        0.5,
+                                                        -5.0501466308088317E-12,
+                                                        -2.5250733154044161E-32,
+                                                        -5.0501466308088317E-12
+                                                    ],
+                                           "source":  [
+                                                          0.0,
+                                                          -0.47825371939941685,
+                                                          -1.5712104993646716E-18,
+                                                          -0.47825371939941685
+                                                      ]
+                                       },
+                      "nodes":  {
+
+                                },
+                      "relative_current_imbalance":  5.4554401703805131E-12,
+                      "elapsed_s":  140.919811663,
+                      "mesh_sha256":  "4af1ee5406a38a4536c35f112d4eda827717692937a45de023558747f63fd05e",
+                      "harness_sha256":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                      "artifacts":  {
+                                        "gmsh_mos2d.msh":  "4af1ee5406a38a4536c35f112d4eda827717692937a45de023558747f63fd05e",
+                                        "gmsh_mos2d_out.msh":  "90d32c186253cff4592edc4b018ffe32ce4c7ea8d250bd09a4b7ad1c884a7f84",
+                                        "gmsh_mos2d_potentialonly.visit":  "40226c486f0eb85cc3f7f6ef15eca79e5be168fde65ec0770c1a348795946593",
+                                        "gmsh_mos2d_potentialonly.vtm":  "eead9c63f3811149549c8504cabfe2dc454371bcd3cc7c62b7c5e635c878362e",
+                                        "gmsh_mos2d_potentialonly_0.vtu":  "3102f426a9383bc682fd54443111d98e87886029869b2b7e4b52918203b1886f",
+                                        "gmsh_mos2d_potentialonly_1.vtu":  "6e4168dfe7fe4917f2f325a50b766e1d2fe6117161a6ea9baaaa32e6bacda514",
+                                        "gmsh_mos2d_potentialonly_2.vtu":  "3054bc8308d1771eb63a05f07b63431327e85ff91fd0b06a5a66290034a0362d",
+                                        "harness.py":  "43c42bf9252e81fd54de9fe8e86c399ddce72c89e83ccb8a114a4216fa680aa8",
+                                        "stderr.log":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "stdout.log":  "7387068b793ea6e23d221c48e63b11e00ab11ef2e1b4e365b69c0d302c1dce2c"
+                                    },
+                      "stdout_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-3/stdout.log",
+                      "stderr_log":  "results/device-reference/planar-mos-qualification-work/a8a13c452d114060afca7d08f7c9993a/level-3/stderr.log"
+                  }
+              ],
+    "mesh_comparisons":  [
+                             {
+                                 "levels":  [
+                                                0,
+                                                1
+                                            ],
+                                 "outcome":  "unresolved",
+                                 "currents":  [
+                                                  {
+                                                      "contact":  "gate",
+                                                      "absolute_delta_A_per_cm":  4.0119464948844963E-12,
+                                                      "relative_delta":  0.04011946494884496,
+                                                      "pass":  true
+                                                  },
+                                                  {
+                                                      "contact":  "drain",
+                                                      "absolute_delta_A_per_cm":  0.1729736927942045,
+                                                      "relative_delta":  0.05419387226385556,
+                                                      "pass":  false
+                                                  },
+                                                  {
+                                                      "contact":  "source",
+                                                      "absolute_delta_A_per_cm":  0.17297369279451358,
+                                                      "relative_delta":  0.054193872263952746,
+                                                      "pass":  false
+                                                  },
+                                                  {
+                                                      "contact":  "body",
+                                                      "absolute_delta_A_per_cm":  6.5302259381477975E-15,
+                                                      "relative_delta":  6.5302259381477972E-05,
+                                                      "pass":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "levels":  [
+                                                1,
+                                                2
+                                            ],
+                                 "outcome":  "unresolved",
+                                 "currents":  [
+                                                  {
+                                                      "contact":  "gate",
+                                                      "absolute_delta_A_per_cm":  1.6055102924227245E-13,
+                                                      "relative_delta":  0.0016055102924227246,
+                                                      "pass":  true
+                                                  },
+                                                  {
+                                                      "contact":  "drain",
+                                                      "absolute_delta_A_per_cm":  0.10542052761602028,
+                                                      "relative_delta":  0.03197295685981459,
+                                                      "pass":  false
+                                                  },
+                                                  {
+                                                      "contact":  "source",
+                                                      "absolute_delta_A_per_cm":  0.10542052761570586,
+                                                      "relative_delta":  0.03197295685972248,
+                                                      "pass":  false
+                                                  },
+                                                  {
+                                                      "contact":  "body",
+                                                      "absolute_delta_A_per_cm":  1.4588957038872007E-14,
+                                                      "relative_delta":  0.00014588957038872007,
+                                                      "pass":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "levels":  [
+                                                2,
+                                                3
+                                            ],
+                                 "outcome":  "unresolved",
+                                 "currents":  [
+
+                                              ]
+                             }
+                         ],
+    "claim_boundary":  "Endpoint only at Vg=Vd=0.5 V, Vs=Vb=0 V, 300 K; no bias-domain, slope, or physical-device validation. Upstream oxide material label is Silicon; oxide equations are assigned by simple_physics.",
+    "attempt_note":  "Rejected exploratory transition mesh. Final solve stopped after earlier levels disagreed with the uniform reference. Refiner source changed after mesh generation; its end-of-run hash was invalidated. Exact generated meshes and solver logs remain retained."
+}

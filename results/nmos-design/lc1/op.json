@@ -1,0 +1,159 @@
+{
+ "schema": "planar-nmos-op/1",
+ "spec": {
+  "schema": "planar-nmos-spec/1",
+  "name": "lc1",
+  "purpose": "First generated long-channel planar NMOS candidate for a resistively loaded common-source stage. Starting hypothesis, not a qualified design.",
+  "temperature_k": 300.0,
+  "supply_v": 3.3,
+  "geometry_um": {
+   "gate_length": 1.0,
+   "oxide_thickness": 0.01,
+   "poly_thickness": 0.1,
+   "source_drain_length": 0.5,
+   "junction_depth": 0.1,
+   "body_depth": 0.5
+  },
+  "doping_cm3": {
+   "body_acceptors": 1e+17,
+   "source_drain_donors": 1e+20,
+   "gate_poly_donors": 1e+20
+  },
+  "junction_grading_um": {
+   "lateral": 0.02,
+   "vertical": 0.02
+  },
+  "contacts": {
+   "gate": "ohmic contact on top of the n+ polysilicon gate region (sets the gate work function to n+ poly)",
+   "source": "top silicon surface from the left edge to the left gate edge",
+   "drain": "top silicon surface from the right gate edge to the right edge",
+   "body": "bottom silicon surface, full width"
+  },
+  "mesh_um": {
+   "scale": 1.0,
+   "surface": 0.001,
+   "junction_edge": 0.005,
+   "channel_centre": 0.02,
+   "junction_bottom": 0.005,
+   "body_bottom": 0.05,
+   "outer_edge": 0.02,
+   "oxide": 0.001,
+   "poly_top": 0.02
+  },
+  "physics": "DEVSIM simple_physics: constant mobility (mu_n 400, mu_p 200 cm^2/Vs), SRH, drift-diffusion, no velocity saturation, no field-dependent mobility, no gate tunneling, no interface charge"
+ },
+ "status": "completed",
+ "equilibrium": {
+  "currents_a_per_cm": {
+   "gate": 0.0,
+   "drain": -6.572861865223059e-11,
+   "source": -6.146646088586198e-11,
+   "body": 2.684533508049717e-15
+  },
+  "kcl_residual_a_per_cm": 1.2719239500458451e-10,
+  "kcl_pass": true
+ },
+ "stencil": {
+  "vg_v": 0.6,
+  "vd_v": 1.65,
+  "delta_v": 0.01,
+  "points": [
+   {
+    "vg_v": 0.6,
+    "vd_v": 1.65,
+    "currents_a_per_cm": {
+     "gate": 0.0,
+     "drain": 0.0428423569646751,
+     "source": -0.042842356824460144,
+     "body": -6.650957955172735e-14
+    },
+    "kcl_residual_a_per_cm": 1.4014844812056156e-10,
+    "kcl_pass": true,
+    "resolved": true
+   },
+   {
+    "vg_v": 0.59,
+    "vd_v": 1.65,
+    "currents_a_per_cm": {
+     "gate": 0.0,
+     "drain": 0.03983489238634923,
+     "source": -0.03983489243645708,
+     "body": -7.035182629145098e-14
+    },
+    "kcl_residual_a_per_cm": 5.0178207191258433e-11,
+    "kcl_pass": true,
+    "resolved": true
+   },
+   {
+    "vg_v": 0.61,
+    "vd_v": 1.65,
+    "currents_a_per_cm": {
+     "gate": 0.0,
+     "drain": 0.04597215730854679,
+     "source": -0.0459721573036142,
+     "body": -6.227656716628072e-14
+    },
+    "kcl_residual_a_per_cm": 4.870312492259116e-12,
+    "kcl_pass": true,
+    "resolved": true
+   },
+   {
+    "vg_v": 0.6,
+    "vd_v": 1.64,
+    "currents_a_per_cm": {
+     "gate": 0.0,
+     "drain": 0.042824328885224854,
+     "source": -0.0428243284212385,
+     "body": -6.499887903707013e-14
+    },
+    "kcl_residual_a_per_cm": 4.6392135740149534e-10,
+    "kcl_pass": true,
+    "resolved": true
+   },
+   {
+    "vg_v": 0.6,
+    "vd_v": 1.66,
+    "currents_a_per_cm": {
+     "gate": 0.0,
+     "drain": 0.042860329954684105,
+     "source": -0.04286033064838237,
+     "body": -6.583558001387147e-14
+    },
+    "kcl_residual_a_per_cm": 6.937641010770475e-10,
+    "kcl_pass": true,
+    "resolved": true
+   }
+  ]
+ },
+ "small_signal": {
+  "id_a_per_cm": 0.0428423569646751,
+  "gm_s_per_cm": 0.30686324610987825,
+  "gds_s_per_cm": 0.0018000534729625817,
+  "intrinsic_gain": 170.47451685134308,
+  "gm_over_id_per_v": 7.162613540681173
+ },
+ "metadata": {
+  "spec_path": "devices/planar-nmos-lc1.json",
+  "spec_sha256": "e93b516e6042e7641efb8cf95e2912ee3e27b05c1d68246311b02d0dc6b0cc3e",
+  "mesh_scale": 1.0,
+  "runner_sha256": "87c93ea5bdc23ffe610588be5d4d85e0a5f0287e16e207398506d52a1e6991a1",
+  "devsim_version": "2.11.0",
+  "openblas_num_threads": "1",
+  "nodes": {
+   "gate": 1615,
+   "oxide": 1045,
+   "bulk": 11907
+  },
+  "solver": {
+   "relative_error": 1e-06,
+   "absolute_error": 1e+30,
+   "maximum_iterations": 50,
+   "convergence": "every recorded point follows a DEVSIM solve that did not raise",
+   "kcl_relative": 1e-06,
+   "kcl_absolute_a_per_cm": 1e-09
+  },
+  "current_units": "A/cm (2D, per cm of out-of-plane width)",
+  "elapsed_s": 36.223338482,
+  "step_halvings": 0
+ }
+}

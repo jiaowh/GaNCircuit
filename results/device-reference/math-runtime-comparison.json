@@ -1,0 +1,57 @@
+{
+  "outcome": "pass",
+  "currents": [
+    {
+      "contact": "gate",
+      "absolute_delta_A_per_cm": 0.0,
+      "relative_delta": 0.0,
+      "pass": true
+    },
+    {
+      "contact": "drain",
+      "absolute_delta_A_per_cm": 0.0,
+      "relative_delta": 0.0,
+      "pass": true
+    },
+    {
+      "contact": "source",
+      "absolute_delta_A_per_cm": 0.0,
+      "relative_delta": 0.0,
+      "pass": true
+    },
+    {
+      "contact": "body",
+      "absolute_delta_A_per_cm": 5.509023114100336e-16,
+      "relative_delta": 5.509023114100335e-06,
+      "pass": true
+    }
+  ],
+  "reference_mesh_outcome": "unresolved",
+  "candidate_mesh_outcome": "pass",
+  "mesh_hashes": [
+    "1cda80489ae8890a939c18faa16ea8538a7647e48ffaae176096678710b2426f",
+    "1cda80489ae8890a939c18faa16ea8538a7647e48ffaae176096678710b2426f"
+  ],
+  "schema": "planar-mesh-policy-comparison/1",
+  "scope": "Cross-policy endpoint agreement only; neither report is independent physical ground truth",
+  "levels": [
+    -1,
+    2
+  ],
+  "require_same_mesh": true,
+  "tolerances": {
+    "relative_current": 1e-08,
+    "absolute_current_A_per_cm": 1e-10
+  },
+  "inputs": [
+    {
+      "path": "results/device-reference/planar-mos-qualification.json",
+      "sha256": "6981228da4aca6c9560b3eeb03785465e6a7bb998ce3f8a424d7250313e20ab2"
+    },
+    {
+      "path": "results/device-reference/planar-mos-openblas-qualification.json",
+      "sha256": "cfc7d188230761e726968ab3bf98df5dfa095aa2b0bfd096fe26e2e02b3e5b3b"
+    }
+  ],
+  "evaluator_sha256": "bac42390ee04c512310e8f23ad8dd5ceb0bb87a05d1da8ba6feaa1fb2e69fe8d"
+}

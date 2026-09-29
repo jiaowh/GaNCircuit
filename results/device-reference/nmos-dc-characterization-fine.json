@@ -1,0 +1,120 @@
+{
+  "schema": "nmos-characterization-run/1",
+  "outcome": "pass",
+  "scope": "Exploratory 300 K DC grid; only the centre bias has prior mesh evidence. No model export or full-domain accuracy claim.",
+  "experiment": {
+    "schema": "nmos-dc-experiment/1",
+    "temperature_k": 300.0,
+    "reference_script": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/devices/devsim-upstream/examples/mobility/gmsh_mos2d.py",
+    "points": [
+      {
+        "id": "g0_d0",
+        "vgs_v": 0.45,
+        "vds_v": 0.45
+      },
+      {
+        "id": "g0_d1",
+        "vgs_v": 0.45,
+        "vds_v": 0.5
+      },
+      {
+        "id": "g0_d2",
+        "vgs_v": 0.45,
+        "vds_v": 0.55
+      },
+      {
+        "id": "g1_d0",
+        "vgs_v": 0.5,
+        "vds_v": 0.45
+      },
+      {
+        "id": "g1_d1",
+        "vgs_v": 0.5,
+        "vds_v": 0.5
+      },
+      {
+        "id": "g1_d2",
+        "vgs_v": 0.5,
+        "vds_v": 0.55
+      },
+      {
+        "id": "g2_d0",
+        "vgs_v": 0.55,
+        "vds_v": 0.45
+      },
+      {
+        "id": "g2_d1",
+        "vgs_v": 0.55,
+        "vds_v": 0.5
+      },
+      {
+        "id": "g2_d2",
+        "vgs_v": 0.55,
+        "vds_v": 0.55
+      }
+    ],
+    "train_ids": [
+      "g0_d0",
+      "g0_d1",
+      "g0_d2",
+      "g2_d0",
+      "g2_d1",
+      "g2_d2"
+    ],
+    "holdout_ids": [
+      "g1_d0",
+      "g1_d1",
+      "g1_d2"
+    ],
+    "split_policy": "hold out the complete central gate-bias slice before fitting",
+    "body_source_bias_v": 0.0,
+    "retries": 0
+  },
+  "mesh_level": 3,
+  "provenance": {
+    "device_revision": "4b12aa89a61032f30dc18f2c7e495c2d743089ef7522b43ecd1cb72a9f34ecea",
+    "mesh_sha256": "ff609ace3f8b90111d05c2c9ca54de9bf29e89d94c2773ea4c0cb8a5afc0f673",
+    "physics_sha256": "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f",
+    "qualification_sha256": "cfc7d188230761e726968ab3bf98df5dfa095aa2b0bfd096fe26e2e02b3e5b3b",
+    "runtime": {
+      "available": true,
+      "version": "2.11.0",
+      "python": "/usr/bin/python3",
+      "imported_physics": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/python/devsim/python_packages/simple_physics.py",
+      "imported_physics_sha256": "c1f66b11df7d1b96f41f123b9c5841681655438fc17e13e60906274f7d99490f",
+      "math_libraries": [
+        {
+          "path": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/openblas/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0",
+          "sha256": "bfc7492adbf84a8f567720a9e1fae2afc18f3d817da233e7f4d453683485308e"
+        }
+      ],
+      "openblas_num_threads": "1"
+    },
+    "experiment_sha256": "5d2defcbb34870d58f74be58b2f1c48600719bd239dceb24d51aec5b1004308b",
+    "runner_sha256": "1965c2b1565527fe2f77e4b608b335c05596323f5d22fb78997c9a45462dd9fc",
+    "mesh_domain_status": "endpoint_only"
+  },
+  "execution": {
+    "status": "completed",
+    "returncode": 0,
+    "elapsed_s": 1037.795138427,
+    "timeout_s": 1800
+  },
+  "observed_points": 9,
+  "missing_point_ids": [],
+  "dataset_sha256": "e03ce989953f6509225e7a54304b3cc07a0496110e1ce9075204606da10843ac",
+  "dataset_fingerprint": "79c0912891313d54f77cda1c96830ed7412f22cc4439c03a20772b161af2d26a",
+  "dataset_path": "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/dataset.json",
+  "domain_accuracy": "unresolved",
+  "artifacts": {
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/dataset.json": "e03ce989953f6509225e7a54304b3cc07a0496110e1ce9075204606da10843ac",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/experiment.json": "cc66de766d638900f08ef5e1d6b51acc629e37a67f9bf5b9ee01f8b515f5869d",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/gmsh_mos2d.msh": "ff609ace3f8b90111d05c2c9ca54de9bf29e89d94c2773ea4c0cb8a5afc0f673",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/points.json": "b48c6b4d4d1bb4ccd760fbb930de69a796fef24edf1873c18d4d74408640afee",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/runner-source.py": "1965c2b1565527fe2f77e4b608b335c05596323f5d22fb78997c9a45462dd9fc",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/solve-info.json": "317711e4983c96c35685f364dab3a6dba95114d51ac34c18a44bdbae4d6c8a43",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/stdout.log": "0a9f0e8ae4a836ddb197e626c4157dfdf91a747e48a1314af3e9d40f12dc595c",
+    "results/device-reference/nmos-characterization-work/85f6ba451e0547ca96dfe2825f2d73df/worker.py": "523352b6de3b824fb0b4d04d0ed0d65dc14988bf532b901423ce9f12120fc000"
+  }
+}

@@ -1,0 +1,400 @@
+{
+  "schema": "epc2204-datasheet-baseline/1",
+  "scope": "Unmodified EPC2204 vendor model in LTspice compared with the datasheet table. Datasheet values are vendor-described typical/limit values, not our measurements; agreement here is model-to-datasheet consistency, not hardware validation.",
+  "run_outcome": "completed",
+  "failed_benches": {},
+  "evaluator_sha256": "d11c193b89a9756700acb73a01cf0ef457a95a2a8581e83f4ae2a20d06cd02f9",
+  "model": {
+    "library": "EPCGaNLibrary.lib",
+    "library_sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+    "archive_sha256": "107611b7510e4e7d374a1baa646ecf432dd50a81150eb2470900f3b2cdbf1c65",
+    "subcircuit": "EPC2204",
+    "modified": false
+  },
+  "tool": {
+    "name": "ltspice",
+    "available": true,
+    "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+    "version": "26.1.1.0",
+    "capabilities": [
+      "batch",
+      "raw-binary",
+      "raw-ascii",
+      "op",
+      "dc",
+      "ac",
+      "tran",
+      "meas",
+      "step"
+    ],
+    "reason": null
+  },
+  "comparison_rules": {
+    "limit_check": "inside/outside datasheet min-max; does not establish accuracy",
+    "typical_check_screening_band": 0.25,
+    "review": "outside a limit, or deviation from typical beyond the band",
+    "screening_meaning": "flags values for review; not an acceptance tolerance"
+  },
+  "datasheet_table": {
+    "rds_on": {
+      "unit": "ohm",
+      "typ": 0.0044,
+      "max": 0.006,
+      "conditions": "VGS = 5 V, ID = 16 A",
+      "model": 0.004399544816760949,
+      "limit_check": "inside-limits",
+      "deviation_from_typ": -0.00010345073614803635,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "vgs_th": {
+      "unit": "V",
+      "min": 0.8,
+      "typ": 1.1,
+      "max": 2.5,
+      "conditions": "VDS = VGS, ID = 4 mA",
+      "model": 1.1704008953104652,
+      "limit_check": "inside-limits",
+      "deviation_from_typ": 0.06400081391860457,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "vsd": {
+      "unit": "V",
+      "typ": 1.6,
+      "conditions": "IS = 0.5 A, VGS = 0 V (defined by design)",
+      "model": 1.6051449157072555,
+      "limit_check": "no-limits",
+      "deviation_from_typ": 0.0032155723170346207,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "ciss": {
+      "unit": "F",
+      "typ": 6.44e-10,
+      "max": 8.51e-10,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 6.445307088724277e-10,
+      "limit_check": "inside-limits",
+      "deviation_from_typ": 0.0008240821000429221,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "crss": {
+      "unit": "F",
+      "typ": 2.3e-12,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 2.313634589722458e-12,
+      "limit_check": "no-limits",
+      "deviation_from_typ": 0.0059280824880252325,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "coss": {
+      "unit": "F",
+      "typ": 3.04e-10,
+      "max": 4.56e-10,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 3.0476976028366555e-10,
+      "limit_check": "inside-limits",
+      "deviation_from_typ": 0.0025321061962684244,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "coss_er": {
+      "unit": "F",
+      "typ": 4.01e-10,
+      "conditions": "VDS = 0 to 50 V, VGS = 0 V",
+      "model": 4.01423958158115e-10,
+      "limit_check": "no-limits",
+      "deviation_from_typ": 0.0010572522646259408,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "coss_tr": {
+      "unit": "F",
+      "typ": 5.01e-10,
+      "conditions": "VDS = 0 to 50 V, VGS = 0 V",
+      "model": 5.016265180055487e-10,
+      "limit_check": "no-limits",
+      "deviation_from_typ": 0.0012505349412148536,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "qg": {
+      "unit": "C",
+      "typ": 5.7e-09,
+      "max": 7.4e-09,
+      "conditions": "VDS = 50 V, VGS = 5 V, ID = 16 A",
+      "model": 5.652160968327775e-09,
+      "limit_check": "inside-limits",
+      "deviation_from_typ": -0.008392812574074537,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "qgs": {
+      "unit": "C",
+      "typ": 1.8e-09,
+      "conditions": "VDS = 50 V, ID = 16 A",
+      "model": 1.3513883917908666e-09,
+      "limit_check": "no-limits",
+      "deviation_from_typ": -0.2492286712272963,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "qgd": {
+      "unit": "C",
+      "typ": 8e-10,
+      "conditions": "VDS = 50 V, ID = 16 A",
+      "model": 6.515498068068447e-10,
+      "limit_check": "no-limits",
+      "deviation_from_typ": -0.18556274149144414,
+      "typical_check": "within-screening-band",
+      "review": false
+    },
+    "qg_th": {
+      "unit": "C",
+      "typ": 1e-09,
+      "conditions": "VDS = 50 V, ID = 16 A",
+      "model": 7.251234632425994e-10,
+      "limit_check": "no-limits",
+      "deviation_from_typ": -0.27487653675740065,
+      "typical_check": "outside-screening-band",
+      "review": true
+    },
+    "qoss": {
+      "unit": "C",
+      "typ": 2.5e-08,
+      "max": 3.8e-08,
+      "conditions": "VDS = 50 V, VGS = 0 V",
+      "model": 2.5081325900277434e-08,
+      "limit_check": "inside-limits",
+      "deviation_from_typ": 0.0032530360110973877,
+      "typical_check": "within-screening-band",
+      "review": false
+    }
+  },
+  "informational": {
+    "rds_on_125C": 0.007463179865370652,
+    "rds_on_ratio_125C_to_25C": 1.6963527310684894
+  },
+  "checks_and_definitions": {
+    "capacitance_sign_check": "CISS and CRSS use signed currents; a negative value indicates a sign-convention error",
+    "ac_integrated": {
+      "qoss_C": 2.5080907502349315e-08,
+      "eoss_J": 5.017592571617875e-07,
+      "points": 401,
+      "method": "trapezoid of small-signal COSS over 0..50 V, 0.25 V spacing"
+    },
+    "transient": {
+      "qoss_C": 2.5081325900277434e-08,
+      "eoss_J": 5.017799476976438e-07,
+      "method": "integral of drain-source current over a 1 us 0 -> 50 V ramp"
+    },
+    "ac_vs_transient": {
+      "qoss_relative_difference": 1.668165111295425e-05,
+      "eoss_relative_difference": 4.123428198187376e-05,
+      "tolerance": 0.02,
+      "purpose": "checks that the model's small-signal and large-signal output charge agree in LTspice",
+      "outcome": "pass"
+    },
+    "gate_charge_checks": {
+      "starting_bias": {
+        "vgs_V": 0.045718416571617126,
+        "vds_V": 50.01599884033203,
+        "clamp_current_A": 15.999999046325684,
+        "fet_drain_current_A": 8.949362495513924e-07,
+        "expect": "VGS near 0, VDS near 50 V, load current in the clamp, FET off"
+      },
+      "gate_current_balance": {
+        "definition": "I(Ig) - Ix(X1:gatein) - V(g)/Rhold at every time point",
+        "max_abs_residual_A": 6.896257400516317e-10,
+        "hold_resistor_current_at_5V_A": 5.0008835792541506e-05
+      },
+      "integration_resolution": {
+        "qg_full_C": 5.652160968327775e-09,
+        "qg_every_other_sample_C": 5.652169712453038e-09,
+        "relative_difference": 1.5470410896835273e-06
+      },
+      "drain_transition_at_vgs_5V": {
+        "vds_V": 0.0704193115234375,
+        "fet_drain_current_A": 16.0,
+        "clamp_current_A": -4.992963198446887e-08,
+        "expect": "VDS near 16 A x RDS(on), FET carries the 16 A load"
+      },
+      "miller_plateau_vgs_V": 2.0476862333621937,
+      "endpoint_sensitivity": {
+        "qgs_C_by_clamp_threshold_fraction": {
+          "0.1": 1.3344181736079368e-09,
+          "0.01": 1.3513883917908666e-09,
+          "0.001": 1.3531292974530524e-09
+        },
+        "qgd_C_by_vds_end_V": {
+          "10.0": 3.75669531689346e-10,
+          "5.0": 6.515498068068447e-10,
+          "1.0": 9.991912162547055e-10
+        }
+      }
+    },
+    "gate_charge_equation_check": {
+      "qg_from_model_equations_C": 5.646521322165067e-09,
+      "qg_transient_C": 5.652160968327775e-09,
+      "relative_difference": 0.0009987824079526098,
+      "tolerance": 0.01,
+      "outcome": "pass",
+      "method": "Q_gate(end) - Q_gate(start) from the EPC2204 charge equations, parameters read from the local library, at the simulated start and VGS = 5 V states"
+    },
+    "gate_charge_numerical_convergence": {
+      "qg_reltol_1e-7_C": 5.652160952196832e-09,
+      "relative_change_1e-6_to_1e-7": 2.853942526748199e-09,
+      "qg_default_reltol_C": 3.815202355112368e-09,
+      "default_reltol_note": "LTspice default reltol (1e-3); kept to record the under-integration artifact",
+      "tolerance": 0.005,
+      "outcome": "pass"
+    },
+    "gate_charge_drive_current_sensitivity": {
+      "values_at_2mA_C": {
+        "qg": 5.684325307961257e-09,
+        "qg_th": 7.271247434521674e-10,
+        "qgs": 1.3512249056856587e-09,
+        "qgd": 6.504649023357436e-10
+      },
+      "relative_change_from_10mA": {
+        "qg": 0.005690626967936208,
+        "qg_th": 0.0027599164983833635,
+        "qgs": -0.00012097640189967507,
+        "qgd": -0.001665113640994087
+      },
+      "gate_current_balance_2mA": {
+        "definition": "I(Ig) - Ix(X1:gatein) - V(g)/Rhold at every time point",
+        "max_abs_residual_A": 2.133101224883918e-10,
+        "hold_resistor_current_at_5V_A": 5.000136375427246e-05
+      },
+      "tolerance_qg": 0.005,
+      "leakage_diagnostic": {
+        "added_after_the_declared_check_failed": true,
+        "leakage_charge_to_vgs_5V_C": {
+          "10mA": 6.607094466237327e-12,
+          "2mA": 3.519882768287075e-11
+        },
+        "stored_charge_qg_minus_leakage_C": {
+          "10mA": 5.6455538738615375e-09,
+          "2mA": 5.649126480278386e-09
+        },
+        "stored_charge_relative_difference": 0.0006328176998522395,
+        "method": "integral of the model's gate-diode and convergence-resistor currents along each trajectory"
+      },
+      "outcome": "fail",
+      "purpose": "a charge-based model gives the same QG at any drive current, apart from gate leakage"
+    },
+    "gate_charge_definitions": {
+      "qg": "charge delivered into the gate terminal (Ix(x1:gatein)) when VGS reaches 5 V; 10 mA drive",
+      "qg_th": "gate charge when VGS reaches the model's VGS(th) from the vgs_th bench",
+      "qgs": "gate charge when the clamp-diode current falls below 1% of 16 A (FET carries the load)",
+      "qgd": "additional charge until VDS falls to 5 V (10% of 50 V)",
+      "note": "QGS/QGD/QG(TH) boundary definitions are the bench's; EPC's exact extraction definitions are not stated"
+    }
+  },
+  "evidence_directory": "runs\\epc2204-baseline-49b0f16ef1b64d8ba6e35289abe50015",
+  "runs": {
+    "rds_on_25C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7339999999385327,
+      "warnings": [],
+      "netlist_sha256": "1613c02c3571cc79eaa40b4d50de0de34bbf9a4a049b6656569d0d80f8528084"
+    },
+    "rds_on_125C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.75,
+      "warnings": [],
+      "netlist_sha256": "99bb24214510dd328b4465d85881a5db1c63c14e545f9d3b16955cc784117b5a"
+    },
+    "vgs_th": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7660000000614673,
+      "warnings": [],
+      "netlist_sha256": "7917cedece8f5cfa5cae3c2f247ff03080f823d389a61affbfde4bb086c028cc"
+    },
+    "vsd": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.734000000054948,
+      "warnings": [],
+      "netlist_sha256": "fda4ed9c679e562ceb8448c53f5ad00c83565d2fb72bb6f418f4a664c79fc2eb"
+    },
+    "caps_gate_ac": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7189999999245629,
+      "warnings": [],
+      "netlist_sha256": "a7bb6e16eacb64e255c692eb588fae5f3db2f3a29dae3c6ea347bd4d728e516e"
+    },
+    "coss_curve_ac": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 17.31200000003446,
+      "warnings": [],
+      "netlist_sha256": "08ae435839d86af51693834576ea47136c9a1d99ba309c1b8c03010c8811bf1c"
+    },
+    "qoss_tran": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7970000000204891,
+      "warnings": [],
+      "netlist_sha256": "b9735a018107c8fb5b6de1e192db52e081deb9426055e9a3cbe8620c7e8ce61a"
+    },
+    "gate_charge_tran": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 1.0160000000614673,
+      "warnings": [],
+      "netlist_sha256": "c259da9f8a77e9be430b85cc0146b1f9c9f2d120523a2d8f94e614ca20375a7d"
+    },
+    "gate_charge_tran_2mA": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 1.5,
+      "warnings": [],
+      "netlist_sha256": "a047dd87f8f1f77cefb58482516a5aab2e472466d5e79c83282c41ed37f62de1"
+    },
+    "gate_charge_tran_reltol1e-7": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 1.0160000000614673,
+      "warnings": [],
+      "netlist_sha256": "7807b4d18d034b5699ddc4b36aa8ef97f5ddd897037a0979a3f6f41cba98efde"
+    },
+    "gate_charge_tran_default_reltol": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.9690000000409782,
+      "warnings": [],
+      "netlist_sha256": "1acd9879e4ae019dbd81ada6849e7a97268f6d5a6a2882e7f6bb97ab679dee1a"
+    },
+    "output_curves_25C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.75,
+      "warnings": [],
+      "netlist_sha256": "2d11eef6fa76ff582633d4fb57c926731c379bd25415169ed2568533958c6176"
+    },
+    "transfer_curve_25C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7339999999385327,
+      "warnings": [],
+      "netlist_sha256": "1b8cd5e532d5cda31b06634650ce14d0aaab32ec8e094a750754b9ea60c8ba62"
+    },
+    "transfer_curve_125C": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7190000000409782,
+      "warnings": [],
+      "netlist_sha256": "3738d5fd8fffcf528e91fe400d3dc991f6889b6a8fab3eb783d76a21b354c20f"
+    }
+  },
+  "curves_file": "results\\gan\\epc2204-model-curves.json"
+}

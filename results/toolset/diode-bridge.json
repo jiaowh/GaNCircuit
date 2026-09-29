@@ -1,9 +1,10 @@
 {
   "schema": "diode-bridge/1",
-  "scope": "Native SPICE fixture data; not a TCAD-derived physical device",
+  "scope": "Native LTspice diode fixture data; not a TCAD-derived physical device",
+  "simulator": "ltspice",
   "outcome": "pass",
-  "dataset_hash": "663a1afdb3afd591733152d65204756123ebfbad9b6c52d477fa6370a5906cdd",
-  "device_revision": "native-spice-fixture:880c16cd7c479d41a44554e9bbf772772b0161a6062e77eca6725eacc5540079",
+  "dataset_hash": "9158a3a5c15698f45bff615347dded398c797981c542c83664a9d7e296215b04",
+  "device_revision": "native-spice-fixture:9884d8368b5e54a281d5cb724860b0230f323c7e448866dc4097e6694cb306e6",
   "train_ids": [
     "point-4",
     "point-6",
@@ -15,59 +16,99 @@
     "point-7",
     "point-9"
   ],
-  "heldout_mean_relative_error": 0.00012510209325307205,
-  "export_replay_max_relative_error": 0.00030661042036120664,
+  "heldout_mean_relative_error": 0.00012510584890092742,
+  "export_replay_max_relative_error": 0.00031758500370208665,
   "tolerance": 0.002,
-  "model": ".model fitted_diode D(Is=9.9942692090432441e-13 N=0.99996555759024031 TNOM=26.85)\n",
+  "model": ".model fitted_diode D(Is=9.9942655460707849e-13 N=0.99996693444745177 TNOM=26.85)\n",
   "reference_provenance": {
-    "simulator": "ngspice",
-    "executable": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
-    "tool_version": "** ngspice-42 : Circuit level simulation program",
-    "tool_version_sha256": "1dfcf1a9423225b0fb543ad1f819066fe61fc60f2688fe035bf4b05fa22f7d73",
-    "executable_sha256": "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
-    "netlist_sha256": "880c16cd7c479d41a44554e9bbf772772b0161a6062e77eca6725eacc5540079",
-    "netlist": "netlist.cir",
-    "timeout_s": 30.0,
-    "options": [],
+    "simulator": "ltspice",
+    "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+    "tool_version": "26.1.1.0",
+    "executable_sha256": "3c144a2b3ec6a30baac6761c502d99b95aaa40b947ff5eca25b8fbd80d68af72",
+    "netlist": "bench.cir",
+    "netlist_sha256": "b5ced673b43f86ac738d86f18061d32ca455e4e8c986873fdf68cf8eb8b129b2",
+    "timeout_s": 60.0,
+    "ascii_raw": false,
     "command": [
-      "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
-      "-n",
+      "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
       "-b",
-      "-o",
-      "ngspice.log",
-      "netlist.cir"
+      "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\diode-bridge-d47dd290eba541eea63e36c101346299\\reference\\bench.cir"
     ],
-    "status": "completed",
+    "libraries": {},
     "returncode": 0,
-    "measurements": true,
-    "log_sha256": "10e228c3a1fcb1b7d894c2e37aae0fe19ea951ebb9d6f0bd0b2be468373cafd4",
-    "result_raw_sha256": "759ec54d6e79c739ce969c3c63add2c4c74aa8fd38d3facc1e22f1d110e6b245",
-    "result_sha256": "56bcc04feb343a4e306e00b363e89447ea18ea90ad2f6cb9055ce58d418c0861"
+    "log_sha256": "475e08d6cd94bc7c86e45d354a960d85cd6aac69fc0c92a2a97f3e8f6fd81239",
+    "declared_measurements": [],
+    "log_errors": [],
+    "log_warnings": [],
+    "log_notices": [
+      "gmin = 1e-18"
+    ],
+    "failed_measurements": [],
+    "missing_measurements": [],
+    "files_loaded": [
+      "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\diode-bridge-d47dd290eba541eea63e36c101346299\\reference\\bench.cir"
+    ],
+    "log_header": [
+      "LTspice 26.1.1 for Windows",
+      "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\diode-bridge-d47dd290eba541eea63e36c101346299\\reference\\bench.cir",
+      "Start Time: Mon Sep 28 11:29:59 2026"
+    ],
+    "raw_sha256": "3976a2a04832d3a2ded2f61911d8a0b5a552c344d2d1cb9f3e0cb028dba727c1",
+    "raw_plotname": "DC transfer characteristic",
+    "raw_flags": [
+      "real",
+      "forward",
+      "linear"
+    ],
+    "raw_points": 11,
+    "raw_steps": 1,
+    "result_sha256": "6bbf6bf6b48c1656807c7e7c6cc530068be3d6d7d24af1056d4ef1e4b20c734d",
+    "status": "completed"
   },
   "replay_provenance": {
-    "simulator": "ngspice",
-    "executable": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
-    "tool_version": "** ngspice-42 : Circuit level simulation program",
-    "tool_version_sha256": "1dfcf1a9423225b0fb543ad1f819066fe61fc60f2688fe035bf4b05fa22f7d73",
-    "executable_sha256": "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
-    "netlist_sha256": "7734cf3d78c3744aff03ca07a812263a2348ed75e71794a399dc637e57abd1de",
-    "netlist": "netlist.cir",
-    "timeout_s": 30.0,
-    "options": [],
+    "simulator": "ltspice",
+    "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+    "tool_version": "26.1.1.0",
+    "executable_sha256": "3c144a2b3ec6a30baac6761c502d99b95aaa40b947ff5eca25b8fbd80d68af72",
+    "netlist": "bench.cir",
+    "netlist_sha256": "778c64b63d6f3d7ace82a0e285f0abcb634318b6de6a0833f52c1d82ab331ae1",
+    "timeout_s": 60.0,
+    "ascii_raw": false,
     "command": [
-      "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/.tools/ngspice/usr/bin/ngspice",
-      "-n",
+      "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
       "-b",
-      "-o",
-      "ngspice.log",
-      "netlist.cir"
+      "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\diode-bridge-d47dd290eba541eea63e36c101346299\\exported\\bench.cir"
     ],
-    "status": "completed",
+    "libraries": {},
     "returncode": 0,
-    "measurements": true,
-    "log_sha256": "ce22378b40cdc0c7fb73ebc8ced58d70107d5d1b5876d2a6273f4d639f997e76",
-    "result_raw_sha256": "31fa86681720f661e6090dca4b904d6d41775f467bead614f3a9dc867d279d73",
-    "result_sha256": "fc6aa6db8b65b4f0b5c25491a7eeb3345adb2c95c6f7ac788819d37c45acc6c5"
+    "log_sha256": "4b6ed3619127e374b22bb7fc880a944fe5d6c8fe9b9ba5fab6402490678f46c8",
+    "declared_measurements": [],
+    "log_errors": [],
+    "log_warnings": [],
+    "log_notices": [
+      "gmin = 1e-18"
+    ],
+    "failed_measurements": [],
+    "missing_measurements": [],
+    "files_loaded": [
+      "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\diode-bridge-d47dd290eba541eea63e36c101346299\\exported\\bench.cir"
+    ],
+    "log_header": [
+      "LTspice 26.1.1 for Windows",
+      "Circuit: C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\diode-bridge-d47dd290eba541eea63e36c101346299\\exported\\bench.cir",
+      "Start Time: Mon Sep 28 11:29:59 2026"
+    ],
+    "raw_sha256": "7ae9b4fd6bb4e10b8202e692fb4e7284dfb58aa2095e231408e1e497c253d541",
+    "raw_plotname": "DC transfer characteristic",
+    "raw_flags": [
+      "real",
+      "forward",
+      "linear"
+    ],
+    "raw_points": 7,
+    "raw_steps": 1,
+    "result_sha256": "4831c68cd2d0b170e5b637dc657c40e99516fc696fc4dba0f0c47f37f04e3e0c",
+    "status": "completed"
   },
-  "evidence_directory": "/mnt/c/Users/Jiaow/Documents/github/phd_circuit/runs/diode-bridge-165fd6baae1d4eadacbeb02b0ce48c2b"
+  "evidence_directory": "runs\\diode-bridge-d47dd290eba541eea63e36c101346299"
 }

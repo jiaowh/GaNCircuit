@@ -1,0 +1,96 @@
+{
+    "schema": "vendor-target-sources/1",
+    "target": "EPC90133/EPC2302",
+    "selected_by": "owner, 2026-09-28",
+    "checked": "2026-09-28",
+    "board_page": "https://epc-co.com/epc/products/evaluation-boards/epc90133",
+    "device_page": "https://epc-co.com/epc/products/gan-fets-and-ics/epc2302",
+    "terms": "Vendor copyright notices apply; no redistribution permission established. Original downloads remain git-ignored.",
+    "files": [
+        {
+            "name": "EPC2302_datasheet.pdf",
+            "url": "https://epc-co.com/epc/documents/datasheets/EPC2302_datasheet.pdf",
+            "local_path": "vendor/epc/epc90133/EPC2302_datasheet.pdf",
+            "revision": "Revised April 29, 2026",
+            "sha256": "c77d265a098910385c9a4d334223316eea85d4b9d6ad93da5858a3b790495f0b",
+            "status": "downloaded; PDF readable"
+        },
+        {
+            "name": "EPC90133_qsg.pdf",
+            "url": "https://epc-co.com/epc/documents/guides/EPC90133_qsg.pdf",
+            "local_path": "vendor/epc/epc90133/EPC90133_qsg.pdf",
+            "revision": "Version 1.0, September 6, 2022",
+            "sha256": "53e70a9c7f4583b079c8c2ce20117e3be3b6b0417146b56cdd09a32a71764886",
+            "status": "downloaded; PDF readable"
+        },
+        {
+            "name": "EPC90133_Schematic.pdf",
+            "url": "https://epc-co.com/epc/documents/schematics/EPC90133_Schematic.pdf",
+            "local_path": "vendor/epc/epc90133/EPC90133_Schematic.pdf",
+            "revision": "Revision not yet audited",
+            "sha256": "8056d102f46df9f955b302a24dc881a29b357daebb59c7adb8ce35bd3c098947",
+            "status": "downloaded; PDF readable"
+        },
+        {
+            "name": "EPC90133BOM.xlsx",
+            "url": "https://epc-co.com/epc/documents/bill-of-materials/EPC90133BOM.xlsx",
+            "local_path": "vendor/epc/epc90133/EPC90133BOM.xlsx",
+            "retrieved": "2026-09-28",
+            "revision": "no revision or date in the file",
+            "sha256": "b3ffeee264c5a6280f02a16b2db909a256aec3bb93c37746c07d90456d34824b",
+            "status": "downloaded; 90 fitted and 14 optional reference designators"
+        },
+        {
+            "name": "EPC90133 Development Board Gerbers.zip",
+            "url": "https://epc-co.com/epc/documents/gerber-files/EPC90133%20Development%20Board%20Gerbers.zip",
+            "local_path": "vendor/epc/epc90133/EPC90133 Development Board Gerbers.zip",
+            "retrieved": "2026-09-28",
+            "revision": "B5253 Rev 2.0, files dated 2022-01-18",
+            "sha256": "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1",
+            "contents": "8 copper Gerbers (GTL, G1-G6, GBL), NC drill, stackup .xls, fab notes PDF, layout PDF (Altium print with component tokens)",
+            "status": "downloaded; extracted to vendor/epc/epc90133/gerbers"
+        }
+    ],
+    "model": {
+        "subcircuit": "EPC2302 gatein drainin sourcein",
+        "local_path": "vendor/epc/ltspice/EPCGaNLibrary.lib",
+        "sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+        "archive_provenance": "devices/epc/sources.json",
+        "status": "unmodified subcircuit executed in LTspice 28 September 2026 by scripts/epc2302_baseline.py; table baseline in results/gan/epc2302-baseline.json"
+    },
+    "pending_resources": [
+        "Editable Altium: 'Altium file from Ask a GaN Expert' on the board page; optional, not requested, does not block our design",
+        "Physical board identity: silkscreen revision of any board we obtain versus B5253 Rev 2.0",
+        "Gerbers are not KiCad projects; a geometry reader for extraction is not yet written"
+    ],
+    "gate_status": {
+        "G0": "Target selected; source/board identity, lab inventory and test envelope still open",
+        "G1": "Existing LTspice adapter qualification retained; EPC2302 model executes through it (2026-09-28)",
+        "G2": "EPC2302 table baseline and curve comparison run (2026-09-28): 24 curves in Figs. 1-6 and 8-10 pass; Fig. 7 gate charge fails its declared checks; table QGD/QG(TH) unresolved. G2 open; owner (2026-09-28): provisional G3 baseline, gate-charge-dependent results not validated; EPC2204 acceptance does not transfer",
+        "G3": "EPC90133 BOM, Gerbers (B5253 Rev 2.0, 8 copper layers) and stackup retrieved and cross-checked; board simulation and extraction not built"
+    },
+    "retained_reference": "EPC9097/EPC2204 results preserved separately; no measurements or fitted parasitics transferred",
+    "board_page_listing_checked": {
+        "date": "2026-09-28",
+        "documents_listed": [
+            "EPC90133BOM.xlsx",
+            "EPC90133 Development Board Gerbers.zip",
+            "EPC90133_qsg.pdf",
+            "EPC90133_Schematic.pdf"
+        ],
+        "not_listed": "no ODB++, separate stackup report or test-point report (unlike EPC9097). One published layout found (B5253 Rev 2.0); that does not prove no other revision exists.",
+        "page_terms": "Copyright (c) 2026 Efficient Power Conversion Corporation. All rights reserved; site links 'terms of use'. No redistribution licence found; files stay local."
+    },
+    "board_audit": {
+        "script": "scripts/audit_epc90133_board_files.py",
+        "result": "results/gan/epc90133-board-audit.json",
+        "geometry_reader": "src/circuit_tools/gerber.py; scripts/read_epc90133_geometry.py -> results/gan/epc90133-geometry.json",
+        "schematic": "devices/epc/epc90133-schematic.json; scripts/epc90133_schematic.py -> results/gan/epc90133-schematic-check.json",
+        "findings": [
+            "drill layer-pair file design path names 'EPC90133 (Die EPC2301) ... 80V 1_9 mE EPC2301 ... Rev2_0'; BOM/schematic/guide say EPC2302; meaning unknown",
+            "schematic labels U80 uP1966A; BOM and guide uP1966E",
+            "optional J32 (MMCX) is described in the guide but absent from the Rev 2.0 layout component tokens",
+            "all 445 drills are through-holes (single top-bottom layer pair)"
+        ]
+    }
+}

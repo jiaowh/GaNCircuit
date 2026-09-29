@@ -1,0 +1,8 @@
+* Known answer: I(R1) = (V(a) - V(b)) / 2k over a nested sweep (3 x 2 points)
+Va a 0 0
+Vb b 0 0
+R1 a b 2k
+* numdgt > 6 makes LTspice store double-precision traces (float32 limits this check to ~3e-11 A)
+.options numdgt=15
+.dc Va 0 1 0.5 Vb 1 2 1
+.end

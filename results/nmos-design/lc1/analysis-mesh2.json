@@ -1,0 +1,104 @@
+{
+ "schema": "planar-nmos-analysis/1",
+ "supply_v": 3.3,
+ "constant_current_criterion_a_per_cm": 0.001,
+ "transfer": {
+  "0.05": {
+   "vt_constant_current_v": 0.3386845971883718,
+   "subthreshold_slope_mv_per_dec": 79.68948833086009,
+   "gm_peak_s_per_cm": 0.07020387684507094,
+   "vg_at_gm_peak_v": 1.9,
+   "vt_linear_extrapolation_v": 0.38075983089375554
+  },
+  "1.65": {
+   "vt_constant_current_v": 0.3205741556884638,
+   "subthreshold_slope_mv_per_dec": 79.45669716278249,
+   "gm_peak_s_per_cm": 2.2836397239983506,
+   "vg_at_gm_peak_v": 3.2,
+   "vt_linear_extrapolation_v": 0.47670832558824894
+  },
+  "3.3": {
+   "vt_constant_current_v": 0.31763951573478333,
+   "subthreshold_slope_mv_per_dec": 79.41843391270892,
+   "gm_peak_s_per_cm": 3.607064598736494,
+   "vg_at_gm_peak_v": 3.2,
+   "vt_linear_extrapolation_v": 0.07158657888713016
+  }
+ },
+ "vt_linear_v": 0.38075983089375554,
+ "dibl_mv_per_v": 6.47540967802722,
+ "ion_a_per_cm": 5.698578879829769,
+ "ion_ua_per_um": 569.857887982977,
+ "ioff_a_per_cm": 1.349582751742151e-07,
+ "ioff_resolved": true,
+ "ion_over_ioff": 42224745.92590622,
+ "mid_supply_small_signal": {
+  "0.5": {
+   "vov_v": 0.11924016910624446,
+   "id_a_per_cm": 0.019012248416944526,
+   "gm_s_per_cm": 0.19567748870225193,
+   "gds_s_per_cm": 0.0008108731329743107,
+   "intrinsic_gain": 241.31702080755855,
+   "gm_over_id_per_v": 10.292180304558602,
+   "early_voltage_v": 23.446637511847186,
+   "gm_rd_at_mid_supply": 16.982097502521693
+  },
+  "0.75": {
+   "vov_v": 0.36924016910624446,
+   "id_a_per_cm": 0.10576290996459692,
+   "gm_s_per_cm": 0.5044904089414844,
+   "gds_s_per_cm": 0.004479497501406055,
+   "intrinsic_gain": 112.62209852402675,
+   "gm_over_id_per_v": 4.77001256026671,
+   "early_voltage_v": 23.61044066469494,
+   "gm_rd_at_mid_supply": 7.870520724440071
+  },
+  "1.0": {
+   "vov_v": 0.6192401691062445,
+   "id_a_per_cm": 0.27167486811532815,
+   "gm_s_per_cm": 0.8227702689243339,
+   "gds_s_per_cm": 0.01191459271060916,
+   "intrinsic_gain": 69.05567726135625,
+   "gm_over_id_per_v": 3.0285107880316016,
+   "early_voltage_v": 22.801859426837108,
+   "gm_rd_at_mid_supply": 4.997042800252142
+  },
+  "1.5": {
+   "vov_v": 1.1192401691062446,
+   "id_a_per_cm": 0.8394084013509826,
+   "gm_s_per_cm": 1.441203867312186,
+   "gds_s_per_cm": 0.04324043317365301,
+   "intrinsic_gain": 33.33000531063901,
+   "gm_over_id_per_v": 1.7169280948256487,
+   "early_voltage_v": 19.412580766245554,
+   "gm_rd_at_mid_supply": 2.83293135646232
+  },
+  "2.0": {
+   "vov_v": 1.6192401691062446,
+   "id_a_per_cm": 1.6988162661844797,
+   "gm_s_per_cm": 1.9638744306686544,
+   "gds_s_per_cm": 0.15260957155353366,
+   "intrinsic_gain": 12.86861899078034,
+   "gm_over_id_per_v": 1.1560252098830512,
+   "early_voltage_v": 11.131780588143219,
+   "gm_rd_at_mid_supply": 1.9074415963070344
+  },
+  "3.0": {
+   "vov_v": 2.6192401691062446,
+   "id_a_per_cm": 3.877549633923325,
+   "gm_s_per_cm": 2.2735755148877623,
+   "gds_s_per_cm": 1.1298965475960303,
+   "intrinsic_gain": 2.0121979483210435,
+   "gm_over_id_per_v": 0.5863433687597563,
+   "early_voltage_v": 3.431774034687694,
+   "gm_rd_at_mid_supply": 0.967466558453598
+  }
+ },
+ "method": "finite differences on the sweep grid; gm from the Vd=VDD/2 transfer curve, gds from output curves interpolated to VDD/2",
+ "source": {
+  "sweep": "results\\nmos-design\\lc1\\sweep-mesh2.json",
+  "spec_sha256": "e93b516e6042e7641efb8cf95e2912ee3e27b05c1d68246311b02d0dc6b0cc3e",
+  "mesh_scale": 2.0
+ },
+ "plot": "results\\nmos-design\\lc1\\analysis-mesh2.png"
+}

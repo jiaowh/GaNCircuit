@@ -10,3 +10,9 @@ devices/devsim-upstream/
 devices/spicexplorer-release/
 devices/ltspice-mcp/
 devices/mcp-spice/
+
+# Regenerable simulation scratch output (meshes, fields, raw logs)
+results/**/*-work/
+results/device-reference/work/
+# Vendor files: keep provenance records in git, files outside it until terms allow
+vendor/

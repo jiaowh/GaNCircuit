@@ -1,0 +1,677 @@
+{
+  "schema": "epc9097-switching-ideal-layout/1",
+  "gate": "G3 (stock-board simulation), step: switching bench before layout extraction",
+  "scope": "Simulated predictions from the unmodified EPC2204 model with a behavioural driver and swept, not extracted, loop inductance. Not a board prediction until the loop inductance is extracted from the matching layout revision; not validated against measurement.",
+  "run_outcome": "completed",
+  "failed_runs": {},
+  "evaluator_sha256": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+  "model": {
+    "library": "EPCGaNLibrary.lib",
+    "library_sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+    "archive_sha256": "107611b7510e4e7d374a1baa646ecf432dd50a81150eb2470900f3b2cdbf1c65",
+    "subcircuit": "EPC2204",
+    "modified": false
+  },
+  "tool": {
+    "name": "ltspice",
+    "available": true,
+    "executable": "C:\\Users\\Jiaow\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+    "version": "26.1.1.0",
+    "capabilities": [
+      "batch",
+      "raw-binary",
+      "raw-ascii",
+      "op",
+      "dc",
+      "ac",
+      "tran",
+      "meas",
+      "step"
+    ],
+    "reason": null
+  },
+  "conditions": {
+    "vin_V": 48.0,
+    "vout_V": 12.0,
+    "inductor_H": 2.2e-06,
+    "switching_frequency_Hz": 1000000.0,
+    "off_time_s": 7.5e-07,
+    "ripple_A_pp": 4.090909090909091,
+    "loads_A": [
+      10.0,
+      15.0
+    ],
+    "double_pulse": "converter-equivalent: turn-off at load + ripple/2, turn-on at load - ripple/2",
+    "temperature_C": 25,
+    "source": "EPC9097 QSG v3.0 Table 2 and Figs. 12-14"
+  },
+  "assumptions": {
+    "driver": "behavioural uP1966E: ramped pull-up/pull-down sources behind typical 0.7/0.4 ohm, each connected only while active; ramps calibrated to the datasheet's 8 ns rise / 4 ns fall into 3000 pF; propagation delay omitted",
+    "gate_resistors": {
+      "turn_on_ohm": 1.0,
+      "turn_off_ohm": 0.0,
+      "source": "schematic R80-R83, BOM"
+    },
+    "high_side_supply_V": 4.8,
+    "low_side_supply_V": 5.0,
+    "loop_capacitors": "7 x 220 nF (BOM Ci1-Ci7) as one ideal 1.54 uF, 1 mohm ESR; no DC-bias derating",
+    "bus_network": [
+      "Vin vin 0 {vin}",
+      "Rsup vin vm1 20m",
+      "Lsup vm1 vm 20n",
+      "Cm vm vmc 10u",
+      "Rcm vmc 0 10m",
+      "Rbus vm vcr 2m",
+      "Lbus vcr vc 1n"
+    ],
+    "loop_inductance": "lumped in series with Q1 drain; swept, not extracted",
+    "gate_and_common_source_inductance_H": 0,
+    "dead_time": "applied at the driver inputs, as the QSG defines it"
+  },
+  "driver_calibration": {
+    "load_F": 3e-09,
+    "r_source_ohm": 0.7,
+    "r_sink_ohm": 0.4,
+    "grid_control_edge_s": [
+      1e-10,
+      5e-10,
+      1e-09,
+      2e-09,
+      3e-09,
+      4e-09,
+      6e-09,
+      8e-09,
+      1e-08,
+      1.2e-08
+    ],
+    "rise_10_90_s": [
+      4.620753771068382e-09,
+      4.621427551179065e-09,
+      4.6784545303941675e-09,
+      4.932029200414328e-09,
+      5.2848636038961135e-09,
+      5.7050248657560496e-09,
+      6.696261324048081e-09,
+      7.8407290630051e-09,
+      9.09943261146525e-09,
+      1.0444517419514445e-08
+    ],
+    "fall_90_10_s": [
+      2.6432441751329864e-09,
+      2.664309758812612e-09,
+      2.778212279629321e-09,
+      3.138221775637168e-09,
+      3.6044923934180926e-09,
+      4.146046491641677e-09,
+      5.3892317718064825e-09,
+      6.7757488865432686e-09,
+      8.253195329577642e-09,
+      9.791299602780592e-09
+    ],
+    "target_rise_s": 8e-09,
+    "target_fall_s": 4e-09,
+    "calibrated_pull_up_edge_s": 8.253071403810289e-09,
+    "calibrated_pull_down_edge_s": 3.730319663131087e-09
+  },
+  "loop_inductance_sweep_H": [
+    1e-11,
+    2e-10,
+    4e-10,
+    8e-10
+  ],
+  "cases": {
+    "lloop_10pH_dt10ns": {
+      "parameters": {
+        "l_loop": 1e-11,
+        "dead": 1e-08
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.886130332948474,
+          "sw_fall_time_90_10_s": 3.200573454845671e-09,
+          "sw_dv_dt_V_per_s": 11997849929.63132,
+          "q1_eoff_J": 5.019526237890973e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.562028169631958
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.87894916533735,
+          "sw_rise_time_10_90_s": 1.1882215644001068e-09,
+          "sw_dv_dt_V_per_s": 32317205099.19114,
+          "sw_peak_V": 48.080589294433594,
+          "sw_overshoot_above_bus_V": 0.022884368896484375,
+          "ringing_frequency_Hz": 2882287846.046644,
+          "ringing_damping_ratio": 0.008621487314195297,
+          "q1_peak_drain_current_A": 29.65218162536621,
+          "q1_eon_J": 1.3289342344976598e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.3471904710582723e-06,
+          "q2_gate_peak_during_rise_V": 0.3218260109424591
+        },
+        "limits": {
+          "q1_vds_max_V": 50.773152589797974,
+          "q2_vds_max_V": 48.2593879699707,
+          "q1_vgs_max_V": 4.799896240234375,
+          "q2_vgs_max_V": 4.999689102172852,
+          "q2_vgs_min_V": -0.2972375750541687,
+          "bus_voltage_at_event_b_V": 48.05770492553711
+        }
+      }
+    },
+    "lloop_200pH_dt10ns": {
+      "parameters": {
+        "l_loop": 2e-10,
+        "dead": 1e-08
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.885564804078951,
+          "sw_fall_time_90_10_s": 3.0434073943636413e-09,
+          "sw_dv_dt_V_per_s": 12617436650.484718,
+          "q1_eoff_J": 5.13518150609872e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.4884655475616455
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.879165649407565,
+          "sw_rise_time_10_90_s": 8.655594262701423e-10,
+          "sw_dv_dt_V_per_s": 44364371566.57492,
+          "sw_peak_V": 51.778282165527344,
+          "sw_overshoot_above_bus_V": 3.7207603454589844,
+          "ringing_frequency_Hz": 639849456.7474605,
+          "ringing_damping_ratio": 0.008901961096425385,
+          "q1_peak_drain_current_A": 32.761898040771484,
+          "q1_eon_J": 1.233378476916986e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.2462114747229563e-06,
+          "q2_gate_peak_during_rise_V": 0.3529619574546814
+        },
+        "limits": {
+          "q1_vds_max_V": 53.67202639579773,
+          "q2_vds_max_V": 51.778282165527344,
+          "q1_vgs_max_V": 4.802333831787109,
+          "q2_vgs_max_V": 5.0007476806640625,
+          "q2_vgs_min_V": -0.28642743825912476,
+          "bus_voltage_at_event_b_V": 48.05752182006836
+        }
+      }
+    },
+    "lloop_400pH_dt10ns": {
+      "parameters": {
+        "l_loop": 4e-10,
+        "dead": 1e-08
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.884891510011462,
+          "sw_fall_time_90_10_s": 2.9488863726152915e-09,
+          "sw_dv_dt_V_per_s": 13021864917.07513,
+          "q1_eoff_J": 4.5262655488716594e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.5281858444213867
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.879112720482613,
+          "sw_rise_time_10_90_s": 6.980649978177469e-10,
+          "sw_dv_dt_V_per_s": 55009204185.91967,
+          "sw_peak_V": 69.4307632446289,
+          "sw_overshoot_above_bus_V": 21.372634887695312,
+          "ringing_frequency_Hz": 447868303.8216707,
+          "ringing_damping_ratio": 0.00628321590742235,
+          "q1_peak_drain_current_A": 38.302127838134766,
+          "q1_eon_J": 1.0773715009418693e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.1033123982869324e-06,
+          "q2_gate_peak_during_rise_V": 0.36424413323402405
+        },
+        "limits": {
+          "q1_vds_max_V": 54.34474563598633,
+          "q2_vds_max_V": 69.4307632446289,
+          "q1_vgs_max_V": 4.8140106201171875,
+          "q2_vgs_max_V": 5.0016608238220215,
+          "q2_vgs_min_V": -0.2883636951446533,
+          "bus_voltage_at_event_b_V": 48.058128356933594
+        }
+      }
+    },
+    "lloop_800pH_dt10ns": {
+      "parameters": {
+        "l_loop": 8e-10,
+        "dead": 1e-08
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.883490562440768,
+          "sw_fall_time_90_10_s": 2.925084020305863e-09,
+          "sw_dv_dt_V_per_s": 13127828032.777222,
+          "q1_eoff_J": 5.478215423550911e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.651552677154541
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.878864288322659,
+          "sw_rise_time_10_90_s": 6.985126465734435e-10,
+          "sw_dv_dt_V_per_s": 54973950991.970375,
+          "sw_peak_V": 95.64640045166016,
+          "sw_overshoot_above_bus_V": 47.5886116027832,
+          "ringing_frequency_Hz": 305079531.900416,
+          "ringing_damping_ratio": 0.004678672375321442,
+          "q1_peak_drain_current_A": 39.928627014160156,
+          "q1_eon_J": 7.135401531124297e-07,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 7.763105148934975e-07,
+          "q2_gate_peak_during_rise_V": 0.35268089175224304
+        },
+        "limits": {
+          "q1_vds_max_V": 64.67424011230469,
+          "q2_vds_max_V": 95.64640045166016,
+          "q1_vgs_max_V": 4.825550079345703,
+          "q2_vgs_max_V": 5.006378650665283,
+          "q2_vgs_min_V": -0.415775328874588,
+          "bus_voltage_at_event_b_V": 48.05778884887695
+        }
+      }
+    },
+    "lloop_400pH_dt10ns_15A": {
+      "parameters": {
+        "l_loop": 4e-10,
+        "dead": 1e-08,
+        "load": 15.0
+      },
+      "times_s": {
+        "t_off1": 1.0616666666666667e-06,
+        "t_on2": 1.8116666666666668e-06,
+        "t_off2": 1.961666666666667e-06,
+        "t_end": 2.0616666666666667e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 16.80001640313836,
+          "sw_fall_time_90_10_s": 2.1009755090549316e-09,
+          "sw_dv_dt_V_per_s": 18277224001.184685,
+          "q1_eoff_J": 5.127334549429517e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.857231855392456
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 12.770439147970615,
+          "sw_rise_time_10_90_s": 6.834002997092432e-10,
+          "sw_dv_dt_V_per_s": 56189615392.81958,
+          "sw_peak_V": 69.09365844726562,
+          "sw_overshoot_above_bus_V": 20.9463958740214,
+          "ringing_frequency_Hz": 448778517.29605776,
+          "ringing_damping_ratio": 0.005698929199432174,
+          "q1_peak_drain_current_A": 43.55996322631836,
+          "q1_eon_J": 1.3096021021866894e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.3494252482975439e-06,
+          "q2_gate_peak_during_rise_V": 0.37600192427635193
+        },
+        "limits": {
+          "q1_vds_max_V": 57.10098314285278,
+          "q2_vds_max_V": 69.09365844726562,
+          "q1_vgs_max_V": 4.813896179199219,
+          "q2_vgs_max_V": 5.002714157104492,
+          "q2_vgs_min_V": -0.41098955273628235,
+          "bus_voltage_at_event_b_V": 48.14726257324423
+        }
+      }
+    },
+    "lloop_400pH_dt4ns": {
+      "parameters": {
+        "l_loop": 4e-10,
+        "dead": 4e-09
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.884891510011462,
+          "sw_fall_time_90_10_s": 2.9535029691344485e-09,
+          "sw_dv_dt_V_per_s": 13001510545.714293,
+          "q1_eoff_J": 4.196008527819797e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -1.5610785484313965
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.888477325432564,
+          "sw_rise_time_10_90_s": 6.958805041183652e-10,
+          "sw_dv_dt_V_per_s": 55181887943.031654,
+          "sw_peak_V": 69.77458953857422,
+          "sw_overshoot_above_bus_V": 21.717529296879242,
+          "ringing_frequency_Hz": 447915874.5722396,
+          "ringing_damping_ratio": 0.006306680560229126,
+          "q1_peak_drain_current_A": 38.47807693481445,
+          "q1_eon_J": 1.1056307020687177e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.1317193566911236e-06,
+          "q2_gate_peak_during_rise_V": 0.36330801248550415
+        },
+        "limits": {
+          "q1_vds_max_V": 53.25246870517731,
+          "q2_vds_max_V": 69.77458953857422,
+          "q1_vgs_max_V": 4.814243316650391,
+          "q2_vgs_max_V": 5.00211763381958,
+          "q2_vgs_min_V": -0.03389984369277954,
+          "bus_voltage_at_event_b_V": 48.05706024169498
+        }
+      }
+    },
+    "lloop_400pH_dt16ns": {
+      "parameters": {
+        "l_loop": 4e-10,
+        "dead": 1.6e-08
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.884891510011462,
+          "sw_fall_time_90_10_s": 2.9488863726152915e-09,
+          "sw_dv_dt_V_per_s": 13021864917.07513,
+          "q1_eoff_J": 4.5262655488716594e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.5281858444213867
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.868624687187876,
+          "sw_rise_time_10_90_s": 6.894595544442996e-10,
+          "sw_dv_dt_V_per_s": 55695797893.39518,
+          "sw_peak_V": 69.7184066772461,
+          "sw_overshoot_above_bus_V": 21.660476684570312,
+          "ringing_frequency_Hz": 447133386.05911165,
+          "ringing_damping_ratio": 0.0062378916602606575,
+          "q1_peak_drain_current_A": 38.63651657104492,
+          "q1_eon_J": 1.0804081857967387e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.1062017978550278e-06,
+          "q2_gate_peak_during_rise_V": 0.36718133091926575
+        },
+        "limits": {
+          "q1_vds_max_V": 54.40778422355652,
+          "q2_vds_max_V": 69.7184066772461,
+          "q1_vgs_max_V": 4.814208984375,
+          "q2_vgs_max_V": 5.001219749450684,
+          "q2_vgs_min_V": -0.2883636951446533,
+          "bus_voltage_at_event_b_V": 48.05792999267578
+        }
+      }
+    },
+    "lloop_400pH_dt10ns_driver_rmax": {
+      "parameters": {
+        "l_loop": 4e-10,
+        "dead": 1e-08,
+        "r_src": 1.4,
+        "r_snk": 0.8
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.878111839296237,
+          "sw_fall_time_90_10_s": 2.958614343009297e-09,
+          "sw_dv_dt_V_per_s": 12979048820.85517,
+          "q1_eoff_J": 4.5860938163609594e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.692324161529541
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.880986213677245,
+          "sw_rise_time_10_90_s": 7.236716480545828e-10,
+          "sw_dv_dt_V_per_s": 53062739300.66097,
+          "sw_peak_V": 67.30609130859375,
+          "sw_overshoot_above_bus_V": 19.248123168945312,
+          "ringing_frequency_Hz": 449703924.33323663,
+          "ringing_damping_ratio": 0.005667538167010644,
+          "q1_peak_drain_current_A": 37.12724685668945,
+          "q1_eon_J": 1.1128524380035988e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.136175151899442e-06,
+          "q2_gate_peak_during_rise_V": 0.5858026742935181
+        },
+        "limits": {
+          "q1_vds_max_V": 54.39922261238098,
+          "q2_vds_max_V": 67.30609130859375,
+          "q1_vgs_max_V": 4.811985015869141,
+          "q2_vgs_max_V": 5.001344680786133,
+          "q2_vgs_min_V": -0.4914091229438782,
+          "bus_voltage_at_event_b_V": 48.05796813964844
+        }
+      }
+    },
+    "lloop_400pH_dt10ns_fine": {
+      "parameters": {
+        "l_loop": 4e-10,
+        "dead": 1e-08,
+        "maxstep": 1e-11,
+        "reltol": 1e-07
+      },
+      "times_s": {
+        "t_off1": 7.561111111111112e-07,
+        "t_on2": 1.5061111111111113e-06,
+        "t_off2": 1.6561111111111113e-06,
+        "t_end": 1.7561111111111114e-06
+      },
+      "metrics": {
+        "event_a_turn_off": {
+          "inductor_current_A": 11.884890556337252,
+          "sw_fall_time_90_10_s": 2.948967221233751e-09,
+          "sw_dv_dt_V_per_s": 13021507910.805027,
+          "q1_eoff_J": 4.525611283450317e-07,
+          "q1_eoff_definition": "terminal VDS*ID of Q1 from VGS1 = 90 % until VDS1 = 90 % of VIN + 2 ns",
+          "q2_third_quadrant_min_sw_V": -2.5285379886627197
+        },
+        "event_b_turn_on": {
+          "inductor_current_A": 7.87910175322968,
+          "sw_rise_time_10_90_s": 6.980105336454017e-10,
+          "sw_dv_dt_V_per_s": 55013496428.84859,
+          "sw_peak_V": 69.42876434326172,
+          "sw_overshoot_above_bus_V": 21.370635986328125,
+          "ringing_frequency_Hz": 448343358.3079713,
+          "ringing_damping_ratio": 0.006261004275505578,
+          "q1_peak_drain_current_A": 38.30168151855469,
+          "q1_eon_J": 1.0778473416666206e-06,
+          "q1_eon_definition": "terminal VDS*ID of Q1 from VGS1 = 10 % until VDS1 = 10 % of VIN",
+          "q1_eon_30ns_window_J": 1.1033219300614125e-06,
+          "q2_gate_peak_during_rise_V": 0.3642409145832062
+        },
+        "limits": {
+          "q1_vds_max_V": 54.29574966430664,
+          "q2_vds_max_V": 69.42876434326172,
+          "q1_vgs_max_V": 4.8140106201171875,
+          "q2_vgs_max_V": 5.001635551452637,
+          "q2_vgs_min_V": -0.28849583864212036,
+          "bus_voltage_at_event_b_V": 48.058128356933594
+        }
+      }
+    }
+  },
+  "numerical_convergence": {
+    "reference": "lloop_400pH_dt10ns",
+    "fine": "lloop_400pH_dt10ns_fine",
+    "change": "max step halved, reltol 1e-7",
+    "relative_change": {
+      "event_b_turn_on.sw_rise_time_10_90_s": 7.802163482684144e-05,
+      "event_b_turn_on.sw_overshoot_above_bus_V": 9.352620197233819e-05,
+      "event_b_turn_on.q1_eon_J": 0.0004416681936874056,
+      "event_b_turn_on.ringing_frequency_Hz": 0.0010607012870680332,
+      "event_a_turn_off.sw_fall_time_90_10_s": 2.7416661154022748e-05,
+      "event_a_turn_off.q1_eoff_J": 0.00014454861613355519
+    },
+    "tolerance": 0.02,
+    "outcome": "pass"
+  },
+  "evidence_directory": "runs\\epc9097-switching-7ce281da266e4ae6a9c9d2118c48d7a4",
+  "runs": {
+    "driver_edge_0": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7650000001303852,
+      "warnings": [],
+      "netlist_sha256": "18fa2f10376fcd653d66f31e0e8912ef3e337caa848f7c12a494eb39f5159d5e"
+    },
+    "driver_edge_1": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7819999998901039,
+      "warnings": [],
+      "netlist_sha256": "bee9ff376d96b0f852e3eb81144c43d3617a218457e2daa59c0c5f7408b09f77"
+    },
+    "driver_edge_2": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7809999999590218,
+      "warnings": [],
+      "netlist_sha256": "4f9f41651bba513677056b704594fa5a82566d2cb8dafa2675004f42e50573d1"
+    },
+    "driver_edge_3": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7810000001918525,
+      "warnings": [],
+      "netlist_sha256": "dfe06d271f2610ec8617b138207e1bcfb4fb320367f8dd821d86ecd4eb03c70d"
+    },
+    "driver_edge_4": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7339999999385327,
+      "warnings": [],
+      "netlist_sha256": "31387dabbd279f2012bf03b8c84571b49131fe07c27deb5e6812641c3c3a7ea7"
+    },
+    "driver_edge_5": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7660000000614673,
+      "warnings": [],
+      "netlist_sha256": "de35bdf13e349c2c52d5185b82391f2115046cd51428062da572a2308378167a"
+    },
+    "driver_edge_6": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7659999998286366,
+      "warnings": [],
+      "netlist_sha256": "bc7ba4881dade74d9d3fc3b3319fc416c8b589c7734eda265e84636eeb1d6cc4"
+    },
+    "driver_edge_7": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7660000000614673,
+      "warnings": [],
+      "netlist_sha256": "3a4cd0d3f027e90b789a908b452b77cf737c7aa2816ebc68a359ec6371892a58"
+    },
+    "driver_edge_8": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7809999999590218,
+      "warnings": [],
+      "netlist_sha256": "9cb75fd53978540dc12455291ccdd0e5ed2ae2f9f578109eb1376ecfba25475a"
+    },
+    "driver_edge_9": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 0.7650000001303852,
+      "warnings": [],
+      "netlist_sha256": "3611f4f78fc686611a895ecab3969cc414bf86b2819a2497cd9e324e18750e5f"
+    },
+    "lloop_10pH_dt10ns": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 3.265000000130385,
+      "warnings": [],
+      "netlist_sha256": "2b6699d139618de30a93aca278b06bccbb1fd4a23d840f3061539a629f5afe75"
+    },
+    "lloop_200pH_dt10ns": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 3.9380000000819564,
+      "warnings": [],
+      "netlist_sha256": "f5a686bc8e410b3e402b221d92e765a17b9cee763c56c6d9b5c928b3b904275b"
+    },
+    "lloop_400pH_dt10ns": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 358.59399999980815,
+      "warnings": [],
+      "netlist_sha256": "34a5a6a7072f8881e2830d27ae0f3ee14a30e3897c2717f4f41335698cf0eefd"
+    },
+    "lloop_800pH_dt10ns": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 3.75,
+      "warnings": [],
+      "netlist_sha256": "d3976d2791add7e290474d33a40432eb62ed3483cbfb2cf905ca53d66f281e22"
+    },
+    "lloop_400pH_dt10ns_15A": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 4.452999999979511,
+      "warnings": [],
+      "netlist_sha256": "9aab17ae8480c077f41787eeafc31da23de1b3c9e662aa70d385d271551e50d1"
+    },
+    "lloop_400pH_dt4ns": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 330.68800000008196,
+      "warnings": [],
+      "netlist_sha256": "9c4d9b14c7357223e30debc0363f42b6a443ebf4d50cc56e5111329cf02f0ce8"
+    },
+    "lloop_400pH_dt16ns": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 380.2650000001304,
+      "warnings": [],
+      "netlist_sha256": "0483a7dde950aa31c9fea58a0d86a2808735e7ac5b4b1e3b6647b5d2d0b47b4e"
+    },
+    "lloop_400pH_dt10ns_driver_rmax": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 3.9839999999385327,
+      "warnings": [],
+      "netlist_sha256": "cb4012a1fe131caed23fc5251fe09709a77ddad9eb687600f7b4488ca9e4bd7d"
+    },
+    "lloop_400pH_dt10ns_fine": {
+      "status": "completed",
+      "message": null,
+      "duration_s": 7.75,
+      "warnings": [],
+      "netlist_sha256": "2ec9b93cc9005d21efe5efcca354e0ac36b3e127e5feef034803a9648850bb35"
+    }
+  },
+  "traces_file": "results\\gan\\epc9097-switching-traces.json"
+}
