@@ -1,0 +1,1289 @@
+{
+ "schema": "epc90133-switching-sensitivity/1",
+ "numerical_check": {
+  "relative_change": {
+   "sw_fall_time_90_10_s": 8.655350766679758e-07,
+   "sw_rise_time_10_90_s": -7.672000980795958e-05,
+   "sw_overshoot_above_bus_V": 2.861895094674129e-05,
+   "ringing_frequency_Hz": -0.0002127679426966811,
+   "ringing_damping_ratio": 0.008650749923800442,
+   "sw_peak_V": 1.5152691080978198e-05,
+   "q1_vds_peak_V": -4.897656207276737e-06,
+   "q1_peak_drain_current_A": 1.9819926510015232e-05
+  },
+  "pass": true
+ },
+ "scope": "Sensitivity of simulated switching to exploratory extraction assumptions. Not a validated prediction: the extraction is unqualified for plane holes and via arrays, the driver is behavioural, capacitor models are assumed, and gate-charge-dependent quantities carry the EPC2302 Fig. 7 exception.",
+ "evaluator_sha256": "c2c052c9b049ce9e4615afa136dc48236d6dcd7e013b9e8a22dfbf799f61c380",
+ "conditions": {
+  "VIN": 48.0,
+  "VOUT": 13.8,
+  "IOUT": 20.0,
+  "f_sw_Hz": 250000.0,
+  "L_out_H": 2.2e-06,
+  "duty": 0.28750000000000003,
+  "ripple_A": 17.87727272727273,
+  "I_peak_A": 28.938636363636363,
+  "I_valley_A": 11.061363636363636,
+  "dead_time_s": 1e-08,
+  "source": "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)"
+ },
+ "fixed_assumptions": {
+  "capacitors": {
+   "Ci": {
+    "C": 1.1e-07,
+    "ESL": 2.5e-10,
+    "ESR": 0.01
+   },
+   "Cm": {
+    "C": 5e-07,
+    "ESL": 3.5e-10,
+    "ESR": 0.01
+   }
+  },
+  "bus": {
+   "R_sup": 0.02,
+   "L_sup": 2e-08,
+   "R_bus": 0.002,
+   "L_bus": 1e-09
+  },
+  "N_cm_lumped": 10,
+  "gate_resistors_ohm": [
+   1.0,
+   0.0
+  ],
+  "driver_supplies_V": [
+   5.0,
+   5.0
+  ],
+  "temperature_C": 25,
+  "maxstep_s": 2e-11,
+  "reltol": 1e-06,
+  "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"
+ },
+ "driver_calibration": {
+  "pull_up_edge_s": 8.253071403810289e-09,
+  "pull_down_edge_s": 3.730319663131087e-09,
+  "targets_s": [
+   8e-09,
+   4e-09
+  ]
+ },
+ "reference": "B-m1-mid",
+ "materiality": {
+  "sw_fall_time_90_10_s": [
+   "rel",
+   0.1
+  ],
+  "sw_rise_time_10_90_s": [
+   "rel",
+   0.1
+  ],
+  "sw_overshoot_above_bus_V": [
+   "rel_or_abs",
+   0.1,
+   1.0
+  ],
+  "ringing_frequency_Hz": [
+   "rel",
+   0.05
+  ],
+  "ringing_damping_ratio": [
+   "rel",
+   0.2
+  ]
+ },
+ "cases": {
+  "A-m1-mid": {
+   "parameters": {
+    "ext": "A-m1-mid"
+   },
+   "extraction_case": {
+    "variant": "A",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.177310943639206,
+     10.417468070968274
+    ],
+    "slopes_A_per_s": [
+     15136480.550890772,
+     6231523.814972256
+    ],
+    "corrected_timing_s": {
+     "t1": 1.911847094596461e-06,
+     "t_off": 2.8688444846057797e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.5017378907651558,
+    "R_loop_mohm": 4.091100756751459,
+    "capacitor_current_share": {
+     "Ci1": 0.03801770378807624,
+     "Ci2": 0.07783972244420202,
+     "Ci3": 0.16456747592601859,
+     "Ci4": 0.16962994316593077,
+     "Ci5": 0.15541629948242278,
+     "Ci6": 0.22831762881999035,
+     "Ci7": 0.16621122637335917
+    }
+   },
+   "times_s": {
+    "t_off1": 1.931847094596461e-06,
+    "t_on2": 4.800691579202241e-06,
+    "t_end": 5.050691579202241e-06
+   },
+   "bus_attachment": "Ci4",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93199348444412,
+     "sw_fall_time_90_10_s": 4.0111491286608965e-09,
+     "q1_vds_peak_V": 50.529983043670654,
+     "sw_min_V": -2.7829272747039795,
+     "q1_eoff_J": 1.6362160909293472e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.04963302610848,
+     "sw_rise_time_10_90_s": 8.810469485518853e-10,
+     "sw_peak_V": 103.21769714355469,
+     "sw_overshoot_above_bus_V": 54.86328591785178,
+     "bus_at_event_V": 48.354411225702904,
+     "ringing_frequency_Hz": 203457254.42360935,
+     "ringing_damping_ratio": 0.007998590971385095,
+     "q1_peak_drain_current_A": 92.76947021484375,
+     "q1_eon_J": 1.7838708673824401e-06,
+     "q2_gate_peak_during_rise_V": 0.2495894432067871
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "B-m1-mid": {
+   "parameters": {
+    "ext": "B-m1-mid"
+   },
+   "extraction_case": {
+    "variant": "B",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.20605468753569,
+     10.44406890866709
+    ],
+    "slopes_A_per_s": [
+     15151921.311768172,
+     6232275.711883719
+    ],
+    "corrected_timing_s": {
+     "t1": 1.909898802151272e-06,
+     "t_off": 2.8684983710178765e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.28087269212247873,
+    "R_loop_mohm": 2.0344462844652362,
+    "capacitor_current_share": {
+     "Ci1": 0.04574484273242839,
+     "Ci2": 0.0643381406825675,
+     "Ci3": 0.11857808336987197,
+     "Ci4": 0.10579665677175652,
+     "Ci5": 0.09605279924010264,
+     "Ci6": 0.134605161062116,
+     "Ci7": 0.09090414383757832,
+     "Cm1": 0.03647699191961111,
+     "Cm10": 0.019403075507277788,
+     "Cm2": 0.04804808732917993,
+     "Cm3": 0.0492616107057721,
+     "Cm4": 0.05169446304107821,
+     "Cm5": 0.04343583713476079,
+     "Cm6": 0.038770073493725694,
+     "Cm7": 0.02025917985084994,
+     "Cm8": 0.015952870668909006,
+     "Cm9": 0.02067798265241413
+    }
+   },
+   "times_s": {
+    "t_off1": 1.9298988021512717e-06,
+    "t_on2": 4.7983971731691486e-06,
+    "t_end": 5.048397173169149e-06
+   },
+   "bus_attachment": "Cm10",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93050384523425,
+     "sw_fall_time_90_10_s": 4.078911970466758e-09,
+     "q1_vds_peak_V": 52.82624959945679,
+     "sw_min_V": -2.742805242538452,
+     "q1_eoff_J": 1.7603774300145325e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.048280715948371,
+     "sw_rise_time_10_90_s": 8.259052758747231e-10,
+     "sw_peak_V": 83.84760284423828,
+     "sw_overshoot_above_bus_V": 35.65481956303533,
+     "bus_at_event_V": 48.19278328120295,
+     "ringing_frequency_Hz": 282453862.90517086,
+     "ringing_damping_ratio": 0.010366023542596496,
+     "q1_peak_drain_current_A": 95.46639251708984,
+     "q1_eon_J": 2.8929758236137725e-06,
+     "q2_gate_peak_during_rise_V": 0.25470685958862305
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "ideal-copper": {
+   "parameters": {
+    "ext": "B-m1-mid",
+    "ideal": true
+   },
+   "extraction_case": {
+    "variant": "B",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.237411499059128,
+     10.473484039291028
+    ],
+    "slopes_A_per_s": [
+     15168765.778179884,
+     6232957.003427403
+    ],
+    "corrected_timing_s": {
+     "t1": 1.9077779159372545e-06,
+     "t_off": 2.8681848306417483e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.28087269212247873,
+    "R_loop_mohm": 2.0344462844652362,
+    "capacitor_current_share": {
+     "Ci1": 0.04574484273242839,
+     "Ci2": 0.0643381406825675,
+     "Ci3": 0.11857808336987197,
+     "Ci4": 0.10579665677175652,
+     "Ci5": 0.09605279924010264,
+     "Ci6": 0.134605161062116,
+     "Ci7": 0.09090414383757832,
+     "Cm1": 0.03647699191961111,
+     "Cm10": 0.019403075507277788,
+     "Cm2": 0.04804808732917993,
+     "Cm3": 0.0492616107057721,
+     "Cm4": 0.05169446304107821,
+     "Cm5": 0.04343583713476079,
+     "Cm6": 0.038770073493725694,
+     "Cm7": 0.02025917985084994,
+     "Cm8": 0.015952870668909006,
+     "Cm9": 0.02067798265241413
+    }
+   },
+   "times_s": {
+    "t_off1": 1.9277779159372543e-06,
+    "t_on2": 4.795962746579003e-06,
+    "t_end": 5.045962746579003e-06
+   },
+   "bus_attachment": "Cm10",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.932621002155994,
+     "sw_fall_time_90_10_s": 4.3865235109351856e-09,
+     "q1_vds_peak_V": 50.62051844596863,
+     "sw_min_V": -2.7690083980560303,
+     "q1_eoff_J": 1.6217989049430241e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.05055809021694,
+     "sw_rise_time_10_90_s": 1.2978141508847348e-09,
+     "sw_peak_V": 50.34632110595703,
+     "sw_overshoot_above_bus_V": 2.0761812565625988,
+     "bus_at_event_V": 48.27013984939443,
+     "ringing_frequency_Hz": 1150994274.3038747,
+     "ringing_damping_ratio": 0.03521601704883149,
+     "q1_peak_drain_current_A": 70.18453216552734,
+     "q1_eon_J": 3.922678769832095e-06,
+     "q2_gate_peak_during_rise_V": 0.2335404008626938
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "B-m1-mid-esl0.5x": {
+   "parameters": {
+    "ext": "B-m1-mid",
+    "esl_scale": 0.5
+   },
+   "extraction_case": {
+    "variant": "B",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.20600700381987,
+     10.443961143493652
+    ],
+    "slopes_A_per_s": [
+     15151895.696703678,
+     6232296.793096919
+    ],
+    "corrected_timing_s": {
+     "t1": 1.9099020309341237e-06,
+     "t_off": 2.8684886681061363e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.28087269212247873,
+    "R_loop_mohm": 2.0344462844652362,
+    "capacitor_current_share": {
+     "Ci1": 0.04574484273242839,
+     "Ci2": 0.0643381406825675,
+     "Ci3": 0.11857808336987197,
+     "Ci4": 0.10579665677175652,
+     "Ci5": 0.09605279924010264,
+     "Ci6": 0.134605161062116,
+     "Ci7": 0.09090414383757832,
+     "Cm1": 0.03647699191961111,
+     "Cm10": 0.019403075507277788,
+     "Cm2": 0.04804808732917993,
+     "Cm3": 0.0492616107057721,
+     "Cm4": 0.05169446304107821,
+     "Cm5": 0.04343583713476079,
+     "Cm6": 0.038770073493725694,
+     "Cm7": 0.02025917985084994,
+     "Cm8": 0.015952870668909006,
+     "Cm9": 0.02067798265241413
+    }
+   },
+   "times_s": {
+    "t_off1": 1.9299020309341235e-06,
+    "t_on2": 4.798390699040259e-06,
+    "t_end": 5.0483906990402595e-06
+   },
+   "bus_attachment": "Cm10",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93050956732366,
+     "sw_fall_time_90_10_s": 4.087729403171112e-09,
+     "q1_vds_peak_V": 52.69408106803894,
+     "sw_min_V": -2.743264675140381,
+     "q1_eoff_J": 1.7549646518303721e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.048282623291016,
+     "sw_rise_time_10_90_s": 8.263023359417047e-10,
+     "sw_peak_V": 82.49217987060547,
+     "sw_overshoot_above_bus_V": 34.29633842411943,
+     "bus_at_event_V": 48.195841446486035,
+     "ringing_frequency_Hz": 287610612.65032643,
+     "ringing_damping_ratio": 0.010765645986979468,
+     "q1_peak_drain_current_A": 95.1507797241211,
+     "q1_eon_J": 2.9486590663662187e-06,
+     "q2_gate_peak_during_rise_V": 0.25465694069862366
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "B-m1-mid-esl2x": {
+   "parameters": {
+    "ext": "B-m1-mid",
+    "esl_scale": 2.0
+   },
+   "extraction_case": {
+    "variant": "B",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.206144332921433,
+     10.44427776334796
+    ],
+    "slopes_A_per_s": [
+     15151969.468089422,
+     6232233.884060867
+    ],
+    "corrected_timing_s": {
+     "t1": 1.909892732069065e-06,
+     "t_off": 2.8685176230299073e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.28087269212247873,
+    "R_loop_mohm": 2.0344462844652362,
+    "capacitor_current_share": {
+     "Ci1": 0.04574484273242839,
+     "Ci2": 0.0643381406825675,
+     "Ci3": 0.11857808336987197,
+     "Ci4": 0.10579665677175652,
+     "Ci5": 0.09605279924010264,
+     "Ci6": 0.134605161062116,
+     "Ci7": 0.09090414383757832,
+     "Cm1": 0.03647699191961111,
+     "Cm10": 0.019403075507277788,
+     "Cm2": 0.04804808732917993,
+     "Cm3": 0.0492616107057721,
+     "Cm4": 0.05169446304107821,
+     "Cm5": 0.04343583713476079,
+     "Cm6": 0.038770073493725694,
+     "Cm7": 0.02025917985084994,
+     "Cm8": 0.015952870668909006,
+     "Cm9": 0.02067798265241413
+    }
+   },
+   "times_s": {
+    "t_off1": 1.9298927320690648e-06,
+    "t_on2": 4.798410355098972e-06,
+    "t_end": 5.048410355098972e-06
+   },
+   "bus_attachment": "Cm10",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93049621580627,
+     "sw_fall_time_90_10_s": 4.066264507220808e-09,
+     "q1_vds_peak_V": 52.99734902381897,
+     "sw_min_V": -2.7444441318511963,
+     "q1_eoff_J": 1.7635490071607579e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.048277854926669,
+     "sw_rise_time_10_90_s": 8.268229148474118e-10,
+     "sw_peak_V": 86.27149200439453,
+     "sw_overshoot_above_bus_V": 38.08663034439677,
+     "bus_at_event_V": 48.184861659997765,
+     "ringing_frequency_Hz": 273303743.60829806,
+     "ringing_damping_ratio": 0.010377794980214745,
+     "q1_peak_drain_current_A": 95.90150451660156,
+     "q1_eon_J": 2.783604032499737e-06,
+     "q2_gate_peak_during_rise_V": 0.2546447813510895
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "B-m1-mid-csw": {
+   "parameters": {
+    "ext": "B-m1-mid",
+    "c_sw": true
+   },
+   "extraction_case": {
+    "variant": "B",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.20578956607573,
+     10.446430206298828
+    ],
+    "slopes_A_per_s": [
+     15151778.892009582,
+     6231354.161325229
+    ],
+    "corrected_timing_s": {
+     "t1": 1.909916754322319e-06,
+     "t_off": 2.868922591212621e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.28087269212247873,
+    "R_loop_mohm": 2.0344462844652362,
+    "capacitor_current_share": {
+     "Ci1": 0.04574484273242839,
+     "Ci2": 0.0643381406825675,
+     "Ci3": 0.11857808336987197,
+     "Ci4": 0.10579665677175652,
+     "Ci5": 0.09605279924010264,
+     "Ci6": 0.134605161062116,
+     "Ci7": 0.09090414383757832,
+     "Cm1": 0.03647699191961111,
+     "Cm10": 0.019403075507277788,
+     "Cm2": 0.04804808732917993,
+     "Cm3": 0.0492616107057721,
+     "Cm4": 0.05169446304107821,
+     "Cm5": 0.04343583713476079,
+     "Cm6": 0.038770073493725694,
+     "Cm7": 0.02025917985084994,
+     "Cm8": 0.015952870668909006,
+     "Cm9": 0.02067798265241413
+    }
+   },
+   "times_s": {
+    "t_off1": 1.929916754322319e-06,
+    "t_on2": 4.79883934553494e-06,
+    "t_end": 5.04883934553494e-06
+   },
+   "bus_attachment": "Cm10",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93050765994749,
+     "sw_fall_time_90_10_s": 4.223207373164078e-09,
+     "q1_vds_peak_V": 52.938925981521606,
+     "sw_min_V": -2.707731246948242,
+     "q1_eoff_J": 1.767934872596929e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.048172950709528,
+     "sw_rise_time_10_90_s": 8.686933760717271e-10,
+     "sw_peak_V": 82.78137969970703,
+     "sw_overshoot_above_bus_V": 34.5885734930651,
+     "bus_at_event_V": 48.19280620664193,
+     "ringing_frequency_Hz": 266223763.86382154,
+     "ringing_damping_ratio": 0.010488283298034324,
+     "q1_peak_drain_current_A": 98.10704803466797,
+     "q1_eon_J": 3.0237504634358723e-06,
+     "q2_gate_peak_during_rise_V": 0.25062060356140137
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "A-m1-mid-fine": {
+   "parameters": {
+    "ext": "A-m1-mid",
+    "maxstep": 1e-11,
+    "reltol": 1e-07
+   },
+   "extraction_case": {
+    "variant": "A",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.17731094365214,
+     10.41746807096964
+    ],
+    "slopes_A_per_s": [
+     15136480.55089772,
+     6231523.814976317
+    ],
+    "corrected_timing_s": {
+     "t1": 1.9118470945955836e-06,
+     "t_off": 2.8688444846039103e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.5017378907651558,
+    "R_loop_mohm": 4.091100756751459,
+    "capacitor_current_share": {
+     "Ci1": 0.03801770378807624,
+     "Ci2": 0.07783972244420202,
+     "Ci3": 0.16456747592601859,
+     "Ci4": 0.16962994316593077,
+     "Ci5": 0.15541629948242278,
+     "Ci6": 0.22831762881999035,
+     "Ci7": 0.16621122637335917
+    }
+   },
+   "times_s": {
+    "t_off1": 1.9318470945955834e-06,
+    "t_on2": 4.800691579199494e-06,
+    "t_end": 5.050691579199494e-06
+   },
+   "bus_attachment": "Ci4",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.931993484430357,
+     "sw_fall_time_90_10_s": 4.011152600451165e-09,
+     "q1_vds_peak_V": 50.52973556518555,
+     "sw_min_V": -2.782933235168457,
+     "q1_eoff_J": 1.6365235669802264e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.049633026126418,
+     "sw_rise_time_10_90_s": 8.809793546213512e-10,
+     "sw_peak_V": 103.2192611694336,
+     "sw_overshoot_above_bus_V": 54.86485604754024,
+     "bus_at_event_V": 48.35440512189335,
+     "ringing_frequency_Hz": 203413965.24215892,
+     "ringing_damping_ratio": 0.008067784781621316,
+     "q1_peak_drain_current_A": 92.77130889892578,
+     "q1_eon_J": 1.7846330129373958e-06,
+     "q2_gate_peak_during_rise_V": 0.24959281086921692
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "A-m1-mid-pkg50pH": {
+   "parameters": {
+    "ext": "A-m1-mid",
+    "l_pkg": 5e-11
+   },
+   "extraction_case": {
+    "variant": "A",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.150016784698558,
+     10.341205596908216
+    ],
+    "slopes_A_per_s": [
+     15121818.487971269,
+     6248705.679926435
+    ],
+    "corrected_timing_s": {
+     "t1": 1.913700814928823e-06,
+     "t_off": 2.8609561152323614e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.5017378907651558,
+    "R_loop_mohm": 4.091100756751459,
+    "capacitor_current_share": {
+     "Ci1": 0.03801770378807624,
+     "Ci2": 0.07783972244420202,
+     "Ci3": 0.16456747592601859,
+     "Ci4": 0.16962994316593077,
+     "Ci5": 0.15541629948242278,
+     "Ci6": 0.22831762881999035,
+     "Ci7": 0.16621122637335917
+    }
+   },
+   "times_s": {
+    "t_off1": 1.933700814928823e-06,
+    "t_on2": 4.794656930161184e-06,
+    "t_end": 5.044656930161184e-06
+   },
+   "bus_attachment": "Ci4",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93114471433788,
+     "sw_fall_time_90_10_s": 7.015860858143938e-09,
+     "q1_vds_peak_V": 53.25240159034729,
+     "sw_min_V": -3.1172895431518555,
+     "q1_eoff_J": 1.7898721839898944e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.047134399406096,
+     "sw_rise_time_10_90_s": 1.5440839817237198e-09,
+     "sw_peak_V": 84.7965316772461,
+     "sw_overshoot_above_bus_V": 36.4264744371187,
+     "bus_at_event_V": 48.370057240127394,
+     "ringing_frequency_Hz": 178502321.1429914,
+     "ringing_damping_ratio": 0.011921820739051086,
+     "q1_peak_drain_current_A": 69.99366760253906,
+     "q1_eon_J": 2.800579347469619e-06,
+     "q2_gate_peak_during_rise_V": 1.0834250450134277
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "A-m1-mid-pkg150pH": {
+   "parameters": {
+    "ext": "A-m1-mid",
+    "l_pkg": 1.5e-10
+   },
+   "extraction_case": {
+    "variant": "A",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     28.143789291417526,
+     10.338726997357647
+    ],
+    "slopes_A_per_s": [
+     15118473.160551002,
+     6247390.278617502
+    ],
+    "corrected_timing_s": {
+     "t1": 1.9141242674654904e-06,
+     "t_off": 2.861558495626565e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.5017378907651558,
+    "R_loop_mohm": 4.091100756751459,
+    "capacitor_current_share": {
+     "Ci1": 0.03801770378807624,
+     "Ci2": 0.07783972244420202,
+     "Ci3": 0.16456747592601859,
+     "Ci4": 0.16962994316593077,
+     "Ci5": 0.15541629948242278,
+     "Ci6": 0.22831762881999035,
+     "Ci7": 0.16621122637335917
+    }
+   },
+   "times_s": {
+    "t_off1": 1.9341242674654902e-06,
+    "t_on2": 4.795682763092055e-06,
+    "t_end": 5.045682763092055e-06
+   },
+   "bus_attachment": "Ci4",
+   "metrics": {
+    "event_a_turn_off_at_peak": {
+     "inductor_current_A": 28.93119239800394,
+     "sw_fall_time_90_10_s": 3.987309208284876e-09,
+     "q1_vds_peak_V": 53.941779136657715,
+     "sw_min_V": -3.7107815742492676,
+     "q1_eoff_J": 1.7621329826389282e-06
+    },
+    "event_b_turn_on_at_valley": {
+     "inductor_current_A": 11.047248840318312,
+     "sw_rise_time_10_90_s": 2.9996225158662713e-09,
+     "sw_peak_V": 72.41842651367188,
+     "sw_overshoot_above_bus_V": 24.034063190215115,
+     "bus_at_event_V": 48.38436332345676,
+     "ringing_frequency_Hz": 145900773.213375,
+     "ringing_damping_ratio": 0.021214536447825977,
+     "q1_peak_drain_current_A": 46.00397872924805,
+     "q1_eon_J": 3.719676810996877e-06,
+     "q2_gate_peak_during_rise_V": 1.7021695375442505
+    },
+    "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"
+   },
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true
+   }
+  },
+  "A-m1-mid-periodic3": {
+   "parameters": {
+    "ext": "A-m1-mid",
+    "periods": 3
+   },
+   "extraction_case": {
+    "variant": "A",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": null,
+   "extraction_summary": {
+    "L_loop_nH": 0.5017378907651558,
+    "R_loop_mohm": 4.091100756751459,
+    "capacitor_current_share": {
+     "Ci1": 0.03801770378807624,
+     "Ci2": 0.07783972244420202,
+     "Ci3": 0.16456747592601859,
+     "Ci4": 0.16962994316593077,
+     "Ci5": 0.15541629948242278,
+     "Ci6": 0.22831762881999035,
+     "Ci7": 0.16621122637335917
+    }
+   },
+   "times_s": {
+    "t_off1": 9.186514889884162e-06,
+    "t_on2": 8.02e-06,
+    "t_end": 1.207e-05,
+    "duty": 0.29162872247104077,
+    "period_starts_s": [
+     2e-08,
+     4.02e-06,
+     8.02e-06
+    ],
+    "note": "last period: event B at its start, event A at the end of its on-time"
+   },
+   "bus_attachment": "Ci4",
+   "metrics": null,
+   "checks": null
+  }
+ },
+ "comparison_to_reference": {
+  "A-m1-mid": {
+   "compared_with": "B-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.078911970466758e-09,
+    "case": 4.0111491286608965e-09,
+    "relative_change": -0.01661296990386081,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.259052758747231e-10,
+    "case": 8.810469485518853e-10,
+    "relative_change": 0.0667651294741534,
+    "material": false
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 35.65481956303533,
+    "case": 54.86328591785178,
+    "relative_change": 0.5387340783160371,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 282453862.90517086,
+    "case": 203457254.42360935,
+    "relative_change": -0.2796796888137561,
+    "material": true
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.010366023542596496,
+    "case": 0.007998590971385095,
+    "relative_change": -0.2283838698111236,
+    "material": true
+   }
+  },
+  "ideal-copper": {
+   "compared_with": "B-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.078911970466758e-09,
+    "case": 4.3865235109351856e-09,
+    "relative_change": 0.07541509664726266,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.259052758747231e-10,
+    "case": 1.2978141508847348e-09,
+    "relative_change": 0.5713837758333837,
+    "material": true
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 35.65481956303533,
+    "case": 2.0761812565625988,
+    "relative_change": -0.9417699687726073,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 282453862.90517086,
+    "case": 1150994274.3038747,
+    "relative_change": 3.0749815296040106,
+    "material": true
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.010366023542596496,
+    "case": 0.03521601704883149,
+    "relative_change": 2.3972542030336284,
+    "material": true
+   }
+  },
+  "B-m1-mid-esl0.5x": {
+   "compared_with": "B-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.078911970466758e-09,
+    "case": 4.087729403171112e-09,
+    "relative_change": 0.0021617119389181145,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.259052758747231e-10,
+    "case": 8.263023359417047e-10,
+    "relative_change": 0.00048075739262119977,
+    "material": false
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 35.65481956303533,
+    "case": 34.29633842411943,
+    "relative_change": -0.03810091189815713,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 282453862.90517086,
+    "case": 287610612.65032643,
+    "relative_change": 0.01825696307395472,
+    "material": false
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.010366023542596496,
+    "case": 0.010765645986979468,
+    "relative_change": 0.03855118047347922,
+    "material": false
+   }
+  },
+  "B-m1-mid-esl2x": {
+   "compared_with": "B-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.078911970466758e-09,
+    "case": 4.066264507220808e-09,
+    "relative_change": -0.0031006953171638864,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.259052758747231e-10,
+    "case": 8.268229148474118e-10,
+    "relative_change": 0.0011110704816806145,
+    "material": false
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 35.65481956303533,
+    "case": 38.08663034439677,
+    "relative_change": 0.06820426554289964,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 282453862.90517086,
+    "case": 273303743.60829806,
+    "relative_change": -0.032395093495127,
+    "material": false
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.010366023542596496,
+    "case": 0.010377794980214745,
+    "relative_change": 0.0011355789006148738,
+    "material": false
+   }
+  },
+  "B-m1-mid-csw": {
+   "compared_with": "B-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.078911970466758e-09,
+    "case": 4.223207373164078e-09,
+    "relative_change": 0.03537595411278452,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.259052758747231e-10,
+    "case": 8.686933760717271e-10,
+    "relative_change": 0.05180751527672084,
+    "material": false
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 35.65481956303533,
+    "case": 34.5885734930651,
+    "relative_change": -0.029904682818130156,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 282453862.90517086,
+    "case": 266223763.86382154,
+    "relative_change": -0.05746106239941319,
+    "material": true
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.010366023542596496,
+    "case": 0.010488283298034324,
+    "relative_change": 0.011794277230360639,
+    "material": false
+   }
+  },
+  "A-m1-mid-fine": {
+   "compared_with": "A-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.0111491286608965e-09,
+    "case": 4.011152600451165e-09,
+    "relative_change": 8.655350766679758e-07,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.810469485518853e-10,
+    "case": 8.809793546213512e-10,
+    "relative_change": -7.672000980795958e-05,
+    "material": false
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 54.86328591785178,
+    "case": 54.86485604754024,
+    "relative_change": 2.861895094674129e-05,
+    "material": false
+   },
+   "ringing_frequency_Hz": {
+    "reference": 203457254.42360935,
+    "case": 203413965.24215892,
+    "relative_change": -0.0002127679426966811,
+    "material": false
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.007998590971385095,
+    "case": 0.008067784781621316,
+    "relative_change": 0.008650749923800442,
+    "material": false
+   }
+  },
+  "A-m1-mid-pkg50pH": {
+   "compared_with": "A-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.0111491286608965e-09,
+    "case": 7.015860858143938e-09,
+    "relative_change": 0.7490900071536734,
+    "material": true
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.810469485518853e-10,
+    "case": 1.5440839817237198e-09,
+    "relative_change": 0.752555847632889,
+    "material": true
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 54.86328591785178,
+    "case": 36.4264744371187,
+    "relative_change": -0.33605007742954,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 203457254.42360935,
+    "case": 178502321.1429914,
+    "relative_change": -0.12265442857427138,
+    "material": true
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.007998590971385095,
+    "case": 0.011921820739051086,
+    "relative_change": 0.4904901102833384,
+    "material": true
+   }
+  },
+  "A-m1-mid-pkg150pH": {
+   "compared_with": "A-m1-mid",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.0111491286608965e-09,
+    "case": 3.987309208284876e-09,
+    "relative_change": -0.00594341412182281,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.810469485518853e-10,
+    "case": 2.9996225158662713e-09,
+    "relative_change": 2.4046114350620464,
+    "material": true
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 54.86328591785178,
+    "case": 24.034063190215115,
+    "relative_change": -0.5619281129788336,
+    "material": true
+   },
+   "ringing_frequency_Hz": {
+    "reference": 203457254.42360935,
+    "case": 145900773.213375,
+    "relative_change": -0.2828922535757734,
+    "material": true
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.007998590971385095,
+    "case": 0.021214536447825977,
+    "relative_change": 1.6522841990196568,
+    "material": true
+   }
+  }
+ },
+ "runs": {
+  "driver_edge_0": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7970000000204891,
+   "warnings": [],
+   "netlist_sha256": "18fa2f10376fcd653d66f31e0e8912ef3e337caa848f7c12a494eb39f5159d5e"
+  },
+  "driver_edge_1": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7970000000204891,
+   "warnings": [],
+   "netlist_sha256": "bee9ff376d96b0f852e3eb81144c43d3617a218457e2daa59c0c5f7408b09f77"
+  },
+  "driver_edge_2": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.796000000089407,
+   "warnings": [],
+   "netlist_sha256": "4f9f41651bba513677056b704594fa5a82566d2cb8dafa2675004f42e50573d1"
+  },
+  "driver_edge_3": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7809999999590218,
+   "warnings": [],
+   "netlist_sha256": "dfe06d271f2610ec8617b138207e1bcfb4fb320367f8dd821d86ecd4eb03c70d"
+  },
+  "driver_edge_4": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7809999999590218,
+   "warnings": [],
+   "netlist_sha256": "31387dabbd279f2012bf03b8c84571b49131fe07c27deb5e6812641c3c3a7ea7"
+  },
+  "driver_edge_5": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.875,
+   "warnings": [],
+   "netlist_sha256": "de35bdf13e349c2c52d5185b82391f2115046cd51428062da572a2308378167a"
+  },
+  "driver_edge_6": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7970000000204891,
+   "warnings": [],
+   "netlist_sha256": "bc7ba4881dade74d9d3fc3b3319fc416c8b589c7734eda265e84636eeb1d6cc4"
+  },
+  "driver_edge_7": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7969999997876585,
+   "warnings": [],
+   "netlist_sha256": "3a4cd0d3f027e90b789a908b452b77cf737c7aa2816ebc68a359ec6371892a58"
+  },
+  "driver_edge_8": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.8129999998491257,
+   "warnings": [],
+   "netlist_sha256": "9cb75fd53978540dc12455291ccdd0e5ed2ae2f9f578109eb1376ecfba25475a"
+  },
+  "driver_edge_9": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7810000001918525,
+   "warnings": [],
+   "netlist_sha256": "3611f4f78fc686611a895ecab3969cc414bf86b2819a2497cd9e324e18750e5f"
+  },
+  "A-m1-mid-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 22.04699999978766,
+   "warnings": [],
+   "netlist_sha256": "0f74916a9187f74aa8b4ac24f8b8d322e1005f7f25a275c0763c3a54efbb1db0"
+  },
+  "A-m1-mid": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 24.687000000150874,
+   "warnings": [],
+   "netlist_sha256": "5f5955d9c1b44de35d4de17ca9aa606fffd775923f1f5bba19366d8d0113ed24"
+  },
+  "B-m1-mid-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 122.48500000010245,
+   "warnings": [],
+   "netlist_sha256": "5bf4e457a1a24cba758f542cfd42fe26251483744c7a56a2c9cb0ea056c35388"
+  },
+  "B-m1-mid": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 115.57800000021234,
+   "warnings": [],
+   "netlist_sha256": "7b93ca8859ad9e4d3de5efa6d9dd381c7e00d34d35ff062cce9f9142ecc2104e"
+  },
+  "ideal-copper-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 14.875,
+   "warnings": [],
+   "netlist_sha256": "077d1f908f2ab50fca2ee8dfcda67a3a10aa0425b1095675736ed516d87539b0"
+  },
+  "ideal-copper": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 15.141000000061467,
+   "warnings": [],
+   "netlist_sha256": "60afe8022574539c38b38d6171f542a6eda360871712d86587841f3633b0d19a"
+  },
+  "B-m1-mid-esl0.5x-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 142.2180000001099,
+   "warnings": [],
+   "netlist_sha256": "4ab0c135ea9ea91c022ecc554a64a5020988a7acf0a2514a18b0601ec741e1c1"
+  },
+  "B-m1-mid-esl0.5x": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 176.5779999999795,
+   "warnings": [],
+   "netlist_sha256": "5d9a0fbe0611fbe08ddec619a89f60091066223823f4a006a71bf2402ad12f97"
+  },
+  "B-m1-mid-esl2x-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 142.0,
+   "warnings": [],
+   "netlist_sha256": "01ae8531c2b8fe86ede3bc73d539d6a04c32d4641fa42041635432f18ba938ec"
+  },
+  "B-m1-mid-esl2x": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 126.07799999997951,
+   "warnings": [],
+   "netlist_sha256": "24b1047df7c0a1aa9c87545e56d1fc42847b8a20c648f28c29fca6bb76d719ce"
+  },
+  "B-m1-mid-csw-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 119.89100000006147,
+   "warnings": [],
+   "netlist_sha256": "c0a500aeff5d3b4bc568303f5bc753d1145843b711f0ae48c1f5f8022b308333"
+  },
+  "B-m1-mid-csw": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 104.0,
+   "warnings": [],
+   "netlist_sha256": "8cb088771d4d478202d792a25dcf689bdcb32483b12c8a6363793f6d92ee7167"
+  },
+  "A-m1-mid-fine-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 206.71899999980815,
+   "warnings": [],
+   "netlist_sha256": "90b3933758fc93c80d2f371b64c1360fc4f96dbf5ea0f1000f8882619c99070d"
+  },
+  "A-m1-mid-fine": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 237.1720000000205,
+   "warnings": [],
+   "netlist_sha256": "b7913d0cdd92c96d9d603ce626f4b427dc75fba02354279716169a26670c8f4b"
+  },
+  "A-m1-mid-pkg50pH-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 92.18800000008196,
+   "warnings": [],
+   "netlist_sha256": "9c443f2bbb943dd415a264695ee91672779a989e0af5090214dd2bb7b9045d92"
+  },
+  "A-m1-mid-pkg50pH": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 107.79700000002049,
+   "warnings": [],
+   "netlist_sha256": "5493e8372def4f0584739956e7c4480067590004f324f628798b051af828d5a7"
+  },
+  "A-m1-mid-pkg150pH-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 192.4069999998901,
+   "warnings": [],
+   "netlist_sha256": "029da77398510942eaba8ce4350c8cdbce998de6e74854d3b255474f5f089e2e"
+  },
+  "A-m1-mid-pkg150pH": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 175.98400000017136,
+   "warnings": [],
+   "netlist_sha256": "a9698cf718baaf1d452f30a0d37bc5942d5c78fac65713ece770d0c091e5ceb3"
+  },
+  "A-m1-mid-periodic3": {
+   "status": "failed",
+   "message": "timeout",
+   "duration_s": 600.0469999997877,
+   "warnings": null,
+   "netlist_sha256": "f17f6a933838e97994f2110150f6cd91c497cb7159cd80d90a76c5fea7a87d0e"
+  }
+ },
+ "evidence_directory": "runs\\epc90133-switching-3739f39c03df"
+}

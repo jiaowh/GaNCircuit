@@ -347,6 +347,10 @@ Test runs 3–4 (29 September 2026, later the same day):
   a non-monotonic tf of 7.0/4.0 ns) are contaminated by them. Next: a finer step or a damping resistance across the package
   inductors, and a check that the spikes are gone before any metric is read.
 - On B, the package and periodic cases exceeded the adapter's 600 s limit and were moved to A.
+- The periodic-buck case (3 periods of 4 µs at a 20 ps maximum step) also exceeded 600 s on A. The double pulse is
+  therefore still not shown to be equivalent to Fig. 9's continuous operation. Options: raise the adapter's limit
+  (a change to the accepted G1 adapter), use a coarser step away from the edges, or use fewer, shorter periods at a matched
+  steady state. Test 4's report: `results/gan/epc90133-switching-test4.json` (its package cases are unusable, as above).
 
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
