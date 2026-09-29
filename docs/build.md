@@ -282,6 +282,59 @@ and keying groups on the contact split via pairs. Run 3 measures distance from t
 Limits: component positions come from paste and silkscreen, not a placement file, and the 1-mil board raster
 does not resolve sub-pitch copper. Ci/Cm reference designators follow the silkscreen order read from the renders.
 
+### EPC90133 exploratory extraction and switching sensitivity (G3 steps 2–3, interim)
+
+```sh
+PYTHONPATH=src python scripts/epc90133_extract.py A:m1:mid I:m1:mid B:m1:mid   # results/gan/epc90133-extraction/
+PYTHONPATH=src python scripts/epc90133_switching.py                            # results/gan/epc90133-switching-sensitivity.json
+```
+
+Specifications are in each script's docstring, fixed before its first board run. This work is exploratory:
+the via check failed, plane holes and via arrays are unqualified, and two meshes show sensitivity, not convergence.
+
+Extraction (coarse mesh m1, 100 MHz), with the diagnostic loop inductance at Q1 (Q2 and every capacitor shorted):
+
+| Variant | Copper | Capacitors | Loop L | Time |
+|---|---|---|---|---|
+| A, via junction mid / gap / pad | top layer, mid-layer 1 | Ci | 0.502 / 0.493 / 0.500 nH | ~1.5 min |
+| I | all 8 layers | Ci | 0.300 nH | 71 min |
+| B (reference) | all 8 layers | Ci, Cm | 0.281 nH | 110 min |
+
+The network, not this one number, goes to the bench: every branch pair keeps its mutual inductance.
+The via representation moves the loop inductance by under 2% in A. The additional copper moves it by −40%.
+Ci current shares in A range from 4% (Ci1) to 23% (Ci6).
+
+Switching (double pulse at Fig. 9 edge currents, 28.9 A turn-off and 11.1 A turn-on, both matched after a
+timing correction; driver, dead time, 25 °C and an ideal probe fixed):
+
+| Case | Rise overshoot above bus | Ringing | tr | tf |
+|---|---|---|---|---|
+| A, three via variants | 54.5–54.9 V | 203–205 MHz | 0.88 ns | 4.01 ns |
+| I | 40.0 V | 266 MHz | 0.83 ns | 4.05 ns |
+| B | 35.7 V | 283 MHz | 0.83 ns | 4.08 ns |
+| B, capacitor body ESL ×0.5 / ×2 | 34.3 / 38.1 V | 288 / 273 MHz | 0.83 ns | 4.09 / 4.07 ns |
+| ideal copper (1 pH branches) | 2.1 V | 1151 MHz | 1.30 ns | 4.39 ns |
+| QSG Fig. 9 measurement, read by eye | about 7 V | about 0.6 GHz | 1.7 ns | 3.7 ns |
+
+- The overshoot comes almost entirely from the extracted copper. With ideal copper it falls to 2 V.
+  The via representation is immaterial. The extra copper layers are material (55 → 40 V), and so is adding Cm (40 → 36 V).
+  The capacitor-ESL assumption changes the overshoot by about ±2 V, which is material by the declared 1 V rule, but it is secondary.
+- **None of the extraction variants resembles the measurement.** Fig. 9 rings at a higher frequency than any
+  extracted case and with far less overshoot. Raising the loop inductance (package terms, which the literature notes
+  suggest are missing) would lower the frequency further. So the disagreement probably does not come from the loop
+  inductance alone. Candidates, none tested: missing damping (Coss loss, frequency-dependent resistance), missing
+  switch-node capacitance, the behavioural driver's edge speed (simulated tr 0.83 ns against 1.7 ns measured), and the
+  unknown probe path behind Fig. 9, whose ringing may belong to the measurement loop. The rise time and switching
+  losses also depend on gate charge (EPC2302 Fig. 7 exception).
+- Numerical check: on A, maxstep/2 and reltol/10 changed no waveform metric by more than 1e-4. The first ringing
+  detector reported 3.98 GHz there by picking numerical wiggles; it was replaced by settled-level crossings with
+  hysteresis before this sweep. On B, the same check exceeded the adapter's 600 s limit and has not run.
+- The periodic-buck equivalence case failed to find its operating point on B (the inductor initial condition); it has
+  not yet run. Until it does, this double pulse is not shown to be equivalent to Fig. 9's continuous operation.
+- Still running or queued: B with gap and pad vias, A on the fine mesh m2. Added before their first run: package
+  inductance of 50 and 150 pH per terminal (assumed), and a switch-node capacitance of 135 pF to GND and 2 pF to
+  VIN (parallel-plate overlap from the Gerbers, no fringing).
+
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
 on 28 September 2026 when LTspice became the project simulator. GaN and

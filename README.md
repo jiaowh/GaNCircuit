@@ -43,7 +43,14 @@ land pattern (pins, orientation, pin nets: pass). It locates the 7 top-side Ci a
 and groups the loop's vias by the layers they actually connect, and it fixes the extraction ports. It shows two stacked loops
 (top layer over mid-layer 1, and a second through G5, G6 and the bottom layer via Cm). It also shows that the return
 plane under both FETs is slotted by SW via clearances. That is a plane-hole case not yet qualified.
-Next: exploratory extractions under explicit, alternative geometry assumptions; and a switching
+Steps 2–3 now run end to end, as exploratory work (interim results in
+[build notes](docs/build.md#epc90133-exploratory-extraction-and-switching-sensitivity-g3-steps-23-interim)).
+The via representation changes neither the extracted loop inductance (under 2%) nor the switching predictions.
+The extra copper layers and the Cm capacitors do: 0.50 → 0.28 nH, and rise overshoot 55 → 36 V. No variant resembles
+EPC's measured Fig. 9 (about 7 V at about 0.6 GHz against 36 V at 0.28 GHz), so the gap is probably not the loop
+inductance alone; the candidates are untested. [Literature notes](docs/gan-layout-literature-notes.md)
+add missing package inductance, switch-node capacitance and the probe response as cases to test.
+Originally planned next: exploratory extractions under explicit, alternative geometry assumptions; and a switching
 sensitivity bench that shows which assumptions change the predictions, to decide where qualification is worth
 the effort. Those simulations carry the Fig. 7 gate-charge limitation.
 Retain the accepted LTspice adapter and FastHenry checks. The previous

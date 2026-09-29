@@ -83,6 +83,14 @@ MATERIAL = {"sw_fall_time_90_10_s": ("rel", 0.10), "sw_rise_time_10_90_s": ("rel
             "sw_overshoot_above_bus_V": ("rel_or_abs", 0.10, 1.0), "ringing_frequency_Hz": ("rel", 0.05),
             "ringing_damping_ratio": ("rel", 0.20)}
 EXTRACTIONS = ROOT / "results/gan/epc90133-extraction"
+# Added 29 September 2026 after the literature review (docs/gan-layout-literature-notes.md), before
+# their first run. Package inductance: the vendor model has none (EPC AN005 structure) and the QFN
+# value is not published, so an assumed bracket in series with each FET drain and source terminal;
+# the drivers stay at the pads, so the source term acts as common-source inductance. Switch-node
+# capacitance: parallel-plate overlap of SW copper with adjacent-layer copper over the whole board
+# (Gerber raster, er 4.8, no fringing): 135 pF to GND and 2 pF to VIN, placed at the FET terminals.
+L_PKG_CASES = (50e-12, 150e-12)
+C_SW = {"GND": 135e-12, "VIN": 2e-12}
 
 
 def node(t):
@@ -113,7 +121,8 @@ def capacitor(tag, p, n, model, scale=1.0):
             f"L{tag} x{tag}b {n} {max(model['ESL'] * scale, 1e-15):.6g}")
 
 
-def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None):
+def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
+          l_pkg=0.0, c_sw=False):
     net, terms = network(ext, ideal)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -169,8 +178,10 @@ Rbret bn {node(at + '.GND')} 1u"""
         l_ic = f"\n.ic I(L1)={timing.get('i0', I_VALLEY):.6g}"  # not uic: the bus capacitors must start charged
     lines += [
         "Vq1d q1_d q1dd 0",
-        "X1 gu q1dd q1_s EPC2302",
-        "X2 gl q2_d 0 EPC2302",
+        *([f"Lp1d q1dd p1d {l_pkg:g}", f"Lp1s p1s q1_s {l_pkg:g}", f"Lp2d q2_d p2d {l_pkg:g}", f"Lp2s p2s 0 {l_pkg:g}",
+           "X1 gu p1d p1s EPC2302", "X2 gl p2d p2s EPC2302"] if l_pkg else
+          ["X1 gu q1dd q1_s EPC2302", "X2 gl q2_d 0 EPC2302"]),
+        *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
         drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", R_SRC, R_SNK, R_GON, R_GOFF, t_end).rstrip(),
@@ -306,13 +317,17 @@ def main():
         cases["ideal-copper"] = {"ext": REFERENCE, "ideal": True}
         cases[f"{REFERENCE}-esl0.5x"] = {"ext": REFERENCE, "esl_scale": 0.5}  # esl 0 (1 fF) stalled the solver
         cases[f"{REFERENCE}-esl2x"] = {"ext": REFERENCE, "esl_scale": 2.0}
+        for lp in L_PKG_CASES:
+            cases[f"{REFERENCE}-pkg{lp * 1e12:.0f}pH"] = {"ext": REFERENCE, "l_pkg": lp}
+        cases[f"{REFERENCE}-csw"] = {"ext": REFERENCE, "c_sw": True}
         cases[f"{REFERENCE}-fine"] = {"ext": REFERENCE, "maxstep": MAXSTEP / 2, "reltol": RELTOL / 10}
         cases[f"{REFERENCE}-periodic3"] = {"ext": REFERENCE, "periods": 3}
     results, slopes = {}, {}
     for name, c in cases.items():
         ext = exts[c["ext"]]
         kw = dict(esl_scale=c.get("esl_scale", 1.0), ideal=c.get("ideal", False),
-                  maxstep=c.get("maxstep", MAXSTEP), reltol=c.get("reltol", RELTOL))
+                  maxstep=c.get("maxstep", MAXSTEP), reltol=c.get("reltol", RELTOL),
+                  l_pkg=c.get("l_pkg", 0.0), c_sw=c.get("c_sw", False))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle from the reference's measured slopes, started at the matching valley.
