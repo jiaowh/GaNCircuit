@@ -336,7 +336,9 @@ timing correction; driver, dead time, 25 °C and an ideal probe fixed):
   VIN (parallel-plate overlap from the Gerbers, no fringing).
 
 Test runs 3–4 (29 September 2026, later the same day):
-- B with gap vias: loop L 0.271 nH (−4% from mid). The via representation stays minor on the full board.
+- B with gap vias: loop L 0.271 nH (−4% from mid); with pad vias 0.261 nH (−7%, 132 min). On the full board, with 784 via
+  segments against A's 87, the via representation matters more than on A (<2%), but far less than the extra copper (−40%).
+  Its effect on switching has not yet been run through the bench.
 - Numerical check, run on A because B exceeds the 600 s limit: halving maxstep and dividing reltol by 10 changes
   every metric by less than 1% (ringing frequency −0.02%, damping +0.9%). **Pass.**
 - Switch-node capacitance, 135 pF on B: overshoot 35.7 → 34.6 V, ringing 283 → 266 MHz, tf 4.08 → 4.22 ns.
