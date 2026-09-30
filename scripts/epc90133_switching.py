@@ -143,7 +143,10 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
   modified L matrix stays positive definite, minimum eigenvalue 6.27 pH). If the overshoot returns towards G-ctl
   (32 V), coupling to the power network carries the high-side effect; if it stays near G (25 V), the gate loop's
   own impedance does. In this branch-port network shared copper also appears as coupling, so the check does not
-  separate magnetic from shared-conductor coupling; the board L_cs of Q1 (0.9 pH) bounds the latter. G differs from B in extraction window, local mesh
+  separate magnetic from shared-conductor coupling; the board L_cs of Q1 (0.9 pH) bounds the latter.
+  Result (1 October 2026): INVALID as a test. Removing the terms does not remove coupling; it adds spurious
+  common-source inductance, because the branches share reference nodes (overshoot fell to 9.4 V). Kept as run;
+  scripts/epc90133_gate_coupling.py computes the coupling correctly from the extraction instead. G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
   attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).

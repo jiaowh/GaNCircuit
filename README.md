@@ -191,9 +191,9 @@ approximations stated; none of them yet reproduces the measurement on every crit
   gate and source return to the extracted network. With it, the overshoot falls from about 36 V to 25 V. A matched
   control (same network, ideal gate drive) and two split cases separate the causes:
   - about a third of the drop comes from G's slightly different network (8 % less loop inductance);
-  - the rest comes from the high-side gate-drive path. The high side's gate return shares almost no source copper
-    with the power loop (0.9 pH), so the mechanism is probably coupling between the two loops. It is not yet
-    isolated;
+  - the rest comes from the high-side gate-drive path. Its gate return shares almost no source copper with the
+    power loop (0.9 pH), but the forward gate path (driver, gate resistor, gate) couples magnetically with it. In
+    effect, it acts as about 10 pH of common-source inductance, which slows the high-side turn-on;
   - the low-side path adds damping. It also lifts the low-side transistor's gate to about 2 V during the high-side
     turn-on, above the model's 1.5 V threshold, so the low side may partly conduct. Its gate return shares 48 pH with
     the power loop. A lower overshoot bought this way is not a better design.

@@ -695,10 +695,28 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   for −3.4 V and +4.6 % frequency, consistent with the 8 % lower loop inductance (which alone predicts about
   +4.3 %). The board's gate-drive copper (G against G-ctl) accounts for −7.0 V and a 6 % slower rise.
 - **The high-side gate-drive path carries that −7 V; the low-side path adds the damping.** ctl-ls matches G
-  in overshoot and rise time, and ctl-hs matches G-ctl; the two parts add up to within 0.3 V. Q1's board
-  common-source inductance is only 0.9 pH, so shared source copper is unlikely to be the mechanism. Coupling
-  between the power loop and the high-side gate loop is the likely candidate (test 6: gate-loop inductance
-  without coupling raised overshoot by 3–10 %), but the mechanism within the high-side path is not isolated.
+  in overshoot and rise time, and ctl-hs matches G-ctl; the two parts add up to within 0.3 V.
+- **The high-side mechanism is magnetic coupling of the forward gate path, about 10 pH in effect.**
+  `scripts/epc90133_gate_coupling.py` ([result](../results/gan/epc90133-gate-coupling.json)) repeats the
+  extractor's L_cs solve (1 A commutation-loop current, 100 MHz) and adds the voltages induced in the forward
+  gate branches (driver ball → gate resistor → gate), which g_summary's L_cs leaves out. The induced die VGS per
+  ampere, as an inductance with L_cs's sign:
+
+  | FET | return side (L_cs) | forward, turn-on path | total, turn-on path | total, turn-off path |
+  |---|---|---|---|---|
+  | Q1 (high side) | +0.9 pH | +9.1 pH | +10.0 pH | +5.3 pH |
+  | Q2 (low side) | +47.7 pH | −4.1 pH | +43.6 pH | +38.7 pH |
+
+  Q2's value comes from shared source copper (classic common-source inductance) and has the same sign, so Q1's
+  +10 pH also opposes its turn-on. It is the same order as test 6, where 25 pH at the pad lowered the overshoot by
+  12.6 V. One frequency and one mesh: an estimate. For layout (Stage 2) this means the forward gate path's
+  placement relative to the power loop matters, not only the shared source copper.
+- **An invalid check, kept.** Case G-m1-mid-nogpk removed every coupling term between gate-drive and power
+  branches ([report](../results/gan/epc90133-switching-gateloop-coupling.json): overshoot 9.4 V, rise 1.54 ns).
+  It was declared as a coupling test, but the branch network's terms also represent shared copper (the branches
+  share reference nodes, for example 238 pH between the PHASE-ball return and Q1's source pin 2), so removing
+  them adds spurious common-source inductance instead of removing coupling. Its result carries no physical
+  meaning; the calculation above replaces it.
 - **The low-side path disturbs Q2's gate.** With it extracted, Q2's die VGS reaches 2.0 V during the rise
   (2.37 V with the high side ideal, whose faster turn-on raises di/dt), against 1.07 V without it. The
   unmodified model conducts 3.9 A at VGS 2.0 V and 38 A at 2.3 V (DC, VDS 48 V, 25 °C); its VGS(th) is
