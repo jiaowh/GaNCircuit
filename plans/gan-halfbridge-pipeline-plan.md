@@ -446,16 +446,26 @@ hardware is energized before G4's test plan and interlocks are approved.
    on the lab and development hosts.
 3. Lab inventory: oscilloscope and probe bandwidth, isolated or differential
    probes, current sensing, supplies, electronic load, temperature control.
+   Owner, 30 September 2026: the lab has a Keysight B1506A (power device analyzer)
+   and a PD1550A (double-pulse tester). Both test devices in their own fixtures, not
+   an assembled evaluation board; the owner is checking what is available for board
+   measurements. The B1506A could later measure EPC2302 gate charge and capacitances
+   (the open Fig. 7 question) if a fixture for its small package is available.
 4. Whether to request EPC's Altium files, and the budget for fabricating
    boards.
-5. Whether an EPC90133 is owned or will be purchased; its silkscreen revision,
-   fitted population and any vendor confirmation. Identify separately the board
+5. Owner decision, 30 September 2026: an EPC90133 will be purchased. On arrival,
+   record its silkscreen revision and fitted population. Identify separately the board
    and population used for EPC's published measurements. No ownership is assumed.
 6. FastHenry use beyond the internal-only scope recorded in `95b0fad`, including
    partner or commercial collaboration. The restrictive MIT-authored notice is not the
    standard MIT License; keep source/binaries out of git. Separate local builds
    do not by themselves settle whether a broader use is permitted.
-7. Define I-1/I-2/I-3 schemas, layout variables,
+7. Owner decision, 30 September 2026: no EPC inquiry will be sent. Fig. 9's probe,
+   probing point and dead-time setting, and the EPC2302 package inductance, stay unknown
+   and are treated as assumptions or measured on our board.
+8. Owner decision, 30 September 2026: the agent-workflow milestone (section 10, item 7)
+   is a project goal but not the current priority.
+9. Define I-1/I-2/I-3 schemas, layout variables,
    held-out validation conditions and whether board-performance improvement is required.
 
 ## 10. Immediate work and dependencies

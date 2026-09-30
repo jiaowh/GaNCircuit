@@ -135,17 +135,18 @@ Done on 29–30 September 2026:
 1. **Extract the shared source path.** The board copper between each transistor's source pad and the Kelvin via that
    the gate driver returns to, plus the gate-loop path, with FastHenry, and add them to the model. Test 6 shows that
    this path can change the spike by half.
-2. **Plan the hardware stage in parallel.** Decide whether to buy an EPC90133, list the lab equipment, and design
-   experiments that separate the remaining explanations, with held-out operating conditions:
+2. **Plan the hardware stage in parallel.** An EPC90133 will be bought (owner decision, 30 September 2026). The lab
+   equipment for board measurements is being checked; the lab's B1506A and PD1550A are device testers, not board
+   testers. The experiments should separate the remaining explanations and include held-out operating conditions:
    - a known probe on a known point;
    - ringing measured at several currents and bus voltages;
    - dead time measured at the driver outputs;
    - loop inductance measured from the ringing frequency with a known added capacitor.
-3. **A first bounded agent run.** One reproducible run that consumes the declared inputs, checks them, produces this
+3. **A first bounded agent run** (a project goal, not the current priority). One reproducible run that consumes the declared inputs, checks them, produces this
    comparison and stops correctly, with interventions, failures, time and cost recorded and compared with the plain
    scripts. So far the evidence is for the tools, not yet for the agent workflow.
-4. **Ask EPC** (only on the owner's instruction) which probe, probing point and dead-time setting produced Fig. 9, and
-   whether a package inductance for the EPC2302 is available.
+4. **No EPC inquiry** (owner decision, 30 September 2026). Fig. 9's probe, probing point and dead-time setting, and
+   the EPC2302 package inductance, stay unknown: they are treated as assumptions or measured on our own board.
 5. **Add capacitance extraction with FasterCap.** Qualify it on known answers (a parallel-plate capacitor with
    fringing, a microstrip line), then replace the rough ~135 pF switch-node estimate with an extracted value. Today's
    bench shows that estimate changes the spike by only about 1 V, so this matters more for switching losses and for our own
