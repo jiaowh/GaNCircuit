@@ -232,8 +232,8 @@ Gate G3 (stock-board simulation) stays open until the gap is explained or bounde
 
 Next steps:
 1. **Finish the common-source and gate-loop extraction** (variant G) and rerun the switching comparison with it.
-2. **Complete the parasitic set.** Switch-node capacitance comes from capacitance extraction with FasterCap, after
-   known-answer checks. It replaces today's rough parallel-plate estimate, which changes the overshoot by only about
+2. **Complete the parasitic set.** Switch-node capacitance comes from capacitance extraction with FasterCap, within
+   the scope its known-answer checks support and with its own convergence check. It replaces today's rough parallel-plate estimate, which changes the overshoot by only about
    1 V. All values go into one `parasitics.inc` file, with the couplings kept.
 3. **Measure the board** following the hardware test plan once equipment and interlocks are in place (gate G4).
 4. **A first bounded agent run.** Reproduce the comparison from declared inputs, with interventions, failures, time and
@@ -250,7 +250,7 @@ Next steps:
 | **FastHenry 3.0.1** | inductance and resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory; internal use only (licence note below) |
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
-| **FasterCap** | capacitance extraction between conductors | planned; LGPL 2.1+ ([source](https://github.com/ediloren/FasterCap)); needs known-answer checks before board use |
+| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass, including microstrip on a dielectric; its accuracy setting is not an error bound, and zero-thickness conductors and some dielectric cases are not qualified ([results](results/gan/fastercap-known-answer.json)) |
 | KiCad | our own board design | not installed |
 | DEVSIM | device simulator for the paused silicon fixture (WSL) | paused |
 

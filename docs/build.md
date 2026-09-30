@@ -1558,3 +1558,57 @@ The [active plan](../plans/gan-halfbridge-pipeline-plan.md) and
 [V1 review record](gan-workflow-methods-review.md) specify the adopted layout
 search, stage handoffs and blind validation. These are future work; they do
 not alter executed results or justify tuning the vendor model.
+
+## FasterCap capacitance extraction: tool qualification (G3)
+
+FasterCap 6.0.7 (FastFieldSolvers) is the candidate capacitance extractor, for the switch-node capacitance and the
+other capacitive parasitics. It is licensed LGPL 2.1 or later, which allows use and redistribution; the source and
+binary still stay in the git-ignored `.tools/`, like FastHenry.
+
+- **Build** (Ubuntu 24.04 under WSL, gcc 13.3, cmake 3.28.3, wxWidgets 3.2.4 base). The README's headless route; the
+  only change, made in a build copy, is the wxWidgets version that CMake asks for (3.0 → 3.2).
+
+  ```sh
+  cd .tools && git clone https://github.com/ediloren/FasterCap.git \
+      && git clone https://github.com/ediloren/LinAlgebra.git && git clone https://github.com/ediloren/Geometry.git
+  sudo apt-get install cmake libwxgtk3.2-dev
+  bash scripts/build_fastercap.sh      # -> .tools/FasterCap-bin/FasterCap
+  ```
+
+  Commits are recorded in the script header and in the report. At run time wxWidgets prints harmless "Assert
+  failure" lines (FasterCap README).
+- **Qualification.** `python scripts/fastercap_known_answer.py` (Windows, calling FasterCap through `wsl`). Cases,
+  references and tolerances are declared in its docstring before the recorded run. Each case runs at `-a0.005`
+  and `-a0.001` (FasterCap's automatic refinement), and the two must agree within 0.5 %. Run 1 stopped at case D:
+  in 2D, FasterCap takes the last conductor as the reference and prints an (N−1) × (N−1) matrix, which the
+  evaluator first misread. The fix changed only the reading.
+
+[Result, 30 September 2026](../results/gan/fastercap-known-answer.json):
+
+| Case | FasterCap (-a0.001) | Reference | Error | Mesh change | Declared check |
+|---|---|---|---|---|---|
+| A: unit cube in air (3D) | 73.47 pF | 73.51 pF (Hwang and Mascagni) | −0.05 % | 0.88 % | **fail** (mesh) |
+| B: sphere in air, 1 mm (3D) | 0.11094 pF | 0.11127 pF | −0.30 % | 0.01 % | pass (1 %) |
+| C: sphere with a dielectric shell, εr 4.3 (3D) | 0.18058 pF | 0.18054 pF | +0.02 % | 3.3 % | **fail** (mesh) |
+| D: coax in air (2D) | 80.27 pF/m | 80.26 pF/m | +0.01 % | 0.00 % | pass (0.5 %) |
+| E: coax with a dielectric layer (2D) | did not finish in 1800 s | 145.6 pF/m | +2.1 % at -a0.005 | — | **fail** (time) |
+| F: coplanar strips, zero thickness (2D) | 20.95 pF/m | 21.32 pF/m (conformal mapping) | −1.7 % | 0.10 % | **fail** (1 %) |
+| G(i): microstrip w = 2h, t = h/100, air (2D) | 37.75 pF/m | 37.70 pF/m (Hammerstad–Jensen) | +0.13 % | 0.26 % | pass (2 %) |
+| G(ii): the same on εr 4.3 (2D) | 123.05 pF/m | 123.04 pF/m | +0.004 % | 0.08 % | pass (2 %) |
+
+What this shows:
+
+- **`-a` is a stopping rule, not an error bound.** In A and C the finer setting lands within 0.05 % of the answer,
+  but the `-a0.005` runs stop 0.9 % and 3.3 % away. A board extraction therefore needs its own refinement
+  sequence with a declared convergence check, not one `-a` setting.
+- **Finite-thickness conductors on a planar dielectric work** (G, the geometry closest to board copper over a
+  prepreg), in 2D and at modest cost.
+- **Dielectric interfaces are expensive.** C needed 480,000 panels and 24 minutes for one sphere; E, a 2D case with
+  curved concentric interfaces, still changed by 0.3 % per refinement when it was stopped. The cause of E's slow
+  convergence is not established. G shows it is not a general failure of planar 2D dielectrics.
+- **Zero-thickness conductors are not qualified.** F's automatic refinement stopped at 54 panels. Under-resolved
+  edge singularities are a plausible cause, but not isolated. Board copper will be modelled with its thickness.
+- **Scope.** Qualified so far: conductors in a homogeneous medium in 3D at a strict setting (A, B), and
+  finite-thickness strips on a planar dielectric in 2D (G). Not yet: 3D board geometry with FR-4 and solder mask,
+  holes and vias. Before board use: a follow-up check declared for F (finite thickness or manual mesh) and a
+  diagnosis of E, if a board model needs curved interfaces.
