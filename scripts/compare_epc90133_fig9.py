@@ -27,7 +27,9 @@ Specification (30 September 2026, written before the first comparison):
 Added 30 September 2026 after an external review (no criterion above changed):
 * a case whose switching checks failed ("usable" false) keeps its metrics for inspection but is
   structurally excluded: it receives no "resembles" or consistency verdict;
-* each usable case also gets, per metric, "consistent within digitization uncertainty": the rule in
+* each usable case also gets, per metric, "consistent with the declared extraction range" (second review:
+  this is a sensitivity range over the digitizer's processing choices, not a complete uncertainty interval;
+  it excludes the unknown probe response, the failed volt-scale check and other raster or fit errors): the rule in
   scripts/digitize_epc90133_qsg_fig9.py (the measured range over its extraction choices, widened by one
   pixel for time and voltage metrics);
 * the report binds its inputs by hash (the digitized figure, every switching report, and the imported
@@ -131,7 +133,7 @@ FIT_METRICS = ("ring_frequency_Hz", "ring_damping_ratio", "overshoot_fraction")
 
 
 def consistency(sim, fig9):
-    """Per metric: is the simulated value inside the measured digitization range (see the digitizer's rule)?"""
+    """Per metric: is the simulated value inside the declared extraction range (see the digitizer's rule)?"""
     out = {}
     for kind in ("rising", "falling"):
         u = fig9["panels"][kind]["uncertainty"]
@@ -203,7 +205,7 @@ def summary_md(report, fig9):
              "| Case | tr (ns) | overshoot (V) | f (MHz) | ζ | tf (ns) | plateau | criteria passed at any probe bandwidth |",
              "|---|---|---|---|---|---|---|---|",
              row("**QSG Fig. 9**", meas["rising"], meas["falling"], "measured"),
-             f"| digitization range | {rng('rising', 'edge_10_90_s', 1e9, 2)} | {rng('rising', 'overshoot_above_settled_V', 1, 2)} | "
+             f"| declared extraction range | {rng('rising', 'edge_10_90_s', 1e9, 2)} | {rng('rising', 'overshoot_above_settled_V', 1, 2)} | "
              f"{rng('rising', 'ring_frequency_Hz', 1e-6, 0)} | {rng('rising', 'ring_damping_ratio', 1, 3)} | "
              f"{rng('falling', 'edge_10_90_s', 1e9, 2)} | {rng('rising', 'plateau_duration_s', 1e9, 2)} ns | "
              f"one pixel: {fig9['panels']['rising']['uncertainty']['resolution']['s_per_px'] * 1e9:.2f} ns, "

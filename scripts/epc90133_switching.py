@@ -98,7 +98,31 @@ after the turn-on. Every test 6 case therefore ends its transient 80 ns after th
 later than that are dropped). The stall itself is recorded as a caveat for the gate-inductance cases, which
 also get a direct 50 ps step check.
 Result status: a comparison is formed only between two cases whose checks all pass; otherwise it is
-recorded as excluded. Every report carries an input manifest (extraction files, vendor library and
+recorded as excluded.
+
+Second external review (30 September 2026), before test 7's first run:
+* device metrics now use die terminals: with package or gate-loop inductors the pad nodes are not the
+  die's. Each bench records its die nodes; Q1's gate-source voltage (switching-energy windows), Vds for the
+  energies and Q2's gate peak are die quantities; Q2's pad-level gate peak is kept under its own name. The
+  energies exclude energy stored in the package inductors. Switch-node metrics are unchanged (pads);
+* the leading common-source case gets its own numerical checks: B-Ls50-csi at 50 ps, and with the
+  damping-resistor corner at 20 GHz and at 5 GHz (20 GHz exceeded 600 s on the package case);
+* reports are written to a temporary file and atomically replaced, and the input manifest is taken once,
+  when the inputs are loaded.
+
+Test 7, extracted gate-drive loops (--study gateloop; specification of 30 September 2026, before the first
+run). The network is extraction G (scripts/epc90133_extract.py): B's copper plus the gate nets, the driver
+balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+6. In the bench:
+* each die source joins its pins 2 and 4+6 through 0 V sources (the package interior is ideal; their
+  currents give the pin split); the gate pin is the die gate; Q2's pins 4+6 are the circuit ground;
+* the upper driver stage is referenced to the PHASE balls (U80.PH), the lower to the GND ball (U80.GND);
+  pull-up outputs drive the UGH/LGH balls and pull-down outputs the UGL/LGL balls; R80/R82 (1 ohm) and
+  R81/R83 (0 ohm, 1 mohm here) sit between their pad terminals. Driver supplies stay ideal at the balls
+  (the C80/C81 loops are not extracted). Everything else as test 6's reference (100 ps step, 80 ns end);
+* cases: G-m1-mid, compared with B-m1-mid-ms100 (B also has no gate or source paths, so the difference is
+  what the board's gate-drive copper adds); G-m1-mid-ms50, the direct step check; and G with the assumed
+  package common-source inductance of test 6 (25 and 50 pH on each die source, drivers at the pins), to see
+  what package inductance would still be needed on top of the board's. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
 import argparse
@@ -106,6 +130,7 @@ import glob
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import sys
 import uuid
@@ -160,7 +185,12 @@ TRACE_STEP = 25e-12
 
 
 def node(t):
-    return {"Q2.S": "0"}.get(t, t.replace(".", "_").lower())
+    # Q2.S (power-loop variants) or Q2.S46 (variant G) is the circuit ground; the gate pins are gu/gl.
+    return {"Q2.S": "0", "Q2.S46": "0", "Q1.G": "gu", "Q2.G": "gl"}.get(t, t.replace(".", "_").lower())
+
+
+def is_gate_extraction(ext):
+    return any(p["terminal"] == "U80.PH" for p in ext["ports"])
 
 
 def network(ext, ideal=False, r_scale=1.0):
@@ -196,6 +226,25 @@ def fet(n, gate, dpad, spad, l_d, l_s, l_g, r_corner):
             lines += [f"Lp{n}{tag} {a} {b} {lv:g}", f"Rp{n}{tag} {a} {b} {2 * math.pi * r_corner * lv:.6g}"]
     lines.append(f"X{n} {gg} {dd} {ss} EPC2302")
     return lines, ss
+
+
+def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
+    """Test 7: uP1966E stages at the extracted ball terminals, gate resistors between their pad terminals.
+
+    drive_stage ties its pull-up and pull-down resistors to one gate node; here the pull-down resistor is
+    moved to the turn-off ball, and the board resistors R80-R83 are separate elements.
+    """
+    out = []
+    for tag, ref, vdd, edges, up, dn in (("u", "u80_ph", VBOOT, hi, "u80_ugh", "u80_ugl"),
+                                          ("l", "u80_gnd", VCC, lo, "u80_lgh", "u80_lgl")):
+        text = drive_stage(tag, ref, vdd, edges, te_rise, te_fall, up, r_src, r_snk, 0.0, 0.0, t_end).rstrip()
+        old = f"R{tag}d {up} pd{tag}"
+        if text.count(old) != 1:
+            raise RuntimeError("drive_stage output changed; cannot split its outputs")
+        out.append(text.replace(old, f"R{tag}d {dn} pd{tag}"))
+    for ref, ohm in (("R80", R_GON), ("R81", R_GOFF), ("R82", R_GON), ("R83", R_GOFF)):
+        out.append(f"{ref} {ref.lower()}_d {ref.lower()}_g {max(ohm, 1e-3):g}")
+    return out
 
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
@@ -272,8 +321,29 @@ Rbret bn {node(at + '.GND')} 1u"""
     # l_pkg (tests 4-5) is the same inductance on drain and source; l_d / l_s / l_g (test 6) set them apart.
     ld = l_pkg if l_d is None else l_d
     ls = l_pkg if l_s is None else l_s
-    fet1, s1_die = fet(1, "gu", "q1dd", "q1_s", ld, ls, l_g, r_pkg_corner)
-    fet2, s2_die = fet(2, "gl", "q2_d", "0", ld, ls, l_g, r_pkg_corner)
+    g_ext = is_gate_extraction(ext)
+    die = {"g1": "gu", "d1": "q1dd", "s1": "q1_s", "g2": "gl", "d2": "q2_d", "s2": "0"}
+    if g_ext:
+        # Test 7: die source q1_s / q2_s joins the split pins; optional package source inductance l_s.
+        if ld or l_g or c_gd or c_sw:
+            raise ValueError("variant G bench supports only l_s (package common-source) among the options")
+        fet1, fet2 = [], []
+        for n_, pins, gate_node, d_node in ((1, ("q1_s2", "q1_s46"), "gu", "q1dd"), (2, ("q2_s2", "0"), "gl", "q2_d")):
+            junction = f"q{n_}_s"
+            src = f"p{n_}s" if ls else junction
+            lst = fet1 if n_ == 1 else fet2
+            if ls:
+                lst += [f"Lp{n_}s {src} {junction} {ls:g}", f"Rp{n_}s {src} {junction} {2 * math.pi * r_pkg_corner * ls:.6g}"]
+            lst += [f"Vs{n_}2 {junction} {pins[0]} 0", f"Vs{n_}46 {junction} {pins[1]} 0",
+                    f"X{n_} {gate_node} {d_node} {src} EPC2302"]
+        s1_die, s2_die = "q1_s", "q2_s"
+        die.update(s1="p1s" if ls else "q1_s", s2="p2s" if ls else "q2_s")
+    else:
+        fet1, s1_die = fet(1, "gu", "q1dd", "q1_s", ld, ls, l_g, r_pkg_corner)
+        fet2, s2_die = fet(2, "gl", "q2_d", "0", ld, ls, l_g, r_pkg_corner)
+        die.update(g1="p1g" if l_g else "gu", d1="p1d" if ld else "q1dd", s1=s1_die,
+                   g2="p2g" if l_g else "gl", d2="p2d" if ld else "q2_d", s2=s2_die)
+    times["die_nodes"] = die
     lines += [
         "Vq1d q1_d q1dd 0",
         *fet1, *fet2,
@@ -281,13 +351,16 @@ Rbret bn {node(at + '.GND')} 1u"""
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        # Drivers return at the source pads (common-source coupling through l_s) or, with kelvin, at the die source.
-        drive_stage("u", s1_die if kelvin else "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF,
-                    t_end).rstrip(),
-        drive_stage("l", s2_die if kelvin else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
-                    t_end).rstrip(),
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext else [
+            # Drivers return at the source pads (common-source coupling through l_s) or, with kelvin, at the die source.
+            drive_stage("u", s1_die if kelvin else "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF,
+                        t_end).rstrip(),
+            drive_stage("l", s2_die if kelvin else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
+                        t_end).rstrip()]),
         SWITCH_MODELS.rstrip(),
-        ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})"),
+        ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
+        + (" V(q2_s) V(u80_ph) V(u80_gnd) I(Vs12) I(Vs146) I(Vs22) I(Vs246)" if g_ext else "")
+        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s"})),
         ".temp 25",
         f".options plotwinsize=0 reltol={reltol:g}",
         f".tran 0 {t_end:.9g} 0 {maxstep:g}",
@@ -299,9 +372,17 @@ Rbret bn {node(at + '.GND')} 1u"""
 
 def metrics(s, times, at):
     t = s["time"]
-    sw, d1, s1, gu, gl = s["v(q2_d)"], s["v(q1_d)"], s["v(q1_s)"], s["v(gu)"], s["v(gl)"]
+    die = times.get("die_nodes") or {"g1": "gu", "d1": "q1_d", "s1": "q1_s", "g2": "gl", "s2": "0"}
+    zero = [0.0] * len(t)
+    v = lambda nd: zero if nd == "0" else s[f"v({nd})"]
+    sw, gl = s["v(q2_d)"], s["v(gl)"]
+    # Second review: device quantities at the die terminals (q1dd is not saved; Vq1d is a 0 V source, so
+    # the die drain equals q1_d unless a drain inductor is present).
+    d1 = v("q1_d" if die["d1"] == "q1dd" else die["d1"])
+    s1, g1 = v(die["s1"]), v(die["g1"])
     vds1 = [a - b for a, b in zip(d1, s1)]
-    vgs1 = [a - b for a, b in zip(gu, s1)]
+    vgs1 = [a - b for a, b in zip(g1, s1)]
+    vgs2 = [a - b for a, b in zip(v(die["g2"]), v(die["s2"]))]
     id1, il = s["i(vq1d)"], s["i(l1)"]
     p1 = [a * b for a, b in zip(vds1, id1)]
     bus = [a - b for a, b in zip(s[f"v({node(at + '.VIN')})"], s[f"v({node(at + '.GND')})"])] \
@@ -329,8 +410,12 @@ def metrics(s, times, at):
                "ringing_frequency_Hz": freq, "ringing_damping_ratio": damping,
                "q1_peak_drain_current_A": max(v for _, v in window(t, id1, tb, tb + 60e-9)),
                "q1_eon_J": integral(t, p1, gb, b_end) if gb and b_end else None,
-               "q2_gate_peak_during_rise_V": max(v for _, v in window(t, gl, tb, tb + 60e-9))}
+               "q2_gate_peak_during_rise_V": max(x for _, x in window(t, vgs2, tb, tb + 60e-9)),
+               "q2_gate_pad_peak_during_rise_V": max(x for _, x in window(t, gl, tb, tb + 60e-9))}
     return {"event_a_turn_off_at_peak": event_a, "event_b_turn_on_at_valley": event_b,
+            "terminals": {"device_metrics": "die (q1 vgs and vds for the energies, q2 gate-source peak)",
+                          "switch_node_metrics": "Q2 drain pad to circuit ground (Q2 source pad)",
+                          "die_nodes": die, "energies_exclude": "energy stored in package or gate-loop inductors"},
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
 
 
@@ -457,6 +542,11 @@ def path_cases(exts):
     cases["B-pkg50pH"] = {**common, "l_pkg": 50e-12, "base": ref}
     cases["B-pkg50pH-ms50"] = {**common, "l_pkg": 50e-12, "maxstep": MAXSTEP_PKG / 2, "base": "B-pkg50pH"}
     cases["B-pkg50pH-r20GHz"] = {**common, "l_pkg": 50e-12, "r_pkg_corner": 20e9, "base": "B-pkg50pH"}
+    # Second review: direct checks of the leading common-source case.
+    csi = {**common, **L_PATH_CASES["B-Ls50-csi"], "base": "B-Ls50-csi"}
+    cases["B-Ls50-csi-ms50"] = {**csi, "maxstep": MAXSTEP_PKG / 2}
+    cases["B-Ls50-csi-r20GHz"] = {**csi, "r_pkg_corner": 20e9}
+    cases["B-Ls50-csi-r5GHz"] = {**csi, "r_pkg_corner": 5e9}
     if b not in exts:
         raise SystemExit(f"path study needs extraction {b}")
     return cases
@@ -481,6 +571,19 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def gateloop_cases(exts):
+    """Test 7 cases (see the module docstring)."""
+    g, ref = "G-m1-mid", "B-m1-mid-ms100"
+    if g not in exts or "B-m1-mid" not in exts:
+        raise SystemExit("test 7 needs extractions G-m1-mid and B-m1-mid")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B}
+    return {ref: {"ext": "B-m1-mid", **common},
+            g: {"ext": g, "base": ref, **common},
+            f"{g}-ms50": {"ext": g, "base": g, **common, "maxstep": MAXSTEP_PKG / 2},
+            f"{g}-Ls25": {"ext": g, "base": g, **common, "l_s": 25e-12},
+            f"{g}-Ls50": {"ext": g, "base": g, **common, "l_s": 50e-12}}
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -490,7 +593,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
@@ -525,6 +628,10 @@ def main():
         pe, pm = args.periodic_ext, args.periodic_maxstep
         tag = pe + ("" if pm == MAXSTEP else f"-ms{pm * 1e12:.0f}")
         cases = {tag: {"ext": pe, "maxstep": pm}, f"{tag}-periodic3": {"ext": pe, "periods": 3, "maxstep": pm, "base": tag}}
+    elif args.study == "gateloop":
+        cases = gateloop_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "paths":
         cases = path_cases(exts)
         if args.only:
@@ -549,6 +656,15 @@ def main():
             for lp in L_PKG_CASES:
                 cases[f"{NUMERICAL_REF}-pkg{lp * 1e12:.0f}pH"] = {"ext": NUMERICAL_REF, "l_pkg": lp}
             cases[f"{NUMERICAL_REF}-periodic3"] = {"ext": NUMERICAL_REF, "periods": 3}
+    # Second review: identities of the inputs as loaded, not as found at the end of a long run.
+    manifest = {
+        "taken_at": "start of run, when the inputs were loaded",
+        "evaluator_sha256": sha256(Path(__file__)),
+        "extractions": {ext_files[e].relative_to(ROOT).as_posix(): sha256(ext_files[e])
+                        for e in sorted({c["ext"] for c in cases.values()})},
+        "vendor_library": {"file": Path(lib).name, "sha256": sha256(lib)},
+        "modules": {m: sha256(ROOT / m) for m in ("scripts/epc9097_switching.py", "scripts/epc2302_baseline.py",
+                                                  "src/circuit_tools/ltspice.py")}}
     results, slopes = {}, {}
     import threading
     save_lock = threading.Lock()
@@ -650,13 +766,8 @@ def main():
                 "scope": ("Sensitivity of simulated switching to exploratory extraction assumptions. Not a validated prediction: "
                           "the extraction is unqualified for plane holes and via arrays, the driver is behavioural, capacitor "
                           "models are assumed, and gate-charge-dependent quantities carry the EPC2302 Fig. 7 exception."),
-                "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                "input_manifest": {
-                    "extractions": {ext_files[e].relative_to(ROOT).as_posix(): sha256(ext_files[e])
-                                    for e in sorted({c["ext"] for c in cases.values()})},
-                    "vendor_library": {"file": Path(lib).name, "sha256": sha256(lib)},
-                    "modules": {m: sha256(ROOT / m) for m in ("scripts/epc9097_switching.py", "scripts/epc2302_baseline.py",
-                                                              "src/circuit_tools/ltspice.py")}},
+                "evaluator_sha256": manifest["evaluator_sha256"],
+                "input_manifest": manifest,
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
                                "source": "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)"},
@@ -668,7 +779,9 @@ def main():
                 "runs": runs, "evidence_directory": str(run_root.relative_to(ROOT)),
             }
             report["complete"] = final
-            args.output.write_text(json.dumps(report, indent=1) + "\n")
+            tmp = args.output.with_name(args.output.name + ".tmp")
+            tmp.write_text(json.dumps(report, indent=1) + "\n")
+            os.replace(tmp, args.output)  # atomic: an interruption leaves the previous checkpoint intact
 
     def guarded(name, c):
         try:

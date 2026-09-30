@@ -71,6 +71,11 @@ ideally in the bench). Diagnostic added for G: with 1 A round the power loop (as
 Q2 and capacitors shorted), the voltage induced between each driver return (U80.PH, U80.GND) and its FET's
 source pins tied (Q1.S2+S46, Q2.S2+S46) gives the board's common-source inductance of each FET.
 
+Variant G run 1 (30 September 2026) stopped at FastHenry's input stage: it truncates lines of roughly
+1000 characters, and the fine-meshed terminals' .equiv lines were longer. Such lines are now split into
+several .equiv lines sharing their first node (electrically identical; shorter lines, and so the A/B/I
+decks, are unchanged).
+
 Run history (29 September 2026). First A-m1-mid attempt: FastHenry rejected the via node names
 (they must start with "n"); no result. Second: capacitor terminal boxes grown by s/2 overlapped
 between neighbouring Ci pads, so shared nodes tied the Ci1-Ci5 VIN terminals together and the
@@ -343,7 +348,11 @@ def build(b, loop, variant, mesh, junction, per_layer, gate=None):
              f".default sigma={SIGMA_CU_PER_MM:g} nwinc=1"]
     lines += [f"{nm} x={x:.6f} y={y:.6f} z={zz:.6f}" for nm, (x, y, zz, _, _) in nodes.items()]
     lines += [f"E{k} {a_} {c_} {geo}" for k, (a_, c_, geo) in enumerate(segs, 1)]
-    lines += [".equiv " + " ".join(eq) for eq in equivs]
+    for eq in equivs:  # FastHenry truncates long lines (G run 1): split, every chunk sharing the first node
+        if len(".equiv " + " ".join(eq)) <= 900:
+            lines.append(".equiv " + " ".join(eq))
+        else:
+            lines += [".equiv " + " ".join([eq[0]] + eq[k:k + 40]) for k in range(1, len(eq), 40)]
     lines += [f".external {term_nodes[br][0]} {term_nodes[ref][0]} {name}" for name, br, ref in ports]
     lines += [f".freq fmin={FREQ:g} fmax={FREQ:g} ndec=1", ".end", ""]
     fil = sum(n if "nhinc=%d" % n in geo and "nwinc=3" not in geo else 9 for _, _, geo in segs)

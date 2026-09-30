@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-HAVE_PYMUPDF = importlib.util.find_spec("fitz") is not None
+HAVE_PYMUPDF = importlib.util.find_spec("fitz") is not None and importlib.util.find_spec("scipy") is not None
 
 
 def load(name):
@@ -42,7 +42,7 @@ def case(usable):
                        "falling_V": ringing_edge(False)}}
 
 
-@unittest.skipUnless(HAVE_PYMUPDF, "PyMuPDF not installed")
+@unittest.skipUnless(HAVE_PYMUPDF, "PyMuPDF or SciPy not installed")
 class ComparisonStatusTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
