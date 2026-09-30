@@ -47,6 +47,23 @@ The falling edge's undershoot recovers without ringing above the pixel noise
 (checked on an overlay after the first run), so only the rising edge reports
 a ringing frequency; the falling edge's extrema are listed but not converted.
 
+Digitization uncertainty (added 30 September 2026 after an external review, before
+its first run; the baseline method and checks above are unchanged). Every metric is
+recomputed over all combinations of these extraction choices:
+* trace estimator: midpoint of the longest run (baseline), or the centroid of
+  that run weighted by blueness (b - (r + g) / 2);
+* settled-level windows: 20-40, 25-45 (baseline) and 30-45 ns from the 50 % crossing;
+* ringing fit: start at the first crest (baseline) or at the highest sample;
+  end at 20, 25 (baseline) or 30 ns;
+* grid pitch: detected value and +/- two standard errors of its least-squares
+  fit, on each axis.
+Each metric is reported with the range over the combinations and with the pixel
+resolution. Rule for "consistent within digitization uncertainty" (used by
+scripts/compare_epc90133_fig9.py): a simulated value lies inside the range widened
+by one pixel (time and voltage metrics) or inside the range itself (frequency and
+damping, which are fits over many pixels). Point estimates finer than this are
+not claimed.
+
 Resolution is about 0.32 V and 0.20 ns per pixel. Evidence class:
 vendor-described measurement. Probe, bandwidth and probing point are not
 stated for Fig. 9. The guide recommends the J32 MMCX or the J33 header and
@@ -112,12 +129,18 @@ def grid_lines(counts, lo=15.0, hi=90.0):
     pts = [(0, centre)] + [(k, near_max(centre + k * pitch)) for k in ks if 1 <= centre + k * pitch < n - 2]
     k = np.array([p[0] for p in pts], float)
     p = np.array([p[1] for p in pts], float)
-    slope, intercept = np.polyfit(k, p, 1)
-    return {"centre_px": centre, "pitch_px": float(slope), "lines_px": sorted(int(x) for x in p),
+    (slope, intercept), cov = np.polyfit(k, p, 1, cov=True)
+    return {"centre_px": centre, "pitch_px": float(slope), "pitch_se_px": float(np.sqrt(cov[0, 0])),
+            "lines_px": sorted(int(x) for x in p),
             "max_offset_px": float(np.max(np.abs(p - (slope * k + intercept)))), "contrast": score}
 
 
-def digitize(a):
+def digitize(a, estimator="mid", pitch_se=(0.0, 0.0)):
+    """Calibrate the panel and extract the trace.
+
+    estimator: "mid" (baseline) or "centroid" (blueness-weighted, longest run);
+    pitch_se: multiples of the pitch standard error added to (rows, cols).
+    """
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     h, w = r.shape
     blue = (b - r > 60) & (b - g > 40)
@@ -128,15 +151,21 @@ def digitize(a):
     for d in (rows, cols):
         d["centre_px"] += M
         d["lines_px"] = [p + M for p in d["lines_px"]]
-    v_per_px = V_PER_DIV / rows["pitch_px"]
-    s_per_px = S_PER_DIV / cols["pitch_px"]
+    v_per_px = V_PER_DIV / (rows["pitch_px"] + pitch_se[0] * rows["pitch_se_px"])
+    s_per_px = S_PER_DIV / (cols["pitch_px"] + pitch_se[1] * cols["pitch_se_px"])
+    weight = np.clip(b - 0.5 * (r + g), 0, None)
     trace = []
     for x in range(14, w - 14):
         yy = np.nonzero(blue[FRAME:h - FRAME, x])[0] + FRAME
         if len(yy) == 0:
             continue
         run = max(np.split(yy, np.nonzero(np.diff(yy) > 1)[0] + 1), key=len)
-        trace.append(((x - cols["centre_px"]) * s_per_px, 0.5 * (run[0] + run[-1])))
+        if estimator == "mid":
+            y = 0.5 * (run[0] + run[-1])
+        else:
+            wts = weight[run, x].astype(float)
+            y = float(np.sum(run * wts) / np.sum(wts)) if np.sum(wts) > 0 else 0.5 * (run[0] + run[-1])
+        trace.append(((x - cols["centre_px"]) * s_per_px, y))
     marker = [y for y in range(FRAME, h - FRAME) if blue[y, 0:12].sum() >= 4]
     blob = max(np.split(np.array(marker), np.nonzero(np.diff(marker) > 1)[0] + 1), key=len) if marker else None
     cal = {"image_px": [w, h], "grid_rows": rows, "grid_cols": cols, "v_per_px": v_per_px, "s_per_px": s_per_px,
@@ -203,16 +232,17 @@ def fit_ring(tr, settled, t_start, t_stop=25e-9):
             "data_rms_V": float(np.sqrt(np.mean((y - np.mean(y)) ** 2)))}
 
 
-def edge_metrics(cal, raw, rising):
+def edge_metrics(cal, raw, rising, settle=None, fit_start="crest", fit_stop=25e-9):
     """Convert pixel rows to volts (settled low = 0 V) and measure the edge."""
+    settle = settle or SETTLE
     ys = np.array([y for _, y in raw])
     ts = np.array([t for t, _ in raw])
     # First pass: settled rows from the panel ends, then the 50 % crossing in pixel rows.
     first, last = float(np.median(ys[:40])), float(np.median(ys[-40:]))
     t50 = crossing([(t, -y) for t, y in raw], -0.5 * (first + last), rising)
     rel = ts - t50
-    before = ys[(rel >= -SETTLE[1]) & (rel <= -SETTLE[0])]
-    after = ys[(rel >= SETTLE[0]) & (rel <= SETTLE[1])]
+    before = ys[(rel >= -settle[1]) & (rel <= -settle[0])]
+    after = ys[(rel >= settle[0]) & (rel <= settle[1])]
     low_row = float(np.mean(before if rising else after))
     high_row = float(np.mean(after if rising else before))
     vp = cal["v_per_px"]
@@ -237,7 +267,7 @@ def edge_metrics(cal, raw, rising):
                 "start_s": dip[0][0], "end_s": dip[-1][0], "duration_s": dip[-1][0] - dip[0][0],
                 "min_V": min(v for _, v in dip), "mean_V": float(np.mean([v for _, v in dip])),
                 "definition": "switch node more than 1 V below its settled low level, 20 ns to 1 ns before the rise"}
-        out["ring_fit"] = fit_ring(tr, hi, ext[0][0] if ext else pk_t)
+        out["ring_fit"] = fit_ring(tr, hi, ext[0][0] if ext and fit_start == "crest" else pk_t, fit_stop)
     else:
         pk_t, pk_v = min(ring, key=lambda p: p[1])
         out.update(trough_V=pk_v, undershoot_below_settled_V=-pk_v, trough_time_s=pk_t)
@@ -250,6 +280,49 @@ def edge_metrics(cal, raw, rising):
         out["frequency_from_mean_spacing_Hz"] = 1.0 / float(np.mean(sp))
     out["trace_rel_s_V"] = [[t, v] for t, v in tr]
     return out
+
+
+UNCERTAINTY = {"estimator": ("mid", "centroid"), "settle_s": ((20e-9, 40e-9), (25e-9, 45e-9), (30e-9, 45e-9)),
+               "fit_start": ("crest", "peak"), "fit_stop_s": (20e-9, 25e-9, 30e-9), "pitch_se": (-2.0, 0.0, 2.0)}
+
+
+def headline(m, rising):
+    """The metrics compared with simulation (scripts/compare_epc90133_fig9.py)."""
+    if not rising:
+        return {"edge_10_90_s": m["edge_10_90_s"], "undershoot_below_settled_V": m["undershoot_below_settled_V"],
+                "swing_V": m["swing_V"]}
+    out = {"edge_10_90_s": m["edge_10_90_s"], "overshoot_above_settled_V": m["overshoot_above_settled_V"],
+           "overshoot_fraction": m["overshoot_above_settled_V"] / m["swing_V"], "swing_V": m["swing_V"]}
+    fit = m.get("ring_fit") or {}
+    if fit.get("frequency_Hz"):
+        out["ring_frequency_Hz"] = fit["frequency_Hz"]
+        out["ring_damping_ratio"] = 1 / (2 * np.pi * fit["frequency_Hz"] * fit["decay_time_s"])
+    if m.get("frequency_from_mean_spacing_Hz"):
+        out["ring_frequency_crest_spacing_Hz"] = m["frequency_from_mean_spacing_Hz"]
+    plat = m.get("reverse_conduction_plateau")
+    if plat:
+        out["plateau_duration_s"] = plat["duration_s"]
+        out["plateau_mean_V"] = plat["mean_V"]
+    return out
+
+
+def uncertainty(img, rising):
+    """Range of each headline metric over every combination of UNCERTAINTY's extraction choices."""
+    import itertools
+    values, n = {}, 0
+    for est, pr, pc in itertools.product(UNCERTAINTY["estimator"], UNCERTAINTY["pitch_se"], UNCERTAINTY["pitch_se"]):
+        cal, raw = digitize(img, est, (pr, pc))
+        for settle, start, stop in itertools.product(UNCERTAINTY["settle_s"], UNCERTAINTY["fit_start"],
+                                                     UNCERTAINTY["fit_stop_s"] if rising else (25e-9,)):
+            if not rising and start != "crest":
+                continue
+            h = headline(edge_metrics(cal, raw, rising, settle, start, stop), rising)
+            n += 1
+            for k, v in h.items():
+                if v is not None:
+                    values.setdefault(k, []).append(float(v))
+    return {"combinations": n,
+            "ranges": {k: {"min": min(v), "max": max(v), "n": len(v)} for k, v in values.items()}}
 
 
 def main():
@@ -266,10 +339,13 @@ def main():
         raise SystemExit("Fig. 9 panels are not side by side as expected (xref 119 left of xref 117)")
     panels, checks = {}, {}
     for kind, xref, rising in PANELS:
-        cal, raw = digitize(load(doc, xref))
+        img = load(doc, xref)
+        cal, raw = digitize(img)
         m = edge_metrics(cal, raw, rising)
         panels[kind] = {"xref": xref, "bbox_pt": [round(x, 1) for x in infos[xref]["bbox"]],
-                        "calibration": cal, "metrics": m}
+                        "calibration": cal, "metrics": m, "headline": headline(m, rising),
+                        "uncertainty": {**uncertainty(img, rising), "choices": {k: list(v) for k, v in UNCERTAINTY.items()},
+                                        "resolution": {"s_per_px": cal["s_per_px"], "V_per_px": cal["v_per_px"]}}}
         edge_err = m["edge_10_90_s"] - PRINTED[kind]
         c = {"grid_rows_offset_px": cal["grid_rows"]["max_offset_px"],
              "grid_cols_offset_px": cal["grid_cols"]["max_offset_px"],
@@ -305,6 +381,7 @@ def main():
     for kind in ("rising", "falling"):
         m = panels[kind]["metrics"]
         summary[kind] = {k: v for k, v in m.items() if k not in ("trace_rel_s_V", "extrema_s_V")}
+        summary[kind + "_uncertainty"] = panels[kind]["uncertainty"]["ranges"]
     print(json.dumps({"checks": checks, "summary": summary}, indent=1, default=str))
     failed = [k for k, c in checks.items() for f in ("grid", "time_scale", "volt_scale", "zero", "outcome")
               if c.get(f) == "fail"]

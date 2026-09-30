@@ -74,6 +74,32 @@ with package against 20 ps.
 Probe and oscilloscope bandwidth are applied afterwards to the saved traces by
 scripts/compare_epc90133_fig9.py. The gate-charge exception (EPC2302 Fig. 7: the model's Miller plateau is
 24% narrow) is not tested: the model stays unmodified.
+
+Test 6, separated gate and source paths (--study paths; specification of 30 September 2026, after an
+external review, before the first run). The bench so far returns both drivers at the FET source pads and
+has no gate-loop inductance, and test 5's package cases put the same inductance on drain and source
+together, so they cannot say which path matters. Each case below adds one inductance, per FET, to the
+reference B at the 100 ps step (compared with B-m1-mid-ms100); values are an assumed bracket, not
+extracted, and every inductor carries the 10 GHz damping resistor:
+* drain only, 50 pH (power loop only);
+* source only, 25 and 50 pH, driver returning at the source pad: common-source inductance;
+* source only, 50 pH, driver returning at the die side of it (Kelvin): the same power-loop inductance
+  without the common-source coupling. Csi50 against Kelvin50 isolates the common-source effect;
+* gate only, 0.5 and 2 nH (board and package gate loop lumped in series with the gate).
+Direct numerical checks on a B package case (test 5 checked only related configurations): B-pkg50pH at
+100 ps against the same case at 50 ps and against the 20 GHz damping-resistor corner.
+The periodic study now takes --periodic-ext and --periodic-maxstep, so the continuous-operation check can
+run on B (at the 100 ps step, compared with the double pulse at the same step).
+Added before the rerun of test 6 (its first run was interrupted with the session, and its report was lost
+because reports were written only at the end; they are now saved after every case). In the first run the
+0.5 nH gate case stalled (time step 1e-19 s; Gear integration stalled too) at Q1's second turn-off, 150 ns
+after the valley turn-on. No metric uses that edge: the event B window ends 60 ns and the saved trace 70 ns
+after the turn-on. Every test 6 case therefore ends its transient 80 ns after the valley turn-on (edges
+later than that are dropped). The stall itself is recorded as a caveat for the gate-inductance cases, which
+also get a direct 50 ps step check.
+Result status: a comparison is formed only between two cases whose checks all pass; otherwise it is
+recorded as excluded. Every report carries an input manifest (extraction files, vendor library and
+imported modules by sha256).
 """
 import argparse
 import glob
@@ -161,9 +187,20 @@ def capacitor(tag, p, n, model, scale=1.0, esr=None):
             f"L{tag} x{tag}b {n} {max(model['ESL'] * scale, 1e-15):.6g}")
 
 
+def fet(n, gate, dpad, spad, l_d, l_s, l_g, r_corner):
+    """One EPC2302 with optional drain, source and gate inductance; returns lines and the die source node."""
+    dd, ss, gg = (f"p{n}d" if l_d else dpad), (f"p{n}s" if l_s else spad), (f"p{n}g" if l_g else gate)
+    lines = []
+    for tag, a, b, lv in (("d", dpad, dd, l_d), ("s", ss, spad, l_s), ("g", gate, gg, l_g)):
+        if lv:
+            lines += [f"Lp{n}{tag} {a} {b} {lv:g}", f"Rp{n}{tag} {a} {b} {2 * math.pi * r_corner * lv:.6g}"]
+    lines.append(f"X{n} {gg} {dd} {ss} EPC2302")
+    return lines, ss
+
+
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
-          c_gd=0.0):
+          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None):
     net, terms = network(ext, ideal, r_scale)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -200,6 +237,10 @@ Rbret bn {node(at + '.GND')} 1u"""
         hi = [(t_on1, 1), (t_off1, 0), (t_on2, 1), (t_on2 + T_ON2, 0)]
         lo = [(t_off1 + DEAD, 1), (t_on2 - DEAD, 0), (t_on2 + T_ON2 + DEAD, 1)]
         t_end = t_on2 + T_ON2 + 100e-9
+        if t_after_b is not None:  # test 6: stop after the measured window; drop later edges
+            t_end = t_on2 + t_after_b
+            hi = [e for e in hi if e[0] <= t_end - 20e-9]
+            lo = [e for e in lo if e[0] <= t_end - 20e-9]
         times = {"t_off1": t_off1, "t_on2": t_on2, "t_end": t_end}
         l_ic = ""
     else:
@@ -228,19 +269,23 @@ Rbret bn {node(at + '.GND')} 1u"""
                  "period_starts_s": starts,
                  "note": "last period: event B (valley turn-on) at its start, event A (peak turn-off) at the end of its on-time"}
         l_ic = ""
+    # l_pkg (tests 4-5) is the same inductance on drain and source; l_d / l_s / l_g (test 6) set them apart.
+    ld = l_pkg if l_d is None else l_d
+    ls = l_pkg if l_s is None else l_s
+    fet1, s1_die = fet(1, "gu", "q1dd", "q1_s", ld, ls, l_g, r_pkg_corner)
+    fet2, s2_die = fet(2, "gl", "q2_d", "0", ld, ls, l_g, r_pkg_corner)
     lines += [
         "Vq1d q1_d q1dd 0",
-        *([f"Lp1d q1dd p1d {l_pkg:g}", f"Lp1s p1s q1_s {l_pkg:g}", f"Lp2d q2_d p2d {l_pkg:g}", f"Lp2s p2s 0 {l_pkg:g}",
-           *(f"Rp{n} {a} {b} {2 * math.pi * r_pkg_corner * l_pkg:.6g}"
-             for n, a, b in (("1d", "q1dd", "p1d"), ("1s", "p1s", "q1_s"), ("2d", "q2_d", "p2d"), ("2s", "p2s", "0"))),
-           "X1 gu p1d p1s EPC2302", "X2 gl p2d p2s EPC2302"] if l_pkg else
-          ["X1 gu q1dd q1_s EPC2302", "X2 gl q2_d 0 EPC2302"]),
+        *fet1, *fet2,
         *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip(),
-        drive_stage("l", "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip(),
+        # Drivers return at the source pads (common-source coupling through l_s) or, with kelvin, at the die source.
+        drive_stage("u", s1_die if kelvin else "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF,
+                    t_end).rstrip(),
+        drive_stage("l", s2_die if kelvin else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
+                    t_end).rstrip(),
         SWITCH_MODELS.rstrip(),
         ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})"),
         ".temp 25",
@@ -390,6 +435,52 @@ def cause_cases(exts):
     return cases
 
 
+L_PATH_CASES = {"B-Ld50": {"l_d": 50e-12, "l_s": 0.0},
+                "B-Ls25-csi": {"l_d": 0.0, "l_s": 25e-12},
+                "B-Ls50-csi": {"l_d": 0.0, "l_s": 50e-12},
+                "B-Ls50-kelvin": {"l_d": 0.0, "l_s": 50e-12, "kelvin": True},
+                "B-Lg0.5n": {"l_g": 0.5e-9},
+                "B-Lg2n": {"l_g": 2e-9}}
+
+
+T_AFTER_B = 80e-9
+
+
+def path_cases(exts):
+    """Test 6 cases (see the module docstring)."""
+    b, ref = "B-m1-mid", "B-m1-mid-ms100"
+    common = {"ext": b, "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B}
+    cases = {ref: dict(common)}
+    for name, kw in L_PATH_CASES.items():
+        cases[name] = {**common, "base": ref, **kw}
+    cases["B-Lg0.5n-ms50"] = {**common, **L_PATH_CASES["B-Lg0.5n"], "maxstep": MAXSTEP_PKG / 2, "base": "B-Lg0.5n"}
+    cases["B-pkg50pH"] = {**common, "l_pkg": 50e-12, "base": ref}
+    cases["B-pkg50pH-ms50"] = {**common, "l_pkg": 50e-12, "maxstep": MAXSTEP_PKG / 2, "base": "B-pkg50pH"}
+    cases["B-pkg50pH-r20GHz"] = {**common, "l_pkg": 50e-12, "r_pkg_corner": 20e9, "base": "B-pkg50pH"}
+    if b not in exts:
+        raise SystemExit(f"path study needs extraction {b}")
+    return cases
+
+
+def comparisons(results, exts, reference):
+    """Materiality of each case against its base; formed only when both passed every check (test 6)."""
+    out = {}
+    for name, r in results.items():
+        base = r["parameters"].get("base") or (reference if (name in exts or name == "ideal-copper") else r["parameters"]["ext"])
+        if name == base or base not in results:
+            continue
+        if r.get("usable") is True and results[base].get("usable") is True:
+            out[name] = {"compared_with": base, **material(flat(results[base]["metrics"]), flat(r["metrics"]))}
+        else:
+            out[name] = {"compared_with": base, "excluded": "case or base failed its checks",
+                         "case_usable": r.get("usable") is True, "base_usable": results[base].get("usable") is True}
+    return out
+
+
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -397,7 +488,9 @@ def main():
     ap.add_argument("--cases", nargs="*", default=None, help="extraction names (e.g. A-m1-mid); default: all found")
     ap.add_argument("--no-extra", action="store_true", help="skip ideal, capacitor, numerical and periodic cases")
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic"), default="sensitivity",
+    ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
+    ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
@@ -425,10 +518,17 @@ def main():
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
 
     files = sorted(glob.glob(str(EXTRACTIONS / "*.json")))
+    ext_files = {Path(f).stem: Path(f) for f in files}
     exts = {Path(f).stem: json.loads(Path(f).read_text(encoding="utf-8")) for f in files}
     exts = {k: v for k, v in exts.items() if v.get("outcome") == "complete" and (args.cases is None or k in args.cases)}
     if args.study == "periodic":
-        cases = {NUMERICAL_REF: {"ext": NUMERICAL_REF}, f"{NUMERICAL_REF}-periodic3": {"ext": NUMERICAL_REF, "periods": 3}}
+        pe, pm = args.periodic_ext, args.periodic_maxstep
+        tag = pe + ("" if pm == MAXSTEP else f"-ms{pm * 1e12:.0f}")
+        cases = {tag: {"ext": pe, "maxstep": pm}, f"{tag}-periodic3": {"ext": pe, "periods": 3, "maxstep": pm, "base": tag}}
+    elif args.study == "paths":
+        cases = path_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "causes":
         cases = cause_cases(exts)
         if args.only:
@@ -450,6 +550,8 @@ def main():
                 cases[f"{NUMERICAL_REF}-pkg{lp * 1e12:.0f}pH"] = {"ext": NUMERICAL_REF, "l_pkg": lp}
             cases[f"{NUMERICAL_REF}-periodic3"] = {"ext": NUMERICAL_REF, "periods": 3}
     results, slopes = {}, {}
+    import threading
+    save_lock = threading.Lock()
 
     def run_case(name, c):
         ext = exts[c["ext"]]
@@ -457,11 +559,13 @@ def main():
                   maxstep=c.get("maxstep", MAXSTEP), reltol=c.get("reltol", RELTOL),
                   l_pkg=c.get("l_pkg", 0.0), c_sw=c.get("c_sw", False),
                   r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
-                  esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0))
+                  esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
+                  l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
+                  t_after_b=c.get("t_after_b"))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
-            s_on, s_off = slopes[c["ext"]]
+            s_on, s_off = slopes[c.get("base", c["ext"])]
             duty = s_off / (s_on + s_off)
             timing = {"duty": duty, "t1": I_PEAK / s_on}
             text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
@@ -525,12 +629,54 @@ def main():
         else:
             print(name, "failed:", runs[name]["message"], flush=True)
 
+    def save(final=False):
+        """Write the report; called after every case (test 6), so an interrupted run keeps its results."""
+        with save_lock:
+            done = {k: results[k] for k in cases if k in results}
+            # Extraction variants are compared with the reference B; a modified case (ideal copper, ESL, package,
+            # switch-node capacitance, fine, periodic) is compared with the unmodified case of its own extraction.
+            comparison = comparisons(done, exts, REFERENCE)
+            numerical = None
+            fine = done.get(f"{NUMERICAL_REF}-fine")
+            if fine and fine.get("usable") and NUMERICAL_REF in done and done[NUMERICAL_REF].get("usable"):
+                a, b_ = flat(done[NUMERICAL_REF]["metrics"]), flat(fine["metrics"])
+                keys = list(MATERIAL) + ["sw_peak_V", "q1_vds_peak_V", "q1_peak_drain_current_A"]
+                rel = {k: (b_[k] - a[k]) / abs(a[k]) for k in keys if a.get(k) and b_.get(k) is not None}
+                numerical = {"relative_change": rel, "pass": all(abs(v) <= 0.02 for v in rel.values()) and len(rel) == len(keys)}
+            report = {
+                "schema": "epc90133-switching-sensitivity/1",
+                "study": args.study,
+                "numerical_check": numerical,
+                "scope": ("Sensitivity of simulated switching to exploratory extraction assumptions. Not a validated prediction: "
+                          "the extraction is unqualified for plane holes and via arrays, the driver is behavioural, capacitor "
+                          "models are assumed, and gate-charge-dependent quantities carry the EPC2302 Fig. 7 exception."),
+                "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                "input_manifest": {
+                    "extractions": {ext_files[e].relative_to(ROOT).as_posix(): sha256(ext_files[e])
+                                    for e in sorted({c["ext"] for c in cases.values()})},
+                    "vendor_library": {"file": Path(lib).name, "sha256": sha256(lib)},
+                    "modules": {m: sha256(ROOT / m) for m in ("scripts/epc9097_switching.py", "scripts/epc2302_baseline.py",
+                                                              "src/circuit_tools/ltspice.py")}},
+                "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
+                               "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
+                               "source": "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)"},
+                "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
+                                      "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
+                                      "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"},
+                "driver_calibration": {"pull_up_edge_s": te_rise, "pull_down_edge_s": te_fall, "targets_s": [DRIVER_RISE, DRIVER_FALL]},
+                "reference": REFERENCE, "materiality": MATERIAL, "cases": done, "comparison_to_reference": comparison,
+                "runs": runs, "evidence_directory": str(run_root.relative_to(ROOT)),
+            }
+            report["complete"] = final
+            args.output.write_text(json.dumps(report, indent=1) + "\n")
+
     def guarded(name, c):
         try:
             run_case(name, c)
         except Exception as exc:  # record the failure; the other cases continue
             results[name] = {"parameters": c, "metrics": None, "checks": None, "error": repr(exc)}
             print(name, "error:", repr(exc), flush=True)
+        save()
 
     # Cases are independent except that a periodic case needs its extraction's slopes: run it afterwards.
     plain = {k: c for k, c in cases.items() if not c.get("periods")}
@@ -539,40 +685,7 @@ def main():
     for name, c in cases.items():
         if c.get("periods"):
             guarded(name, c)
-    results = {k: results[k] for k in cases if k in results}
-    # Extraction variants are compared with the reference B; a modified case (ideal copper, ESL, package,
-    # switch-node capacitance, fine, periodic) is compared with the unmodified case of its own extraction.
-    comparison = {}
-    for name, r in results.items():
-        base = r["parameters"].get("base") or (REFERENCE if (name in exts or name == "ideal-copper") else r["parameters"]["ext"])
-        if name != base and r["metrics"] and base in results and results[base]["metrics"]:
-            comparison[name] = {"compared_with": base, **material(flat(results[base]["metrics"]), flat(r["metrics"]))}
-    numerical = None
-    fine = results.get(f"{NUMERICAL_REF}-fine")
-    if fine and fine["metrics"] and NUMERICAL_REF in results and results[NUMERICAL_REF]["metrics"]:
-        a, b_ = flat(results[NUMERICAL_REF]["metrics"]), flat(fine["metrics"])
-        keys = list(MATERIAL) + ["sw_peak_V", "q1_vds_peak_V", "q1_peak_drain_current_A"]
-        rel = {k: (b_[k] - a[k]) / abs(a[k]) for k in keys if a.get(k) and b_.get(k) is not None}
-        numerical = {"relative_change": rel, "pass": all(abs(v) <= 0.02 for v in rel.values()) and len(rel) == len(keys)}
-    report = {
-        "schema": "epc90133-switching-sensitivity/1",
-        "study": args.study,
-        "numerical_check": numerical,
-        "scope": ("Sensitivity of simulated switching to exploratory extraction assumptions. Not a validated prediction: "
-                  "the extraction is unqualified for plane holes and via arrays, the driver is behavioural, capacitor "
-                  "models are assumed, and gate-charge-dependent quantities carry the EPC2302 Fig. 7 exception."),
-        "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-        "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
-                       "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
-                       "source": "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)"},
-        "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
-                              "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
-                              "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"},
-        "driver_calibration": {"pull_up_edge_s": te_rise, "pull_down_edge_s": te_fall, "targets_s": [DRIVER_RISE, DRIVER_FALL]},
-        "reference": REFERENCE, "materiality": MATERIAL, "cases": results, "comparison_to_reference": comparison,
-        "runs": runs, "evidence_directory": str(run_root.relative_to(ROOT)),
-    }
-    args.output.write_text(json.dumps(report, indent=1) + "\n")
+    save(final=True)
 
 
 if __name__ == "__main__":
