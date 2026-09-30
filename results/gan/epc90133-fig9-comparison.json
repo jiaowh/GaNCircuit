@@ -6,13 +6,16 @@
   "sim": {
    "results/gan/epc90133-switching-causes.json": "024f3ce8bca205c1d2943da7ad639dd133c2b46783f76d80300bca88943432d2",
    "results/gan/epc90133-switching-causes-2.json": "c2ea9a56ee9c95ffcf4abb331af804bb416adbb333e7c9aa8430502a1f0a1778",
-   "results/gan/epc90133-switching-paths.json": "4e4619bdf33c1d75dea29eea6d8d2eab5217053f5b9f08693edc261d55b4e8ea"
+   "results/gan/epc90133-switching-paths.json": "4e4619bdf33c1d75dea29eea6d8d2eab5217053f5b9f08693edc261d55b4e8ea",
+   "results/gan/epc90133-switching-gateloop-ctl.json": "8bf30ee4225661a33f882f24cf5d1347f3b79d00ad1349da1e64a4741d985355",
+   "results/gan/epc90133-switching-gateloop-split.json": "9effbb585f971de8a02321ce62385d8d78b5660eb0d53fb899506f940fa2df55",
+   "results/gan/epc90133-switching-gateloop.json": "484f151498b4b4027cfde958916158bdaa79913d6cff3df6960cee15e481b255"
   },
   "modules": {
-   "scripts/digitize_epc90133_qsg_fig9.py": "4f3bf39f2d3ec84badfd277345909a354d739347e9f1889972a5877f5d680721"
+   "scripts/digitize_epc90133_qsg_fig9.py": "b8a4f687a80f211e9cc273528626f59cbfb7bd5b72225150e0b4bc57f8d3311c"
   }
  },
- "evaluator_sha256": "a51bd3ae1798f86a88a9d0d503fbccd2065f0773c387b02dc9bb3102355f6da2",
+ "evaluator_sha256": "e9babeb2992e6e9741741cecad9e126439f84b33d072dd435c86a7314afea104",
  "criteria": {
   "edge_rel": 0.25,
   "overshoot_V": 3.0,
@@ -584,28 +587,29 @@
    "parameters": {
     "ext": "B-m1-mid",
     "maxstep": 1e-10,
-    "t_after_b": 8e-08
+    "t_after_b": 8e-08,
+    "sense_q2": true
    },
    "bandwidths": {
     "none": {
      "metrics": {
       "rising": {
-       "swing_V": 48.82985087782714,
-       "edge_10_90_s": 8.306258185478785e-10,
-       "overshoot_above_settled_V": 35.023635875,
-       "overshoot_fraction": 0.7172587105094698,
-       "ring_frequency_Hz": 283573316.5321438,
-       "ring_decay_time_s": 7.381890876214948e-08,
-       "ring_damping_ratio": 0.007603037774769962,
-       "ring_fit_rms_V": 1.2677586621930392,
+       "swing_V": 48.829845002827135,
+       "edge_10_90_s": 8.306554769402707e-10,
+       "overshoot_above_settled_V": 35.023441749999996,
+       "overshoot_fraction": 0.7172548212670391,
+       "ring_frequency_Hz": 283573308.45885724,
+       "ring_decay_time_s": 7.381755559358901e-08,
+       "ring_damping_ratio": 0.007603177364468335,
+       "ring_fit_rms_V": 1.2677426705226928,
        "plateau_duration_s": 1.19e-08,
-       "plateau_mean_V": -1.8313895574453962
+       "plateau_mean_V": -1.8313868320785198
       },
       "falling": {
-       "swing_V": 46.83400950925925,
-       "edge_10_90_s": 3.964418640199071e-09,
-       "undershoot_below_settled_V": 2.70136975,
-       "undershoot_fraction": 0.05767966010823672
+       "swing_V": 46.83400975925925,
+       "edge_10_90_s": 3.964417041350106e-09,
+       "undershoot_below_settled_V": 2.7013694999999998,
+       "undershoot_fraction": 0.057679654462341426
       }
      },
      "resembles": {
@@ -618,7 +622,7 @@
      },
      "consistency": {
       "rising.edge_10_90_s": {
-       "value": 8.306258185478785e-10,
+       "value": 8.306554769402707e-10,
        "range": [
         1.4766155808528213e-09,
         1.8851417362679156e-09
@@ -626,7 +630,7 @@
        "consistent": false
       },
       "rising.overshoot_above_settled_V": {
-       "value": 35.023635875,
+       "value": 35.023441749999996,
        "range": [
         5.370953700095178,
         6.046416357087082
@@ -642,7 +646,7 @@
        "consistent": false
       },
       "rising.plateau_mean_V": {
-       "value": -1.8313895574453962,
+       "value": -1.8313868320785198,
        "range": [
         -2.7935494354216903,
         -2.0944281303709067
@@ -650,7 +654,7 @@
        "consistent": false
       },
       "rising.ring_frequency_Hz": {
-       "value": 283573316.5321438,
+       "value": 283573308.45885724,
        "range": [
         261753094.07619855,
         265302528.46517625
@@ -658,7 +662,7 @@
        "consistent": false
       },
       "rising.ring_damping_ratio": {
-       "value": 0.007603037774769962,
+       "value": 0.007603177364468335,
        "range": [
         0.07196182544903994,
         0.07696751224622135
@@ -666,7 +670,7 @@
        "consistent": false
       },
       "rising.overshoot_fraction": {
-       "value": 0.7172587105094698,
+       "value": 0.7172548212670391,
        "range": [
         0.12426038576823764,
         0.12490352423907976
@@ -674,7 +678,7 @@
        "consistent": false
       },
       "falling.edge_10_90_s": {
-       "value": 3.964418640199071e-09,
+       "value": 3.964417041350106e-09,
        "range": [
         3.4265829485152522e-09,
         3.838503436237449e-09
@@ -682,7 +686,7 @@
        "consistent": false
       },
       "falling.undershoot_below_settled_V": {
-       "value": 2.70136975,
+       "value": 2.7013694999999998,
        "range": [
         4.258520750031356,
         4.962584062666437
@@ -694,22 +698,22 @@
     "2000MHz": {
      "metrics": {
       "rising": {
-       "swing_V": 48.824636017282835,
-       "edge_10_90_s": 8.337051429060245e-10,
-       "overshoot_above_settled_V": 34.75688052811015,
-       "overshoot_fraction": 0.7118717795624117,
-       "ring_frequency_Hz": 283574833.25388753,
-       "ring_decay_time_s": 7.378711845515546e-08,
-       "ring_damping_ratio": 0.007606272770691078,
-       "ring_fit_rms_V": 1.2344425006192787,
+       "swing_V": 48.82463026535912,
+       "edge_10_90_s": 8.33699792372454e-10,
+       "overshoot_above_settled_V": 34.756834444372004,
+       "overshoot_fraction": 0.7118709195639693,
+       "ring_frequency_Hz": 283574825.61376125,
+       "ring_decay_time_s": 7.378562454000734e-08,
+       "ring_damping_ratio": 0.007606426977521349,
+       "ring_fit_rms_V": 1.2344277100720502,
        "plateau_duration_s": 1.19e-08,
-       "plateau_mean_V": -1.8304354906414166
+       "plateau_mean_V": -1.8304333765770475
       },
       "falling": {
-       "swing_V": 46.83400881072421,
-       "edge_10_90_s": 3.966195417936736e-09,
-       "undershoot_below_settled_V": 2.68744166410883,
-       "undershoot_fraction": 0.057382268406061594
+       "swing_V": 46.83400906072421,
+       "edge_10_90_s": 3.96620184925161e-09,
+       "undershoot_below_settled_V": 2.687423286861072,
+       "undershoot_fraction": 0.05738187570866724
       }
      },
      "resembles": {
@@ -722,7 +726,7 @@
      },
      "consistency": {
       "rising.edge_10_90_s": {
-       "value": 8.337051429060245e-10,
+       "value": 8.33699792372454e-10,
        "range": [
         1.4766155808528213e-09,
         1.8851417362679156e-09
@@ -730,7 +734,7 @@
        "consistent": false
       },
       "rising.overshoot_above_settled_V": {
-       "value": 34.75688052811015,
+       "value": 34.756834444372004,
        "range": [
         5.370953700095178,
         6.046416357087082
@@ -746,7 +750,7 @@
        "consistent": false
       },
       "rising.plateau_mean_V": {
-       "value": -1.8304354906414166,
+       "value": -1.8304333765770475,
        "range": [
         -2.7935494354216903,
         -2.0944281303709067
@@ -754,7 +758,7 @@
        "consistent": false
       },
       "rising.ring_frequency_Hz": {
-       "value": 283574833.25388753,
+       "value": 283574825.61376125,
        "range": [
         261753094.07619855,
         265302528.46517625
@@ -762,7 +766,7 @@
        "consistent": false
       },
       "rising.ring_damping_ratio": {
-       "value": 0.007606272770691078,
+       "value": 0.007606426977521349,
        "range": [
         0.07196182544903994,
         0.07696751224622135
@@ -770,7 +774,7 @@
        "consistent": false
       },
       "rising.overshoot_fraction": {
-       "value": 0.7118717795624117,
+       "value": 0.7118709195639693,
        "range": [
         0.12426038576823764,
         0.12490352423907976
@@ -778,7 +782,7 @@
        "consistent": false
       },
       "falling.edge_10_90_s": {
-       "value": 3.966195417936736e-09,
+       "value": 3.96620184925161e-09,
        "range": [
         3.4265829485152522e-09,
         3.838503436237449e-09
@@ -786,7 +790,7 @@
        "consistent": false
       },
       "falling.undershoot_below_settled_V": {
-       "value": 2.68744166410883,
+       "value": 2.687423286861072,
        "range": [
         4.258520750031356,
         4.962584062666437
@@ -798,22 +802,22 @@
     "1000MHz": {
      "metrics": {
       "rising": {
-       "swing_V": 48.82980910437794,
-       "edge_10_90_s": 8.435217670411125e-10,
-       "overshoot_above_settled_V": 33.943362596536964,
-       "overshoot_fraction": 0.6951360904151825,
-       "ring_frequency_Hz": 283579237.6585943,
-       "ring_decay_time_s": 7.369434238401322e-08,
-       "ring_damping_ratio": 0.0076157302557235814,
-       "ring_fit_rms_V": 1.1418916981085936,
+       "swing_V": 48.829803766219335,
+       "edge_10_90_s": 8.435185994179032e-10,
+       "overshoot_above_settled_V": 33.94330478900792,
+       "overshoot_fraction": 0.6951349825511697,
+       "ring_frequency_Hz": 283579229.40342677,
+       "ring_decay_time_s": 7.369296897627223e-08,
+       "ring_damping_ratio": 0.007615872410951787,
+       "ring_fit_rms_V": 1.1418794008258755,
        "plateau_duration_s": 1.1874999999999999e-08,
-       "plateau_mean_V": -1.8293647358652614
+       "plateau_mean_V": -1.829363086470974
       },
       "falling": {
-       "swing_V": 46.83400689524001,
-       "edge_10_90_s": 3.971508804760654e-09,
-       "undershoot_below_settled_V": 2.6605880336861243,
-       "undershoot_fraction": 0.05680889187289534
+       "swing_V": 46.83400714489957,
+       "edge_10_90_s": 3.971518266897368e-09,
+       "undershoot_below_settled_V": 2.660584231393544,
+       "undershoot_fraction": 0.056808810383488464
       }
      },
      "resembles": {
@@ -826,7 +830,7 @@
      },
      "consistency": {
       "rising.edge_10_90_s": {
-       "value": 8.435217670411125e-10,
+       "value": 8.435185994179032e-10,
        "range": [
         1.4766155808528213e-09,
         1.8851417362679156e-09
@@ -834,7 +838,7 @@
        "consistent": false
       },
       "rising.overshoot_above_settled_V": {
-       "value": 33.943362596536964,
+       "value": 33.94330478900792,
        "range": [
         5.370953700095178,
         6.046416357087082
@@ -850,7 +854,7 @@
        "consistent": false
       },
       "rising.plateau_mean_V": {
-       "value": -1.8293647358652614,
+       "value": -1.829363086470974,
        "range": [
         -2.7935494354216903,
         -2.0944281303709067
@@ -858,7 +862,7 @@
        "consistent": false
       },
       "rising.ring_frequency_Hz": {
-       "value": 283579237.6585943,
+       "value": 283579229.40342677,
        "range": [
         261753094.07619855,
         265302528.46517625
@@ -866,7 +870,7 @@
        "consistent": false
       },
       "rising.ring_damping_ratio": {
-       "value": 0.0076157302557235814,
+       "value": 0.007615872410951787,
        "range": [
         0.07196182544903994,
         0.07696751224622135
@@ -874,7 +878,7 @@
        "consistent": false
       },
       "rising.overshoot_fraction": {
-       "value": 0.6951360904151825,
+       "value": 0.6951349825511697,
        "range": [
         0.12426038576823764,
         0.12490352423907976
@@ -882,7 +886,7 @@
        "consistent": false
       },
       "falling.edge_10_90_s": {
-       "value": 3.971508804760654e-09,
+       "value": 3.971518266897368e-09,
        "range": [
         3.4265829485152522e-09,
         3.838503436237449e-09
@@ -890,7 +894,7 @@
        "consistent": false
       },
       "falling.undershoot_below_settled_V": {
-       "value": 2.6605880336861243,
+       "value": 2.660584231393544,
        "range": [
         4.258520750031356,
         4.962584062666437
@@ -902,22 +906,22 @@
     "500MHz": {
      "metrics": {
       "rising": {
-       "swing_V": 48.80488021890386,
-       "edge_10_90_s": 8.944184409452614e-10,
-       "overshoot_above_settled_V": 30.864544847247544,
-       "overshoot_fraction": 0.6324069377654699,
-       "ring_frequency_Hz": 283589135.71268797,
-       "ring_decay_time_s": 7.333080395923608e-08,
-       "ring_damping_ratio": 0.007653218210550825,
-       "ring_fit_rms_V": 0.8563747117038623,
+       "swing_V": 48.80487580255114,
+       "edge_10_90_s": 8.944167139006551e-10,
+       "overshoot_above_settled_V": 30.864506552811832,
+       "overshoot_fraction": 0.6324062103483209,
+       "ring_frequency_Hz": 283589126.38598186,
+       "ring_decay_time_s": 7.33294146989588e-08,
+       "ring_damping_ratio": 0.007653363456076692,
+       "ring_fit_rms_V": 0.8563699068709699,
        "plateau_duration_s": 1.18e-08,
-       "plateau_mean_V": -1.8242103658690283
+       "plateau_mean_V": -1.8242089684701202
       },
       "falling": {
-       "swing_V": 46.834000078195736,
-       "edge_10_90_s": 3.99315136502795e-09,
-       "undershoot_below_settled_V": 2.6053849092997052,
-       "undershoot_fraction": 0.055630202522732645
+       "swing_V": 46.83400032526638,
+       "edge_10_90_s": 3.99316022165121e-09,
+       "undershoot_below_settled_V": 2.6053845954007055,
+       "undershoot_fraction": 0.055630195526883745
       }
      },
      "resembles": {
@@ -930,7 +934,7 @@
      },
      "consistency": {
       "rising.edge_10_90_s": {
-       "value": 8.944184409452614e-10,
+       "value": 8.944167139006551e-10,
        "range": [
         1.4766155808528213e-09,
         1.8851417362679156e-09
@@ -938,7 +942,7 @@
        "consistent": false
       },
       "rising.overshoot_above_settled_V": {
-       "value": 30.864544847247544,
+       "value": 30.864506552811832,
        "range": [
         5.370953700095178,
         6.046416357087082
@@ -954,7 +958,7 @@
        "consistent": false
       },
       "rising.plateau_mean_V": {
-       "value": -1.8242103658690283,
+       "value": -1.8242089684701202,
        "range": [
         -2.7935494354216903,
         -2.0944281303709067
@@ -962,7 +966,7 @@
        "consistent": false
       },
       "rising.ring_frequency_Hz": {
-       "value": 283589135.71268797,
+       "value": 283589126.38598186,
        "range": [
         261753094.07619855,
         265302528.46517625
@@ -970,7 +974,7 @@
        "consistent": false
       },
       "rising.ring_damping_ratio": {
-       "value": 0.007653218210550825,
+       "value": 0.007653363456076692,
        "range": [
         0.07196182544903994,
         0.07696751224622135
@@ -978,7 +982,7 @@
        "consistent": false
       },
       "rising.overshoot_fraction": {
-       "value": 0.6324069377654699,
+       "value": 0.6324062103483209,
        "range": [
         0.12426038576823764,
         0.12490352423907976
@@ -986,7 +990,7 @@
        "consistent": false
       },
       "falling.edge_10_90_s": {
-       "value": 3.99315136502795e-09,
+       "value": 3.99316022165121e-09,
        "range": [
         3.4265829485152522e-09,
         3.838503436237449e-09
@@ -994,7 +998,7 @@
        "consistent": false
       },
       "falling.undershoot_below_settled_V": {
-       "value": 2.6053849092997052,
+       "value": 2.6053845954007055,
        "range": [
         4.258520750031356,
         4.962584062666437
@@ -1006,22 +1010,22 @@
     "350MHz": {
      "metrics": {
       "rising": {
-       "swing_V": 48.7537227719002,
-       "edge_10_90_s": 9.701374345534366e-10,
-       "overshoot_above_settled_V": 26.988393282007166,
-       "overshoot_fraction": 0.5535657945194342,
-       "ring_frequency_Hz": 283597678.2921763,
-       "ring_decay_time_s": 7.294514787345041e-08,
-       "ring_damping_ratio": 0.007693448509578948,
-       "ring_fit_rms_V": 0.6054693125614852,
+       "swing_V": 48.75371936145815,
+       "edge_10_90_s": 9.70136701575354e-10,
+       "overshoot_above_settled_V": 26.9883713503078,
+       "overshoot_fraction": 0.5535653833960252,
+       "ring_frequency_Hz": 283597667.64786065,
+       "ring_decay_time_s": 7.294372251611368e-08,
+       "ring_damping_ratio": 0.007693599132230171,
+       "ring_fit_rms_V": 0.605471140728413,
        "plateau_duration_s": 1.1675e-08,
-       "plateau_mean_V": -1.8198203216598876
+       "plateau_mean_V": -1.8198190487895436
       },
       "falling": {
-       "swing_V": 46.8339917055608,
-       "edge_10_90_s": 4.0247950236726754e-09,
-       "undershoot_below_settled_V": 2.558636794718979,
-       "undershoot_fraction": 0.054632046117375495
+       "swing_V": 46.833991959117014,
+       "edge_10_90_s": 4.024802988183252e-09,
+       "undershoot_below_settled_V": 2.558635927486232,
+       "undershoot_fraction": 0.05463202730443632
       }
      },
      "resembles": {
@@ -1034,7 +1038,7 @@
      },
      "consistency": {
       "rising.edge_10_90_s": {
-       "value": 9.701374345534366e-10,
+       "value": 9.70136701575354e-10,
        "range": [
         1.4766155808528213e-09,
         1.8851417362679156e-09
@@ -1042,7 +1046,7 @@
        "consistent": false
       },
       "rising.overshoot_above_settled_V": {
-       "value": 26.988393282007166,
+       "value": 26.9883713503078,
        "range": [
         5.370953700095178,
         6.046416357087082
@@ -1058,7 +1062,7 @@
        "consistent": false
       },
       "rising.plateau_mean_V": {
-       "value": -1.8198203216598876,
+       "value": -1.8198190487895436,
        "range": [
         -2.7935494354216903,
         -2.0944281303709067
@@ -1066,7 +1070,7 @@
        "consistent": false
       },
       "rising.ring_frequency_Hz": {
-       "value": 283597678.2921763,
+       "value": 283597667.64786065,
        "range": [
         261753094.07619855,
         265302528.46517625
@@ -1074,7 +1078,7 @@
        "consistent": false
       },
       "rising.ring_damping_ratio": {
-       "value": 0.007693448509578948,
+       "value": 0.007693599132230171,
        "range": [
         0.07196182544903994,
         0.07696751224622135
@@ -1082,7 +1086,7 @@
        "consistent": false
       },
       "rising.overshoot_fraction": {
-       "value": 0.5535657945194342,
+       "value": 0.5535653833960252,
        "range": [
         0.12426038576823764,
         0.12490352423907976
@@ -1090,7 +1094,7 @@
        "consistent": false
       },
       "falling.edge_10_90_s": {
-       "value": 4.0247950236726754e-09,
+       "value": 4.024802988183252e-09,
        "range": [
         3.4265829485152522e-09,
         3.838503436237449e-09
@@ -1098,7 +1102,7 @@
        "consistent": false
       },
       "falling.undershoot_below_settled_V": {
-       "value": 2.558636794718979,
+       "value": 2.558635927486232,
        "range": [
         4.258520750031356,
         4.962584062666437
@@ -11452,6 +11456,3773 @@
   "B-pkg50pH-r20GHz": {
    "usable": false,
    "reason": "no traces"
+  },
+  "G-m1-mid-ctl": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "B-m1-mid-ms100",
+    "maxstep": 1e-10,
+    "t_after_b": 8e-08,
+    "sense_q2": true,
+    "gate_ctl": true,
+    "on_request": true
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.019995393203885,
+       "edge_10_90_s": 8.286643487859417e-10,
+       "overshoot_above_settled_V": 32.4650915,
+       "overshoot_fraction": 0.6760744401194733,
+       "ring_frequency_Hz": 296674152.0448643,
+       "ring_decay_time_s": 6.918752971168052e-08,
+       "ring_damping_ratio": 0.007753764336636463,
+       "ring_fit_rms_V": 0.9761120377065146,
+       "plateau_duration_s": 1.1874999999999999e-08,
+       "plateau_mean_V": -1.831052392510402
+      },
+      "falling": {
+       "swing_V": 46.83621948128466,
+       "edge_10_90_s": 3.990773229614578e-09,
+       "undershoot_below_settled_V": 2.7039731249999996,
+       "undershoot_fraction": 0.05773252314014122
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.286643487859417e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 32.4650915,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1874999999999999e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.831052392510402,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 296674152.0448643,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.007753764336636463,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.6760744401194733,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.990773229614578e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.7039731249999996,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.0206593516361,
+       "edge_10_90_s": 8.317764466336438e-10,
+       "overshoot_above_settled_V": 32.19332803244272,
+       "overshoot_fraction": 0.6704057892396655,
+       "ring_frequency_Hz": 296674510.55353034,
+       "ring_decay_time_s": 6.917779584682962e-08,
+       "ring_damping_ratio": 0.007754845981655206,
+       "ring_fit_rms_V": 0.9492672640525649,
+       "plateau_duration_s": 1.1874999999999999e-08,
+       "plateau_mean_V": -1.8300816930401878
+      },
+      "falling": {
+       "swing_V": 46.83621952058006,
+       "edge_10_90_s": 3.9924475509241285e-09,
+       "undershoot_below_settled_V": 2.6901180508906455,
+       "undershoot_fraction": 0.0574367034407761
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.317764466336438e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 32.19332803244272,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1874999999999999e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8300816930401878,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 296674510.55353034,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.007754845981655206,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.6704057892396655,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.9924475509241285e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.6901180508906455,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.02261808595876,
+       "edge_10_90_s": 8.416694834212366e-10,
+       "overshoot_above_settled_V": 31.386917377696697,
+       "overshoot_fraction": 0.6535861356312404,
+       "ring_frequency_Hz": 296678307.9378338,
+       "ring_decay_time_s": 6.90409042039321e-08,
+       "ring_damping_ratio": 0.00777012253499609,
+       "ring_fit_rms_V": 0.8741952215112049,
+       "plateau_duration_s": 1.1849999999999997e-08,
+       "plateau_mean_V": -1.8289852924654924
+      },
+      "falling": {
+       "swing_V": 46.836219712013516,
+       "edge_10_90_s": 3.9974766083924346e-09,
+       "undershoot_below_settled_V": 2.663703347780473,
+       "undershoot_fraction": 0.05687272295157569
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.416694834212366e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 31.386917377696697,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1849999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8289852924654924,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 296678307.9378338,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.00777012253499609,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.6535861356312404,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.9974766083924346e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.663703347780473,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.040804297057136,
+       "edge_10_90_s": 8.941090926673955e-10,
+       "overshoot_above_settled_V": 28.292075622730806,
+       "overshoot_fraction": 0.5889176094510955,
+       "ring_frequency_Hz": 296691050.0203633,
+       "ring_decay_time_s": 6.861094476567572e-08,
+       "ring_damping_ratio": 0.007818479224693458,
+       "ring_fit_rms_V": 0.6479805887732382,
+       "plateau_duration_s": 1.1774999999999998e-08,
+       "plateau_mean_V": -1.8237291506214346
+      },
+      "falling": {
+       "swing_V": 46.83623400039324,
+       "edge_10_90_s": 4.0180115509395146e-09,
+       "undershoot_below_settled_V": 2.6086938783135794,
+       "undershoot_fraction": 0.055698198926320094
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.941090926673955e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 28.292075622730806,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1774999999999998e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8237291506214346,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 296691050.0203633,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.007818479224693458,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5889176094510955,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.0180115509395146e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.6086938783135794,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.05849640553111,
+       "edge_10_90_s": 9.726646955924993e-10,
+       "overshoot_above_settled_V": 24.42518019815399,
+       "overshoot_fraction": 0.508238543129761,
+       "ring_frequency_Hz": 296703811.73324347,
+       "ring_decay_time_s": 6.829647788476833e-08,
+       "ring_damping_ratio": 0.007854141091680011,
+       "ring_fit_rms_V": 0.45800491754412787,
+       "plateau_duration_s": 1.1625000000000003e-08,
+       "plateau_mean_V": -1.8209909040497263
+      },
+      "falling": {
+       "swing_V": 46.83623507531218,
+       "edge_10_90_s": 4.048154215953537e-09,
+       "undershoot_below_settled_V": 2.561496984430177,
+       "undershoot_fraction": 0.05469049722530678
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 9.726646955924993e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 24.42518019815399,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1625000000000003e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8209909040497263,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 296703811.73324347,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.007854141091680011,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.508238543129761,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.048154215953537e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.561496984430177,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
+  },
+  "G-m1-mid": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "B-m1-mid-ms100",
+    "maxstep": 1e-10,
+    "t_after_b": 8e-08,
+    "sense_q2": true
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.016098283891544,
+       "edge_10_90_s": 8.817819419673617e-10,
+       "overshoot_above_settled_V": 25.414787999999994,
+       "overshoot_fraction": 0.5292972338097316,
+       "ring_frequency_Hz": 300359765.23967236,
+       "ring_decay_time_s": 4.861539276618872e-08,
+       "ring_damping_ratio": 0.01089944982919898,
+       "ring_fit_rms_V": 0.4809762872181494,
+       "plateau_duration_s": 1.2225000000000002e-08,
+       "plateau_mean_V": -1.90122269570029
+      },
+      "falling": {
+       "swing_V": 46.83586524908759,
+       "edge_10_90_s": 3.96764505011048e-09,
+       "undershoot_below_settled_V": 2.6075688749999997,
+       "undershoot_fraction": 0.05567461732866775
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.817819419673617e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 25.414787999999994,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2225000000000002e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.90122269570029,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300359765.23967236,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01089944982919898,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5292972338097316,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.96764505011048e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.6075688749999997,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.01681564315819,
+       "edge_10_90_s": 8.854107050973487e-10,
+       "overshoot_above_settled_V": 25.192952478101866,
+       "overshoot_fraction": 0.5246693713578559,
+       "ring_frequency_Hz": 300360762.767443,
+       "ring_decay_time_s": 4.8600349962230646e-08,
+       "ring_damping_ratio": 0.010902787222857398,
+       "ring_fit_rms_V": 0.46839098606296287,
+       "plateau_duration_s": 1.22e-08,
+       "plateau_mean_V": -1.9020754109085802
+      },
+      "falling": {
+       "swing_V": 46.83586540674333,
+       "edge_10_90_s": 3.969388939405505e-09,
+       "undershoot_below_settled_V": 2.5957982548693166,
+       "undershoot_fraction": 0.05542330076163339
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.854107050973487e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 25.192952478101866,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.22e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.9020754109085802,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300360762.767443,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010902787222857398,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5246693713578559,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.969388939405505e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.5957982548693166,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.01892983542905,
+       "edge_10_90_s": 8.966659252048748e-10,
+       "overshoot_above_settled_V": 24.538483044685506,
+       "overshoot_fraction": 0.5110168662397109,
+       "ring_frequency_Hz": 300361812.320884,
+       "ring_decay_time_s": 4.863999233790408e-08,
+       "ring_damping_ratio": 0.010893863209472934,
+       "ring_fit_rms_V": 0.4324298556438974,
+       "plateau_duration_s": 1.2174999999999998e-08,
+       "plateau_mean_V": -1.9009840682945685
+      },
+      "falling": {
+       "swing_V": 46.835865957437306,
+       "edge_10_90_s": 3.9746355045475334e-09,
+       "undershoot_below_settled_V": 2.5723433336693295,
+       "undershoot_fraction": 0.05492251036859187
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.966659252048748e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 24.538483044685506,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2174999999999998e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.9009840682945685,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300361812.320884,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010893863209472934,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5110168662397109,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.9746355045475334e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.5723433336693295,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.038949122978764,
+       "edge_10_90_s": 9.52654304980282e-10,
+       "overshoot_above_settled_V": 22.034295432986028,
+       "overshoot_fraction": 0.45867563373583936,
+       "ring_frequency_Hz": 300369053.67454195,
+       "ring_decay_time_s": 4.853358608948402e-08,
+       "ring_damping_ratio": 0.01091748398062718,
+       "ring_fit_rms_V": 0.32724777425729434,
+       "plateau_duration_s": 1.2074999999999997e-08,
+       "plateau_mean_V": -1.897633107994052
+      },
+      "falling": {
+       "swing_V": 46.835867796903145,
+       "edge_10_90_s": 3.996105828730228e-09,
+       "undershoot_below_settled_V": 2.518059489579368,
+       "undershoot_fraction": 0.05376348529504275
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 9.52654304980282e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 22.034295432986028,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2074999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.897633107994052,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300369053.67454195,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01091748398062718,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.45867563373583936,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.996105828730228e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.518059489579368,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.052627753212924,
+       "edge_10_90_s": 1.0354923347487682e-09,
+       "overshoot_above_settled_V": 18.886185807159244,
+       "overshoot_fraction": 0.3930312802903159,
+       "ring_frequency_Hz": 300374771.5503289,
+       "ring_decay_time_s": 4.8530128159889876e-08,
+       "ring_damping_ratio": 0.01091805404898477,
+       "ring_fit_rms_V": 0.23993622684207427,
+       "plateau_duration_s": 1.1974999999999996e-08,
+       "plateau_mean_V": -1.8915335187417062
+      },
+      "falling": {
+       "swing_V": 46.83588272916918,
+       "edge_10_90_s": 4.027528752228445e-09,
+       "undershoot_below_settled_V": 2.4663932100299877,
+       "undershoot_fraction": 0.0526603336226634
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.0354923347487682e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 18.886185807159244,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1974999999999996e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8915335187417062,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300374771.5503289,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01091805404898477,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.3930312802903159,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.027528752228445e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.4663932100299877,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
+  },
+  "G-m1-mid-ctl-hs": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "G-m1-mid",
+    "maxstep": 1e-10,
+    "t_after_b": 8e-08,
+    "sense_q2": true,
+    "gate_ctl": "u",
+    "on_request": true
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.03776279045307,
+       "edge_10_90_s": 8.256311145005219e-10,
+       "overshoot_above_settled_V": 32.175024750000006,
+       "overshoot_fraction": 0.6697860783057616,
+       "ring_frequency_Hz": 298203327.0646422,
+       "ring_decay_time_s": 5.060328736478268e-08,
+       "ring_damping_ratio": 0.01054699927190967,
+       "ring_fit_rms_V": 0.9160250170562357,
+       "plateau_duration_s": 1.2050000000000002e-08,
+       "plateau_mean_V": -1.8972561448471326
+      },
+      "falling": {
+       "swing_V": 46.83606510097042,
+       "edge_10_90_s": 3.994223633457101e-09,
+       "undershoot_below_settled_V": 2.624327875,
+       "undershoot_fraction": 0.056032202306970175
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.256311145005219e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 32.175024750000006,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2050000000000002e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8972561448471326,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 298203327.0646422,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01054699927190967,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.6697860783057616,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.994223633457101e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.624327875,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.038306659091795,
+       "edge_10_90_s": 8.288223641905431e-10,
+       "overshoot_above_settled_V": 31.904567254970537,
+       "overshoot_fraction": 0.664148457217366,
+       "ring_frequency_Hz": 298202087.68888855,
+       "ring_decay_time_s": 5.060663175253443e-08,
+       "ring_damping_ratio": 0.010546346095481867,
+       "ring_fit_rms_V": 0.8924974941250914,
+       "plateau_duration_s": 1.2025e-08,
+       "plateau_mean_V": -1.8980664497071595
+      },
+      "falling": {
+       "swing_V": 46.836065256449416,
+       "edge_10_90_s": 3.995874837151889e-09,
+       "undershoot_below_settled_V": 2.613074575961623,
+       "undershoot_fraction": 0.05579193217136868
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.288223641905431e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 31.904567254970537,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2025e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8980664497071595,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 298202087.68888855,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010546346095481867,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.664148457217366,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.995874837151889e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.613074575961623,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.03991051794546,
+       "edge_10_90_s": 8.388902962527259e-10,
+       "overshoot_above_settled_V": 31.102433221857154,
+       "overshoot_fraction": 0.6474290415307652,
+       "ring_frequency_Hz": 298205802.10844743,
+       "ring_decay_time_s": 5.0518567526936445e-08,
+       "ring_damping_ratio": 0.010564598946846025,
+       "ring_fit_rms_V": 0.8279833729213761,
+       "plateau_duration_s": 1.2025e-08,
+       "plateau_mean_V": -1.895102195803724
+      },
+      "falling": {
+       "swing_V": 46.83606557391103,
+       "edge_10_90_s": 4.000814677994447e-09,
+       "undershoot_below_settled_V": 2.5906693862484667,
+       "undershoot_fraction": 0.0553135570740925
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.388902962527259e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 31.102433221857154,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2025e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.895102195803724,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 298205802.10844743,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010564598946846025,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.6474290415307652,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.000814677994447e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.5906693862484667,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.060880472311446,
+       "edge_10_90_s": 8.917092632848085e-10,
+       "overshoot_above_settled_V": 28.01986905062902,
+       "overshoot_fraction": 0.583007817902372,
+       "ring_frequency_Hz": 298216822.05570096,
+       "ring_decay_time_s": 5.0247283077275505e-08,
+       "ring_damping_ratio": 0.010621244584494642,
+       "ring_fit_rms_V": 0.6331478819375561,
+       "plateau_duration_s": 1.1899999999999997e-08,
+       "plateau_mean_V": -1.8934472886054556
+      },
+      "falling": {
+       "swing_V": 46.83608005959721,
+       "edge_10_90_s": 4.021027668231327e-09,
+       "undershoot_below_settled_V": 2.5388290536835636,
+       "undershoot_fraction": 0.05420669386620306
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.917092632848085e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 28.01986905062902,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1899999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8934472886054556,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 298216822.05570096,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010621244584494642,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.583007817902372,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.021027668231327e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.5388290536835636,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.07979400809612,
+       "edge_10_90_s": 9.706912726872544e-10,
+       "overshoot_above_settled_V": 24.16879631170206,
+       "overshoot_fraction": 0.5026809455055546,
+       "ring_frequency_Hz": 298226904.9820072,
+       "ring_decay_time_s": 5.004746357165867e-08,
+       "ring_damping_ratio": 0.01066329043260912,
+       "ring_fit_rms_V": 0.46790716871227056,
+       "plateau_duration_s": 1.1799999999999996e-08,
+       "plateau_mean_V": -1.887125680866434
+      },
+      "falling": {
+       "swing_V": 46.83608159619091,
+       "edge_10_90_s": 4.050792512905923e-09,
+       "undershoot_below_settled_V": 2.4893568932546453,
+       "undershoot_fraction": 0.05315040900981563
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 9.706912726872544e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 24.16879631170206,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1799999999999996e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.887125680866434,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 298226904.9820072,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01066329043260912,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5026809455055546,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.050792512905923e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.4893568932546453,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
+  },
+  "G-m1-mid-ctl-ls": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "G-m1-mid",
+    "maxstep": 1e-10,
+    "t_after_b": 8e-08,
+    "sense_q2": true,
+    "gate_ctl": "l",
+    "on_request": true
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.038775895933014,
+       "edge_10_90_s": 8.884624664549691e-10,
+       "overshoot_above_settled_V": 25.42370975,
+       "overshoot_fraction": 0.5292330888088342,
+       "ring_frequency_Hz": 299120925.8863157,
+       "ring_decay_time_s": 6.571674158065607e-08,
+       "ring_damping_ratio": 0.008096499873556507,
+       "ring_fit_rms_V": 0.5070416547461526,
+       "plateau_duration_s": 1.2049999999999999e-08,
+       "plateau_mean_V": -1.834093650133238
+      },
+      "falling": {
+       "swing_V": 46.83601423905109,
+       "edge_10_90_s": 3.964151344922067e-09,
+       "undershoot_below_settled_V": 2.68102025,
+       "undershoot_fraction": 0.057242707210653505
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.884624664549691e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 25.42370975,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2049999999999999e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.834093650133238,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 299120925.8863157,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.008096499873556507,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5292330888088342,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.964151344922067e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.68102025,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.04461835689539,
+       "edge_10_90_s": 8.920899328807457e-10,
+       "overshoot_above_settled_V": 25.200301237990892,
+       "overshoot_fraction": 0.5245187098957178,
+       "ring_frequency_Hz": 299122689.7967157,
+       "ring_decay_time_s": 6.581111596123876e-08,
+       "ring_damping_ratio": 0.00808484166399175,
+       "ring_fit_rms_V": 0.49187780439783724,
+       "plateau_duration_s": 1.2049999999999999e-08,
+       "plateau_mean_V": -1.8331179939050826
+      },
+      "falling": {
+       "swing_V": 46.836014470220654,
+       "edge_10_90_s": 3.965935755904975e-09,
+       "undershoot_below_settled_V": 2.667311900415261,
+       "undershoot_fraction": 0.056950018710733706
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.920899328807457e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 25.200301237990892,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2049999999999999e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8331179939050826,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 299122689.7967157,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.00808484166399175,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5245187098957178,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.965935755904975e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.667311900415261,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.04601509630488,
+       "edge_10_90_s": 9.031510021480311e-10,
+       "overshoot_above_settled_V": 24.553869856556027,
+       "overshoot_fraction": 0.5110490392874313,
+       "ring_frequency_Hz": 299123757.21713024,
+       "ring_decay_time_s": 6.577102350799237e-08,
+       "ring_damping_ratio": 0.008089741123107796,
+       "ring_fit_rms_V": 0.4522537368438109,
+       "plateau_duration_s": 1.2024999999999997e-08,
+       "plateau_mean_V": -1.8320777024451795
+      },
+      "falling": {
+       "swing_V": 46.836014964823015,
+       "edge_10_90_s": 3.971285553415696e-09,
+       "undershoot_below_settled_V": 2.6400967561168396,
+       "undershoot_fraction": 0.056368945097052536
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 9.031510021480311e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 24.553869856556027,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2024999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8320777024451795,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 299123757.21713024,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.008089741123107796,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5110490392874313,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.971285553415696e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.6400967561168396,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.05610317228542,
+       "edge_10_90_s": 9.586145721839464e-10,
+       "overshoot_above_settled_V": 22.064367975872827,
+       "overshoot_fraction": 0.4591376853168909,
+       "ring_frequency_Hz": 299132014.2138874,
+       "ring_decay_time_s": 6.561945472104582e-08,
+       "ring_damping_ratio": 0.00810820310837122,
+       "ring_fit_rms_V": 0.33287969247154026,
+       "plateau_duration_s": 1.1925000000000003e-08,
+       "plateau_mean_V": -1.8287270672125606
+      },
+      "falling": {
+       "swing_V": 46.83601651362532,
+       "edge_10_90_s": 3.99309197233226e-09,
+       "undershoot_below_settled_V": 2.583731303613363,
+       "undershoot_fraction": 0.05516547938831894
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 9.586145721839464e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 22.064367975872827,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1925000000000003e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8287270672125606,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 299132014.2138874,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.00810820310837122,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.4591376853168909,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.99309197233226e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.583731303613363,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.070688106727715,
+       "edge_10_90_s": 1.041136994172434e-09,
+       "overshoot_above_settled_V": 18.92505915700336,
+       "overshoot_fraction": 0.3936922873869723,
+       "ring_frequency_Hz": 299138746.7120453,
+       "ring_decay_time_s": 6.564445620155111e-08,
+       "ring_damping_ratio": 0.00810493258579082,
+       "ring_fit_rms_V": 0.23455442086430603,
+       "plateau_duration_s": 1.1800000000000003e-08,
+       "plateau_mean_V": -1.824488781198691
+      },
+      "falling": {
+       "swing_V": 46.8360312326103,
+       "edge_10_90_s": 4.0248866712340315e-09,
+       "undershoot_below_settled_V": 2.535062028487584,
+       "undershoot_fraction": 0.05412632030876494
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.041136994172434e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 18.92505915700336,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1800000000000003e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.824488781198691,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 299138746.7120453,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.00810493258579082,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.3936922873869723,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.0248866712340315e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.535062028487584,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
+  },
+  "G-m1-mid-ms50": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "G-m1-mid",
+    "maxstep": 5e-11,
+    "t_after_b": 8e-08,
+    "sense_q2": true
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.016092533891545,
+       "edge_10_90_s": 8.817825768433725e-10,
+       "overshoot_above_settled_V": 25.41499375,
+       "overshoot_fraction": 0.5293015822156114,
+       "ring_frequency_Hz": 300359720.90495616,
+       "ring_decay_time_s": 4.86153203627463e-08,
+       "ring_damping_ratio": 0.010899467670714426,
+       "ring_fit_rms_V": 0.48097041897197834,
+       "plateau_duration_s": 1.2225000000000002e-08,
+       "plateau_mean_V": -1.9012216752921265
+      },
+      "falling": {
+       "swing_V": 46.835864759124085,
+       "edge_10_90_s": 3.967649803699751e-09,
+       "undershoot_below_settled_V": 2.607569,
+       "undershoot_fraction": 0.05567462057999089
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.817825768433725e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 25.41499375,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2225000000000002e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.9012216752921265,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300359720.90495616,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010899467670714426,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5293015822156114,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.967649803699751e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.607569,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.016809817008294,
+       "edge_10_90_s": 8.854062523337012e-10,
+       "overshoot_above_settled_V": 25.19292220964327,
+       "overshoot_fraction": 0.5246688046468166,
+       "ring_frequency_Hz": 300360718.8431838,
+       "ring_decay_time_s": 4.8600293004204085e-08,
+       "ring_damping_ratio": 0.010902801594991343,
+       "ring_fit_rms_V": 0.468385177458694,
+       "plateau_duration_s": 1.22e-08,
+       "plateau_mean_V": -1.9020743543243792
+      },
+      "falling": {
+       "swing_V": 46.835864916779826,
+       "edge_10_90_s": 3.9693932110166845e-09,
+       "undershoot_below_settled_V": 2.595799060963094,
+       "undershoot_fraction": 0.05542331855246897
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.854062523337012e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 25.19292220964327,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.22e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.9020743543243792,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300360718.8431838,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010902801594991343,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5246688046468166,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.9693932110166845e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.595799060963094,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.01892397649049,
+       "edge_10_90_s": 8.966591235026386e-10,
+       "overshoot_above_settled_V": 24.5384365633766,
+       "overshoot_fraction": 0.5110159606114942,
+       "ring_frequency_Hz": 300361768.42160654,
+       "ring_decay_time_s": 4.863994671911004e-08,
+       "ring_damping_ratio": 0.010893875018880731,
+       "ring_fit_rms_V": 0.43242500375742077,
+       "plateau_duration_s": 1.2174999999999998e-08,
+       "plateau_mean_V": -1.9009829551700512
+      },
+      "falling": {
+       "swing_V": 46.83586546748361,
+       "edge_10_90_s": 3.974640758742413e-09,
+       "undershoot_below_settled_V": 2.572345901101355,
+       "undershoot_fraction": 0.05492256576078943
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 8.966591235026386e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 24.5384365633766,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2174999999999998e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.9009829551700512,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300361768.42160654,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010893875018880731,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.5110159606114942,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.974640758742413e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.572345901101355,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.038943149124705,
+       "edge_10_90_s": 9.526488062979909e-10,
+       "overshoot_above_settled_V": 22.03423559203098,
+       "overshoot_fraction": 0.45867444509824645,
+       "ring_frequency_Hz": 300369009.6392883,
+       "ring_decay_time_s": 4.853357278993255e-08,
+       "ring_damping_ratio": 0.010917488572867675,
+       "ring_fit_rms_V": 0.3272450049473548,
+       "plateau_duration_s": 1.2074999999999997e-08,
+       "plateau_mean_V": -1.8976321942153649
+      },
+      "falling": {
+       "swing_V": 46.83586731287277,
+       "edge_10_90_s": 3.996112305275816e-09,
+       "undershoot_below_settled_V": 2.5180624819663726,
+       "undershoot_fraction": 0.05376354974159487
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 9.526488062979909e-10,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 22.03423559203098,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.2074999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8976321942153649,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300369009.6392883,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010917488572867675,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.45867444509824645,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.996112305275816e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.5180624819663726,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.052621696528874,
+       "edge_10_90_s": 1.0354887305512491e-09,
+       "overshoot_above_settled_V": 18.886143166290594,
+       "overshoot_fraction": 0.39303044245044494,
+       "ring_frequency_Hz": 300374727.1726145,
+       "ring_decay_time_s": 4.853014456868126e-08,
+       "ring_damping_ratio": 0.010918051970467637,
+       "ring_fit_rms_V": 0.239934586593172,
+       "plateau_duration_s": 1.1974999999999996e-08,
+       "plateau_mean_V": -1.8915328622351466
+      },
+      "falling": {
+       "swing_V": 46.83588226181373,
+       "edge_10_90_s": 4.02753545699668e-09,
+       "undershoot_below_settled_V": 2.4663965707640956,
+       "undershoot_fraction": 0.052660405903680395
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": false,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.0354887305512491e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 18.886143166290594,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1974999999999996e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8915328622351466,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 300374727.1726145,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.010918051970467637,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.39303044245044494,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.02753545699668e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.4663965707640956,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
+  },
+  "G-m1-mid-Ls25": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "G-m1-mid",
+    "maxstep": 1e-10,
+    "t_after_b": 8e-08,
+    "sense_q2": true,
+    "l_s": 2.5e-11
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.32211368233229,
+       "edge_10_90_s": 1.2372662310449164e-09,
+       "overshoot_above_settled_V": 13.154669625000004,
+       "overshoot_fraction": 0.27222877110629506,
+       "ring_frequency_Hz": 279767897.73471147,
+       "ring_decay_time_s": 3.065161513006514e-08,
+       "ring_damping_ratio": 0.01855961181293053,
+       "ring_fit_rms_V": 0.08424229095019949,
+       "plateau_duration_s": 1.1924999999999996e-08,
+       "plateau_mean_V": -1.8796738056384181
+      },
+      "falling": {
+       "swing_V": 46.84129110894496,
+       "edge_10_90_s": 3.945880898972015e-09,
+       "undershoot_below_settled_V": 2.615389625,
+       "undershoot_fraction": 0.055835130994084776
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.2372662310449164e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 13.154669625000004,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1924999999999996e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8796738056384181,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 279767897.73471147,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01855961181293053,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.27222877110629506,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.945880898972015e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.615389625,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.32058726899277,
+       "edge_10_90_s": 1.241257468751699e-09,
+       "overshoot_above_settled_V": 13.050754816506867,
+       "overshoot_fraction": 0.27008684194700405,
+       "ring_frequency_Hz": 279768314.18429744,
+       "ring_decay_time_s": 3.065287410758413e-08,
+       "ring_damping_ratio": 0.018558821905129207,
+       "ring_fit_rms_V": 0.08219983518543339,
+       "plateau_duration_s": 1.1924999999999996e-08,
+       "plateau_mean_V": -1.879093933863744
+      },
+      "falling": {
+       "swing_V": 46.84125391382488,
+       "edge_10_90_s": 3.947712934998269e-09,
+       "undershoot_below_settled_V": 2.6136141530730335,
+       "undershoot_fraction": 0.05579727130877773
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.241257468751699e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 13.050754816506867,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1924999999999996e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.879093933863744,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 279768314.18429744,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.018558821905129207,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.27008684194700405,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.947712934998269e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.6136141530730335,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.31606969153761,
+       "edge_10_90_s": 1.2531388025767403e-09,
+       "overshoot_above_settled_V": 12.748720851024459,
+       "overshoot_fraction": 0.26386088380978867,
+       "ring_frequency_Hz": 279769457.7175265,
+       "ring_decay_time_s": 3.065786973785303e-08,
+       "ring_damping_ratio": 0.0185557219420321,
+       "ring_fit_rms_V": 0.07640983179021843,
+       "plateau_duration_s": 1.19e-08,
+       "plateau_mean_V": -1.8791385266914966
+      },
+      "falling": {
+       "swing_V": 46.84114393570328,
+       "edge_10_90_s": 3.953273387547409e-09,
+       "undershoot_below_settled_V": 2.608335435189186,
+       "undershoot_fraction": 0.05568470827205949
+      }
+     },
+     "resembles": {
+      "rise_time": false,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.2531388025767403e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 12.748720851024459,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.19e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8791385266914966,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 279769457.7175265,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.0185557219420321,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.26386088380978867,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.953273387547409e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.608335435189186,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.294278161265986,
+       "edge_10_90_s": 1.3050893511373124e-09,
+       "overshoot_above_settled_V": 11.602931429078879,
+       "overshoot_fraction": 0.24025478526325528,
+       "ring_frequency_Hz": 279772108.8063073,
+       "ring_decay_time_s": 3.070774902622575e-08,
+       "ring_damping_ratio": 0.01852540591864244,
+       "ring_fit_rms_V": 0.05755988434960156,
+       "plateau_duration_s": 1.1849999999999997e-08,
+       "plateau_mean_V": -1.8756376362247904
+      },
+      "falling": {
+       "swing_V": 46.84072588937433,
+       "edge_10_90_s": 3.975865383490048e-09,
+       "undershoot_below_settled_V": 2.5882350636892713,
+       "undershoot_fraction": 0.0552560835586112
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.3050893511373124e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 11.602931429078879,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1849999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8756376362247904,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 279772108.8063073,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.01852540591864244,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.24025478526325528,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.975865383490048e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.5882350636892713,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.26862102800559,
+       "edge_10_90_s": 1.3846649652114091e-09,
+       "overshoot_above_settled_V": 10.109623413475823,
+       "overshoot_fraction": 0.2094450431391067,
+       "ring_frequency_Hz": 279769797.7568007,
+       "ring_decay_time_s": 3.081544608259754e-08,
+       "ring_damping_ratio": 0.018460813880027602,
+       "ring_fit_rms_V": 0.04315041760921302,
+       "plateau_duration_s": 1.1774999999999998e-08,
+       "plateau_mean_V": -1.8712651622553647
+      },
+      "falling": {
+       "swing_V": 46.84019874606557,
+       "edge_10_90_s": 4.008963528640113e-09,
+       "undershoot_below_settled_V": 2.554917698095546,
+       "undershoot_fraction": 0.05454540686188167
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.3846649652114091e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 10.109623413475823,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1774999999999998e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8712651622553647,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 279769797.7568007,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": false
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.018460813880027602,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.2094450431391067,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 4.008963528640113e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.554917698095546,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
+  },
+  "G-m1-mid-Ls50": {
+   "usable": true,
+   "checks": {
+    "edge_current_A_within_2pct": true,
+    "edge_current_B_within_5pct": true,
+    "no_spikes": true
+   },
+   "parameters": {
+    "ext": "G-m1-mid",
+    "base": "G-m1-mid",
+    "maxstep": 1e-10,
+    "t_after_b": 8e-08,
+    "sense_q2": true,
+    "l_s": 5e-11
+   },
+   "bandwidths": {
+    "none": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.06370560509188,
+       "edge_10_90_s": 1.6640047857432827e-09,
+       "overshoot_above_settled_V": 11.279815374999998,
+       "overshoot_fraction": 0.2346846801134911,
+       "ring_frequency_Hz": 261817603.90767193,
+       "ring_decay_time_s": 2.4255618332073304e-08,
+       "ring_damping_ratio": 0.025061608269815232,
+       "ring_fit_rms_V": 0.0546938148867889,
+       "plateau_duration_s": 1.1724999999999997e-08,
+       "plateau_mean_V": -1.880484126291095
+      },
+      "falling": {
+       "swing_V": 46.829478459862386,
+       "edge_10_90_s": 3.934529130960438e-09,
+       "undershoot_below_settled_V": 2.659723375,
+       "undershoot_fraction": 0.056795921340009214
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.6640047857432827e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": true
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 11.279815374999998,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1724999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.880484126291095,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 261817603.90767193,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": true
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.025061608269815232,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.2346846801134911,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.934529130960438e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.659723375,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "2000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.063961261985206,
+       "edge_10_90_s": 1.6674061664090613e-09,
+       "overshoot_above_settled_V": 11.211672289574409,
+       "overshoot_fraction": 0.2332656733901364,
+       "ring_frequency_Hz": 261818015.94114947,
+       "ring_decay_time_s": 2.4254651123836725e-08,
+       "ring_damping_ratio": 0.025062568215237845,
+       "ring_fit_rms_V": 0.05364548290143122,
+       "plateau_duration_s": 1.1724999999999997e-08,
+       "plateau_mean_V": -1.8799370099794988
+      },
+      "falling": {
+       "swing_V": 46.82951364771338,
+       "edge_10_90_s": 3.936386334354925e-09,
+       "undershoot_below_settled_V": 2.65713241163617,
+       "undershoot_fraction": 0.056740551089748806
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.6674061664090613e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": true
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 11.211672289574409,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1724999999999997e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8799370099794988,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 261818015.94114947,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": true
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.025062568215237845,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.2332656733901364,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.936386334354925e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.65713241163617,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "1000MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.0647173845512,
+       "edge_10_90_s": 1.6769440474697154e-09,
+       "overshoot_above_settled_V": 11.008539267370786,
+       "overshoot_fraction": 0.22903576399492392,
+       "ring_frequency_Hz": 261819243.1394077,
+       "ring_decay_time_s": 2.4251322948709813e-08,
+       "ring_damping_ratio": 0.025065890233802873,
+       "ring_fit_rms_V": 0.050663344956272706,
+       "plateau_duration_s": 1.1700000000000002e-08,
+       "plateau_mean_V": -1.880189535309215
+      },
+      "falling": {
+       "swing_V": 46.829617866749075,
+       "edge_10_90_s": 3.9419978529965e-09,
+       "undershoot_below_settled_V": 2.6493334275826927,
+       "undershoot_fraction": 0.05657388525187661
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.6769440474697154e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": true
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 11.008539267370786,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1700000000000002e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.880189535309215,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 261819243.1394077,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": true
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.025065890233802873,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.22903576399492392,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.9419978529965e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.6493334275826927,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "500MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.07264860925228,
+       "edge_10_90_s": 1.7154613773951596e-09,
+       "overshoot_above_settled_V": 10.20929470719991,
+       "overshoot_fraction": 0.2123722116953419,
+       "ring_frequency_Hz": 261824176.15567833,
+       "ring_decay_time_s": 2.425336322034104e-08,
+       "ring_damping_ratio": 0.025063309384300365,
+       "ring_fit_rms_V": 0.040464154040134516,
+       "plateau_duration_s": 1.1675e-08,
+       "plateau_mean_V": -1.8755637692958136
+      },
+      "falling": {
+       "swing_V": 46.830017200315304,
+       "edge_10_90_s": 3.964949250094864e-09,
+       "undershoot_below_settled_V": 2.61976656835047,
+       "undershoot_fraction": 0.05594203728656395
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.7154613773951596e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": true
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 10.20929470719991,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1675e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8755637692958136,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 261824176.15567833,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": true
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.025063309384300365,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.2123722116953419,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.964949250094864e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.61976656835047,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    },
+    "350MHz": {
+     "metrics": {
+      "rising": {
+       "swing_V": 48.07576791476912,
+       "edge_10_90_s": 1.7752434809202072e-09,
+       "overshoot_above_settled_V": 9.174372692791266,
+       "overshoot_fraction": 0.19083153719054483,
+       "ring_frequency_Hz": 261828947.383323,
+       "ring_decay_time_s": 2.426343199173473e-08,
+       "ring_damping_ratio": 0.025052452150636024,
+       "ring_fit_rms_V": 0.03044775838156504,
+       "plateau_duration_s": 1.1600000000000001e-08,
+       "plateau_mean_V": -1.8722744671797007
+      },
+      "falling": {
+       "swing_V": 46.83052723732359,
+       "edge_10_90_s": 3.998501550430964e-09,
+       "undershoot_below_settled_V": 2.581122889641246,
+       "undershoot_fraction": 0.05511624664315353
+      }
+     },
+     "resembles": {
+      "rise_time": true,
+      "fall_time": true,
+      "overshoot": false,
+      "ring_frequency": true,
+      "damping": false,
+      "all": false
+     },
+     "consistency": {
+      "rising.edge_10_90_s": {
+       "value": 1.7752434809202072e-09,
+       "range": [
+        1.4766155808528213e-09,
+        1.8851417362679156e-09
+       ],
+       "consistent": true
+      },
+      "rising.overshoot_above_settled_V": {
+       "value": 9.174372692791266,
+       "range": [
+        5.370953700095178,
+        6.046416357087082
+       ],
+       "consistent": false
+      },
+      "rising.plateau_duration_s": {
+       "value": 1.1600000000000001e-08,
+       "range": [
+        6.89098136273248e-09,
+        7.310245331544889e-09
+       ],
+       "consistent": false
+      },
+      "rising.plateau_mean_V": {
+       "value": -1.8722744671797007,
+       "range": [
+        -2.7935494354216903,
+        -2.0944281303709067
+       ],
+       "consistent": false
+      },
+      "rising.ring_frequency_Hz": {
+       "value": 261828947.383323,
+       "range": [
+        261753094.07619855,
+        265302528.46517625
+       ],
+       "consistent": true
+      },
+      "rising.ring_damping_ratio": {
+       "value": 0.025052452150636024,
+       "range": [
+        0.07196182544903994,
+        0.07696751224622135
+       ],
+       "consistent": false
+      },
+      "rising.overshoot_fraction": {
+       "value": 0.19083153719054483,
+       "range": [
+        0.12426038576823764,
+        0.12490352423907976
+       ],
+       "consistent": false
+      },
+      "falling.edge_10_90_s": {
+       "value": 3.998501550430964e-09,
+       "range": [
+        3.4265829485152522e-09,
+        3.838503436237449e-09
+       ],
+       "consistent": false
+      },
+      "falling.undershoot_below_settled_V": {
+       "value": 2.581122889641246,
+       "range": [
+        4.258520750031356,
+        4.962584062666437
+       ],
+       "consistent": false
+      }
+     }
+    }
+   }
   }
  }
 }

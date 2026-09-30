@@ -157,40 +157,52 @@ that failed check is recorded ([digitized values](results/gan/epc90133-qsg-fig9.
 through a range of assumed probe bandwidths (2 GHz to 350 MHz) and applies acceptance criteria fixed before the
 comparison. The headline table is generated in [results/gan/epc90133-fig9-summary.md](results/gan/epc90133-fig9-summary.md).
 
-| | Measured (Fig. 9) | Simulated, variant B |
-|---|---|---|
-| Turn-on rise time | 1.67–1.69 ns | 0.83 ns |
-| Overshoot above the bus | 5.7 V | about 35 V |
-| Ringing frequency | 262–265 MHz | 284 MHz |
-| Ringing damping ratio | 0.072–0.077 | about 0.008 |
-| Turn-off fall time | 3.62–3.64 ns | 3.96 ns (within the fall-time criterion) |
+| | Measured (Fig. 9) | Simulated, variant B | Variant G + 50 pH package source (assumed) |
+|---|---|---|---|
+| Turn-on rise time | 1.67–1.69 ns | 0.83 ns | 1.66 ns |
+| Overshoot above the bus | 5.7 V | about 35 V | about 11 V |
+| Ringing frequency | 262–265 MHz | 284 MHz | 262 MHz |
+| Ringing damping ratio | 0.072–0.077 | about 0.008 | about 0.025 |
+| Turn-off fall time | 3.62–3.64 ns | 3.96 ns (within the fall-time criterion) | 3.93 ns |
 
-The ringing frequency and the turn-off edge are close. The turn-on edge is too fast, and its ringing is far too large
-and too slowly damped.
+For variant B, the ringing frequency and the turn-off edge are close, but the turn-on edge is too fast and its
+ringing far too large and too slowly damped. With the board's gate-drive copper (variant G) and an assumed package
+inductance, rise time and frequency match; the overshoot is still twice the measured value and the damping a third.
+The package value is an assumption, so this is consistency, not identification.
 
-![EPC's measured waveform against four simulated cases](results/gan/epc90133-fig9-overlay.png)
+![EPC's measured waveform against four simulated cases](results/gan/epc90133-fig9-overlay-g.png)
 
 *EPC's measurement (black) against the simulation with:*
-- *the board as extracted (blue);*
-- *50 pH added in the transistors' drain path (orange);*
-- *50 pH added in the source path shared with the gate driver (green);*
-- *extra loss added to damp the ringing (red).*
+- *the power loop as extracted, variant B (blue);*
+- *variant B plus an assumed 50 pH in the source path shared with the gate driver (orange);*
+- *variant G, which adds the board's gate-drive copper (green);*
+- *variant G plus an assumed 50 pH of package source inductance (red).*
 
-*The turn-off edge (right) matches. At turn-on (left) every simulated ring is larger than the measured one. The shared
-source path (green) comes closest without shifting the frequency much.*
+*The turn-off edge (right) matches. At turn-on (left) the gate-drive copper and the assumed package inductance each
+lower the first peak, and the red case matches the measured rise time and frequency. Every simulated ring still
+decays far more slowly than the measured one, which dies out within about three cycles.*
 
 ### What the diagnosis shows so far
 
 Candidate causes were added one at a time, each with its own numerical checks. The results below hold for the
 approximations stated; none of them yet reproduces the measurement on every criterion.
 
-- **Common-source inductance: the strongest lead.** This is inductance in the part of the source path that the gate
-  driver's return shares with the power current. It slows the turn-on and halves the overshoot (about 17 V at 50 pH)
-  while keeping the frequency near the measurement (250 MHz). It meets the rise-time, fall-time and frequency
-  criteria but not the overshoot or damping criteria. The same inductance placed where the driver does not share it
-  behaves like extra loop inductance and makes the overshoot worse. The board part of this path is what extraction G
-  computes.
-- **Gate-loop inductance** of 0.5–2 nH changes the overshoot by only 3–10 %.
+- **The board's gate-drive copper matters.** Extraction G adds the driver, gate resistors and each transistor's
+  gate and source return to the extracted network. With it, the overshoot falls from about 36 V to 25 V. A matched
+  control (same network, ideal gate drive) and two split cases separate the causes:
+  - about a third of the drop comes from G's slightly different network (8 % less loop inductance);
+  - the rest comes from the high-side gate-drive path. The high side's gate return shares almost no source copper
+    with the power loop (0.9 pH), so the mechanism is probably coupling between the two loops. It is not yet
+    isolated;
+  - the low-side path adds damping. It also lifts the low-side transistor's gate to about 2 V during the high-side
+    turn-on, above the model's 1.5 V threshold, so the low side may partly conduct. Its gate return shares 48 pH with
+    the power loop. A lower overshoot bought this way is not a better design.
+- **Common-source inductance in the package** is the remaining lead. Adding an assumed 50 pH of package source
+  inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice
+  the measured value. Overshoot and damping still fail. The package value is assumed, not published, so this is
+  consistency, not identification. The same inductance placed where the gate driver does not share it behaves like
+  extra loop inductance and makes the overshoot worse.
+- **Gate-loop inductance** alone, without coupling, of 0.5–2 nH changes the overshoot by only 3–10 %.
 - **A weaker driver** lowers the overshoot without moving the frequency, but not far enough.
 - **Extra capacitor loss** can reproduce the measured damping (about 60–70 mΩ in the loop) but barely lowers the
   first peak. Loss located elsewhere, such as in the transistor's output capacitance, is untested.
@@ -231,7 +243,9 @@ switching simulation → comparison with a measurement. Its board-level predicti
 Gate G3 (stock-board simulation) stays open until the gap is explained or bounded.
 
 Next steps:
-1. **Finish the common-source and gate-loop extraction** (variant G) and rerun the switching comparison with it.
+1. **Carry the gate-path findings into the measurement plan:** the low-side gate voltage during the high-side
+   turn-on (false turn-on margin) and the high-side gate-loop coupling as a separate hypothesis. The extraction is
+   one mesh with unqualified vias, so its numbers are estimates.
 2. **Complete the parasitic set.** Switch-node capacitance comes from capacitance extraction with FasterCap, within
    the scope its known-answer checks support and with its own convergence check. It replaces today's rough parallel-plate estimate, which changes the overshoot by only about
    1 V. All values go into one `parasitics.inc` file, with the couplings kept.

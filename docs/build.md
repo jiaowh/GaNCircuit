@@ -630,6 +630,106 @@ metric is within 0.7 % of the double pulse: fall time +0.6 %, rise time −0.1 %
 damping −0.7 %. Scope: ideal driver supplies, 25 °C and an ideal output-voltage source, without package or
 common-source inductance. It is not a check of the physical board.
 
+### EPC90133 extraction G and switching test 7: extracted gate-drive and source paths (G3 diagnosis)
+
+```sh
+python scripts/epc90133_extract.py G:m1:mid --jobs 2        # ~3.4 h; run detached, not from a session shell
+PYTHONPATH=src python scripts/epc90133_switching.py --study gateloop --jobs 2 --timeout 3600 \
+    --output results/gan/epc90133-switching-gateloop.json
+PYTHONPATH=src python scripts/epc90133_switching.py --study gateloop --only B-m1-mid-ms100 G-m1-mid-ctl \
+    --timeout 3600 --output results/gan/epc90133-switching-gateloop-ctl.json
+PYTHONPATH=src python scripts/epc90133_switching.py --study gateloop --only G-m1-mid G-m1-mid-ctl-hs G-m1-mid-ctl-ls \
+    --jobs 3 --timeout 3600 --output results/gan/epc90133-switching-gateloop-split.json
+PYTHONPATH=src python scripts/epc90133_phase_check.py
+python scripts/compare_epc90133_fig9.py --sim results/gan/epc90133-switching-causes.json \
+    results/gan/epc90133-switching-causes-2.json results/gan/epc90133-switching-paths.json \
+    results/gan/epc90133-switching-gateloop-ctl.json results/gan/epc90133-switching-gateloop-split.json \
+    results/gan/epc90133-switching-gateloop.json
+```
+
+Why: test 6 left the board's own gate-drive and shared source paths unextracted, and its leading case used an
+assumed common-source inductance. Extraction G adds them. Its specification is in `scripts/epc90133_extract.py`
+(variant G) and test 7's in the switching script's docstring. Before the first run, an external audit added: both
+FETs' die gate-source extremes and drain currents (a 0 V source in Q2's drain), the driver PHASE-ball voltage,
+and a matched control, because G changes the extraction window, local mesh and source terminals as well as the
+gate paths.
+
+**Extraction G-m1-mid** ([result](../results/gan/epc90133-extraction/G-m1-mid.json), run 4, 12,279 s, 80,922
+filaments, 47 ports). Its checks pass: all ports connected, every gate terminal has nodes, L symmetric (0.05 %),
+positive definite. Runs 1–3 failed or were stopped (long `.equiv` lines; a session-shell time limit; stopped for
+the day), and run 4 ran as an independent process. It is an exploratory estimate under declared geometry
+assumptions: vias and plane holes are unqualified, the local mesh has no convergence evidence (one mesh), and
+the package interior is ideal.
+
+| Quantity | G-m1-mid | B-m1-mid |
+|---|---|---|
+| power-loop inductance at Q1 | 0.257 nH | 0.281 nH |
+| board common-source inductance, Q1 (high side) | 0.9 pH | not represented |
+| board common-source inductance, Q2 (low side) | 47.7 pH | not represented |
+
+The high side's gate return is a separate top-layer trace to source pin 2, so it shares almost no source copper
+with the power loop. The low side's returns through the top GND pour and shares much more. The 8 % lower loop
+inductance comes from the changes that are not gate paths (window, local mesh, split source pins), since the loop
+does not include the gate nets.
+
+**Switching, test 7** (bench values; B at the 100 ps step; overshoot above the bus):
+
+| Case | overshoot (V) | tr (ns) | f (MHz) | ζ | Q2 die VGS during the rise, max / min (V) |
+|---|---|---|---|---|---|
+| B-m1-mid-ms100 | 35.7 | 0.83 | 282.5 | 0.010 | 1.07 / −0.03 |
+| G-m1-mid-ctl (G network, B's ideal gate drive) | 32.3 | 0.83 | 295.6 | 0.011 | 1.07 / −0.03 |
+| G-m1-mid-ctl-hs (high side ideal, low side extracted) | 32.0 | 0.83 | 296.8 | 0.014 | 2.37 / −1.61 |
+| G-m1-mid-ctl-ls (low side ideal, high side extracted) | 25.3 | 0.89 | 298.2 | 0.011 | 1.07 / −0.02 |
+| G-m1-mid (both extracted) | 25.2 | 0.88 | 299.4 | 0.014 | 2.00 / −1.26 |
+| G-m1-mid-ms50 (step check) | 25.2 | 0.88 | 299.3 | 0.014 | 2.00 / −1.26 |
+| G + package source 25 pH (assumed) | 13.3 | 1.23 | 279.3 | 0.021 | 1.88 / −1.59 |
+| G + package source 50 pH (assumed) | 11.1 | 1.66 | 261.2 | 0.026 | 1.93 / −1.88 |
+
+The G-ctl, ctl-hs and ctl-ls controls were declared before their runs (ctl before G's first result, the split
+after ctl). Every case passes its edge-current and spike checks; the 50 ps step changes no metric by more than
+0.1 %.
+
+What this shows, scoped to this unvalidated model and exploratory extraction:
+
+- **The G–B overshoot change (−10.4 V) splits into two parts.** The network change (G-ctl against B) accounts
+  for −3.4 V and +4.6 % frequency, consistent with the 8 % lower loop inductance (which alone predicts about
+  +4.3 %). The board's gate-drive copper (G against G-ctl) accounts for −7.0 V and a 6 % slower rise.
+- **The high-side gate-drive path carries that −7 V; the low-side path adds the damping.** ctl-ls matches G
+  in overshoot and rise time, and ctl-hs matches G-ctl; the two parts add up to within 0.3 V. Q1's board
+  common-source inductance is only 0.9 pH, so shared source copper is unlikely to be the mechanism. Coupling
+  between the power loop and the high-side gate loop is the likely candidate (test 6: gate-loop inductance
+  without coupling raised overshoot by 3–10 %), but the mechanism within the high-side path is not isolated.
+- **The low-side path disturbs Q2's gate.** With it extracted, Q2's die VGS reaches 2.0 V during the rise
+  (2.37 V with the high side ideal, whose faster turn-on raises di/dt), against 1.07 V without it. The
+  unmodified model conducts 3.9 A at VGS 2.0 V and 38 A at 2.3 V (DC, VDS 48 V, 25 °C); its VGS(th) is
+  1.51 V, and the datasheet allows 0.8–2.5 V. The terminal currents include capacitive current, so channel
+  conduction is not measured directly. This is a false-turn-on margin question for the hardware (the Q2
+  gate probe in the plan), and it means the lower overshoot cannot be read as an improved design.
+- **With assumed package source inductance, G moves closer to Fig. 9 than B did.** In the Fig. 9 comparison
+  ([summary](../results/gan/epc90133-fig9-summary.md)), G+50 pH passes rise time, fall time and frequency
+  (1.66 ns, 3.93 ns, 262 MHz), as B-Ls50-csi did, with a lower overshoot (11.3 V against 17.4 V). G+25 pH passes
+  the same three. Overshoot (about twice the measured 5.7 V) and damping (0.025 against 0.077) still fail at
+  every probe bandwidth. G alone passes only the fall time: its 300 MHz frequency is more than 10 % above the
+  measurement. The package value is assumed, one waveform cannot separate the layers, and the simulated
+  dead-time plateau (about 12 ns against 7.1 ns) is still unexplained. So this shows consistency, not
+  identification, and G3 stays open.
+- **The driver's PHASE ball stays inside its rating once artefacts are removed.** The raw PHASE-to-GND
+  minima (−8 V on G, −24 and −28 V with package inductance) are sub-picosecond spikes (half-widths 0.2–0.35 ps)
+  at the ideal low-side stage's switching instant, and they change with the time step. Averaged over a declared
+  10 ps window, the extremes are −2.2 to −3.7 V and +47 to +64 V, inside −5/+85 V, and identical at 50 and
+  100 ps ([check](../results/gan/epc90133-test7-phase-check.json)). The raw values in the test 7 reports are kept
+  and must be read with this check. Simulated sensitivity results, not a safe limit.
+
+Running notes: the LTspice adapter's per-run bound was raised from 600 s to 3600 s (`MAX_TIMEOUT_S`), because
+G's first timing run exceeded 600 s. A timeout still returns a failed run. Test 7 run 1 was stopped after that
+timeout, and its partial report is kept (`epc90133-switching-gateloop-run1-stopped.json`). With the higher bound,
+single G LTspice runs took 2.4–9.5 min with two or three running at once, except ctl-ls (about 28 min per run,
+cause not examined).
+
+Next, in order: record this in the hardware plan's predictions (Q2 VGS during the high-side turn-on; the
+high-side gate-loop coupling as a separate hypothesis); a second-mesh or window check of G only if a decision
+depends on the 8 % loop difference; and the measurement itself, which is what can separate these layers.
+
 
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed

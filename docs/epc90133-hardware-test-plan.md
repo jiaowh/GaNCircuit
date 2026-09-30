@@ -15,7 +15,8 @@ each explanation predicts a *different pattern* across operating conditions, not
 
 | # | Candidate explanation | What it predicts that the others do not |
 |---|---|---|
-| H1 | Common-source inductance (board source copper shared with the driver return, and/or inside the package) slows the turn-on | Rise time and overshoot depend on the turn-on di/dt: rise time grows with switched current; the gate-source voltage at the die shows a dip during the current rise |
+| H1 | Common-source inductance (board source copper shared with the driver return, and/or inside the package) slows the turn-on | Rise time and overshoot depend on the turn-on di/dt: rise time grows with switched current; the gate-source voltage at the die shows a dip during the current rise. Extraction G estimates the high side's board part at only 0.9 pH (low side 48 pH), so for Q1's turn-on H1 now mainly concerns the package |
+| H1b | Coupling between the power loop and the high-side gate-drive loop slows Q1's turn-on (test 7: the extracted high-side gate path lowers the simulated overshoot by 7 V; mechanism not isolated) | Like H1 in the switching data; separable from package inductance only with the gate-loop geometry changed (for example E4's gate-resistor change shifts H1 and H1b differently in the bench) or with E8-type passive measurements of the gate-loop coupling |
 | H2 | The real driver is weaker or slower than the behavioural model | The driver's output edge, measured with the power stage off (E1), is slower than modelled; with that measured edge in the bench, the predicted rise times match across E3 without other changes. Rise time is not expected to be independent of current or bus voltage under H2 (the Miller interval and di/dt still vary), so H2 is tested by its predicted dependence, not by the absence of one |
 | H3 | Losses missing from the model (output-capacitance or dielectric loss) damp the ringing | Damping depends on bus voltage and temperature, not on the probe; the ringing frequency stays at the loop's LC value |
 | H4 | The measurement chain (probe loading, ground path, bandwidth) shaped EPC's recording | Changing the probe or its connection changes the recorded overshoot and frequency while the circuit is unchanged |
@@ -58,6 +59,11 @@ not, beyond that uncertainty.
   FET limit (100 V) and the driver's PHASE/BOOT ratings (above) before the next step.
   **The simulated overshoots are sensitivity results, not a safe envelope**: the unvalidated full-board simulation
   reaches about 84 V at 48 V, which would already exceed the driver's ratings.
+- Low-side false turn-on: in simulation (test 7, docs/build.md) the board's low-side gate path lifts Q2's die
+  gate-source voltage to about 2.0 V during Q1's turn-on at 48 V and 11 A (2.4 V if Q1 switches faster), above
+  the model's 1.51 V threshold and inside the datasheet's 0.8–2.5 V range. Q2's gate-source voltage is therefore
+  measured from the first energized step, and its trend with bus voltage and current is a stop criterion before
+  each step up. The simulated values are sensitivities, not limits.
 - Shoot-through: since the driver has no lockout, the PWM source and the board's input circuitry must be shown
   (E1, power stage unpowered) never to command both gates on, including at power-up, power-down and with an
   input open, before the bus is energized.
@@ -74,7 +80,7 @@ not, beyond that uncertainty.
 | Oscilloscope | edges of 1–4 ns, ringing near 250 MHz | 1 GHz, 5 GS/s, 4 channels | 2 GHz or more, 10 GS/s or more |
 | Switch-node probe | the main waveform; H4 | 1 GHz passive probe with a spring-tip or solder-in connection at the Q2 pads | optically isolated high-bandwidth probe (IsoVu class) for comparison |
 | Second switch-node connection | H4: the same node through a different connection | a different ground path (e.g., a long ground lead) for a deliberate comparison | — |
-| Low-side gate probe | H1, H2 (gate-source voltage) | 500 MHz passive probe at Q2's gate and source pads | — |
+| Low-side gate probe | H1, H2 (gate-source voltage); Q2 false-turn-on margin (required from the first energized step) | 500 MHz passive probe at Q2's gate and source pads | — |
 | High-side gate probe | H1, H2 on Q1 | — | optically isolated probe (common-mode rejection at 48 V, 10+ V/ns) |
 | Inductor-current probe | double-pulse current (H1 needs the switched current) | 50 MHz current probe, 30 A | — |
 | Deskew and edge source | probe timing and bandwidth (H4) | a deskew fixture; a pulse generator with sub-ns edges | — |
