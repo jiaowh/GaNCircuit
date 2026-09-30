@@ -1608,7 +1608,16 @@ What this shows:
   convergence is not established. G shows it is not a general failure of planar 2D dielectrics.
 - **Zero-thickness conductors are not qualified.** F's automatic refinement stopped at 54 panels. Under-resolved
   edge singularities are a plausible cause, but not isolated. Board copper will be modelled with its thickness.
-- **Scope.** Qualified so far: conductors in a homogeneous medium in 3D at a strict setting (A, B), and
-  finite-thickness strips on a planar dielectric in 2D (G). Not yet: 3D board geometry with FR-4 and solder mask,
-  holes and vias. Before board use: a follow-up check declared for F (finite thickness or manual mesh) and a
-  diagnosis of E, if a board model needs curved interfaces.
+- **Scope.** FasterCap is not qualified for board use. The four passes (B, D, G(i), G(ii)) support only those
+  benchmark geometries: B a sphere in air in 3D, D a 2D coax, and G a finite-thickness microstrip in 2D against an
+  approximate closed-form reference (Hammerstad–Jensen), which is a useful check but not qualification of a
+  3D board. A's value is close to its reference, but A **failed** its declared mesh check and stays a failure;
+  it is not evidence of qualification. Not covered: 3D board geometry with FR-4 and solder mask, holes and vias.
+  Before board use: a board-like 3D check with a declared refinement sequence, a follow-up check declared for F
+  (finite thickness or manual mesh) and a diagnosis of E, if a board model needs curved interfaces.
+- **Runner fixes after an external audit (30 September 2026), no case or tolerance changed.** A timeout now stops
+  only that run's FasterCap process (by its recorded PID, checked to still be FasterCap), not every process of that
+  name on the shared host; an unknown or empty `--only` is rejected instead of reporting `all_pass` over no cases;
+  the report is checkpointed after each case and records the requested cases and whether all of them ran. Checked
+  by a forced 3 s timeout on case C (its process was stopped, the report shows `complete: true, all_pass: false`)
+  and by rejected `--only nosuch` and empty `--only`. The recorded eight-case results are unaffected.

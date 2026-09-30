@@ -250,7 +250,7 @@ Next steps:
 | **FastHenry 3.0.1** | inductance and resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory; internal use only (licence note below) |
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
-| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass, including microstrip on a dielectric; its accuracy setting is not an error bound, and zero-thickness conductors and some dielectric cases are not qualified ([results](results/gan/fastercap-known-answer.json)) |
+| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound; not qualified for board geometry ([results](results/gan/fastercap-known-answer.json)) |
 | KiCad | our own board design | not installed |
 | DEVSIM | device simulator for the paused silicon fixture (WSL) | paused |
 

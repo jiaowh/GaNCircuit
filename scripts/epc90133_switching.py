@@ -122,7 +122,12 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
 * cases: G-m1-mid, compared with B-m1-mid-ms100 (B also has no gate or source paths, so the difference is
   what the board's gate-drive copper adds); G-m1-mid-ms50, the direct step check; and G with the assumed
   package common-source inductance of test 6 (25 and 50 pH on each die source, drivers at the pins), to see
-  what package inductance would still be needed on top of the board's. Every report carries an input manifest (extraction files, vendor library and
+  what package inductance would still be needed on top of the board's;
+* added after an external audit, before the first run: every test 7 case (B included) has a 0 V source in
+  Q2's drain, and reports both die VGS extrema and both drain currents around each event, with traces
+  (gate_and_current_diagnostics; reported, not judged). G differs from B in extraction window, local mesh
+  and source-terminal representation as well as in the gate paths, so a material G-B difference is not
+  attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
 import argparse
@@ -249,7 +254,7 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
-          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None):
+          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False):
     net, terms = network(ext, ideal, r_scale)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -322,13 +327,15 @@ Rbret bn {node(at + '.GND')} 1u"""
     ld = l_pkg if l_d is None else l_d
     ls = l_pkg if l_s is None else l_s
     g_ext = is_gate_extraction(ext)
-    die = {"g1": "gu", "d1": "q1dd", "s1": "q1_s", "g2": "gl", "d2": "q2_d", "s2": "0"}
+    # Test 7 (audit, 30 September 2026): a 0 V source in Q2's drain gives its terminal current.
+    q2dd = "q2dd" if sense_q2 else "q2_d"
+    die = {"g1": "gu", "d1": "q1dd", "s1": "q1_s", "g2": "gl", "d2": q2dd, "s2": "0"}
     if g_ext:
         # Test 7: die source q1_s / q2_s joins the split pins; optional package source inductance l_s.
         if ld or l_g or c_gd or c_sw:
             raise ValueError("variant G bench supports only l_s (package common-source) among the options")
         fet1, fet2 = [], []
-        for n_, pins, gate_node, d_node in ((1, ("q1_s2", "q1_s46"), "gu", "q1dd"), (2, ("q2_s2", "0"), "gl", "q2_d")):
+        for n_, pins, gate_node, d_node in ((1, ("q1_s2", "q1_s46"), "gu", "q1dd"), (2, ("q2_s2", "0"), "gl", q2dd)):
             junction = f"q{n_}_s"
             src = f"p{n_}s" if ls else junction
             lst = fet1 if n_ == 1 else fet2
@@ -340,12 +347,13 @@ Rbret bn {node(at + '.GND')} 1u"""
         die.update(s1="p1s" if ls else "q1_s", s2="p2s" if ls else "q2_s")
     else:
         fet1, s1_die = fet(1, "gu", "q1dd", "q1_s", ld, ls, l_g, r_pkg_corner)
-        fet2, s2_die = fet(2, "gl", "q2_d", "0", ld, ls, l_g, r_pkg_corner)
+        fet2, s2_die = fet(2, "gl", q2dd, "0", ld, ls, l_g, r_pkg_corner)
         die.update(g1="p1g" if l_g else "gu", d1="p1d" if ld else "q1dd", s1=s1_die,
-                   g2="p2g" if l_g else "gl", d2="p2d" if ld else "q2_d", s2=s2_die)
+                   g2="p2g" if l_g else "gl", d2="p2d" if ld else q2dd, s2=s2_die)
     times["die_nodes"] = die
     lines += [
         "Vq1d q1_d q1dd 0",
+        *(["Vq2d q2_d q2dd 0"] if sense_q2 else []),
         *fet1, *fet2,
         *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
@@ -358,9 +366,9 @@ Rbret bn {node(at + '.GND')} 1u"""
             drive_stage("l", s2_die if kelvin else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
                         t_end).rstrip()]),
         SWITCH_MODELS.rstrip(),
-        ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
+        ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (" I(Vq2d)" if sense_q2 else "") + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
         + (" V(q2_s) V(u80_ph) V(u80_gnd) I(Vs12) I(Vs146) I(Vs22) I(Vs246)" if g_ext else "")
-        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s"})),
+        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s", "q2dd", "q1dd"})),
         ".temp 25",
         f".options plotwinsize=0 reltol={reltol:g}",
         f".tran 0 {t_end:.9g} 0 {maxstep:g}",
@@ -413,10 +421,32 @@ def metrics(s, times, at):
                "q2_gate_peak_during_rise_V": max(x for _, x in window(t, vgs2, tb, tb + 60e-9)),
                "q2_gate_pad_peak_during_rise_V": max(x for _, x in window(t, gl, tb, tb + 60e-9))}
     return {"event_a_turn_off_at_peak": event_a, "event_b_turn_on_at_valley": event_b,
+            "gate_and_current_diagnostics": diagnostics(s, t, vgs1, vgs2, id1, ta, tb),
             "terminals": {"device_metrics": "die (q1 vgs and vds for the energies, q2 gate-source peak)",
                           "switch_node_metrics": "Q2 drain pad to circuit ground (Q2 source pad)",
                           "die_nodes": die, "energies_exclude": "energy stored in package or gate-loop inductors"},
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
+
+
+def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
+    """Test 7 (audit, 30 September 2026): die gate-source extremes of both FETs and both drain currents
+    around each event, so gate disturbance and possible false turn-on are read before any conclusion.
+
+    Terminal currents include capacitive (Coss, Cgd) charging current, so a positive Q2 drain current
+    during the rising edge does not by itself show channel conduction; it is read together with Q2's VGS.
+    Reported, not judged: no pass/fail threshold was declared before the first run."""
+    id2 = s.get("i(vq2d)")
+    out = {"window_s": [-5e-9, 60e-9], "vgs_ratings_V": {"max": 6.0, "min": -4.0, "source": "EPC2302 datasheet"},
+           "q2_drain_current": "I(Vq2d), drain terminal into Q2" if id2 else "not saved (no Q2 sense source)"}
+    for tag, te in (("event_a", ta), ("event_b", tb)):
+        w = lambda y: [x for _, x in window(t, y, te - 5e-9, te + 60e-9)]
+        d = {"q1_vgs_max_V": max(w(vgs1)), "q1_vgs_min_V": min(w(vgs1)),
+             "q2_vgs_max_V": max(w(vgs2)), "q2_vgs_min_V": min(w(vgs2)),
+             "q1_id_max_A": max(w(id1)), "q1_id_min_A": min(w(id1))}
+        if id2:
+            d.update(q2_id_max_A=max(w(id2)), q2_id_min_A=min(w(id2)))
+        out[tag] = d
+    return out
 
 
 def spikes(s):
@@ -427,13 +457,23 @@ def spikes(s):
 
 
 def edge_traces(s, times):
-    """V(SW) (Q2 drain pad to Q2 source pad, ideal probe) resampled around both events."""
+    """V(SW) (Q2 drain pad to Q2 source pad, ideal probe) resampled around both events; with a Q2 sense
+    source (test 7) also both die VGS and both drain currents."""
     t, v = np.array(s["time"]), np.array(s["v(q2_d)"])
     rel = np.arange(TRACE_WINDOW[0], TRACE_WINDOW[1] + TRACE_STEP / 2, TRACE_STEP)
-    return {"step_s": TRACE_STEP, "start_s": TRACE_WINDOW[0],
-            "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
-            "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
-            "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
+    out = {"step_s": TRACE_STEP, "start_s": TRACE_WINDOW[0],
+           "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
+           "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
+           "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
+    if "i(vq2d)" in s:
+        die = times["die_nodes"]
+        zero = np.zeros(len(t))
+        nv = lambda nd: zero if nd == "0" else np.array(s[f"v({'q1_d' if nd == 'q1dd' else nd})"])
+        sig = {"q1_vgs_V": nv(die["g1"]) - nv(die["s1"]), "q2_vgs_V": nv(die["g2"]) - nv(die["s2"]),
+               "q1_id_A": np.array(s["i(vq1d)"]), "q2_id_A": np.array(s["i(vq2d)"])}
+        out["device"] = {f"{ev}_{k}": [round(float(x), 5) for x in np.interp(times[tk] + rel, t, y)]
+                         for ev, tk in (("falling", "t_off1"), ("rising", "t_on2")) for k, y in sig.items()}
+    return out
 
 
 def ringing(ring, peak_t, hyst=0.5):
@@ -576,7 +616,7 @@ def gateloop_cases(exts):
     g, ref = "G-m1-mid", "B-m1-mid-ms100"
     if g not in exts or "B-m1-mid" not in exts:
         raise SystemExit("test 7 needs extractions G-m1-mid and B-m1-mid")
-    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B}
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True}
     return {ref: {"ext": "B-m1-mid", **common},
             g: {"ext": g, "base": ref, **common},
             f"{g}-ms50": {"ext": g, "base": g, **common, "maxstep": MAXSTEP_PKG / 2},
@@ -677,7 +717,7 @@ def main():
                   r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
                   esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
-                  t_after_b=c.get("t_after_b"))
+                  t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.

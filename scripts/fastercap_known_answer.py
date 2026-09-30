@@ -36,6 +36,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import platform
 import re
@@ -68,15 +69,23 @@ def run_fastercap(files, workdir, auto, timeout):
         (workdir / name).write_text(text, encoding="ascii")
     root = next(iter(files))
     args = f"-b {root} -a{auto}"
+    pidfile = workdir / f"fastercap-a{auto}.pid"
     if platform.system() == "Windows":
-        cmd = ["wsl", "-e", "bash", "-c", f"cd '{wsl_path(workdir)}' && '{wsl_path(FC_BIN)}' {args}"]
+        # exec keeps bash's PID, so the PID file names this run's FasterCap process and no other.
+        cmd = ["wsl", "-e", "bash", "-c",
+               f"cd '{wsl_path(workdir)}' && echo $$ > '{pidfile.name}' && exec '{wsl_path(FC_BIN)}' {args}"]
     else:
         cmd = [str(FC_BIN), *args.split()]
     try:
         p = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=timeout, check=False)
     except subprocess.TimeoutExpired:
         if platform.system() == "Windows":  # the Linux process outlives wsl.exe
-            subprocess.run(["wsl", "-e", "pkill", "-x", "FasterCap"], check=False)
+            # Audit, 30 September 2026: kill only this run's process (the host is shared; pkill -x would
+            # also stop other FasterCap jobs). The PID is checked to still be FasterCap before the kill.
+            pid = pidfile.read_text().strip() if pidfile.exists() else ""
+            if pid.isdigit():
+                subprocess.run(["wsl", "-e", "bash", "-c",
+                                f'[ "$(cat /proc/{pid}/comm 2>/dev/null)" = FasterCap ] && kill {pid}'], check=False)
         raise RuntimeError(f"FasterCap did not finish within {timeout:g} s at -a{auto}")
     (workdir / f"stdout-a{auto}.log").write_text(p.stdout or "", encoding="utf-8")
     if p.returncode != 0:
@@ -256,11 +265,36 @@ def main():
     ap.add_argument("--only", nargs="*")
     ap.add_argument("--timeout", type=float, default=1800, help="per FasterCap call, s; a timeout fails the case")
     args = ap.parse_args()
+    # Audit, 30 September 2026: an unknown or empty --only selected nothing and all([]) reported all_pass.
+    if args.only is not None:
+        unknown = sorted(set(args.only) - set(CASES))
+        if not args.only or unknown:
+            raise SystemExit(f"--only needs known case names; unknown: {unknown}; known: {sorted(CASES)}")
+    requested = [k for k in CASES if args.only is None or k in args.only]
     run_root = ROOT / "runs" / f"fastercap-known-answer-{uuid.uuid4().hex[:12]}"
     results = {}
-    for key, build in CASES.items():
-        if args.only and key not in args.only:
-            continue
+    commit = lambda d: subprocess.run(["git", "-C", str(d), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    tool = {"name": "FasterCap", "version": "6.0.7", "licence": "LGPL 2.1 or later",
+            "sources": {"FasterCap": commit(FC_SRC), "LinAlgebra": commit(ROOT / ".tools/LinAlgebra"),
+                        "Geometry": commit(ROOT / ".tools/Geometry")},
+            "build": ".tools/build-fastercap.sh (headless; wxWidgets 3.2 base, Ubuntu 24.04)",
+            "binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest()}
+
+    def write_report():
+        """Checkpoint after every case (atomic replace); all_pass needs every requested case, all passing."""
+        complete = [k for k in requested if k in results] == requested
+        report = {"tool": tool, "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                  "requested_cases": requested, "complete": complete,
+                  "cases": results, "run_directory": run_root.relative_to(ROOT).as_posix(),
+                  "time_limit_per_call_s": args.timeout,
+                  "all_pass": complete and bool(results) and all(r["pass"] for r in results.values())}
+        tmp = args.output.with_suffix(args.output.suffix + ".tmp")
+        tmp.write_text(json.dumps(report, indent=1) + "\n")
+        os.replace(tmp, args.output)
+        return report
+
+    for key in requested:
+        build = CASES[key]
         files, ref, extract, geometry = build()
         values = {}
         try:
@@ -271,6 +305,7 @@ def main():
             results[key] = {"reference": ref, "tolerance": TOL[key], "geometry": geometry, "runs": values,
                             "error": str(exc), "pass": False}
             print(f"{key}: ref {ref:.6g} FAIL: {exc}", flush=True)
+            write_report()
             continue
         v, coarse = values[AUTO[-1]]["value"], values[AUTO[0]]["value"]
         err, mesh = v / ref - 1, abs(coarse / v - 1)
@@ -279,17 +314,8 @@ def main():
                         "pass": abs(err) <= TOL[key] and mesh <= MESH_TOL}
         print(f"{key}: ref {ref:.6g} got {v:.6g} err {100 * err:+.3f}% mesh {100 * mesh:.3f}% "
               f"{'PASS' if results[key]['pass'] else 'FAIL'}", flush=True)
-    commit = lambda d: subprocess.run(["git", "-C", str(d), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    report = {
-        "tool": {"name": "FasterCap", "version": "6.0.7", "licence": "LGPL 2.1 or later",
-                 "sources": {"FasterCap": commit(FC_SRC), "LinAlgebra": commit(ROOT / ".tools/LinAlgebra"),
-                             "Geometry": commit(ROOT / ".tools/Geometry")},
-                 "build": ".tools/build-fastercap.sh (headless; wxWidgets 3.2 base, Ubuntu 24.04)",
-                 "binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest()},
-        "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-        "cases": results, "run_directory": run_root.relative_to(ROOT).as_posix(),
-        "time_limit_per_call_s": args.timeout, "all_pass": all(r["pass"] for r in results.values())}
-    args.output.write_text(json.dumps(report, indent=1) + "\n")
+        write_report()
+    report = write_report()
     print("all pass" if report["all_pass"] else "FAILURES recorded")
 
 

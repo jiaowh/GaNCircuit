@@ -1,6 +1,8 @@
-# EPC90133 hardware test plan (draft v0.1, 30 September 2026)
+# EPC90133 hardware test plan (draft v0.2, 30 September 2026)
 
-Status: **draft for owner review; not approved.** Nothing is energized until G4's test plan and interlocks are
+Status: **draft for owner review; not approved, and not yet an executable lab procedure** (the envelope values
+below are still open). v0.2 applies an external audit: the driver has no input lockout, the driver's PHASE/BOOT
+ratings are tighter than the FET's, and categorical signatures became quantitative predictions. Nothing is energized until G4's test plan and interlocks are
 approved (plan section 8). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
 reviews of 30 September 2026. It measures the stock board first, as the plan requires.
 
@@ -14,14 +16,17 @@ each explanation predicts a *different pattern* across operating conditions, not
 | # | Candidate explanation | What it predicts that the others do not |
 |---|---|---|
 | H1 | Common-source inductance (board source copper shared with the driver return, and/or inside the package) slows the turn-on | Rise time and overshoot depend on the turn-on di/dt: rise time grows with switched current; the gate-source voltage at the die shows a dip during the current rise |
-| H2 | The real driver is weaker or slower than the behavioural model | Rise time depends on the gate resistor value but not on current or bus voltage; the driver's output edge, measured with the power stage off, is slower than modelled |
+| H2 | The real driver is weaker or slower than the behavioural model | The driver's output edge, measured with the power stage off (E1), is slower than modelled; with that measured edge in the bench, the predicted rise times match across E3 without other changes. Rise time is not expected to be independent of current or bus voltage under H2 (the Miller interval and di/dt still vary), so H2 is tested by its predicted dependence, not by the absence of one |
 | H3 | Losses missing from the model (output-capacitance or dielectric loss) damp the ringing | Damping depends on bus voltage and temperature, not on the probe; the ringing frequency stays at the loop's LC value |
 | H4 | The measurement chain (probe loading, ground path, bandwidth) shaped EPC's recording | Changing the probe or its connection changes the recorded overshoot and frequency while the circuit is unchanged |
 | H5 | The model's gate charge (the EPC2302 Fig. 7 discrepancy) slows or speeds the Miller interval | Rise time scales with the measured Miller charge; device-level gate-charge measurement differs from the model |
 | H6 | The actual dead time is shorter than the nominal 10 ns | The dead-time plateau measured at the driver outputs, with no power stage load, differs from 10 ns |
 
 These explanations are not exclusive. The aim is to bound each one with its own evidence (the per-layer error
-budget).
+budget). The right-hand column describes qualitative tendencies. Before measurement, each is replaced by a
+quantitative prediction from the bench (the hypothesis's parameter varied over its stated range, with the
+bench's uncertainty), and an explanation is favoured only where its prediction fits and the competing ones do
+not, beyond that uncertainty.
 
 ## Board facts and limits (QSG v1.0, Table 1)
 
@@ -29,6 +34,15 @@ budget).
   50 ns (high) and 200 ns (low).
 - Bus VIN up to 80 V. **The switch-node ringing must stay below 100 V** for the EPC2302. Output current up to 40 A,
   limited by die temperature.
+- **The driver's ratings are tighter than the FET's** (uP1966E datasheet, Aug. 2021, p. 7, absolute maximum):
+  PHASE to GND −5 V to +85 V, BOOT to GND 0 to 85 V, BOOT to PHASE −0.3 to 7 V. BOOT sits about 5 V above PHASE,
+  so a switch-node peak near 80 V at the driver's PHASE ball already reaches the BOOT rating, and undershoot
+  below −5 V exceeds the PHASE rating. The PHASE ball is not the Q2 drain pad: ringing there is not measured by a
+  probe at Q2 and needs its own estimate (the extraction G network has the U80.PH terminal).
+- **The driver has no input lockout** (datasheet p. 5): "There is no lockout between HI and LI inputs: both GaN
+  devices can be driven on at the same time." Shoot-through protection depends on the board's input and
+  dead-time circuitry and on the PWM source, which must be assessed from the schematic and on the bench (E1).
+  The driver cannot be credited with it.
 - Start-up order: gate-drive supply, then PWM, then raise the bus slowly from 0 V.
 - Dead time is set by R620/R625 (120 Ω populated, nominally 10 ns).
 - The switch-node MMCX J32 is described in the guide but absent from the published layout. Plan the probe
@@ -40,10 +54,18 @@ budget).
   enclosure interlock and an emergency stop (plan section 7).
 - A hardware limit on double-pulse width, so the inductor current cannot run away if the PWM source misbehaves.
 - The first energization is at **12 V bus**. The bus rises in steps (12, 24, 36, 48 V), with a human checkpoint at
-  each step. At each step the measured switch-node peak must leave margin to the 100 V limit before the next step.
+  each step. At each step the measured switch-node peak and undershoot must leave margin to the tighter of the
+  FET limit (100 V) and the driver's PHASE/BOOT ratings (above) before the next step.
   **The simulated overshoots are sensitivity results, not a safe envelope**: the unvalidated full-board simulation
-  reaches about 84 V at 48 V.
+  reaches about 84 V at 48 V, which would already exceed the driver's ratings.
+- Shoot-through: since the driver has no lockout, the PWM source and the board's input circuitry must be shown
+  (E1, power stage unpowered) never to command both gates on, including at power-up, power-down and with an
+  input open, before the bus is energized.
 - Any instrument control by software goes through a non-LLM layer that enforces this envelope.
+- **Not yet specified (required before approval):** the double-pulse width limit and its hardware
+  implementation, the maximum inductor current per step, the supply current-trip and over-voltage-trip
+  settings, the case-temperature limit and how it is measured, the stop criteria at each checkpoint, and the
+  ramp for any step above 48 V (the 60 V held-out condition below lies outside the listed steps).
 
 ## Equipment checklist (to compare with the lab inventory)
 
@@ -79,14 +101,21 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   edges and the dead time at the gate pins. This isolates driver timing and strength from the power stage.
 - **E2, loop inductance by frequency shift (parasitic layer).** At a low bus (12–24 V) and low current, measure
   the ringing frequency, then add a known C0G capacitor across Q2 (drain to source) and measure again. The shift
-  gives the loop inductance and the effective capacitance, independently of damping. Compare with the extracted
-  0.26–0.28 nH (variant B).
+  gives an estimate of the loop inductance and the effective capacitance. It assumes the same ringing mode before
+  and after (checked, not presumed), a capacitance that is linear at the operating point, a mounting inductance
+  of the added capacitor small against the loop, and light damping: the method uses the damped frequency, which
+  is within 0.3 % of the natural frequency at the measured damping ratio of about 0.075, but that error grows
+  with damping and with a damping change caused by the added part. Probe loading shifts both readings. Report
+  the estimate with an uncertainty from each assumption, and compare with the extracted network (variant B:
+  0.26–0.28 nH loop; G when available), not with a single number.
 - **E3, double-pulse matrix (H1, H2, H3).** Bus at 24, 36 and 48 V; turn-on current at 5, 11 and 20 A; turn-off
   current at 10, 20 and 29 A. Record the rise and fall times, overshoot, ringing frequency and damping, and, where
-  the probes allow, the low-side gate-source voltage. Signatures:
-  - rise time growing with current points to H1 (common-source);
-  - damping changing with bus voltage at a constant frequency points to H3;
-  - neither current nor voltage changing the rise time points to H2.
+  the probes allow, the low-side gate-source voltage. Before the measurement, each hypothesis's bench variant
+  predicts the rise-time slope against current and against bus voltage, and the damping against bus voltage,
+  with uncertainty. Tendencies, to be quantified:
+  - H1 (common-source) predicts a stronger rise-time dependence on switched current than H2 does;
+  - H3 predicts damping that changes with bus voltage at nearly constant frequency;
+  - H2 predicts the dependence computed with the E1-measured driver edge; it does not predict independence.
 - **E4, gate-resistor change (H2 against H1).** Replace R80 (1 Ω) with 2.2 Ω, and repeat part of E3. The model
   predicts how rise time and overshoot scale with the gate resistance under H1 and under H2, and the predictions
   differ.
@@ -104,9 +133,12 @@ identity (silkscreen revision, fitted population), the case temperature and the 
 - **E8, passive loop inductance (parasitic layer), optional.** On a second, depopulated board: short one FET
   position and connect a VNA across the other (shunt-thru), then add the input capacitors one group at a time
   (method: Tranchero et al., Zenodo 20617321, 2026). The alternative, an impedance analyzer with both FETs gated on
-  (Wolfspeed PRD-08710), is blocked on a stock board because the driver prevents both gates being on. Before
-  use: de-embed the fixture and pass a sub-nH known-answer check. Compare with the extracted network, and with E2
-  on the powered board; E2 minus E8 bounds the package contribution, with both measurements' errors.
+  (Wolfspeed PRD-08710), would need both gates held on together. The driver does not prevent that (no lockout,
+  datasheet p. 5), but it would mean deliberately bypassing the board's dead-time circuitry on an unpowered
+  board, and it is not proposed here. Before use: de-embed the fixture and pass a sub-nH known-answer check.
+  Compare with the extracted network, and with E2 on the powered board. E2 minus E8 estimates the package
+  contribution only if the two measurements represent comparable ports, current paths and ringing modes, with
+  fixture effects included; otherwise the difference is not a bound. Both measurements' errors carry into it.
   Sources and limits: docs/gan-research-round-2-2026-09-30.md.
 
 ## Held-out conditions and frozen predictions
@@ -115,7 +147,8 @@ Before any measurement, freeze the simulation's predictions (model and extractio
 predicted metrics with their stated sensitivity ranges) for all conditions. Use E0–E4 at 24–48 V for calibration
 and diagnosis. Hold out, and score unchanged:
 
-- the bus at 60 V (below the 80 V rating and only if the measured peaks leave margin to 100 V);
+- the bus at 60 V (below the 80 V rating), only with its own ramp and checkpoint above 48 V, and only if the
+  measured peaks and undershoot at 48 V leave margin to the driver's PHASE/BOOT ratings as well as to 100 V;
 - turn-off at 25 A with R80 = 2.2 Ω;
 - the second temperature.
 
@@ -129,4 +162,7 @@ Report the first held-out score as it is; later corrections create new revisions
    option (H21, H51 or H71) the lab has. Open as of 30 September 2026.
 3. Whether a VNA or impedance analyzer is available, and whether a second board may be depopulated (E8). Open as
    of 30 September 2026.
-4. Approval of the envelope and the step-wise bus increase before G4.
+4. Approval of the envelope and the step-wise bus increase before G4, after its open values (safety envelope
+   section) are filled in.
+5. The board's input and dead-time circuitry (schematic review and E1): whether any input state, including
+   power-up and an open input, can command both gates on.
