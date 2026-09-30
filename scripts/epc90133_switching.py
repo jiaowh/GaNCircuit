@@ -126,7 +126,12 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
 * added after an external audit, before the first run: every test 7 case (B included) has a 0 V source in
   Q2's drain, and reports both die VGS extrema and both drain currents around each event, with traces
   (gate_and_current_diagnostics; reported, not judged), and on G the driver's PHASE-to-GND ball voltage
-  extremes against its -5/+85 V absolute maximum (uP1966E datasheet p. 7). G differs from B in extraction window, local mesh
+  extremes against its -5/+85 V absolute maximum (uP1966E datasheet p. 7);
+* matched control G-m1-mid-ctl, declared before G's first result and run only on request (--only), when the
+  G-B difference is material: G's network with B's gate drive (ideal stages at the gate pads returning at
+  the source junction, the driver-ball and gate-resistor copper left open). G-ctl against B isolates the
+  extraction window, local mesh and source-terminal representation; G against G-ctl isolates what the
+  board's gate-drive and shared source paths add. Its PHASE-ball values are not meaningful (open copper). G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
   attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -255,7 +260,7 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
-          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False):
+          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False):
     net, terms = network(ext, ideal, r_scale)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -346,6 +351,16 @@ Rbret bn {node(at + '.GND')} 1u"""
                     f"X{n_} {gate_node} {d_node} {src} EPC2302"]
         s1_die, s2_die = "q1_s", "q2_s"
         die.update(s1="p1s" if ls else "q1_s", s2="p2s" if ls else "q2_s")
+        if gate_ctl:
+            # Matched control: G's network, B's gate drive (ideal stages at the gate pads, returning at the
+            # source junction, as B returns at its single source terminal). The driver-ball and gate-resistor
+            # copper is left open; 1 Gohm bleeders keep those nodes defined.
+            if ls:
+                raise ValueError("the gate control case takes no package inductance")
+            gate_nodes = sorted({node(t) for p_ in ext["ports"] for t in (p_["terminal"], p_["reference"])
+                                 if t.startswith(("U80.", "R80.", "R81.", "R82.", "R83."))})
+            fet2 += [f"Rbleed_{nd} {nd} 0 1e9" for nd in gate_nodes]
+            s2_die = "q2_s"
     else:
         fet1, s1_die = fet(1, "gu", "q1dd", "q1_s", ld, ls, l_g, r_pkg_corner)
         fet2, s2_die = fet(2, "gl", q2dd, "0", ld, ls, l_g, r_pkg_corner)
@@ -360,11 +375,11 @@ Rbret bn {node(at + '.GND')} 1u"""
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext else [
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext and not gate_ctl else [
             # Drivers return at the source pads (common-source coupling through l_s) or, with kelvin, at the die source.
             drive_stage("u", s1_die if kelvin else "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF,
                         t_end).rstrip(),
-            drive_stage("l", s2_die if kelvin else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
+            drive_stage("l", s2_die if (kelvin or gate_ctl) else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
                         t_end).rstrip()]),
         SWITCH_MODELS.rstrip(),
         ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (" I(Vq2d)" if sense_q2 else "") + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
@@ -627,7 +642,9 @@ def gateloop_cases(exts):
             g: {"ext": g, "base": ref, **common},
             f"{g}-ms50": {"ext": g, "base": g, **common, "maxstep": MAXSTEP_PKG / 2},
             f"{g}-Ls25": {"ext": g, "base": g, **common, "l_s": 25e-12},
-            f"{g}-Ls50": {"ext": g, "base": g, **common, "l_s": 50e-12}}
+            f"{g}-Ls50": {"ext": g, "base": g, **common, "l_s": 50e-12},
+            # Matched control (declared before G's first result; run with --only when G-B is material).
+            f"{g}-ctl": {"ext": g, "base": ref, **common, "gate_ctl": True, "on_request": True}}
 
 
 def main():
@@ -678,6 +695,8 @@ def main():
         cases = gateloop_cases(exts)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
+        else:
+            cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "paths":
         cases = path_cases(exts)
         if args.only:
@@ -723,7 +742,7 @@ def main():
                   r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
                   esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
-                  t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False))
+                  t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
