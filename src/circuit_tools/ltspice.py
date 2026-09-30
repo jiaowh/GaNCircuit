@@ -26,6 +26,11 @@ from typing import Any, Sequence
 
 from .adapters import SimulationResult, ToolCapability
 
+# Upper bound on one batch run. Raised from 600 s on 1 October 2026: the variant G board network (47 coupled
+# ports) exceeded 600 s per case. A timeout still returns a failed result; the bound only guards against a
+# caller passing an unbounded or absurd limit.
+MAX_TIMEOUT_S = 3600.0
+
 _STANDARD_PATHS = (
     Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "ADI" / "LTspice" / "LTspice.exe",
     Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "ADI" / "LTspice" / "LTspice.exe",
@@ -345,8 +350,8 @@ def run_ltspice(netlist: str | os.PathLike[str], artifact_dir: str | os.PathLike
     waveform traces of the ``.raw`` output; ``result_path`` points at the raw
     file.  Every reason a run is not ``completed`` is joined into ``message``.
     """
-    if not isinstance(timeout_s, (int, float)) or not math.isfinite(timeout_s) or not 0 < timeout_s <= 600:
-        raise ValueError("timeout_s must be finite and in (0, 600]")
+    if not isinstance(timeout_s, (int, float)) or not math.isfinite(timeout_s) or not 0 < timeout_s <= MAX_TIMEOUT_S:
+        raise ValueError(f"timeout_s must be finite and in (0, {MAX_TIMEOUT_S:g}]")
     out = Path(artifact_dir)
     if out.exists() and any(out.iterdir()):
         raise FileExistsError(f"refusing to overwrite non-empty artifact directory: {out}")

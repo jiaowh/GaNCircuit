@@ -659,6 +659,8 @@ def main():
     ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
+    ap.add_argument("--timeout", type=float, default=600.0,
+                    help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
@@ -667,8 +669,8 @@ def main():
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
     runs = {}
 
-    def run(name, text, timeout=600):  # the adapter allows at most 600 s
-        r = run_ltspice(text, run_root / name, libraries=[lib], timeout_s=timeout)
+    def run(name, text):  # limit per LTspice run: --timeout (the adapter allows up to MAX_TIMEOUT_S)
+        r = run_ltspice(text, run_root / name, libraries=[lib], timeout_s=args.timeout)
         runs[name] = {"status": r.status, "message": r.message, "duration_s": r.duration_s,
                       "warnings": r.provenance.get("log_warnings"), "netlist_sha256": r.provenance.get("netlist_sha256")}
         return parse_raw(r.result_path) if r.status == "completed" and r.result_path else None
