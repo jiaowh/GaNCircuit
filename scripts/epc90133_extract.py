@@ -54,6 +54,23 @@ definite. Diagnostic summary alongside the network (not a replacement for it): t
 inductance and capacitor current shares with all capacitors as ideal shorts, Q2 shorted and
 the port at Q1 (drain to source).
 
+Variant G (30 September 2026, specification before its first run; after test 6 in docs/build.md). B's
+copper and capacitors plus the gate-drive loop, with the terminals and port scheme of
+results/gan/epc90133-gate-loop.json (scripts/epc90133_gate_loop.py): each FET's source split into pin 2
+and pins 4+6, the gate pins, the four gate-resistor pad pairs and the driver balls (UGH, UGL, LGH, LGL,
+PHASE C1+D4 tied, GND). Added nets: the gate nets VGu and VGl and the driver output nets VGuH, VGuL,
+VGlH, VGlL (identified by the islands under those terminals). Window x 14.0-33.0 mm (U80 lies at
+x 14.9-16.1). The gate traces are about 0.15 mm wide and the balls 0.4 mm apart, so the top layer uses a
+fine grid of s/4 inside the box G_FINE (x 14.4-18.8, y 24.2-32.8 mm, snapped outwards to coarse lines):
+nodes every s/4, segments of width s/4 between neighbours inside the closed box; coarse segments that
+lie entirely inside the closed box are dropped, and coarse segments reaching its edge end on the shared
+edge nodes. Other layers stay coarse. The mesh check is the existing one (every port connected) plus
+every G terminal having nodes. Not modelled: the resistor bodies and the driver (lumped in LTspice),
+the driver supply loops (C80, C81), the FET package interior (the die source joins pins 2, 4 and 6
+ideally in the bench). Diagnostic added for G: with 1 A round the power loop (as for the loop inductance,
+Q2 and capacitors shorted), the voltage induced between each driver return (U80.PH, U80.GND) and its FET's
+source pins tied (Q1.S2+S46, Q2.S2+S46) gives the board's common-source inductance of each FET.
+
 Run history (29 September 2026). First A-m1-mid attempt: FastHenry rejected the via node names
 (they must start with "n"); no result. Second: capacitor terminal boxes grown by s/2 overlapped
 between neighbouring Ci pads, so shared nodes tied the Ci1-Ci5 VIN terminals together and the
@@ -90,7 +107,13 @@ VIA_W = 0.847  # side of the square via section / drill diameter
 PAD_R = 0.25  # mm, "pad" junction radius
 VARIANTS = {"A": {"layers": ("GTL", "G1"), "caps": ("Ci",)},
             "I": {"layers": LAYERS, "caps": ("Ci",)},
-            "B": {"layers": LAYERS, "caps": ("Ci", "Cm")}}
+            "B": {"layers": LAYERS, "caps": ("Ci", "Cm")},
+            "G": {"layers": LAYERS, "caps": ("Ci", "Cm"), "gate": True}}
+GATE_LOOP = ROOT / "results/gan/epc90133-gate-loop.json"
+G_WINDOW = (14.0, 22.0, 33.0, 37.5)
+G_FINE = (14.4, 24.2, 18.8, 32.8)
+FINE_DIV = 4
+GATE_NETS = ("VGu", "VGl", "VGuH", "VGuL", "VGlH", "VGlL")
 JUNCTIONS = ("mid", "gap", "pad")
 POWER = ("VIN", "SW", "GND")
 
@@ -110,61 +133,109 @@ class UF:
         self.p[self.find(a)] = self.find(b)
 
 
-def build(b, loop, variant, mesh, junction, per_layer):
+def build(b, loop, variant, mesh, junction, per_layer, gate=None):
+    """FastHenry deck for one case. Grid nodes are keyed by fine indices (I, J) = FINE_DIV x coarse index;
+    without a fine box only coarse points exist, which reproduces the uniform grid of tests 1-4."""
     s, n = MESHES[mesh]
-    layers = VARIANTS[variant]["layers"]
+    spec = VARIANTS[variant]
+    layers = spec["layers"]
+    is_g = bool(spec.get("gate"))
+    window = G_WINDOW if is_g else WINDOW
     z = z_mid()
+    f = s / FINE_DIV
     xc = loop["fets"]["Q1"]["centre_mm"][0]
     yc = loop["fets"]["Q2"]["centre_mm"][1]
-    xs = xc + s * np.arange(math.ceil((WINDOW[0] - xc) / s), math.floor((WINDOW[2] - xc) / s) + 1)
-    ys = yc + s * np.arange(math.ceil((WINDOW[1] - yc) / s), math.floor((WINDOW[3] - yc) / s) + 1)
-    rows = np.round(ys / PITCH).astype(int)
-    cols = np.round(xs / PITCH).astype(int)
+    I0, I1 = FINE_DIV * math.ceil((window[0] - xc) / s), FINE_DIV * math.floor((window[2] - xc) / s)
+    J0, J1 = FINE_DIV * math.ceil((window[1] - yc) / s), FINE_DIV * math.floor((window[3] - yc) / s)
+    X = lambda I: xc + I * f
+    Y = lambda J: yc + J * f
+    if is_g:
+        box = (FINE_DIV * math.floor((G_FINE[0] - xc) / s), FINE_DIV * math.floor((G_FINE[1] - yc) / s),
+               FINE_DIV * math.ceil((G_FINE[2] - xc) / s), FINE_DIV * math.ceil((G_FINE[3] - yc) / s))
+    else:
+        box = None
+    fine_layers = ("GTL",) if is_g else ()
+
+    def in_box(I, J):
+        return box is not None and box[0] <= I <= box[2] and box[1] <= J <= box[3]
+
     pad_only = {(e, lab) for v, lay in zip(b.via_rows, per_layer) for e, lab in v["islands"] if lay[e] == "pad only"}
+    allowed_roots = set()
+    if is_g:
+        for t, cs in gate["terminals"].items():
+            for c in cs:
+                if c["layer"] in layers:
+                    i, j = b.pixel(*c["centre_mm"])
+                    lab = int(b.labels[c["layer"]][i, j])
+                    if lab and b.net_name.get(b.find((c["layer"], lab)), "other") not in POWER:
+                        allowed_roots.add(b.find((c["layer"], lab)))
 
     nodes, segs, equivs = {}, [], []  # nodes: name -> (x, y, z, layer, island)
     grid = {}
     for e in layers:
         lab = b.labels[e]
-        net_of_label = {}
-        L = lab[np.ix_(rows, cols)]
-        for i in range(len(ys)):
-            for j in range(len(xs)):
-                l = int(L[i, j])
-                if not l or (e, l) in pad_only:
-                    continue
-                if l not in net_of_label:
-                    net_of_label[l] = b.net_name.get(b.find((e, l)), "other")
-                if net_of_label[l] not in POWER:
-                    continue
-                name = f"n{e}_{i}_{j}".lower()
-                nodes[name] = (float(xs[j]), float(ys[i]), z[e], e, l)
-                grid[(e, i, j)] = name
-        for (ee, i, j), name in list(grid.items()):
+        keep_label = {}
+        pts = [(I, J) for J in range(J0, J1 + 1, FINE_DIV) for I in range(I0, I1 + 1, FINE_DIV)]
+        if e in fine_layers:
+            pts += [(I, J) for J in range(max(J0, box[1]), min(J1, box[3]) + 1) for I in range(max(I0, box[0]), min(I1, box[2]) + 1)
+                    if I % FINE_DIV or J % FINE_DIV]
+        for I, J in pts:
+            r, c = b.pixel(X(I), Y(J))
+            l = int(lab[r, c])
+            if not l or (e, l) in pad_only:
+                continue
+            if l not in keep_label:
+                root = b.find((e, l))
+                keep_label[l] = b.net_name.get(root, "other") in POWER or root in allowed_roots
+            if not keep_label[l]:
+                continue
+            name = f"n{e}_{I - I0}_{J - J0}".lower()
+            nodes[name] = (float(X(I)), float(Y(J)), z[e], e, l)
+            grid[(e, I, J)] = name
+
+        def connect(k1, k2, width, hinc):
+            if k2 not in grid:
+                return
+            a_, b_ = grid[k1], grid[k2]
+            l = nodes[a_][4]
+            if nodes[b_][4] != l:
+                return
+            r1, c1 = b.pixel(nodes[a_][0], nodes[a_][1])
+            r2, c2 = b.pixel(nodes[b_][0], nodes[b_][1])
+            if np.all(lab[min(r1, r2):max(r1, r2) + 1, min(c1, c2):max(c1, c2) + 1] == l):
+                segs.append((a_, b_, f"w={width:.6g} h={T_CU:.6g} nhinc={hinc} rh=2"))
+
+        for (ee, I, J) in list(grid):
             if ee != e:
                 continue
-            l = nodes[name][4]
-            if (e, i, j + 1) in grid and nodes[grid[(e, i, j + 1)]][4] == l and \
-                    np.all(lab[rows[i], cols[j]:cols[j + 1] + 1] == l):
-                segs.append((name, grid[(e, i, j + 1)], f"w={s:.6g} h={T_CU:.6g} nhinc={n} rh=2"))
-            if (e, i + 1, j) in grid and nodes[grid[(e, i + 1, j)]][4] == l and \
-                    np.all(lab[rows[i]:rows[i + 1] + 1, cols[j]] == l):
-                segs.append((name, grid[(e, i + 1, j)], f"w={s:.6g} h={T_CU:.6g} nhinc={n} rh=2"))
+            fine_here = e in fine_layers
+            if I % FINE_DIV == 0 and J % FINE_DIV == 0:
+                for dI, dJ in ((FINE_DIV, 0), (0, FINE_DIV)):
+                    if fine_here and in_box(I, J) and in_box(I + dI, J + dJ):
+                        continue  # inside the closed fine box the fine segments replace it
+                    connect((e, I, J), (e, I + dI, J + dJ), s, n)
+            if fine_here and in_box(I, J):
+                for dI, dJ in ((1, 0), (0, 1)):
+                    if in_box(I + dI, J + dJ):
+                        connect((e, I, J), (e, I + dI, J + dJ), f, n)
+
+    from scipy.spatial import cKDTree
+    layer_nodes = {e: [(nm, v) for nm, v in nodes.items() if v[3] == e] for e in layers}
+    trees = {e: cKDTree(np.array([[v[0], v[1]] for _, v in ln])) if ln else None for e, ln in layer_nodes.items()}
 
     def grid_nodes_near(e, x, y, island, radius):
-        i0, j0 = int(round((y - ys[0]) / s)), int(round((x - xs[0]) / s))
-        k = int(math.ceil(radius / s)) + 1
+        if trees[e] is None:
+            return []
         out = []
-        for i in range(i0 - k, i0 + k + 1):
-            for j in range(j0 - k, j0 + k + 1):
-                nm = grid.get((e, i, j))
-                if nm and nodes[nm][4] == island:
-                    out.append((math.hypot(nodes[nm][0] - x, nodes[nm][1] - y), nm))
+        for k in trees[e].query_ball_point([x, y], radius + 1e-9):
+            nm, v = layer_nodes[e][k]
+            if v[4] == island:
+                out.append((math.hypot(v[0] - x, v[1] - y), nm))
         return sorted(out)
 
     # Vias
     via_rows = [(k, v) for k, v in enumerate(b.via_rows)
-                if WINDOW[0] <= v["x"] <= WINDOW[2] and WINDOW[1] <= v["y"] <= WINDOW[3]]
+                if window[0] <= v["x"] <= window[2] and window[1] <= v["y"] <= window[3]]
     via_stats = {"vias": 0, "segments": 0, "unattached_ends": 0}
     for k, v in via_rows:
         net = b.net_of(v["layers"][0], v["x"], v["y"]) if v["layers"] else "none"
@@ -199,24 +270,29 @@ def build(b, loop, variant, mesh, junction, per_layer):
             via_stats["segments"] += 1
 
     # Terminals
-    caps = [c for k in VARIANTS[variant]["caps"] for c in loop["capacitors"][k]["caps"]]
-    terms = {}
-    for q in ("Q1", "Q2"):
-        for fn in ("D", "S"):
-            pins = [p for p in loop["fets"][q]["pins"].values() if p["function"] == fn]
-            terms[f"{q}.{fn}"] = [("GTL", p["bbox_mm"], p["centre_mm"]) for p in pins]
-    for c in caps:
-        for p in c["pads"]:
-            terms[f"{c['ref']}.{p['net']}"] = [(c["layer"], p["bbox_mm"], p["centre_mm"])]
+    if is_g:
+        terms = {t: [(c["layer"], c["bbox_mm"], c["centre_mm"]) for c in cs] for t, cs in gate["terminals"].items()}
+        scheme = gate["scheme"]
+    else:
+        caps = [c for k in spec["caps"] for c in loop["capacitors"][k]["caps"]]
+        terms = {}
+        for q in ("Q1", "Q2"):
+            for fn in ("D", "S"):
+                pins = [p for p in loop["fets"][q]["pins"].values() if p["function"] == fn]
+                terms[f"{q}.{fn}"] = [("GTL", p["bbox_mm"], p["centre_mm"]) for p in pins]
+        for c in caps:
+            for p in c["pads"]:
+                terms[f"{c['ref']}.{p['net']}"] = [(c["layer"], p["bbox_mm"], p["centre_mm"])]
+        scheme = loop["ports"]["scheme"]
     # A terminal takes the grid nodes inside its contact box; only a contact with none inside takes
-    # the nodes within s/2 of the box. No node may belong to two terminals (the first run's boxes grown
-    # by s/2 overlapped between neighbouring capacitor pads and shorted their terminals together).
+    # the nodes within half a local pitch of the box. No node may belong to two terminals (the first run's
+    # boxes grown by s/2 overlapped between neighbouring capacitor pads and shorted their terminals together).
     term_nodes, term_missing = {}, []
     claimed = {}
 
     def inside(e, island, x0, y0, x1, y1, g):
-        return [nm for (ee, gi, gj), nm in grid.items() if ee == e and nodes[nm][4] == island
-                and x0 - g <= xs[gj] <= x1 + g and y0 - g <= ys[gi] <= y1 + g]
+        return [nm for (ee, gI, gJ), nm in grid.items() if ee == e and nodes[nm][4] == island
+                and x0 - g <= X(gI) <= x1 + g and y0 - g <= Y(gJ) <= y1 + g]
 
     for t, contacts in terms.items():
         members = []
@@ -225,7 +301,8 @@ def build(b, loop, variant, mesh, junction, per_layer):
                 continue
             i, j = b.pixel(cx, cy)
             island = int(b.labels[e][i, j])
-            got = inside(e, island, x0, y0, x1, y1, 0.0) or inside(e, island, x0, y0, x1, y1, s / 2)
+            half = (f if (e in fine_layers and in_box(round((cx - xc) / f), round((cy - yc) / f))) else s) / 2
+            got = inside(e, island, x0, y0, x1, y1, 0.0) or inside(e, island, x0, y0, x1, y1, half)
             if not got:
                 term_missing.append(f"{t} contact at ({cx:.2f}, {cy:.2f})")
             members += got
@@ -237,7 +314,6 @@ def build(b, loop, variant, mesh, junction, per_layer):
             term_nodes[t] = members
             equivs.append(list(members))
 
-    scheme = loop["ports"]["scheme"]
     ports = []
     for net, sc in scheme.items():
         for br in sc["branches"]:
@@ -246,8 +322,8 @@ def build(b, loop, variant, mesh, junction, per_layer):
 
     # Connectivity: drop components without terminals; every port must be connected.
     uf = UF()
-    for a, c, _ in segs:
-        uf.union(a, c)
+    for a_, c_, _ in segs:
+        uf.union(a_, c_)
     for eq in equivs:
         for m in eq[1:]:
             uf.union(eq[0], m)
@@ -259,19 +335,23 @@ def build(b, loop, variant, mesh, junction, per_layer):
     equivs = [[m for m in eq if m in keep] for eq in equivs]
     equivs = [eq for eq in equivs if len(eq) > 1]
     connected = {name: uf.find(term_nodes[br][0]) == uf.find(term_nodes[ref][0]) for name, br, ref in ports}
+    expected = {br for sc in scheme.values() for br in sc["branches"]}
+    missing_ports = sorted(expected - {p[1] for p in ports}) if is_g else []
 
-    lines = [f"* EPC90133 power loop, variant {variant}, mesh {mesh}, via junction {junction}; "
-             "generated by scripts/epc90133_extract.py", ".units mm", f".default sigma={SIGMA_CU_PER_MM:g} nwinc=1"]
+    lines = [f"* EPC90133 {'power and gate-drive loops' if is_g else 'power loop'}, variant {variant}, mesh {mesh}, "
+             f"via junction {junction}; generated by scripts/epc90133_extract.py", ".units mm",
+             f".default sigma={SIGMA_CU_PER_MM:g} nwinc=1"]
     lines += [f"{nm} x={x:.6f} y={y:.6f} z={zz:.6f}" for nm, (x, y, zz, _, _) in nodes.items()]
-    lines += [f"E{k} {a} {c} {geo}" for k, (a, c, geo) in enumerate(segs, 1)]
+    lines += [f"E{k} {a_} {c_} {geo}" for k, (a_, c_, geo) in enumerate(segs, 1)]
     lines += [".equiv " + " ".join(eq) for eq in equivs]
     lines += [f".external {term_nodes[br][0]} {term_nodes[ref][0]} {name}" for name, br, ref in ports]
     lines += [f".freq fmin={FREQ:g} fmax={FREQ:g} ndec=1", ".end", ""]
     fil = sum(n if "nhinc=%d" % n in geo and "nwinc=3" not in geo else 9 for _, _, geo in segs)
-    stats = {"pitch_mm": s, "nhinc": n, "grid": [len(xs), len(ys)], "nodes": len(nodes), "segments": len(segs),
+    stats = {"pitch_mm": s, "fine_pitch_mm": f if is_g else None, "fine_box_index": box, "nhinc": n,
+             "grid": [(I1 - I0) // FINE_DIV + 1, (J1 - J0) // FINE_DIV + 1], "nodes": len(nodes), "segments": len(segs),
              "filaments_before_refine": fil, "nodes_dropped_unconnected": dropped, "via": via_stats,
              "terminals": {t: len(v) for t, v in term_nodes.items()}, "terminal_contacts_without_nodes": term_missing,
-             "ports": [p[0] for p in ports]}
+             "ports": [p[0] for p in ports], "scheme_branches_without_port": missing_ports}
     return "\n".join(lines), ports, connected, stats
 
 
@@ -371,6 +451,70 @@ def loop_summary(order, Z, ports):
             "capacitor_current_share": shares}
 
 
+def g_summary(order, Z, ports):
+    """Variant G diagnostics: power-loop inductance at Q1 and the board common-source inductance of each FET.
+
+    Only the VIN/SW/GND branches carry the power-loop current; gate-net branches are left out (they carry
+    none). Q2's drain-source, every capacitor, Q1's source pins (S2 to S46) and Q2's source pins are shorted
+    (the die joins them); 1 A enters at Q1.D and leaves at Q1.S46. The common-source inductance of a FET
+    is the imaginary part of the voltage between its driver return and its source, over omega, per ampere
+    of loop current: L_cs(Q1) from U80.PH to Q1.S46, L_cs(Q2) from U80.GND to Q2.S46.
+    """
+    br = {name: (b_, ref) for name, b_, ref in ports}
+    power = [k for k, name in enumerate(order) if not br[name][0].startswith(("R8", "U80.U", "U80.L"))
+             and not br[name][1].startswith(("Q1.G", "Q2.G", "R8"))]
+    names = [order[k] for k in power]
+    Zp = Z[np.ix_(power, power)]
+    nodes = sorted({x for name in names for x in br[name]} | {"Q1.D", "Q1.S46", "Q2.D", "Q2.S46"})
+    caps = sorted({t.rsplit(".", 1)[0] for t in nodes if t.startswith("C")})
+    ground = "Q2.S46"
+    nidx = {n_: k for k, n_ in enumerate(x for x in nodes if x != ground)}
+    nb, nn = len(names), len(nidx)
+    shorts = [("Q2.D", "Q2.S46"), ("Q1.S2", "Q1.S46"), ("Q2.S2", "Q2.S46")] + [(f"{c}.VIN", f"{c}.GND") for c in caps]
+    N = nn + nb + len(shorts)
+    A = np.zeros((N, N), complex)
+    rhs = np.zeros(N, complex)
+
+    def stamp(node, k, sign):
+        if node != ground:
+            A[nidx[node], k] += sign
+
+    for k, name in enumerate(names):
+        t, r = br[name]
+        row = nn + k
+        if t != ground:
+            A[row, nidx[t]] += 1
+        if r != ground:
+            A[row, nidx[r]] -= 1
+        A[row, nn:nn + nb] -= Zp[k]
+        stamp(t, nn + k, 1)
+        stamp(r, nn + k, -1)
+    for k, (a, c) in enumerate(shorts):
+        row = nn + nb + k
+        if a != ground:
+            A[row, nidx[a]] += 1
+        if c != ground:
+            A[row, nidx[c]] -= 1
+        stamp(a, row, 1)
+        stamp(c, row, -1)
+    rhs[nidx["Q1.D"]] += 1
+    rhs[nidx["Q1.S46"]] -= 1
+    x = np.linalg.solve(A, rhs)
+    v = lambda n_: 0 if n_ == ground else x[nidx[n_]]
+    w = 2 * math.pi * FREQ
+    zl = v("Q1.D") - v("Q1.S46")
+    out = {"L_loop_nH": float(zl.imag / w * 1e9), "R_loop_mohm": float(zl.real * 1e3),
+           "source_pin_current_share": {
+               "Q1.S2": float(x[nn + nb + 1].real), "Q2.S2": float(x[nn + nb + 2].real)}}
+    for q, drv in (("Q1", "U80.PH"), ("Q2", "U80.GND")):
+        if drv in nidx or drv == ground:
+            zc = v(drv) - v(f"{q}.S46")
+            out[f"L_cs_{q}_pH"] = float(zc.imag / w * 1e12)
+            out[f"R_cs_{q}_mohm"] = float(zc.real * 1e3)
+    out["definition"] = g_summary.__doc__.strip().splitlines()[0]
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cases", nargs="+", help="variant:mesh:junction, e.g. A:m1:mid")
@@ -379,29 +523,37 @@ def main():
     ap.add_argument("--outdir", type=Path, default=ROOT / "results/gan/epc90133-extraction")
     args = ap.parse_args()
     loop = json.loads(LOOP.read_text(encoding="utf-8"))
+    gate = json.loads(GATE_LOOP.read_text(encoding="utf-8")) if GATE_LOOP.is_file() else None
     b = load_board()
     per_layer = via_layers(b)
     run_root = ROOT / "runs" / ("epc90133-extract-" + uuid.uuid4().hex[:12])
     args.outdir.mkdir(parents=True, exist_ok=True)
     for case in args.cases:
         variant, mesh, junction = case.split(":")
-        deck, ports, connected, stats = build(b, loop, variant, mesh, junction, per_layer)
+        is_g = bool(VARIANTS[variant].get("gate"))
+        if is_g and (gate is None or gate.get("outcome") != "pass"):
+            raise SystemExit("variant G needs a passing results/gan/epc90133-gate-loop.json")
+        deck, ports, connected, stats = build(b, loop, variant, mesh, junction, per_layer, gate)
         print(case, json.dumps({k: stats[k] for k in ("grid", "nodes", "segments", "filaments_before_refine", "via",
                                                        "nodes_dropped_unconnected", "terminal_contacts_without_nodes")}))
         report = {"schema": "epc90133-extraction/1", "case": {"variant": variant, "mesh": mesh, "junction": junction},
                   "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   "power_loop_sha256": hashlib.sha256(LOOP.read_bytes()).hexdigest(),
+                  **({"gate_loop_sha256": hashlib.sha256(GATE_LOOP.read_bytes()).hexdigest()} if is_g else {}),
                   "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
-                  "window_mm": WINDOW, "frequency_Hz": FREQ, "skin_depth_um": skin_depth(FREQ) * 1e6,
+                  "window_mm": G_WINDOW if is_g else WINDOW, "frequency_Hz": FREQ, "skin_depth_um": skin_depth(FREQ) * 1e6,
                   "mesh_stats": stats, "ports": [{"name": p[0], "terminal": p[1], "reference": p[2]} for p in ports],
                   "checks": {"all_ports_connected": all(connected.values())}}
+        if is_g:
+            report["checks"]["every_g_terminal_has_nodes"] = not stats["terminal_contacts_without_nodes"] \
+                and not stats["scheme_branches_without_port"]
         if not all(connected.values()):
             report["unconnected_ports"] = [k for k, ok in connected.items() if not ok]
         wd = run_root / case.replace(":", "_")
-        if args.build_only or not all(connected.values()):
+        if args.build_only or not all(report["checks"].values()):
             wd.mkdir(parents=True, exist_ok=True)
             (wd / "case.inp").write_text(deck, encoding="ascii")
-            print("  deck:", wd.relative_to(ROOT), "connected:", all(connected.values()))
+            print("  deck:", wd.relative_to(ROOT), "checks:", report["checks"])
             continue
         # Memory guard: B-m1 used 1.59 GB per job for 62k filaments (about 26 kB each); allow 30 kB.
         need = 30e3 * stats["filaments_before_refine"]
@@ -424,13 +576,15 @@ def main():
             "L_H": Ls.tolist(), "R_ohm": ((Z.real + Z.real.T) / 2).tolist(),
             "Z_raw_real": Z.real.tolist(), "Z_raw_imag": Z.imag.tolist(),
             "L_asymmetry_rel": asym, "L_min_eigenvalue_H": float(eig.min()),
-            "summary": loop_summary(order, (Z + Z.T) / 2, ports),
+            "summary": (g_summary if is_g else loop_summary)(order, (Z + Z.T) / 2, ports),
         })
         report["outcome"] = "complete" if all(report["checks"].values()) else "check failed"
         out = args.outdir / f"{variant}-{mesh}-{junction}.json"
         out.write_text(json.dumps(report, indent=1) + "\n")
         print(f"  {report['outcome']}; {report['wall_time_s']:.0f} s; filaments {filaments}; "
               f"L_loop {report['summary']['L_loop_nH']:.4f} nH; asym {asym:.2e}; -> {out.relative_to(ROOT)}")
+        if is_g:
+            print("  common-source:", {k: round(v_, 2) for k, v_ in report["summary"].items() if k.startswith(("L_cs", "R_cs"))})
 
 
 if __name__ == "__main__":
