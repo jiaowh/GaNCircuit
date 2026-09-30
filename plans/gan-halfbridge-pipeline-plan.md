@@ -119,12 +119,11 @@ device model. The EPC90133 page lists the uP1966E driver, matching the selected
 board; its listed Gerbers do not by themselves establish a KiCad design or
 stackup.
 
-Immediate deliverable: inventory and record the unmodified EPC2302 model and
-all EPC90133 source files and terms, then demonstrate the model running through
-the LTspice adapter. G1 is retained from adapter qualification; the EPC2302
-model smoke run and datasheet baseline checks are open at G2. Board simulation
-and measurement follow only after the source files, layout and population are
-identified.
+First deliverable after the selection (done 28 September 2026; historical): inventory
+and record the unmodified EPC2302 model and all EPC90133 source files and terms, then
+demonstrate the model running through the LTspice adapter. Both are done, and G2 for
+EPC2302 is a provisional baseline (section 8). Measurement still follows only after the
+physical board, its layout revision and its population are identified.
 
 Historical EPC9097 work used a 6-layer ODB++ layout listing EPC2619,
 4.7 ohm turn-on / 1 ohm turn-off resistors and uP1966A; the published BOM used
@@ -426,7 +425,7 @@ Status, 28 September 2026 (updated after the EPC90133/EPC2302 selection):
 - **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
 - **G2, EPC2204 historical result:** accepted for the EPC9097 stock-board simulation, with a documented exception (owner review, 28 September 2026). The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances (worst point uses 22.8% of its allowed error). The reviewer independently reproduced the extraction, comparisons and 88 tests under WSL. **Exception:** table QGS/QGD/QG(TH) values remain unresolved because EPC's own curve does not reproduce them; they may use different definitions or source data. Total QG matches. No tuning is justified. This result is not EPC2302 validation.
 - **G2, EPC2302:** provisional baseline for G3 (owner review, 28 September 2026). The unmodified model runs in LTspice; limited table rows are inside their limits and QG is 4% low; 24 digitized curves in Figs. 1–6 and 8–10 pass. Fig. 7 gate charge fails its declared checks, and the table QGD/QG(TH) are unresolved. No tuning is justified; gate-charge-dependent switching times and losses must not be labelled validated.
-- **G3, EPC90133:** open. BOM/Gerbers (B5253 Rev 2.0) are audited, the Gerber reader gives copper, drills and nets, and a BOM-based schematic passes a static check. The FastHenry via/plane-pair check fails its mesh criterion and stays recorded as failed; owner decision (29 September 2026): defer the fourth mesh and extract exploratorily, then use prediction sensitivity to choose further qualification.
+- **G3, EPC90133:** open. BOM/Gerbers (B5253 Rev 2.0) are audited, the Gerber reader gives copper, drills and nets, and a BOM-based schematic passes a static check. The FastHenry via/plane-pair check fails its mesh criterion and stays recorded as failed; owner decision (29 September 2026): defer the fourth mesh and extract exploratorily, then use prediction sensitivity to choose further qualification. *Update, 30 September 2026:* power-loop variants A/I/B are extracted on the coarse mesh only (no m2 board extraction has run); QSG Fig. 9 is digitized with a declared uncertainty; the double pulse matches continuous operation on A (and is being checked on B); no tested single change or combination reproduces Fig. 9 (docs/build.md, tests 5–6). The gate and source-return paths are not extracted. Their effect is being bounded by separated sensitivity cases, so layout is not yet excluded as a material contributor.
 - **G3, EPC9097 historical work:** paused for the selected target. The prior switching bench and layout investigation remain historical sensitivity evidence and do not block EPC90133 work.
   - *Done:* the board files are recorded with checksums and terms. A double-pulse bench runs two unmodified EPC2204 models with a datasheet-calibrated behavioural uP1966E driver (no vendor driver model exists), at EPC's published 48 V → 12 V, 1 MHz conditions, with the loop inductance swept.
   - *Comparison:* EPC's published switch-node screenshots are digitized and compared diagnostically ([docs](../docs/build.md#epc9097-switching-bench-g3-before-layout-extraction)).
@@ -494,6 +493,21 @@ Updated 29 September 2026 (owner review of the via check):
    plane) with a declared refinement criterion; then extract SW/VIN/GND capacitances of the power stage
    to replace the parallel-plate estimate (135 pF SW-GND). Its LGPL terms would also avoid FastHenry's
    internal-only restriction for this part of the flow.
+
+6. External review of the test-5 findings (30 September 2026), in its recommended order:
+   (a) correct overclaims and enforce result status in code: unusable cases stay inspectable but are
+   structurally excluded from comparisons and verdicts, and reports bind their inputs by hash;
+   (b) bound the omitted gate and source-return paths with cases that separate gate, common-source,
+   drain and source inductance (test 6), and extract those paths if the bound is material;
+   (c) develop the hardware plan in parallel. It should test explicit competing explanations and
+   include held-out operating conditions, not seek one matching waveform.
+7. Agent-workflow milestone (review item 7). The project has stronger evidence for its engineering
+   tools than for an agent-driven contribution: the I-1/I-2/I-3 schemas are open, the GaN studies do
+   not consistently use the immutable artifact store, and there is no scored agent-versus-script or
+   manual baseline. Next software milestone: one reproducible, bounded run that consumes declared
+   artifacts (the extraction, digitized-figure and model records), checks their validity, produces the
+   Fig. 9 comparison and stops correctly. It records interventions, failures, wall time and cost, and
+   it is run once by the agent and once by the plain scripts for comparison.
 
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a

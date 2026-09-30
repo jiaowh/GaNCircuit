@@ -62,8 +62,10 @@ The full plan, including its checkpoints (gates G0–G6) and safety rules, is in
 
 - **We can calculate the board's hidden effects.** Copper paths act like tiny unwanted coils (inductance). When the
   switch flips in about a nanosecond, these tiny coils cause voltage spikes and ringing. A tool called FastHenry calculates
-  them from the copper shapes. We found that the deeper copper layers matter a lot, while the fine details of how vias are
-  modelled barely matter. That saved us from spending hours refining the wrong thing.
+  them from the copper shapes. We found that the deeper copper layers matter a lot (they cut the loop inductance by
+  about 40 %). How the vias are represented matters less: under 2 % on the partial board, up to 7 % on the full board.
+  Both figures come from the coarse mesh only; the finer-mesh board extraction has not been run. These calculations
+  cover the main power loop only. The gate-drive and source-return paths are not yet extracted.
 - **We can simulate the switching.** The board's calculated inductances go into the circuit simulation alongside the
   transistor models. That lets us predict the voltage waveform when the switch flips.
 

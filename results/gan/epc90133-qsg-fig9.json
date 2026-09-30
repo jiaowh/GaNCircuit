@@ -50,7 +50,7 @@
       "outcome": "pass"
     }
   },
-  "evaluator_sha256": "2976f8c586e419009316b96c69f6da15622746d121584b1974400179df49f7a4",
+  "evaluator_sha256": "4f3bf39f2d3ec84badfd277345909a354d739347e9f1889972a5877f5d680721",
   "panels": {
     "rising": {
       "xref": 119,
@@ -68,6 +68,7 @@
         "grid_rows": {
           "centre_px": 163,
           "pitch_px": 31.833333333333346,
+          "pitch_se_px": 0.03636964837266319,
           "lines_px": [
             36,
             68,
@@ -85,6 +86,7 @@
         "grid_cols": {
           "centre_px": 257,
           "pitch_px": 50.700000000000024,
+          "pitch_se_px": 0.04424558687227405,
           "lines_px": [
             54,
             104,
@@ -1234,6 +1236,105 @@
             45.69742908494177
           ]
         ]
+      },
+      "headline": {
+        "edge_10_90_s": 1.6813355862835502e-09,
+        "overshoot_above_settled_V": 5.698080279232109,
+        "overshoot_fraction": 0.12438272043667996,
+        "swing_V": 45.810867130316986,
+        "ring_frequency_Hz": 264001348.83717778,
+        "ring_damping_ratio": 0.07694405897745016,
+        "ring_frequency_crest_spacing_Hz": 266842105.263158,
+        "plateau_duration_s": 7.1005917159763276e-09,
+        "plateau_mean_V": -2.4610047871274188
+      },
+      "uncertainty": {
+        "combinations": 324,
+        "ranges": {
+          "edge_10_90_s": {
+            "min": 1.6738542396299416e-09,
+            "max": 1.6879030774907952e-09,
+            "n": 324
+          },
+          "overshoot_above_settled_V": {
+            "min": 5.685089825749628,
+            "max": 5.732280231432632,
+            "n": 324
+          },
+          "overshoot_fraction": {
+            "min": 0.12426038576823764,
+            "max": 0.12490352423907976,
+            "n": 324
+          },
+          "swing_V": {
+            "min": 45.68400358987717,
+            "max": 45.962625940025625,
+            "n": 324
+          },
+          "ring_frequency_Hz": {
+            "min": 261753094.07619855,
+            "max": 265302528.46517625,
+            "n": 324
+          },
+          "ring_damping_ratio": {
+            "min": 0.07196182544903994,
+            "max": 0.07696751224622135,
+            "n": 324
+          },
+          "ring_frequency_crest_spacing_Hz": {
+            "min": 266376362.24344984,
+            "max": 267307848.2828662,
+            "n": 324
+          },
+          "plateau_duration_s": {
+            "min": 7.0882200215096e-09,
+            "max": 7.113006672767769e-09,
+            "n": 324
+          },
+          "plateau_mean_V": {
+            "min": -2.4794133097672404,
+            "max": -2.408564256025357,
+            "n": 324
+          }
+        },
+        "choices": {
+          "estimator": [
+            "mid",
+            "centroid"
+          ],
+          "settle_s": [
+            [
+              2e-08,
+              4e-08
+            ],
+            [
+              2.5e-08,
+              4.5e-08
+            ],
+            [
+              3e-08,
+              4.5e-08
+            ]
+          ],
+          "fit_start": [
+            "crest",
+            "peak"
+          ],
+          "fit_stop_s": [
+            2e-08,
+            2.5e-08,
+            3e-08
+          ],
+          "pitch_se": [
+            -2.0,
+            0.0,
+            2.0
+          ]
+        },
+        "resolution": {
+          "s_per_px": 1.9723865877712023e-10,
+          "V_per_px": 0.31413612565445015
+        }
       }
     },
     "falling": {
@@ -1252,6 +1353,7 @@
         "grid_rows": {
           "centre_px": 163,
           "pitch_px": 31.833333333333346,
+          "pitch_se_px": 0.03636964837266319,
           "lines_px": [
             36,
             68,
@@ -1269,6 +1371,7 @@
         "grid_cols": {
           "centre_px": 245,
           "pitch_px": 50.7666666666667,
+          "pitch_se_px": 0.041785544701865775,
           "lines_px": [
             42,
             92,
@@ -2519,6 +2622,69 @@
             -0.18519965616942183
           ]
         ]
+      },
+      "headline": {
+        "edge_10_90_s": 3.63118107256972e-09,
+        "undershoot_below_settled_V": 4.583105415331724,
+        "swing_V": 44.468478139727914
+      },
+      "uncertainty": {
+        "combinations": 54,
+        "ranges": {
+          "edge_10_90_s": {
+            "min": 3.6235625939518905e-09,
+            "max": 3.641523790800811e-09,
+            "n": 54
+          },
+          "undershoot_below_settled_V": {
+            "min": 4.572656875685806,
+            "max": 4.648447937011987,
+            "n": 54
+          },
+          "swing_V": {
+            "min": 44.3368004115156,
+            "max": 44.57183808055235,
+            "n": 54
+          }
+        },
+        "choices": {
+          "estimator": [
+            "mid",
+            "centroid"
+          ],
+          "settle_s": [
+            [
+              2e-08,
+              4e-08
+            ],
+            [
+              2.5e-08,
+              4.5e-08
+            ],
+            [
+              3e-08,
+              4.5e-08
+            ]
+          ],
+          "fit_start": [
+            "crest",
+            "peak"
+          ],
+          "fit_stop_s": [
+            2e-08,
+            2.5e-08,
+            3e-08
+          ],
+          "pitch_se": [
+            -2.0,
+            0.0,
+            2.0
+          ]
+        },
+        "resolution": {
+          "s_per_px": 1.969796454366381e-10,
+          "V_per_px": 0.31413612565445015
+        }
       }
     }
   }
