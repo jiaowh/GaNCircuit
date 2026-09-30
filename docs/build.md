@@ -543,7 +543,76 @@ are needed to separate the driver, package, loss and measurement candidates, and
 as explicit competing explanations with held-out operating conditions. Whether simulation alone can narrow them
 further is open. G3 stays open.
 
-TEST6_SECTION
+### EPC90133 switching test 6: separated gate and source paths (G3 diagnosis, after review)
+
+```sh
+PYTHONPATH=src python scripts/epc90133_switching.py --study paths --output results/gan/epc90133-switching-paths.json
+PYTHONPATH=src python scripts/epc90133_switching.py --study periodic --periodic-ext B-m1-mid --periodic-maxstep 100e-12     --output results/gan/epc90133-switching-periodic-B.json
+python scripts/compare_epc90133_fig9.py --sim results/gan/epc90133-switching-causes.json     results/gan/epc90133-switching-causes-2.json results/gan/epc90133-switching-paths.json
+```
+
+Why: an external review (30 September 2026) pointed out that the bench returns both drivers at the FET source pads and
+has no gate-loop inductance, and that test 5's package cases put equal inductance on drain and source, so they could
+not show which path matters. The specification is in the switching script's docstring ("Test 6"). It adds one
+inductance per FET to B at the 100 ps step, with assumed values (not extracted) and the 10 GHz damping resistor.
+
+Changes to the bench, recorded before the rerun:
+
+- reports are saved after every case, because the first test-6 run was interrupted and lost its report;
+- each test-6 transient ends 80 ns after the valley turn-on. In the first run the 0.5 nH gate case stalled (steps of
+  1e-19 s; Gear integration also stalled) at Q1's second turn-off, 150 ns after the valley turn-on, an edge no metric
+  uses. The 2 nH gate case of that run also failed, because I stopped its LTspice process while it was running,
+  mistaking it for an orphan.
+
+Results against B at the same step (from `comparison_to_reference` in the report; values from the generated summary):
+
+| Case (one inductance per FET) | tr (ns) | overshoot (V) | f (MHz) | ζ | change against B |
+|---|---|---|---|---|---|
+| B, 100 ps step | 0.83 | 35.0 | 284 | 0.008 | — |
+| drain 50 pH | 1.10 | 39.7 | 243 | 0.010 | overshoot +12 %, f −14 % |
+| source 50 pH, driver at the die (Kelvin) | 1.10 | 39.7 | 243 | 0.010 | identical to drain 50 pH |
+| source 25 pH, driver at the pad (common-source) | 1.16 | 22.4 | 267 | 0.012 | overshoot −39 %, f −6 % |
+| source 50 pH, driver at the pad (common-source) | 1.51 | 17.4 | 250 | 0.018 | overshoot −51 %, f −11 % |
+| gate 0.5 nH | 0.82 | 36.0 | 283 | 0.008 | overshoot +3 % |
+| gate 2 nH | 0.80 | 38.2 | 282 | 0.008 | overshoot +10 % |
+| drain + source 50 pH (test 5's package case) | 1.67 | 21.3 | 223 | 0.017 | overshoot −43 %, f −21 % |
+
+What this shows:
+
+- **The common-source coupling, not the inductance itself, is what lowers the overshoot.** 50 pH in the source with the
+  driver returning at the die behaves exactly like 50 pH in the drain: more loop inductance, higher overshoot, lower
+  frequency. The same 50 pH with the driver returning at the pad halves the overshoot and slows the edge.
+- **Common-source inductance is the only tested single change that moves the overshoot and rise time towards the
+  measurement while keeping the frequency near it.** At 50 pH the case meets three of the five criteria (rise time,
+  within the digitization range plus a pixel; fall time; frequency 250 MHz, within 10 %). The overshoot (17.4 V
+  against 5.7 V) and the damping (0.018 against about 0.075) still fail, at every tested probe bandwidth.
+- **Test 5's equal drain-and-source package case mixed two opposite effects.** Its frequency drop came mostly from the
+  drain term.
+- **Gate-loop inductance alone is minor and slightly adverse** (0.5–2 nH: overshoot +3 to +10 %).
+- **Layout is therefore not excluded.** The board's own common-source path (the source copper shared by the power loop
+  and the gate-drive return between the FET source pad and the Kelvin via) and the package's source inductance are both
+  unextracted and unpublished, and this path is now a leading candidate. Extracting it (L_cs and L_ks in the parasitic
+  set, plan section 4) is the next simulation step. The values here are an assumed bracket, and the EPC2302 package's
+  internal split between power source and Kelvin source is not known.
+
+Numerical checks, direct on the new configurations:
+
+- gate 0.5 nH at a 50 ps step against 100 ps: every metric within 0.1 % (pass);
+- B-pkg50pH at 50 ps: every metric within 0.1 % of 100 ps, but its spike detector found one 5.2 V single-sample
+  spike 847 ns after the first turn-off, in the flat off-state, far from both measured windows. By the declared rule
+  the case is unusable, so the automatic comparison excludes it. It is recorded as a failed check, not a pass;
+- B-pkg50pH with the 20 GHz damping-resistor corner exceeded 600 s: no result.
+
+So the B package results remain supported by checks on related configurations, as before, plus one direct check that
+formally failed on a spike outside the measured windows.
+
+**Periodic buck equivalence on B. Pass.** Same method as on A, on the full-board network at the 100 ps step, compared
+with the double pulse at the same step (`results/gan/epc90133-switching-periodic-B.json`). After one duty-cycle
+correction, the valley currents of three successive periods are 11.34, 11.33 and 11.32 A (spread 0.17 %), and every
+metric is within 0.7 % of the double pulse: fall time +0.6 %, rise time −0.1 %, overshoot 0.0 %, frequency +0.1 %,
+damping −0.7 %. Scope: ideal driver supplies, 25 °C and an ideal output-voltage source, without package or
+common-source inductance. It is not a check of the physical board.
+
 
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed

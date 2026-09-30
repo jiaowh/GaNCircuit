@@ -71,16 +71,18 @@ The full plan, including its checkpoints (gates G0–G6) and safety rules, is in
 
 ### What doesn't work yet
 - **The prediction doesn't match EPC's measured waveform.** We now read EPC's published waveform (QSG Fig. 9) from
-  its pixels with a declared method, instead of by eye. The ringing frequency agrees: 264 MHz measured, 266–284 MHz
-  simulated with the full board. (The earlier reading of about 0.6 GHz was wrong: the figure is two zoomed
-  screenshots stitched side by side.) The spike does not agree: about 36 V simulated against 5.7 V measured. Our
-  edge is also twice as fast (0.83 ns against 1.68 ns), and our ringing dies away about 7 times more slowly.
+  its pixels with a declared method, and we report how much the reading depends on our choices. (The earlier reading
+  of about 0.6 GHz was wrong: the figure is two zoomed screenshots stitched side by side.) The ringing frequency is
+  close: 262–265 MHz measured against 284 MHz simulated with the full board. The spike is not: about 35 V simulated
+  against 5.7 V measured. Our edge is also twice as fast (0.83 ns against 1.68 ns), and our ringing dies away about
+  7 times more slowly. One screenshot pixel is 0.2 ns, so edge times can only be compared to about that precision.
 
   ![EPC's measured waveform against four simulated cases](results/gan/epc90133-fig9-overlay.png)
 
-  *EPC's measurement (black) against the simulation with the board as extracted (blue), with 50 pH of assumed
-  package inductance (orange), with a weaker gate driver (green), and with extra loss added to damp the ringing (red).
-  The turn-off edge (right) matches. At turn-on (left) every simulated ring is several times larger than the measured one.*
+  *EPC's measurement (black) against the simulation with the board as extracted (blue), with 50 pH added in the
+  transistors' drain path (orange), with 50 pH added in the source path shared with the gate driver (green), and with
+  extra loss added to damp the ringing (red). The turn-off edge (right) matches. At turn-on (left) every simulated ring
+  is larger than the measured one. The shared source path (green) brings it closest without shifting the frequency much.*
 
   ![Simulated switch-node voltage for each board variant at turn-on and turn-off](results/gan/epc90133-switching-waveforms.png)
 
@@ -89,22 +91,28 @@ The full plan, including its checkpoints (gates G0–G6) and safety rules, is in
   48 V supply. Adding more of the board (orange → green → yellow) lowers the spike but does not reach the ~55 V peak read
   from EPC's measurement (dashed line). The turn-off edge barely depends on the layout. The dashed line is an early
   by-eye reading; the digitized peak is 51.5 V (5.7 V above a settled 45.8 V).*
-- **We tested the suspected missing pieces one at a time.** None of them, and no combination we tried, reproduces
-  the measurement:
-  - inductance inside the transistor's package reproduces the slower edge, but it pulls the ringing frequency away
-    from the measurement;
+- **We tested suspected missing pieces one at a time.** No single change, and no combination we tried, reproduces
+  the measurement. What each test shows, within the approximation it used:
+  - **A shared source path is the strongest lead so far.** When a small inductance sits in the part of the transistor's
+    source path that the gate driver's return shares with the power current, it slows the switch-on and halves the
+    spike (35 → 17 V at 50 pH) while the frequency stays close (250 MHz). The same inductance anywhere else in the
+    power path makes things worse. Our board model doesn't yet include this shared path, neither on the board nor in
+    the package, so the layout is not ruled out; it is the next thing to extract.
   - a weaker gate driver lowers the spike without moving the frequency, but not far enough;
-  - the missing Miller charge seen in the datasheet's gate-charge curve lowers the spike a little;
-  - extra energy loss can reproduce the measured damping, but it would need about 60–70 mΩ in the loop, 30 times the
-    copper's resistance, and it barely lowers the first spike;
-  - a slow measuring probe cannot explain it on its own: one slow enough to hide the spike would also slow the edge
-    more than EPC measured.
+  - extra inductance in the gate loop makes little difference;
+  - adding the missing gate charge from the datasheet's gate-charge curve, as one fixed capacitor, lowers the spike a
+    little. The real discrepancy depends on voltage, so this doesn't show that it is small;
+  - extra loss in the capacitors can reproduce the measured damping (it needs about 60–70 mΩ in the loop, 30 times the
+    copper's resistance) but barely lowers the first spike. Loss located elsewhere might behave differently;
+  - a simple bandwidth limit in EPC's probe can't explain it on its own. A probe's loading, its connection point and
+    its own resonances weren't tested and remain possible.
 
-  EPC's measurement also shows a shorter dead time than the board's resistors should set (about 5 ns against 10 ns).
-  The older EPC9097 board showed the same thing, so the gate driver's timing is suspect on both boards.
-- **What would settle it:** the remaining suspects (the real driver, the package, losses inside the transistor and
-  EPC's probe) cannot be told apart from a single published waveform. We would need our own measurements with a
-  known probe.
+  EPC's waveform also has a shorter dead-time step than our model gives for the board's 10 ns setting. Read through our
+  driver model, that suggests about 5 ns. This is an inference that depends on the model, not a measurement of the
+  driver, and the similar EPC9097 result came from the same method.
+- **What would settle it:** first, extract the shared source path and put it in the model. Then our own measurements
+  with a known probe on a known point, designed to tell the remaining explanations apart (driver, package, losses,
+  probe) and repeated at operating conditions not used for tuning.
 
 ### Stage 3: real hardware (not started)
 - We have no board and have made no measurements. That comes later, with safety hardware that works independently
@@ -117,32 +125,38 @@ Its predictions don't match reality yet, and the next job is to find out why.
 
 Done on 29–30 September 2026:
 - the sensitivity runs: the package-inductance spikes were numerical and are removed, and a continuous-operation
-  (periodic buck) run now shows the simplified double-pulse test gives the same edges;
-- EPC's measured waveform, digitized with a declared method;
-- the candidate causes, tested one at a time against it (see above and the
-  [build notes](docs/build.md#epc90133-switching-test-5-candidate-causes-of-the-gap-to-fig-9-g3-diagnosis)).
+  (periodic buck) run shows the simplified double-pulse test gives the same edges, on both the partial and the full
+  board model;
+- EPC's measured waveform, digitized with a declared method and an uncertainty range;
+- the candidate causes, tested one at a time against it, and after an external review the drain, source, shared-source
+  and gate paths separately (see above and the build notes, tests 5 and 6);
+- the comparison code now refuses to give a verdict on any simulation that failed its own checks.
 
-1. **Plan the hardware stage.** This is now the step that can close the gap. Decide whether to buy an EPC90133, list
-   the lab equipment, and design experiments that isolate each suspect:
+1. **Extract the shared source path.** The board copper between each transistor's source pad and the Kelvin via that
+   the gate driver returns to, plus the gate-loop path, with FastHenry, and add them to the model. Test 6 shows that
+   this path can change the spike by half.
+2. **Plan the hardware stage in parallel.** Decide whether to buy an EPC90133, list the lab equipment, and design
+   experiments that separate the remaining explanations, with held-out operating conditions:
    - a known probe on a known point;
    - ringing measured at several currents and bus voltages;
    - dead time measured at the driver outputs;
    - loop inductance measured from the ringing frequency with a known added capacitor.
-2. **Ask EPC** (only on the owner's instruction) which probe, probing point and dead-time setting produced Fig. 9, and
+3. **A first bounded agent run.** One reproducible run that consumes the declared inputs, checks them, produces this
+   comparison and stops correctly, with interventions, failures, time and cost recorded and compared with the plain
+   scripts. So far the evidence is for the tools, not yet for the agent workflow.
+4. **Ask EPC** (only on the owner's instruction) which probe, probing point and dead-time setting produced Fig. 9, and
    whether a package inductance for the EPC2302 is available.
-3. **Driver timing.** The measured dead time is shorter than the nominal setting on both boards. Look for published
-   uP1966E delay data before blaming the layout.
-4. **Add capacitance extraction with FasterCap.** Qualify it on known answers (a parallel-plate capacitor with
+5. **Add capacitance extraction with FasterCap.** Qualify it on known answers (a parallel-plate capacitor with
    fringing, a microstrip line), then replace the rough ~135 pF switch-node estimate with an extracted value. Today's
    bench shows that estimate changes the spike by only about 1 V, so this matters more for switching losses and for our own
    board than for closing the current gap.
-5. **Complete the parasitic set in the extraction interface.** The draft
+6. **Complete the parasitic set in the extraction interface.** The draft
    [parasitic extraction and Agent 2 stop criteria](plans/Layout%20Parasitic%20Extraction%20and%20Agent%202%20Stop%20Criteria.docx),
    adopted with corrections in the [plan](plans/gan-halfbridge-pipeline-plan.md), lists seven "must" parasitics.
    The power-loop three (L_d, L_sw, L_s) are extracted. Common-source inductance, the two gate-loop inductances and
    switch-node capacitance are not yet extracted. The values go into one `parasitics.inc` file that the simulation reads,
    with the coupling between segments kept.
-6. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
+7. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
 
 Gate G3 (stock-board simulation) stays open until the gap with the measurement is explained or bounded.
 
