@@ -1,0 +1,79 @@
+{
+  "schema": "literature-supplement/1",
+  "retrieved": "2026-09-30",
+  "scope": "Targeted source-return extraction and measurement references; separate from concurrent implementation work",
+  "notes": "docs/gan-reference-supplement-2026-09-30.md",
+  "files": [
+    {
+      "title": "EPC AN003: Using Enhancement Mode GaN-on-Silicon Power FETs",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/product-training/using_gan_r4.pdf",
+      "local_path": "vendor/literature/2026-09-30-supplement/EPC_AN003_Using_GaN.pdf",
+      "sha256": "307e0ffbb88fbf8125a1600884eb33a0f6ea6fbc5401f42b3ff17ba4743c11a8",
+      "bytes": 1212292,
+      "pages": 9,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "EPC copyright 2017. No open reuse licence established; keep outside git, cite rather than redistribute.",
+      "review_scope": "Page 3, common-source inductance and gate crosstalk; vendor explanation, not EPC2302 package data"
+    },
+    {
+      "title": "EPC AN023: Accurately Measuring High Speed GaN Transistors",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/application-notes/AN023%20Accurately%20Measuring%20High%20Speed%20GaN%20Transistors.pdf",
+      "local_path": "vendor/literature/2026-09-30-supplement/EPC_AN023_Measuring_High_Speed_GaN.pdf",
+      "sha256": "32ad015ac538945e652a66dd30477e48510bcb9d07ed4d288c7863074316c854",
+      "bytes": 1256874,
+      "pages": 6,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "EPC copyright 2017. No open reuse licence established; keep outside git, cite rather than redistribute.",
+      "review_scope": "Page 4 Table 3 and Figures 7-9; probing connections on EPC9080, not identification of EPC90133 Fig. 9 setup"
+    },
+    {
+      "title": "John Betten: Power Tips: Calculate an R-C Snubber in Seven Steps (SSZTBC7, May 2016)",
+      "url": "https://www.ti.com/lit/pdf/ssztbc7",
+      "local_path": "vendor/literature/2026-09-30-supplement/TI_SSZTBC7_RC_Snubber_Seven_Steps.pdf",
+      "sha256": "2f68135639e2ddaab007e992799371935cc79f9d8cfb3e0e427ae60c1ca98a13",
+      "bytes": 479207,
+      "pages": 3,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "TI copyright 2023 in downloaded copy. Page 3 restricts resource use to development involving described TI products and prohibits other reproduction/display. No open licence; keep outside git. Citation of method does not establish broader reuse permission.",
+      "review_scope": "Pages 1-2 frequency-shift identification method; not a qualified sub-nH GaN measurement recipe"
+    }
+  ],
+  "web_references": [
+    {
+      "title": "Woehrle, Burger, Ambacher: Power Module Design for GaN Transistors Enabling High Switching Speed in Multi-Kilowatt Applications (2023)",
+      "doi": "10.1002/ente.202300460",
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/ente.202300460",
+      "repository": "https://publica.fraunhofer.de/entities/publication/fe5552b0-e231-4ea4-a8eb-d1b4762cffc8",
+      "pdf_url": "https://publica-rest.fraunhofer.de/server/api/core/bitstreams/967756a7-2e84-4166-9dd6-e0ed2d72af97/content",
+      "accessed": "2026-09-30",
+      "status": "Full HTML reviewed, especially section 5 and Tables 1-2. No local PDF: repository connection reset, publisher PDF HTTP 403.",
+      "reuse_terms": "Repository explicitly declares CC BY 4.0; attribute authors and DOI.",
+      "evidence_class": "Published finite-element extraction and circuit simulation for a different 650 V module"
+    },
+    {
+      "title": "Li, Buttay, Pena Quintal, Evans: Investigation of Mutual Inductance on GaN-HEMT Switching in a Half-Bridge Circuit (IEEE DMC 2024)",
+      "url": "https://doi.org/10.1109/DMC62632.2024.10812133",
+      "accessed": "2026-09-30",
+      "status": "Publisher abstract only; no full text downloaded, no accessible author manuscript located",
+      "reuse_terms": "No open licence verified",
+      "evidence_class": "Abstract describes extraction, model reduction and experimental comparison; detailed method not reviewed"
+    },
+    {
+      "title": "Spitaleri, Iannuzzo, Gurpinar, Scelba: Systematic investigation on the effects of tracks' mutual coupling on a GaN-based three-level bridge leg (2025)",
+      "url": "https://doi.org/10.1016/j.pedc.2025.100120",
+      "preprint_record": "https://ssrn.com/abstract=5212922",
+      "accessed": "2026-09-30",
+      "status": "Publisher abstract/highlights and SSRN record only; full PDF not obtained",
+      "reuse_terms": "Publisher marks open access under Creative Commons; exact licence variant not verified",
+      "evidence_class": "Published simulation study; detailed method not reviewed"
+    },
+    {
+      "title": "uPI uP1966E product page",
+      "url": "https://www.upi-semi.com/upisemi/products/ic/gan-solution/gan-fet-driver/up1966e/",
+      "accessed": "2026-09-30",
+      "status": "Web page reviewed; no downloaded EPC file. Existing Aug. 2021 datasheet retained under devices/epc/sources.json.",
+      "reuse_terms": "No open licence verified",
+      "note": "Headline typical timing differs from EPC-hosted 2021 datasheet; resolve revision and conditions before changing calibration"
+    }
+  ]
+}

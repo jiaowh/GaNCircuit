@@ -63,8 +63,10 @@ budget).
 | Buck load (E6) | continuous operation at Fig. 9 conditions | 2.2 µH inductor (QSG), electronic or resistive load for 20 A at 13.8 V | — |
 | Known capacitors | loop inductance by frequency shift (E2) | C0G 0402/0603 of 47, 100 and 220 pF | — |
 | Thermal control | the core scope includes controlled test temperature | thermocouple on the case; heatsink per QSG Fig. 10 | hot plate or chamber for a second temperature |
-| Device analyzer (lab has a B1506A) | H5: EPC2302 gate charge and capacitances measured on spare devices | a fixture or adaptor that fits the EPC2302 package | — |
-| Double-pulse tester (lab has a PD1550A) | device switching in a known fixture, if a fixture for this small GaN package exists | — | — |
+| Device analyzer (lab has a B1506A) | H5: EPC2302 gate charge and capacitances measured on spare devices | fixture option H21, H51 or H71 with the gate-charge socket adapter (gate charge is not available without one of them); a small adapter board for the 3 × 5 mm QFN on the universal socket module (no standard QFN socket is listed) | an option that supports the datasheet gate-charge condition (VDS 50 V, ID 50 A) |
+| Double-pulse tester (lab has a PD1550A) | not suitable here: its standard interface boards take 62 mm and FM3 modules, other packages need a custom board designed with Keysight, and its probes are specified at 200 MHz, too slow for 1.7 ns edges and 264 MHz ringing | — | — |
+| Network or impedance analyzer (E8, optional) | loop inductance of the unpowered board, separating layout from device and driver | VNA to at least 100 MHz with fixture de-embedding, or an impedance analyzer to 120 MHz | — |
+| Second EPC90133 (E8, optional) | shunt-thru measurement needs the FETs removed | one board, not used for switching tests | — |
 
 ## Experiments
 
@@ -96,7 +98,16 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   explains part of Fig. 9.
 - **E7, device characterization (H5), if a fixture exists.** Gate charge, capacitances and RDS(on) of spare EPC2302
   samples on the B1506A, compared with the unmodified model and the datasheet Fig. 7. Only this evidence, if it
-  isolates a device discrepancy, could justify a separately stored tuned model revision.
+  isolates a device discrepancy, could justify a separately stored tuned model revision. Keep the gate drive
+  within the EPC2302 limits (+6/−4 V), start with a sacrificial part, remove the adapter's stray capacitance by
+  open compensation, and record part-to-part spread over several samples.
+- **E8, passive loop inductance (parasitic layer), optional.** On a second, depopulated board: short one FET
+  position and connect a VNA across the other (shunt-thru), then add the input capacitors one group at a time
+  (method: Tranchero et al., Zenodo 20617321, 2026). The alternative, an impedance analyzer with both FETs gated on
+  (Wolfspeed PRD-08710), is blocked on a stock board because the driver prevents both gates being on. Before
+  use: de-embed the fixture and pass a sub-nH known-answer check. Compare with the extracted network, and with E2
+  on the powered board; E2 minus E8 bounds the package contribution, with both measurements' errors.
+  Sources and limits: docs/gan-research-round-2-2026-09-30.md.
 
 ## Held-out conditions and frozen predictions
 
@@ -114,5 +125,8 @@ Report the first held-out score as it is; later corrections create new revisions
 
 1. The lab's oscilloscope and probes (bandwidth, isolated probe, current probe), supplies and pulse generator,
    compared with the checklist above.
-2. Whether spare EPC2302 devices and a B1506A fixture for them can be obtained (E7).
-3. Approval of the envelope and the step-wise bus increase before G4.
+2. Whether spare EPC2302 devices and a B1506A fixture for them can be obtained (E7), and which B1506A fixture
+   option (H21, H51 or H71) the lab has. Open as of 30 September 2026.
+3. Whether a VNA or impedance analyzer is available, and whether a second board may be depopulated (E8). Open as
+   of 30 September 2026.
+4. Approval of the envelope and the step-wise bus increase before G4.
