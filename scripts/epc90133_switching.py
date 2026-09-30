@@ -125,7 +125,8 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
   what package inductance would still be needed on top of the board's;
 * added after an external audit, before the first run: every test 7 case (B included) has a 0 V source in
   Q2's drain, and reports both die VGS extrema and both drain currents around each event, with traces
-  (gate_and_current_diagnostics; reported, not judged). G differs from B in extraction window, local mesh
+  (gate_and_current_diagnostics; reported, not judged), and on G the driver's PHASE-to-GND ball voltage
+  extremes against its -5/+85 V absolute maximum (uP1966E datasheet p. 7). G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
   attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -445,6 +446,11 @@ def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
              "q1_id_max_A": max(w(id1)), "q1_id_min_A": min(w(id1))}
         if id2:
             d.update(q2_id_max_A=max(w(id2)), q2_id_min_A=min(w(id2)))
+        if "v(u80_ph)" in s:
+            # Variant G only: the driver's PHASE ball against its GND ball (uP1966E absolute maximum
+            # -5 V to +85 V, datasheet p. 7). A simulated sensitivity result, not a safe limit.
+            ph = [a - b for a, b in zip(s["v(u80_ph)"], s["v(u80_gnd)"])]
+            d.update(driver_phase_to_gnd_max_V=max(w(ph)), driver_phase_to_gnd_min_V=min(w(ph)))
         out[tag] = d
     return out
 
