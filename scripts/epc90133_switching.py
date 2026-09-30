@@ -137,7 +137,13 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
   their runs: G-m1-mid-ctl-hs (high-side stage ideal, low-side through the extracted copper) and
   G-m1-mid-ctl-ls (the reverse), both against G. They separate the high-side gate loop (Q1's turn-on) from
   the low-side loop (Q2's gate disturbance and possible conduction). The two parts need not add up exactly;
-  their sum against G-ctl is reported, not assumed. G differs from B in extraction window, local mesh
+  their sum against G-ctl is reported, not assumed;
+* coupling check G-m1-mid-nogpk, declared on 1 October 2026 after the split controls and before its run: G with
+  every coupling between a gate-drive branch (driver balls, gate resistors) and a power branch removed (the
+  modified L matrix stays positive definite, minimum eigenvalue 6.27 pH). If the overshoot returns towards G-ctl
+  (32 V), coupling to the power network carries the high-side effect; if it stays near G (25 V), the gate loop's
+  own impedance does. In this branch-port network shared copper also appears as coupling, so the check does not
+  separate magnetic from shared-conductor coupling; the board L_cs of Q1 (0.9 pH) bounds the latter. G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
   attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -210,8 +216,11 @@ def is_gate_extraction(ext):
     return any(p["terminal"] == "U80.PH" for p in ext["ports"])
 
 
-def network(ext, ideal=False, r_scale=1.0):
-    """Branch inductors, resistances and couplings from an extraction report."""
+def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False):
+    """Branch inductors, resistances and couplings from an extraction report.
+
+    no_gate_power_k (test 7 follow-up): drop every coupling between a gate-drive branch (driver balls and gate
+    resistors, STAGE_OF) and a power branch; couplings within each group are kept."""
     L = np.array(ext["L_H"])
     R = np.array(ext["R_ohm"])
     lines = [f"* extracted branch network: {ext['case']}"]
@@ -221,9 +230,12 @@ def network(ext, ideal=False, r_scale=1.0):
         lines.append(f"Lb{k} {node(p['terminal'])} xb{k} {lk:.6g}")
         lines.append(f"Rb{k} xb{k} {node(p['reference'])} {rk:.6g}")
         names.append(f"Lb{k}")
+    gate_br = {k for k, p in enumerate(ext["ports"]) if p["terminal"].split(".")[0] in GATE_PARTS}
     if not ideal:
         for i in range(len(names)):
             for j in range(i + 1, len(names)):
+                if no_gate_power_k and (i in gate_br) != (j in gate_br):
+                    continue
                 kij = L[i, j] / math.sqrt(L[i, i] * L[j, j])
                 lines.append(f"K{i}_{j} Lb{i} Lb{j} {kij:.6g}")
     return "\n".join(lines), [p["terminal"] for p in ext["ports"]]
@@ -245,6 +257,8 @@ def fet(n, gate, dpad, spad, l_d, l_s, l_g, r_corner):
     return lines, ss
 
 
+# Board parts of the gate-drive branches (test 7 coupling check).
+GATE_PARTS = ("U80", "R80", "R81", "R82", "R83")
 # Board elements of each driver stage (test 7 split controls).
 STAGE_OF = {"R80": "u", "R81": "u", "U80.UGH": "u", "U80.UGL": "u", "U80.PH": "u",
             "R82": "l", "R83": "l", "U80.LGH": "l", "U80.LGL": "l", "U80.GND": "l"}
@@ -282,8 +296,8 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
-          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False):
-    net, terms = network(ext, ideal, r_scale)
+          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False):
+    net, terms = network(ext, ideal, r_scale, no_gate_power_k)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
     for c in caps:
@@ -675,7 +689,9 @@ def gateloop_cases(exts):
             f"{g}-ctl": {"ext": g, "base": ref, **common, "gate_ctl": True, "on_request": True},
             # Split controls (declared 1 October 2026 after G-ctl, before their runs): one stage ideal.
             f"{g}-ctl-hs": {"ext": g, "base": g, **common, "gate_ctl": "u", "on_request": True},
-            f"{g}-ctl-ls": {"ext": g, "base": g, **common, "gate_ctl": "l", "on_request": True}}
+            f"{g}-ctl-ls": {"ext": g, "base": g, **common, "gate_ctl": "l", "on_request": True},
+            # Coupling check (declared 1 October 2026 after the split controls, before its run).
+            f"{g}-nogpk": {"ext": g, "base": g, **common, "no_gate_power_k": True, "on_request": True}}
 
 
 def main():
@@ -775,7 +791,8 @@ def main():
                   r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
                   esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
-                  t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False))
+                  t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
+                  no_gate_power_k=c.get("no_gate_power_k", False))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
