@@ -390,7 +390,7 @@ Measured (vendor-described; probe, bandwidth and probing point not stated):
 | falling (Q1 turns off at the peak current) | 90–10 % fall | 3.63 ns |
 | | undershoot below settled level | 4.6 V, no ringing above pixel noise |
 
-**Digitization uncertainty** (added 30 September 2026 after an external review; method in the digitizer's
+**Declared extraction range** (added 30 September 2026 after an external review; method in the digitizer's
 docstring). Each metric is recomputed over 324 combinations of reasonable extraction choices (rising edge; 54 for
 the falling edge): two trace estimators, three settled-level windows, two ring-fit starts, three ring-fit ends,
 and the grid pitch at ±2 standard errors. Ranges: rise 1.67–1.69 ns, overshoot 5.69–5.73 V, ringing 262–265 MHz
@@ -398,13 +398,17 @@ and the grid pitch at ±2 standard errors. Ranges: rise 1.67–1.69 ns, overshoo
 3.62–3.64 ns. One pixel is 0.20 ns and 0.31 V, so edge times are known to about a pixel, not to the second
 decimal. These ranges cover the extraction choices only. They do not cover the unknown probe, probing point or
 scope processing behind the screenshot, nor systematic effects of line rendering. A simulated value counts as
-"consistent within digitization uncertainty" if it lies inside the range widened by one pixel (time and voltage) or
-inside the range (frequency and damping).
+"consistent with the declared extraction range" if it lies inside the range widened by one pixel (time and voltage) or
+inside the range (frequency and damping). A second review (30 September 2026) noted that these ranges measure sensitivity to
+the processing choices only. They are not a complete uncertainty interval: the unknown probe response, the
+failed volt-scale check and other raster or fit errors are outside them. So "consistent" here means consistent
+with the declared extraction range, and the narrow 262–265 MHz range should not be read as the frequency's
+full uncertainty.
 
 **Correction to the earlier by-eye reading.** The by-eye values in the tables above (about 7 V, about 0.6 GHz)
 came from the stitched picture. The digitized ringing is 262–265 MHz. Extraction variants I (266 MHz) and B
 (282 MHz) are within 1–8 % of it, so the earlier statement that "no variant resembles the measurement" was wrong
-for frequency, although neither variant lies inside the digitization range. The large gaps are the overshoot
+for frequency, although neither variant lies inside the declared extraction range. The large gaps are the overshoot
 (B 35 V against 5.7 V), the rise time (0.83 against 1.68 ns) and the damping (B damping ratio about 0.008–0.010
 against 0.072–0.077).
 
@@ -483,7 +487,7 @@ These checks support the B package results as exploratory evidence. If a B packa
 decision, it has to be verified directly.
 
 Results: the generated table [`results/gan/epc90133-fig9-summary.md`](../results/gan/epc90133-fig9-summary.md)
-(ideal probe; digitization range; criteria passed at any bandwidth). It is written by
+(ideal probe; declared extraction range; criteria passed at any bandwidth). It is written by
 `scripts/compare_epc90133_fig9.py` from the comparison report and is the single source for headline numbers. The
 values quoted below come from it. The damping ratio there comes from the digitizer's damped-cosine fit; the bench's
 own log-decrement value is slightly higher (0.010 for B). The 1 Ω ESR case first exceeded 600 s at 20 ps; it is
@@ -584,7 +588,7 @@ What this shows:
   frequency. The same 50 pH with the driver returning at the pad halves the overshoot and slows the edge.
 - **Common-source inductance is the only tested single change that moves the overshoot and rise time towards the
   measurement while keeping the frequency near it.** At 50 pH the case meets three of the five criteria (rise time,
-  within the digitization range plus a pixel; fall time; frequency 250 MHz, within 10 %). The overshoot (17.4 V
+  within the declared extraction range plus a pixel; fall time; frequency 250 MHz, within 10 %). The overshoot (17.4 V
   against 5.7 V) and the damping (0.018 against about 0.075) still fail, at every tested probe bandwidth.
 - **Test 5's equal drain-and-source package case mixed two opposite effects.** Its frequency drop came mostly from the
   drain term.
@@ -605,6 +609,19 @@ Numerical checks, direct on the new configurations:
 
 So the B package results remain supported by checks on related configurations, as before, plus one direct check that
 formally failed on a spike outside the measured windows.
+
+Direct checks of the leading common-source case, B-Ls50-csi (second review, 30 September 2026;
+`results/gan/epc90133-switching-csi-checks.json`). All pass, and none is material:
+
+| Check | overshoot | rise | frequency | damping ratio |
+|---|---|---|---|---|
+| 50 ps step instead of 100 ps | 0.0 % | 0.0 % | 0.0 % | 0.0 % |
+| damping-resistor corner 20 GHz instead of 10 GHz | +0.7 % | −0.2 % | −0.1 % | −7.8 % |
+| damping-resistor corner 5 GHz | −1.4 % | +0.3 % | 0.0 % | +15.7 % |
+
+The overshoot, rise time and frequency of this case are numerically stable to about 1.5 %. Its damping ratio is
+partly set by the numerical damping resistors (−8 to +16 %), so it should be quoted with that spread. In the same
+run, device metrics moved to die terminals: Q1's peak Vds reads 52.09 V at the die against 51.75 V at the pad.
 
 **Periodic buck equivalence on B. Pass.** Same method as on A, on the full-board network at the 100 ps step, compared
 with the double pulse at the same step (`results/gan/epc90133-switching-periodic-B.json`). After one duty-cycle

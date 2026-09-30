@@ -58,7 +58,9 @@ recomputed over all combinations of these extraction choices:
 * grid pitch: detected value and +/- two standard errors of its least-squares
   fit, on each axis.
 Each metric is reported with the range over the combinations and with the pixel
-resolution. Rule for "consistent within digitization uncertainty" (used by
+resolution. The ranges are an extraction-choice sensitivity, not a complete uncertainty interval: they
+exclude the unknown probe response, the failed volt-scale check and other raster or fit errors (second
+review, 30 September 2026). Rule for "consistent with the declared extraction range" (used by
 scripts/compare_epc90133_fig9.py): a simulated value lies inside the range widened
 by one pixel (time and voltage metrics) or inside the range itself (frequency and
 damping, which are fits over many pixels). Point estimates finer than this are
