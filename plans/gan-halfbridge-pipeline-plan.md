@@ -509,7 +509,7 @@ Updated 29 September 2026 (owner review of the via check):
    structurally excluded from comparisons and verdicts, and reports bind their inputs by hash;
    (b) bound the omitted gate and source-return paths with cases that separate gate, common-source,
    drain and source inductance (test 6), and extract those paths if the bound is material;
-   (c) develop the hardware plan in parallel. It should test explicit competing explanations and
+   (c) develop the hardware plan in parallel (draft v0.1: docs/epc90133-hardware-test-plan.md, not approved). It should test explicit competing explanations and
    include held-out operating conditions, not seek one matching waveform.
 7. Agent-workflow milestone (review item 7). The project has stronger evidence for its engineering
    tools than for an agent-driven contribution: the I-1/I-2/I-3 schemas are open, the GaN studies do

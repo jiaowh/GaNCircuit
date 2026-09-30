@@ -137,7 +137,9 @@ Done on 29–30 September 2026:
    this path can change the spike by half.
 2. **Plan the hardware stage in parallel.** An EPC90133 will be bought (owner decision, 30 September 2026). The lab
    equipment for board measurements is being checked; the lab's B1506A and PD1550A are device testers, not board
-   testers. The experiments should separate the remaining explanations and include held-out operating conditions:
+   testers. A draft plan, for review, is in [docs/epc90133-hardware-test-plan.md](docs/epc90133-hardware-test-plan.md),
+   with an equipment checklist. The experiments should separate the remaining explanations and include held-out
+   operating conditions:
    - a known probe on a known point;
    - ringing measured at several currents and bus voltages;
    - dead time measured at the driver outputs;
