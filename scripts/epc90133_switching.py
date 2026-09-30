@@ -131,7 +131,13 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
   G-B difference is material: G's network with B's gate drive (ideal stages at the gate pads returning at
   the source junction, the driver-ball and gate-resistor copper left open). G-ctl against B isolates the
   extraction window, local mesh and source-terminal representation; G against G-ctl isolates what the
-  board's gate-drive and shared source paths add. Its PHASE-ball values are not meaningful (open copper). G differs from B in extraction window, local mesh
+  board's gate-drive and shared source paths add. Its PHASE-ball values are not meaningful (open copper);
+* split controls, declared on 1 October 2026 after G-ctl showed that the gate-drive copper accounts for about
+  two thirds of the G-B overshoot change together with a Q2 gate peak of 2.0 V (1.07 V in G-ctl), before
+  their runs: G-m1-mid-ctl-hs (high-side stage ideal, low-side through the extracted copper) and
+  G-m1-mid-ctl-ls (the reverse), both against G. They separate the high-side gate loop (Q1's turn-on) from
+  the low-side loop (Q2's gate disturbance and possible conduction). The two parts need not add up exactly;
+  their sum against G-ctl is reported, not assumed. G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
   attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -239,7 +245,12 @@ def fet(n, gate, dpad, spad, l_d, l_s, l_g, r_corner):
     return lines, ss
 
 
-def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
+# Board elements of each driver stage (test 7 split controls).
+STAGE_OF = {"R80": "u", "R81": "u", "U80.UGH": "u", "U80.UGL": "u", "U80.PH": "u",
+            "R82": "l", "R83": "l", "U80.LGH": "l", "U80.LGL": "l", "U80.GND": "l"}
+
+
+def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l")):
     """Test 7: uP1966E stages at the extracted ball terminals, gate resistors between their pad terminals.
 
     drive_stage ties its pull-up and pull-down resistors to one gate node; here the pull-down resistor is
@@ -248,14 +259,25 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
     out = []
     for tag, ref, vdd, edges, up, dn in (("u", "u80_ph", VBOOT, hi, "u80_ugh", "u80_ugl"),
                                           ("l", "u80_gnd", VCC, lo, "u80_lgh", "u80_lgl")):
+        if tag not in stages:
+            continue
         text = drive_stage(tag, ref, vdd, edges, te_rise, te_fall, up, r_src, r_snk, 0.0, 0.0, t_end).rstrip()
         old = f"R{tag}d {up} pd{tag}"
         if text.count(old) != 1:
             raise RuntimeError("drive_stage output changed; cannot split its outputs")
         out.append(text.replace(old, f"R{tag}d {dn} pd{tag}"))
     for ref, ohm in (("R80", R_GON), ("R81", R_GOFF), ("R82", R_GON), ("R83", R_GOFF)):
+        if STAGE_OF[ref] not in stages:
+            continue
         out.append(f"{ref} {ref.lower()}_d {ref.lower()}_g {max(ohm, 1e-3):g}")
     return out
+
+
+def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
+    """B's ideal stage for one FET of the G network, at its gate pad, returning at its source junction."""
+    if tag == "u":
+        return drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip()
+    return drive_stage("l", "q2_s", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip()
 
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
@@ -357,8 +379,11 @@ Rbret bn {node(at + '.GND')} 1u"""
             # copper is left open; 1 Gohm bleeders keep those nodes defined.
             if ls:
                 raise ValueError("the gate control case takes no package inductance")
+            # gate_ctl True: both stages ideal; "u" or "l": only that stage (split control, test 7 follow-up).
+            ideal_st = ("u", "l") if gate_ctl is True else (gate_ctl,)
+            owner = lambda t: STAGE_OF.get(t, STAGE_OF.get(t.split(".")[0]))
             gate_nodes = sorted({node(t) for p_ in ext["ports"] for t in (p_["terminal"], p_["reference"])
-                                 if t.startswith(("U80.", "R80.", "R81.", "R82.", "R83."))})
+                                 if owner(t) in ideal_st})
             fet2 += [f"Rbleed_{nd} {nd} 0 1e9" for nd in gate_nodes]
             s2_die = "q2_s"
     else:
@@ -375,7 +400,10 @@ Rbret bn {node(at + '.GND')} 1u"""
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext and not gate_ctl else [
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext and not gate_ctl else
+          gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=[x for x in ("u", "l") if x != gate_ctl])
+          + [ideal_stage(gate_ctl, hi, lo, te_rise, te_fall, r_src, r_snk, t_end)]
+          if g_ext and gate_ctl in ("u", "l") else [
             # Drivers return at the source pads (common-source coupling through l_s) or, with kelvin, at the die source.
             drive_stage("u", s1_die if kelvin else "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF,
                         t_end).rstrip(),
@@ -644,7 +672,10 @@ def gateloop_cases(exts):
             f"{g}-Ls25": {"ext": g, "base": g, **common, "l_s": 25e-12},
             f"{g}-Ls50": {"ext": g, "base": g, **common, "l_s": 50e-12},
             # Matched control (declared before G's first result; run with --only when G-B is material).
-            f"{g}-ctl": {"ext": g, "base": ref, **common, "gate_ctl": True, "on_request": True}}
+            f"{g}-ctl": {"ext": g, "base": ref, **common, "gate_ctl": True, "on_request": True},
+            # Split controls (declared 1 October 2026 after G-ctl, before their runs): one stage ideal.
+            f"{g}-ctl-hs": {"ext": g, "base": g, **common, "gate_ctl": "u", "on_request": True},
+            f"{g}-ctl-ls": {"ext": g, "base": g, **common, "gate_ctl": "l", "on_request": True}}
 
 
 def main():
