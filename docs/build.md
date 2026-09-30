@@ -610,6 +610,19 @@ Numerical checks, direct on the new configurations:
 So the B package results remain supported by checks on related configurations, as before, plus one direct check that
 formally failed on a spike outside the measured windows.
 
+Direct checks of the leading common-source case, B-Ls50-csi (second review, 30 September 2026;
+`results/gan/epc90133-switching-csi-checks.json`). All pass, and none is material:
+
+| Check | overshoot | rise | frequency | damping ratio |
+|---|---|---|---|---|
+| 50 ps step instead of 100 ps | 0.0 % | 0.0 % | 0.0 % | 0.0 % |
+| damping-resistor corner 20 GHz instead of 10 GHz | +0.7 % | −0.2 % | −0.1 % | −7.8 % |
+| damping-resistor corner 5 GHz | −1.4 % | +0.3 % | 0.0 % | +15.7 % |
+
+The overshoot, rise time and frequency of this case are numerically stable to about 1.5 %. Its damping ratio is
+partly set by the numerical damping resistors (−8 to +16 %), so it should be quoted with that spread. In the same
+run, device metrics moved to die terminals: Q1's peak Vds reads 52.09 V at the die against 51.75 V at the pad.
+
 **Periodic buck equivalence on B. Pass.** Same method as on A, on the full-board network at the 100 ps step, compared
 with the double pulse at the same step (`results/gan/epc90133-switching-periodic-B.json`). After one duty-cycle
 correction, the valley currents of three successive periods are 11.34, 11.33 and 11.32 A (spread 0.17 %), and every
