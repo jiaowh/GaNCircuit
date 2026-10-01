@@ -1,0 +1,76 @@
+{
+  "schema": "epc90133-first-principles/1",
+  "scope": "Analytical scale checks on frozen Fig. 9 metrics, not a fitted board model.\n\nMaps the fitted damped sinusoid to a hypothetical single series RLC mode and\ncompares excitation/decay scales. The board is nonlinear and multiport; its\ndiagnostic loop L is not established as that mode's L. No simulator is invoked.",
+  "inputs": {
+    "results/gan/epc90133-fig9-comparison.json": "e73f30f020f54e608bc27a432acb8486856f5333aefa7050da306cfd74e2b531",
+    "results/gan/epc90133-extraction/G-m1-mid.json": "d1b5a9adc1e6ea24a0835de25cce0663acb3bd097ff4cd75a4e5f02d31cb2693",
+    "results/gan/epc90133-network-transfer-audit.json": "d133f2fb86143dece9010cf84df2f20096763263e6631d1bed76a9e8a256e381"
+  },
+  "evaluator_sha256": "970748f3f0dd33eecc07ed58da6c97de22d9f96f9e4e9dfaa9781e944272d2af",
+  "single_mode_hypotheses_not_board_parameter_estimates": {
+    "board_diagnostic_L_only": {
+      "assumed_modal_L_H": 2.574481089070031e-10,
+      "measured_mode": {
+        "alpha_per_s": 127632450.2426882,
+        "damping_ratio_exact": 0.07671729602580403,
+        "amplitude_remaining_per_cycle": 0.6166499359474983,
+        "modal_energy_remaining_per_cycle": 0.38025714350405365,
+        "R_equivalent_ohm": 0.0657174659002945,
+        "C_equivalent_F": 1.4033779709939793e-09,
+        "first_peak_attenuation_for_initial_current": 0.89140652429993
+      },
+      "simulated_mode": {
+        "alpha_per_s": 41227561.64404582,
+        "damping_ratio_exact": 0.02505374157512729,
+        "amplitude_remaining_per_cycle": 0.8543052368488842,
+        "modal_energy_remaining_per_cycle": 0.729837437707428,
+        "R_equivalent_ohm": 0.021227915560212987,
+        "C_equivalent_F": 1.4344327143316595e-09,
+        "first_peak_attenuation_for_initial_current": 0.9620020191099055
+      },
+      "equivalent_R_gap_ohm": 0.04448955034008151,
+      "omitted_R_fraction_of_equivalent_gap": 0.022472316122875043
+    },
+    "board_plus_two_assumed_50pH_sources": {
+      "assumed_modal_L_H": 3.5744810890700314e-10,
+      "measured_mode": {
+        "alpha_per_s": 127632450.2426882,
+        "damping_ratio_exact": 0.07671729602580403,
+        "amplitude_remaining_per_cycle": 0.6166499359474983,
+        "modal_energy_remaining_per_cycle": 0.38025714350405365,
+        "R_equivalent_ohm": 0.09124395594883214,
+        "C_equivalent_F": 1.0107677050493089e-09,
+        "first_peak_attenuation_for_initial_current": 0.89140652429993
+      },
+      "simulated_mode": {
+        "alpha_per_s": 41227561.64404582,
+        "damping_ratio_exact": 0.02505374157512729,
+        "amplitude_remaining_per_cycle": 0.8543052368488842,
+        "modal_energy_remaining_per_cycle": 0.729837437707428,
+        "R_equivalent_ohm": 0.029473427889022154,
+        "C_equivalent_F": 1.033134545845656e-09,
+        "first_peak_attenuation_for_initial_current": 0.9620020191099055
+      },
+      "equivalent_R_gap_ohm": 0.06177052805980998,
+      "omitted_R_fraction_of_equivalent_gap": 0.01618544103166519
+    }
+  },
+  "overshoot": {
+    "measured_to_simulated_ratio": 0.5051572290678658,
+    "same_initial_current_and_LC_damping_only_ratio": 0.9266160637840509,
+    "residual_excitation_or_observation_factor_in_this_approximation": 0.5451634704075163,
+    "measured_if_voltage_scale_rescaled_to_48V": 5.970370580960638
+  },
+  "Gaussian_gain_at_measured_ring_frequency": {
+    "350000000.0": 0.8210395496534518,
+    "500000000.0": 0.9079007985073114,
+    "1000000000.0": 0.9761343583754931,
+    "2000000000.0": 0.9939794367205603
+  },
+  "bootstrap_charge_scale": {
+    "assumed_gate_charge_C": 2.3e-08,
+    "nominal_C81_F": 1e-07,
+    "Q_over_C_V": 0.23,
+    "scope": "charge scale only; not a predicted droop; recharge, bias derating and driver current omitted"
+  }
+}
