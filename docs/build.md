@@ -730,6 +730,11 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   1.51 V, and the datasheet allows 0.8–2.5 V. The terminal currents include capacitive current, so channel
   conduction is not measured directly. This is a false-turn-on margin question for the hardware (the Q2
   gate probe in the plan), and it means the lower overshoot cannot be read as an improved design.
+  *Corrected by test 9 (below):* these are the vendor model's terminal voltages, not its channel-control
+  voltage behind the internal 0.5 Ω rg, and the 1.07 V figure is Q2's own turn-off tail at the start of the
+  diagnostics window, not the rise. During the rise, Q2's internal VGS stays below about 1 V and its channel
+  does not conduct in any completed case, so comparing the 2.0 V terminal peak with DC conduction overstated
+  the evidence for false turn-on within the model.
 - **With assumed package source inductance, G moves closer to Fig. 9 than B did.** In the Fig. 9 comparison
   ([summary](../results/gan/epc90133-fig9-summary.md)), G+50 pH passes rise time, fall time and frequency
   (1.66 ns, 3.93 ns, 262 MHz), as B-Ls50-csi did, with a lower overshoot (11.3 V against 17.4 V). G+25 pH passes
@@ -834,6 +839,41 @@ This simulation baseline is frozen here (external review, 1 October 2026): the o
 test 8 variants stay as separate, recorded cases, and no finer G mesh, broad sweep or tuning is justified by the
 current decisions. The PHASE-to-GND undershoot near the driver is a measurement item and a stop criterion in the
 hardware plan. Simulated sensitivity results, not a safe limit.
+
+### EPC90133 switching test 9: full extracted resistance and vendor-model internal nodes
+
+After an external method audit (1 October 2026, [audit](epc90133-simulation-method-audit-2026-10-01.md)):
+the bench's branch network kept the full inductance and coupling matrices but only the diagonal resistance.
+`scripts/audit_epc90133_network_transfer.py` (the auditor's) shows the diagnostic loop resistance at 100 MHz
+falls from 2.03 to 1.12 mΩ (B) and 1.03 mΩ (G). Network revision `full_r` (opt-in; the baseline stays as it
+was) keeps each branch's resistor and adds the off-diagonal terms as a behavioural source.
+`scripts/qualify_epc90133_network_transfer.py` checks it in LTspice AC at 100 MHz
+([result](../results/gan/epc90133-network-transfer-qualification.json)): a synthetic known-answer network
+(error 3e-7), the diagnostic loading of B and G against the auditor's independent solve, and the complete
+35-port (B) and 47-port (G) open-circuit impedance matrices against R + jωL (about 1e-6), for both
+representations. Run 1 stopped because a behavioural source carrying the whole row formed source/inductor
+loops that LTspice rejects; the split form fixed it. This qualifies the representation at 100 MHz, not the
+extraction's accuracy or any transient's numerical convergence.
+
+Test 9 (`--study fullr`, declared before its runs) also saves the vendor model's internal nodes
+(`V(x*:gate)`, `V(x*:source)`, `I(x*:bswitch)`) without changing the model.
+[Report](../results/gan/epc90133-switching-fullr.json);
+[assessment](../results/gan/epc90133-test9-assessment.json) (`scripts/assess_epc90133_test9.py`).
+
+- **Reproduction:** the baseline reruns (B, G, G + 50 pH) match test 7 exactly on every switching metric.
+- **Full R on B changes nothing material:** overshoot 35.65 → 35.56 V, frequency +0.01 %, damping ratio
+  0.0104 → 0.0112 (+8 %, below the materiality threshold).
+- **The three full-R G cases timed out** at 3600 s (the dense behavioural coupling of 47 branches makes each
+  step slow). They are kept as failed runs; the G step check was not evaluated. Test 10's small-signal analysis
+  gives the full-R effect on G's ring without a transient.
+- **Q2 does not conduct during Q1's turn-on, within the model.** During the rise (from 1 ns before the switch
+  node passes 10 % to +60 ns), Q2's internal VGS peaks at 0.56 V (B), 0.87 V (G) and 1.01 V (G + 50 pH),
+  against terminal peaks of 0.26, 2.00 and 1.93 V, and its channel current never goes positive. The terminal
+  spike on G is a fast voltage between the extracted gate path and the model's internal rg that does not reach
+  the channel-control node. The report's own diagnostics window (from −5 ns) starts in Q2's turn-off tail,
+  which is where its 2.4–2.7 V internal maxima and test 7's 1.07 V "without the low-side path" come from; the
+  assessment uses the rise window instead. These are model diagnostics: the physical device's internal gate
+  network is not characterized, so the Q2 gate measurement in the hardware plan stays.
 
 ### LTspice installation
 

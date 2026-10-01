@@ -66,9 +66,11 @@ not, beyond that uncertainty.
   FET limit (100 V) and the driver's PHASE/BOOT ratings (above) before the next step.
   **The simulated overshoots are sensitivity results, not a safe envelope**: the unvalidated full-board simulation
   reaches about 84 V at 48 V, which would already exceed the driver's ratings.
-- Low-side false turn-on: in simulation (test 7, docs/build.md) the board's low-side gate path lifts Q2's die
-  gate-source voltage to about 2.0 V during Q1's turn-on at 48 V and 11 A (2.4 V if Q1 switches faster), above
-  the model's 1.51 V threshold and inside the datasheet's 0.8–2.5 V range. Q2's gate-source voltage is therefore
+- Low-side false turn-on: in simulation (test 7, docs/build.md) the board's low-side gate path produces a
+  spike of about 2.0 V at Q2's model terminals during Q1's turn-on at 48 V and 11 A. Test 9 shows that inside
+  the vendor model, behind its internal gate resistance, the channel-control voltage stays below about 1 V and
+  the channel does not conduct. The physical device's internal gate network is not characterized, and the
+  datasheet allows a threshold down to 0.8 V, so the measurement stays. Q2's gate-source voltage is therefore
   measured from the first energized step, and its trend with bus voltage and current is a stop criterion before
   each step up. The simulated values are sensitivities, not limits.
 - Shoot-through: since the driver has no lockout, the PWM source and the board's input circuitry must be shown

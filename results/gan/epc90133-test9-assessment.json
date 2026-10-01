@@ -1,0 +1,191 @@
+{
+ "schema": "epc90133-test9-assessment/1",
+ "inputs": {
+  "results/gan/epc90133-switching-fullr.json": "5a28c986351d88c09a48feecc15d848b5dfe32e730dedfa02c779cdc48a44e7c",
+  "results/gan/epc90133-switching-gateloop.json": "484f151498b4b4027cfde958916158bdaa79913d6cff3df6960cee15e481b255"
+ },
+ "evaluator_sha256": "b874bf8bfb75f700ee96e801949b8ae432bee12d93238fde7dcf791084218ca0",
+ "reproduction_of_test7": {
+  "B-m1-mid-ms100": {
+   "max_abs_rel_change": 0.0,
+   "pass": true
+  },
+  "G-m1-mid": {
+   "max_abs_rel_change": 0.0,
+   "pass": true
+  },
+  "G-m1-mid-Ls50": {
+   "max_abs_rel_change": 0.0,
+   "pass": true
+  }
+ },
+ "case_status": {
+  "B-m1-mid-ms100": {
+   "usable": true,
+   "failure": null
+  },
+  "B-m1-mid-ms100-fullR": {
+   "usable": true,
+   "failure": null
+  },
+  "G-m1-mid": {
+   "usable": true,
+   "failure": null
+  },
+  "G-m1-mid-fullR": {
+   "usable": false,
+   "failure": "timeout"
+  },
+  "G-m1-mid-fullR-ms50": {
+   "usable": false,
+   "failure": "timeout"
+  },
+  "G-m1-mid-Ls50": {
+   "usable": true,
+   "failure": null
+  },
+  "G-m1-mid-Ls50-fullR": {
+   "usable": false,
+   "failure": "timeout"
+  }
+ },
+ "full_R_materiality": {
+  "B-m1-mid-ms100-fullR": {
+   "compared_with": "B-m1-mid-ms100",
+   "sw_fall_time_90_10_s": {
+    "reference": 4.078907195050432e-09,
+    "case": 4.074205770353612e-09,
+    "relative_change": -0.0011526186971170399,
+    "material": false
+   },
+   "sw_rise_time_10_90_s": {
+    "reference": 8.258631096970826e-10,
+    "case": 8.263209155035236e-10,
+    "relative_change": 0.0005543361860646612,
+    "material": false
+   },
+   "sw_overshoot_above_bus_V": {
+    "reference": 35.654881271599194,
+    "case": 35.5615425258107,
+    "relative_change": -0.002617839197878414,
+    "material": false
+   },
+   "ringing_frequency_Hz": {
+    "reference": 282542818.03910047,
+    "case": 282563163.30113655,
+    "relative_change": 7.200771259126322e-05,
+    "material": false
+   },
+   "ringing_damping_ratio": {
+    "reference": 0.010402314016538043,
+    "case": 0.011239628298590945,
+    "relative_change": 0.08049307882089546,
+    "material": false
+   }
+  },
+  "G-m1-mid-fullR": {
+   "compared_with": "G-m1-mid",
+   "excluded": "case or base failed its checks or is declared invalid",
+   "case_usable": false,
+   "base_usable": true,
+   "case_invalid": false,
+   "base_invalid": false
+  },
+  "G-m1-mid-fullR-ms50": {
+   "compared_with": "G-m1-mid-fullR",
+   "excluded": "case or base failed its checks or is declared invalid",
+   "case_usable": false,
+   "base_usable": false,
+   "case_invalid": false,
+   "base_invalid": false
+  },
+  "G-m1-mid-Ls50-fullR": {
+   "compared_with": "G-m1-mid-Ls50",
+   "excluded": "case or base failed its checks or is declared invalid",
+   "case_usable": false,
+   "base_usable": true,
+   "case_invalid": false,
+   "base_invalid": false
+  }
+ },
+ "step_check_G_fullR": "not evaluated: G-m1-mid-fullR and -ms50 timed out (3600 s)",
+ "q2_q1_during_rise": {
+  "B-m1-mid-ms100": {
+   "rise_start_after_command_s": 1.0000000000000004e-08,
+   "q1": {
+    "terminal_vgs_max_V": 4.98949,
+    "terminal_vgs_min_V": 2.88102,
+    "internal_vgs_max_V": 4.97853,
+    "internal_vgs_min_V": 2.25602,
+    "channel_current_max_A": 120.80888,
+    "channel_current_min_A": -52.84947
+   },
+   "q2": {
+    "terminal_vgs_max_V": 0.2547,
+    "terminal_vgs_min_V": -0.03143,
+    "internal_vgs_max_V": 0.5582,
+    "internal_vgs_min_V": -0.06884,
+    "channel_current_max_A": 0.0,
+    "channel_current_min_A": -2.81759
+   }
+  },
+  "B-m1-mid-ms100-fullR": {
+   "rise_start_after_command_s": 1.0000000000000004e-08,
+   "q1": {
+    "terminal_vgs_max_V": 4.98879,
+    "terminal_vgs_min_V": 2.88104,
+    "internal_vgs_max_V": 4.97808,
+    "internal_vgs_min_V": 2.25605,
+    "channel_current_max_A": 120.8118,
+    "channel_current_min_A": -52.60352
+   },
+   "q2": {
+    "terminal_vgs_max_V": 0.25466,
+    "terminal_vgs_min_V": -0.03048,
+    "internal_vgs_max_V": 0.55813,
+    "internal_vgs_min_V": -0.06672,
+    "channel_current_max_A": 0.0,
+    "channel_current_min_A": -2.8189
+   }
+  },
+  "G-m1-mid": {
+   "rise_start_after_command_s": 1.0150000000000002e-08,
+   "q1": {
+    "terminal_vgs_max_V": 5.03787,
+    "terminal_vgs_min_V": 2.84809,
+    "internal_vgs_max_V": 4.9812,
+    "internal_vgs_min_V": 2.24233,
+    "channel_current_max_A": 116.50407,
+    "channel_current_min_A": -35.95777
+   },
+   "q2": {
+    "terminal_vgs_max_V": 2.00369,
+    "terminal_vgs_min_V": -1.25667,
+    "internal_vgs_max_V": 0.87098,
+    "internal_vgs_min_V": -0.32042,
+    "channel_current_max_A": 2e-05,
+    "channel_current_min_A": -3.05916
+   }
+  },
+  "G-m1-mid-Ls50": {
+   "rise_start_after_command_s": 1.0250000000000002e-08,
+   "q1": {
+    "terminal_vgs_max_V": 5.03235,
+    "terminal_vgs_min_V": 2.40408,
+    "internal_vgs_max_V": 4.97294,
+    "internal_vgs_min_V": 2.2373,
+    "channel_current_max_A": 104.26698,
+    "channel_current_min_A": -9.02359
+   },
+   "q2": {
+    "terminal_vgs_max_V": 1.93134,
+    "terminal_vgs_min_V": -1.88469,
+    "internal_vgs_max_V": 1.00796,
+    "internal_vgs_min_V": -0.67761,
+    "channel_current_max_A": 7e-05,
+    "channel_current_min_A": -2.30051
+   }
+  }
+ },
+ "reading": "Within the vendor model, Q2's channel does not conduct during Q1's turn-on in any completed case: its internal VGS stays below about 1 V while the terminal VGS reaches up to 2 V. The terminal peak does not reach the channel-control node. This is a model diagnostic; it says nothing about the physical device's internal gate network."
+}

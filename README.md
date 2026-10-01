@@ -197,8 +197,10 @@ approximations stated; none of them yet reproduces the measurement on every crit
     path (driver, gate resistor, gate) as the mechanism within this model: at 100 MHz and zero gate current it is
     equivalent to about 10 pH of common-source inductance, which would slow the high-side turn-on. That calculation
     does not separate the coupling from the gate path's own impedance during switching;
-  - the low-side path adds damping. It also lifts the low-side transistor's gate to about 2 V during the high-side
-    turn-on, above the model's 1.5 V threshold, so the low side may partly conduct. Its gate return shares 48 pH with
+  - the low-side path adds damping. It also produces a spike of about 2 V at the low-side transistor's model
+    terminals during the high-side turn-on. Inside the model, behind its internal gate resistance, the
+    channel-control voltage stays below about 1 V and the channel does not conduct, so this is not evidence of
+    false turn-on in the model; the real device still needs a measurement. Its gate return shares 48 pH with
     the power loop. A lower overshoot bought this way is not a better design.
 - **Common-source inductance in the package** is the remaining lead. Adding an assumed 50 pH of package source
   inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice
