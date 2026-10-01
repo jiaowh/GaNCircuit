@@ -189,6 +189,22 @@ does, no parameter is adjusted to Fig. 9. The internal Q2 VGS and channel curren
 reported, not judged (no threshold declared); they replace the terminal-VGS-against-DC-current reading of test 7
 for the false-turn-on question inside the model.
 
+Test 11 (--study driver; declared 2 October 2026 after the first-principles review, before any run): does the
+excitation depend on how the driver output stage is represented, within what the uP1966E datasheet constrains?
+The datasheet (p. 8) gives output resistance at 500 mA (0.7/1.4 ohm typical/maximum sourcing, 0.4/0.8 sinking)
+and 10-90 % edge times into 3000 pF (8 ns rise, 4 ns fall typical), separately. Two representations meet both:
+  ramp (baseline): typical resistances behind a source ramp calibrated to 8/4 ns (driver_calibration);
+  step: a near-step source (0.1 ns ramp, the smallest EDGE_GRID point) behind resistances calibrated on the
+        same 3000 pF bench to 8/4 ns (driver_step_calibration, a resistance grid interpolated as for the ramp).
+        It is datasheet-consistent only if those resistances are at or below 1.4/0.8 ohm; otherwise the
+        study reports that and stops (declared check D1).
+Cases (test 7 settings, 100 ps, Q2 sense source, internal saves): B-m1-mid-ms100, G-m1-mid, G-m1-mid-Ls50 (ramp,
+reproductions of tests 7/9, every switching metric within 0.1 %), each with a -dstep counterpart judged with the
+materiality rule against it, and G-m1-mid-Ls50-dstep-ms50 (2 % step check; the step source has sharper edges).
+Reading: material differences mean the excitation depends on a driver property the datasheet does not fix, so
+measuring the driver's gate edges (hardware plan E1) is a model input, not only a check; no difference means
+this family is not a major excitation uncertainty. Both are model statements; neither identifies the real driver.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -834,6 +850,39 @@ def fullr_cases(exts):
             f"{g}-Ls50-fullR": {"ext": g, "base": f"{g}-Ls50", **common, "l_s": 50e-12, "full_r": True}}
 
 
+STEP_TE = 0.1e-9                                       # test 11: near-step source ramp (smallest EDGE_GRID point)
+STEP_R_GRID = (0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8)  # ohm, test 11 calibration grid
+DRIVER_STEP = {}
+
+
+def driver_step_bench():
+    """Test 11: near-step source into the datasheet's 3000 pF load, one run per output resistance."""
+    runs = {}
+    for k, r in enumerate(STEP_R_GRID):
+        stage = drive_stage("1", "0", VCC, [(20e-9, 1), (70e-9, 0)], STEP_TE, STEP_TE, "g", r, r, 0, 0, 150e-9)
+        runs[f"driver_step_{k}"] = "\n".join([f"* uP1966E step-source output stage into 3000 pF; R {r:g} ohm",
+                                              stage.rstrip(), "Cl g 0 3000p", SWITCH_MODELS.rstrip(),
+                                              f".options plotwinsize=0 reltol={RELTOL:g}", ".tran 0 150n 0 10p",
+                                              ".end", ""])
+    return runs
+
+
+def driver_cases(exts):
+    """Test 11 cases (see the module docstring)."""
+    if "G-m1-mid" not in exts or "B-m1-mid" not in exts:
+        raise SystemExit("test 11 needs extractions G-m1-mid and B-m1-mid")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "internal": True}
+    b, g, gl = "B-m1-mid-ms100", "G-m1-mid", "G-m1-mid-Ls50"
+    return {b: {"ext": "B-m1-mid", **common},
+            f"{b}-dstep": {"ext": "B-m1-mid", "base": b, **common, "driver": "step"},
+            g: {"ext": g, **common},
+            f"{g}-dstep": {"ext": g, "base": g, **common, "driver": "step"},
+            gl: {"ext": g, **common, "l_s": 50e-12},
+            f"{gl}-dstep": {"ext": g, "base": gl, **common, "l_s": 50e-12, "driver": "step"},
+            f"{gl}-dstep-ms50": {"ext": g, "base": f"{gl}-dstep", **common, "l_s": 50e-12, "driver": "step",
+                                 "maxstep": MAXSTEP_PKG / 2}}
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -843,7 +892,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -871,6 +920,21 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
+    if args.study == "driver":
+        rs, fs = [], []
+        for name, text in driver_step_bench().items():
+            raw = run(name, text)
+            rf = edge_times(raw)[0] if raw else (None, None)
+            rs.append(rf[0])
+            fs.append(rf[1])
+        r_up, r_dn = solve_edge(STEP_R_GRID, rs, DRIVER_RISE), solve_edge(STEP_R_GRID, fs, DRIVER_FALL)
+        DRIVER_STEP.update(source_ramp_s=STEP_TE, r_grid_ohm=list(STEP_R_GRID), rise_s=rs, fall_s=fs,
+                           r_src_ohm=r_up, r_snk_ohm=r_dn, limits_ohm=[R_SRC_MAX, R_SNK_MAX])
+        DRIVER_STEP["D1_within_datasheet_maximum"] = bool(r_up is not None and r_dn is not None
+                                                          and r_up <= R_SRC_MAX and r_dn <= R_SNK_MAX)
+        print("step driver calibration", DRIVER_STEP, flush=True)
+        if not DRIVER_STEP["D1_within_datasheet_maximum"]:
+            raise SystemExit("test 11 D1: the step representation needs resistances above the datasheet maximum")
 
     files = sorted(glob.glob(str(EXTRACTIONS / "*.json")))
     ext_files = {Path(f).stem: Path(f) for f in files}
@@ -886,6 +950,10 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "driver":
+        cases = driver_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "fullr":
         cases = fullr_cases(exts)
         if args.only:
@@ -942,13 +1010,17 @@ def main():
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
                   no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
                   full_r=c.get("full_r", False), internal=c.get("internal", False))
+        ter, tef = te_rise, te_fall
+        if c.get("driver") == "step":  # test 11
+            kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
+            ter = tef = STEP_TE
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
             s_on, s_off = slopes[c.get("base", c["ext"])]
             duty = s_off / (s_on + s_off)
             timing = {"duty": duty, "t1": I_PEAK / s_on}
-            text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
+            text, times, at = bench(ext, ter, tef, periods=c["periods"], timing=timing, **kw)
             # Test 5 run 1 (duty from the double pulse's average slopes) drifted by about -0.3 A per period
             # (valleys 11.27, 10.95, 10.66 A): the edges and dead times lose volt-seconds that the average
             # slopes miss. One correction from the measured drift, then the measured run.
@@ -959,11 +1031,11 @@ def main():
                 drift = (v0[-1] - v0[0]) / (len(v0) - 1)
                 timing = {**timing, "duty": duty - drift / ((s_on + s_off) / F_SW),
                           "duty_run_valleys_A": v0, "duty_run_drift_A_per_period": drift}
-                text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
+                text, times, at = bench(ext, ter, tef, periods=c["periods"], timing=timing, **kw)
         else:
             # Run 1 of the first bench run missed the edge currents (-2.6% and -5.8%): losses reduce the
             # slopes. Each case therefore runs once at the lossless timing and once corrected from its slopes.
-            text, times, at = bench(ext, te_rise, te_fall, **kw)
+            text, times, at = bench(ext, ter, tef, **kw)
             raw0 = run(name + "-timing", text)
             m0 = metrics(raw0.step(0), times, at) if raw0 else None
             if m0 is None:
@@ -976,7 +1048,7 @@ def main():
             slopes[name] = (s_on, s_off)
             timing = {"t1": I_PEAK / s_on, "t_off": (I_PEAK - I_VALLEY) / s_off}
             first = {"edge_currents_A": [ia, ib], "slopes_A_per_s": [s_on, s_off], "corrected_timing_s": timing}
-            text, times, at = bench(ext, te_rise, te_fall, timing=timing, **kw)
+            text, times, at = bench(ext, ter, tef, timing=timing, **kw)
         raw = run(name, text)
         s = raw.step(0) if raw else None
         m = metrics(s, times, at) if raw else None
@@ -1040,6 +1112,7 @@ def main():
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
                                       "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"},
                 "driver_calibration": {"pull_up_edge_s": te_rise, "pull_down_edge_s": te_fall, "targets_s": [DRIVER_RISE, DRIVER_FALL]},
+                "driver_step_calibration": DRIVER_STEP or None,
                 "reference": REFERENCE, "materiality": MATERIAL, "cases": done, "comparison_to_reference": comparison,
                 "runs": runs, "evidence_directory": str(run_root.relative_to(ROOT)),
             }
