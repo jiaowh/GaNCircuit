@@ -113,17 +113,18 @@ before any part is fitted or any probe connected.
 
 | Measurement | Connection on the published layout | State as published | What it reads, and what it does not |
 |---|---|---|---|
-| Q2 gate-source (lower gate) | J2, an SMD MMCX footprint (Molex 734152063), fed from Q2's gate net through R22 (0 Ω) | J2 and R22 optional, not fitted | Q2's gate net at R22 (0.95 mm from Q2's gate pad, then a 6.1 mm trace to J2) against GND at J2's ground pads, about 6 mm from Q2. Not the die voltage: it adds the package's internal gate path and the voltage along the GND copper between Q2's source pins and J2, which the shared source copper (extracted L_cs about 48 pH, exploratory) can make comparable to the 2 V being looked for at these edge rates. A 100 mil through-hole pair on the same net (signal at (16.05, 24.80) mm, GND at (16.05, 22.26) mm) is not named in the schematic or BOM. |
+| Q2 gate-source (lower gate) | J2, an SMD MMCX footprint (Molex 734152063), fed from Q2's gate net through R22 (0 Ω) | J2 and R22 optional, not fitted | Q2's gate net at R22 (0.95 mm from Q2's gate pad, then a 6.1 mm trace to J2) against GND at J2's ground pads, about 6 mm from Q2. Not the device's internal voltage: it adds the package's internal gate path and the voltage along the GND copper between Q2's source pins and J2's ground. That path's voltage is not quantified: the extracted 48 pH (exploratory) belongs to the driver-return path, not to the Q2-to-J2 path, so it supports concern about the reference location but cannot size J2's error. A 100 mil through-hole pair on the same net (signal at (16.05, 24.80) mm, GND at (16.05, 22.26) mm) is not named in the schematic or BOM. |
 | Q1 gate-source (upper gate) | J1, an SMD MMCX footprint fed from Q1's gate net through R11 (0 Ω), with switch-node ground pads | J1 and R11 optional, not fitted | Q1's gate net against the switch node; needs an isolated probe. Same caveats as J2. |
 | Switch node | J33, a 100 mil two-pin through-hole header (GND (27.55, 25.48), SW (27.55, 28.02) mm), 8.6 mm from Q2's drain | footprint only; not in the BOM | the switch-node copper at the header, including the SW and GND copper between it and Q2. J32 (switch-node MMCX) has no footprint in this layout. |
 | PHASE-to-GND near the driver | tip at C81's PHASE-side pad (bootstrap capacitor, 1.45 mm from U80's PHASE ball), ground at C80's GND pad (VCC capacitor, 1.21 mm from U80's GND ball); 3.9 mm apart | both fitted | the voltage between those pads, not between the balls the rating applies to: both pads carry gate-drive current to the balls, and the probe loop spans the gate-drive area next to the power loop. |
 
 Consequences for the plan, to be settled with the inventory:
 
-- **Fitting parts changes the circuit.** Fitting R22 (or R11) connects a 6 mm trace, the MMCX and the probe's
-  input to the gate net. The load and the stub resonance it adds are estimated for the chosen probe before
-  fitting, and a series resistor in place of the 0 Ω part is considered if the estimate requires it (it then
-  forms a divider with the probe input). The added parts are recorded in the board identity.
+- **Fitting parts is deferred.** Fitting R22 (or R11) would connect a 6 mm trace, the MMCX and the probe's
+  input to the gate net, changing the circuit. No part is fitted until the actual board (revision and
+  population) and the selected probes establish the connection and loading requirements, and until someone
+  with authority over the board approves the modification. Any fitted part is then recorded in the board
+  identity.
 - **Uncertainty allowance per point.** Each row's "does not" column becomes a numerical allowance in the
   procedure: from the probe's specifications and loading for the probe part, and, for the copper between
   the connection point and the device or ball, from an estimate stated with its basis. The exploratory
@@ -206,9 +207,10 @@ Report the first held-out score as it is; later corrections create new revisions
    sample rate, channel count); every probe (passive, active, isolated, current) with its tips and
    accessories (spring tips, solder-in tips, MMCX adapters such as Tektronix 206-0663-xx, deskew fixture);
    bus and gate-drive supplies (range, current limit, over-voltage trip, remote shutdown); pulse generator;
-   enclosure, interlock and emergency-stop hardware; thermal measurement. Also whether parts may be fitted
-   to the board (R22/J2, R11/J1, a J33 header; probe connection points section). This is the input the
-   probe-and-channel plan and the first-power procedure are waiting for.
+   enclosure, interlock and emergency-stop hardware; thermal measurement. This is the input the
+   probe-and-channel plan and the first-power procedure are waiting for. Neither the inventory nor approval of
+   physical modifications (fitting R22/J2, R11/J1 or a J33 header) is with the project owner (1 October 2026);
+   both need the lab's responsible person, after the actual board and the selected probes are known.
 2. Whether spare EPC2302 devices and a B1506A fixture for them can be obtained (E7), and which B1506A fixture
    option (H21, H51 or H71) the lab has. Open as of 30 September 2026.
 3. Whether a VNA or impedance analyzer is available, and whether a second board may be depopulated (E8). Open as
