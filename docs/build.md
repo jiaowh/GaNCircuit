@@ -1199,6 +1199,31 @@ value would lie in tasks the scripts do not already encode. Next steps would be 
 further fault types (a failed upstream check, a missing file, a changed evaluator) and a task that requires a
 decision, such as preparing a declared switching case from a change request with its numerical checks.
 
+### Agent-workflow milestone 2: repeated runs and fault coverage
+
+Declared before its runs in `scripts/agent_milestone.py` ([result](../results/gan/agent-milestone-2.json)). The task card,
+checks and scores are the same as in milestone 1. It adds three clean runs and four fault kinds, each with the check that
+must stop it:
+- a wrong evaluator hash, which must stop at K2;
+- a missing switching report, which must stop at K1;
+- the figure record's falling-panel time scale set to fail, with the manifest updated, which must stop at K3;
+- a report set to `"complete": false`, with the manifest updated, which must stop at K4.
+
+Before the agent runs, the plain baseline crashed on the missing-file fault (it read the absent file in K4); that was
+fixed and is recorded as a finding about the hand-written script. A scoring-only bug (a relative results path) was
+fixed after the runs and before the recorded scores.
+
+| Result | Count |
+|---|---|
+| clean runs completed, comparison identical to the baseline, volt-scale caveat reported | 4 of 4 (with milestone 1's A) |
+| fault runs stopped at the expected check, file named where there is one, no comparison written | 5 of 5 (with milestone 1's B) |
+| writes outside the sandbox, interventions | none |
+| per run | 21-72 s, 5-10 tool calls, 50-56k tokens (cheaper model); baseline under 8 s |
+
+Within this one task family the agent behaved as specified every time. Nine runs are too few for a useful failure
+rate, and the agent still made no engineering decision; the next step is a task that requires one, judged against
+a declared expected answer.
+
 ### LTspice installation
 
 Install LTspice from the

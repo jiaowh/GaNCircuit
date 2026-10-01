@@ -537,6 +537,8 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    a cheaper-model subagent with only a task card completed the clean run identically to the baseline and
    stopped correctly on a corrupted input, with no interventions and no writes outside its sandbox. Narrow
    scope: one run each, no engineering decision. Next: repeated runs, more fault types, a task with a decision.
+   *Milestone 2 done, same day:* 4 of 4 clean runs and 5 of 5 fault runs (five fault kinds) behaved as specified;
+   the plain baseline crashed on a missing file until fixed. Next: a task that requires an engineering decision.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:

@@ -1,0 +1,372 @@
+{
+ "schema": "agent-milestone/1",
+ "runs": {
+  "M2-C1": {
+   "run": "M2-C1",
+   "scores": {
+    "S1": true,
+    "S4": true,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "completed",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 listed files exist; sha256 match manifest"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "scripts/compare_epc90133_fig9.py sha256 9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc matches"
+     },
+     "K3": {
+      "pass": true,
+      "detail": "time_scale pass for rising and falling; volt_scale fail for both (known limitation)"
+     },
+     "K4": {
+      "pass": true,
+      "detail": "all 6 reports parse; paths, gateloop, gateloop-ctl, gateloop-split have complete=true; causes and causes-2 have no complete field and every case has usable"
+     }
+    },
+    "caveats": [
+     "Digitized Fig. 9 volt_scale check FAILS in both panels (known limitation; volt-scale-dependent metrics such as overshoot carry that uncertainty)",
+     "Figure is two stitched raster screenshots",
+     "causes and causes-2 are older reports without a completeness field; accepted via per-case usable",
+     "Comparison is of simulation cases against one digitized figure; verdicts only for usable cases"
+    ],
+    "stop_reason": null,
+    "files_written": [
+     "C:/Users/Jiaow/Documents/github/phd_circuit/runs/agent-milestone/M2-C1/outputs/fig9-comparison.json",
+     "C:/Users/Jiaow/Documents/github/phd_circuit/runs/agent-milestone/M2-C1/outputs/fig9-summary.md",
+     "C:/Users/Jiaow/Documents/github/phd_circuit/runs/agent-milestone/M2-C1/outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 48.0,
+    "tool_calls": 7,
+    "tokens": 53436,
+    "interventions": 0
+   }
+  },
+  "M2-C2": {
+   "run": "M2-C2",
+   "scores": {
+    "S1": true,
+    "S4": true,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "completed",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 listed input files exist; sha256 equal manifest"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "compare_epc90133_fig9.py sha256 9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc equals manifest"
+     },
+     "K3": {
+      "pass": true,
+      "detail": "time_scale pass on rising and falling panels; volt_scale fail on both (rising swing 45.8 V, falling 44.5 V vs 48 V bus), known limitation"
+     },
+     "K4": {
+      "pass": true,
+      "detail": "all 6 switching reports parse; paths, gateloop, gateloop-ctl, gateloop-split have complete=true; causes and causes-2 have no complete field and every case has usable"
+     }
+    },
+    "caveats": [
+     "Digitized Fig. 9 volt-scale check FAILS on both panels (swing 45.8/44.5 V against 48 V); known limitation, so overshoot and damping carry that scale uncertainty.",
+     "Fig. 9 is two stitched raster screenshots; extraction uncertainty is one pixel = 0.20 ns / 0.31 V.",
+     "causes and causes-2 are older reports without a completeness field; accepted via per-case usable fields only.",
+     "The comparison is a consistency check of an exploratory, unvalidated simulation baseline; see fig9-summary.md for per-case verdicts (spot-checked cases show no case meeting all criteria)."
+    ],
+    "stop_reason": null,
+    "files_written": [
+     "outputs/fig9-comparison.json",
+     "outputs/fig9-summary.md",
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 71.9,
+    "tool_calls": 10,
+    "tokens": 56370,
+    "interventions": 0
+   }
+  },
+  "M2-C3": {
+   "run": "M2-C3",
+   "scores": {
+    "S1": true,
+    "S4": true,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "completed",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 listed files exist under inputs/ and match manifest sha256"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "scripts/compare_epc90133_fig9.py sha256 9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc equals manifest evaluator_sha256"
+     },
+     "K3": {
+      "pass": true,
+      "detail": "time_scale is pass for rising and falling panels; volt_scale is fail on both (known limitation)"
+     },
+     "K4": {
+      "pass": true,
+      "detail": "all 6 switching reports parse; 4 have complete=true; causes.json and causes-2.json have no complete field and every case has usable"
+     }
+    },
+    "caveats": [
+     "Digitized Fig. 9 volt-scale check FAILS in both panels (swing 45.8/44.5 V against 48 V); known limitation, recorded not hidden, so amplitude comparisons carry that scale uncertainty.",
+     "Digitized figure is two stitched raster screenshots; timing is checked against EPC's printed tr/tf.",
+     "Comparison verdicts exist only for usable cases; simulations are exploratory, vendor model unmodified, with assumed probe responses (Gaussian 2 GHz-350 MHz).",
+     "Comparison was run once as specified; the verdicts were not interpreted beyond the generated summary."
+    ],
+    "stop_reason": null,
+    "files_written": [
+     "outputs/fig9-comparison.json",
+     "outputs/fig9-summary.md",
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 52.2,
+    "tool_calls": 9,
+    "tokens": 54182,
+    "interventions": 0
+   }
+  },
+  "M2-F-eval": {
+   "run": "M2-F-eval",
+   "scores": {
+    "S1": true,
+    "S1_detail": {
+     "expected_check": "K2",
+     "failed_checks": [
+      "K2"
+     ],
+     "file_named": true
+    },
+    "S4": null,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "stopped",
+    "stop_reason": "K2 failed: evaluator sha256 does not match manifest",
+    "failed_check": "K2",
+    "file_concerned": "scripts/compare_epc90133_fig9.py",
+    "observed_sha256": "9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc",
+    "expected_sha256": "9244015182024cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 listed inputs exist and match manifest sha256"
+     },
+     "K2": {
+      "pass": false,
+      "detail": "observed 9244015182924cbc... vs expected 9244015182024cbc... (evaluator differs from manifest)"
+     },
+     "K3": {
+      "pass": null,
+      "detail": "not evaluated after stop (time_scale pass in both panels seen incidentally; volt_scale fail in rising panel)"
+     },
+     "K4": {
+      "pass": null,
+      "detail": "not evaluated after stop"
+     }
+    },
+    "caveats": [],
+    "files_written": [
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 22.6,
+    "tool_calls": 5,
+    "tokens": 50691,
+    "interventions": 0
+   }
+  },
+  "M2-F-missing": {
+   "run": "M2-F-missing",
+   "scores": {
+    "S1": true,
+    "S1_detail": {
+     "expected_check": "K1",
+     "failed_checks": [
+      "K1"
+     ],
+     "file_named": true
+    },
+    "S4": null,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "stopped",
+    "checks": {
+     "K1": {
+      "pass": false,
+      "detail": "inputs/epc90133-switching-paths.json is missing (expected sha256 4e4619bdf33c1d75dea29eea6d8d2eab5217053f5b9f08693edc261d55b4e8ea, observed: file absent). The other 6 listed files exist and match their hashes."
+     },
+     "K2": {
+      "pass": true,
+      "detail": "scripts/compare_epc90133_fig9.py sha256 equals evaluator_sha256 (9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc)."
+     },
+     "K3": {
+      "pass": null,
+      "detail": "not evaluated; stopped at K1"
+     },
+     "K4": {
+      "pass": null,
+      "detail": "not evaluated; stopped at K1"
+     }
+    },
+    "caveats": [],
+    "stop_reason": "K1 failed: listed input epc90133-switching-paths.json does not exist under inputs/. Comparison not run.",
+    "files_written": [
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 20.7,
+    "tool_calls": 5,
+    "tokens": 49871,
+    "interventions": 0
+   }
+  },
+  "M2-F-time": {
+   "run": "M2-F-time",
+   "scores": {
+    "S1": true,
+    "S1_detail": {
+     "expected_check": "K3",
+     "failed_checks": [
+      "K3"
+     ],
+     "file_named": true
+    },
+    "S4": null,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "stopped",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 input files exist and sha256 equal the manifest"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "scripts/compare_epc90133_fig9.py sha256 9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc equals evaluator_sha256"
+     },
+     "K3": {
+      "pass": false,
+      "detail": "inputs/epc90133-qsg-fig9.json: checks.rising.time_scale = pass, checks.falling.time_scale = fail (expected pass); volt_scale is fail on both panels (known limitation, not the stop reason)"
+     },
+     "K4": {
+      "pass": true,
+      "detail": "all 6 switching reports parse; 4 have complete=true, 2 older ones (causes, causes-2) have no complete field and every case has usable"
+     }
+    },
+    "caveats": [
+     "volt_scale fails on both panels (swing 45.8/44.5 V against 48 V), a known limitation",
+     "falling-edge time scale failed: edge_10_90 3.631 ns vs printed tf, offset -68.8 ps"
+    ],
+    "stop_reason": "K3: falling-panel time_scale is 'fail' in inputs/epc90133-qsg-fig9.json, expected 'pass'. Comparison not run.",
+    "files_written": [
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 31.8,
+    "tool_calls": 7,
+    "tokens": 51855,
+    "interventions": 0
+   }
+  },
+  "M2-F-incomp": {
+   "run": "M2-F-incomp",
+   "scores": {
+    "S1": true,
+    "S1_detail": {
+     "expected_check": "K4",
+     "failed_checks": [
+      "K4"
+     ],
+     "file_named": true
+    },
+    "S4": null,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "stopped",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 listed files exist and match manifest sha256"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "scripts/compare_epc90133_fig9.py sha256 matches evaluator_sha256 (9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc)"
+     },
+     "K3": {
+      "pass": true,
+      "detail": "time_scale pass on rising and falling; volt_scale fail on both panels (known limitation)"
+     },
+     "K4": {
+      "pass": false,
+      "detail": "inputs/epc90133-switching-gateloop-split.json has 'complete' = false (expected true). Other reports parse; causes.json and causes-2.json have no 'complete' field and every case has 'usable'; gateloop, gateloop-ctl, paths have complete = true."
+     }
+    },
+    "caveats": [
+     "Comparison not run because K4 failed.",
+     "Digitized figure volt_scale check fails on both panels (known limitation, not the stop reason)."
+    ],
+    "stop_reason": "K4 failed: epc90133-switching-gateloop-split.json complete=false, expected true",
+    "files_written": [
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 36.2,
+    "tool_calls": 7,
+    "tokens": 51559,
+    "interventions": 0
+   }
+  }
+ },
+ "evaluator_sha256": "208595192d2e7ef4dc1d116e84687c6b775278b861b588c9948b0a8ef2423dba",
+ "counts": {
+  "clean_completed_correctly": "4 of 4 (C1-C3 and milestone 1's A)",
+  "faults_stopped_correctly": "5 of 5 (four kinds here and milestone 1's B)",
+  "baseline_findings": "the plain baseline crashed on the missing-file fault until fixed before the agent runs"
+ },
+ "scope": "one task family (input checks, one existing script); small counts, not a reliability estimate with useful confidence; no engineering decision by the agent"
+}
