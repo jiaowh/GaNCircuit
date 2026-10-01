@@ -30,6 +30,15 @@ whether it lies inside the heatsink footprint, and its distance to the nearest F
 outside the heatsink is where a probe could reach with the heatsink fitted; whether it is usable for a
 high-bandwidth measurement (distance, return path, loading) is a separate engineering judgement.
 
+Run 1 (1 October 2026) passed G1-G4 but is a failed run by design error, kept as
+results/gan/epc9165-board-audit-run1-failed.json: it took each FET's nets from TOP copper inside its outline, but the
+EPC2302s are on the BOTTOM side (the bottom paste has their stripe and gate pads inside the outlines; the top has
+none), so it never saw the gate pads and its "inside the heatsink" ignored the side. Run 2, the one fix run,
+changes only this: the FET side is the side whose paste has at least six pads inside every FET outline, and that
+side's copper gives the FET nets; the heatsink side is the side whose solder mask is open around all four 3.0 mm
+mounting holes; a contact counts as covered by the heatsink only if it is on the heatsink side and inside its
+footprint. Its G4 switch-node nets agree with run 1's (checked by hand from the bottom pads before run 2).
+
     PYTHONPATH=src python scripts/audit_epc9165_board_files.py   # results/gan/epc9165-board-audit.json
 """
 import hashlib
@@ -267,7 +276,21 @@ def main():
     g3 = {"pairs": [[(a.x, a.y), (b.x, b.y)] for a, b in headers], "pass": len(headers) == 2}
 
     nets = Nets(bounds, drills)
-    fet_nets = [nets.in_rect("GTL", r) for r in fets]
+    sides = {"top": ("GTL", "GTP", "GTS"), "bottom": ("GBL", "GBP", "GBS")}
+    paste_pads = {}
+    for side, (_, paste, _) in sides.items():
+        lab, _ = ndimage.label(rasterize(load_layer(GERBERS / f"{PREFIX}Gerbers.{paste}"), bounds, PITCH).grid)
+        cents = [((sl[1].start + sl[1].stop) / 2 * PITCH + bounds[0], (sl[0].start + sl[0].stop) / 2 * PITCH + bounds[1])
+                 for sl in ndimage.find_objects(lab)]
+        paste_pads[side] = [sum(inside(c, r) for c in cents) for r in fets]
+    fet_side = next((sd for sd, n in paste_pads.items() if n and min(n) >= 6), None)
+    fet_cu = sides[fet_side][0] if fet_side else "GTL"
+    hs_side = None
+    for side, (_, _, mask) in sides.items():
+        m = rasterize(load_layer(GERBERS / f"{PREFIX}Gerbers.{mask}"), bounds, PITCH).grid
+        if hs_holes and all(m[nets.idx(h.x + 1.0, h.y)] or m[nets.idx(h.x - 1.0, h.y)] for h in hs_holes):
+            hs_side = side if hs_side is None else "both"
+    fet_nets = [nets.in_rect(fet_cu, r) for r in fets]
     # phases: pair each FET with its nearest neighbour
     order = sorted(range(len(fets)), key=lambda i: fets[i][0])
     phases = [order[:2], order[2:]] if len(fets) == 4 else []
@@ -311,7 +334,7 @@ def main():
                 continue
             p = (c["cx"], c["cy"])
             rows.append({"side": c["side"], "xy_mm": [round(p[0], 2), round(p[1], 2)], "size_mm": [round(c["w"], 2), round(c["h"], 2)],
-                         "inside_heatsink": bool(heatsink and inside(p, heatsink)),
+                         "inside_heatsink": bool(heatsink and c["side"] == hs_side and inside(p, heatsink)),
                          "distance_to_its_fet_mm": round(min(rect_dist(p, fets[i]) for i in touched), 2)})
         outside = [r for r in rows if not r["inside_heatsink"]]
         access[label] = {"fets": touched, "contacts": len(rows), "contacts_outside_heatsink": len(outside),
@@ -335,7 +358,8 @@ def main():
         "driver_labels": {"bom": sorted({v["part_number"] for k, v in fitted.items() if k.startswith("U80")}),
                           "schematic": sorted(set(re.findall(r"MPQ\d+\w*", sch_text))),
                           "quick_start_guide": sorted(set(re.findall(r"MPQ\d+\w*", qsg_text)))},
-        "geometry": {"board_bounds_mm": bounds, "G1_placement": g1, "G2_outlines": g2, "G3_headers": g3,
+        "geometry": {"board_bounds_mm": bounds, "fet_side": fet_side, "paste_pads_in_fet_outlines": paste_pads,
+                     "heatsink_side": hs_side, "G1_placement": g1, "G2_outlines": g2, "G3_headers": g3,
                      "G4_switch_nodes": {"pass": g4_ok, "phases_fet_indices": phases},
                      "header_pin_nets": header_nets, "probe_access": access},
     }
@@ -344,6 +368,7 @@ def main():
     show["copper"] = {k: v for k, v in show["copper"].items() if k != "gerber_copper_layers"}
     print(json.dumps(show, indent=1, ensure_ascii=False))
     g = report["geometry"]
+    print("FET side", fet_side, paste_pads, "heatsink side", hs_side)
     print("G1", g1["pass"], [round(r, 3) for r in g1["residuals_mm"]], "G2", g2["pass"], "G3", g3["pass"], "G4", g4_ok)
     print(json.dumps({"outlines": g2, "headers": header_nets, "access": access}, indent=1))
 
