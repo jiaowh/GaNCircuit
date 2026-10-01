@@ -59,6 +59,9 @@ rule and scores; results in results/gan/agent-milestone-2.json. Runs, each a fre
 For a fault run, S1 requires status "stopped", the expected check id among the failed checks, the affected file
 named where there is one, and no comparison written. Reported: clean runs completed out of four; fault runs
 stopped correctly out of five (with milestone 1's B). No threshold is set for a pass; the counts are the result.
+Baseline fix before any milestone-2 agent run: on the missing-file fault the plain baseline crashed in K4 (it read
+the absent file) instead of reporting the K1 stop; K4 now skips files K1 already reports missing. Recorded as a
+finding about the hand-written baseline.
 """
 import argparse
 import hashlib
@@ -206,7 +209,8 @@ def baseline(name):
         if "complete" in rep:
             return rep["complete"] is True
         return all("usable" in c for c in rep["cases"].values())
-    incomplete = [f["path"] for f in sims if not k4_ok(json.loads((sb / "inputs" / f["path"]).read_text(encoding="utf-8")))]
+    incomplete = [f["path"] for f in sims if (sb / "inputs" / f["path"]).is_file()
+                  and not k4_ok(json.loads((sb / "inputs" / f["path"]).read_text(encoding="utf-8")))]
     checks["K4"] = {"pass": not incomplete, "detail": incomplete}
     failed = [k for k, v in checks.items() if not v["pass"]]
     out = {"status": "stopped" if failed else "completed", "checks": checks, "stop_reason": failed or None,
