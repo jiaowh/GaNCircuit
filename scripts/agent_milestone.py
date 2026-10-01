@@ -227,7 +227,7 @@ def baseline(name):
 
 
 def score(name, ref_name="baseline", results=None):
-    results = results or RESULTS
+    results = (results or RESULTS).resolve()
     sb = BASE / name
     op = json.loads((sb / "operator.json").read_text(encoding="utf-8"))
     rep_p = sb / "outputs/agent-report.json"
