@@ -14,6 +14,12 @@ Q2 saved matrices: the B-m1-mid and G-m1-mid networks as the switching bench wri
    and, on G, the return-ball transfers must match scripts/audit_epc90133_network_transfer.py's independent
    solve of the same matrices: full_r against the full-matrix solve, the baseline against the diagonal-R solve.
    Tolerances: loop R within 1 %, loop L within 0.1 %, transfer resistance within 2 % or 0.005 mohm.
+Q3 complete terminal impedance (added 1 October 2026 after an external review asked for the full terminal Z,
+   declared before its run): on B-m1-mid and G-m1-mid, 1 A AC into each port's terminal, returning at its
+   reference, with no external circuit; every port voltage V(terminal) - V(reference) is read. In the
+   branch-port network each terminal node belongs to one branch, so the open-circuit port matrix is the branch
+   matrix: full_r must reproduce R + j omega L, the baseline diag(R) + j omega L, each within 1e-4 of max |Z|
+   (real and imaginary parts checked separately against their own maxima, since R is about 1 % of omega L).
 Criteria fixed 1 October 2026 before the first run. Open nodes get 1 Gohm to ground (stated, negligible here).
 Run 1 (1 October 2026) stopped at B full_r: LTspice rejected loops of behavioural voltage sources, inductors and
 the 0 V shorts. The revision now keeps R[k, k] as a resistor and puts only the off-diagonal terms in the source
@@ -125,11 +131,42 @@ def saved_matrices(run_root):
     return out
 
 
+def terminal_z(run_root):
+    """Q3: full open-circuit port impedance matrix in LTspice against the branch matrices."""
+    out = {}
+    w = 2 * math.pi * FREQ
+    for name in ("B-m1-mid", "G-m1-mid"):
+        ext = json.loads((ROOT / f"results/gan/epc90133-extraction/{name}.json").read_text(encoding="utf-8"))
+        R, L = np.array(ext["R_ohm"]), np.array(ext["L_H"])
+        ports = [(sw.node(p["terminal"]), sw.node(p["reference"])) for p in ext["ports"]]
+        nodes = sorted({n for pr in ports for n in pr} - {"0"})
+        row = {}
+        for rep_, full in (("full_r", True), ("baseline", False)):
+            net, _ = sw.network(ext, full_r=full)
+            n = len(ports)
+            Z = np.zeros((n, n), complex)
+            for j, (t, r) in enumerate(ports):
+                s = ac_run([net, *[f"Rgmin_{x} {x} 0 1e9" for x in nodes], f"I1 {r} {t} AC 1"],
+                           run_root / f"Z-{name}-{rep_}-{j}", [f"V({x})" for x in nodes])
+                v = lambda x: 0 if x == "0" else s[f"v({x})"][0]
+                for k, (tk, rk) in enumerate(ports):
+                    Z[k, j] = v(tk) - v(rk)
+            ref = (R if full else np.diag(np.diag(R))) + 1j * w * L
+            e_re = float(np.abs(Z.real - ref.real).max() / np.abs(ref.real).max())
+            e_im = float(np.abs(Z.imag - ref.imag).max() / np.abs(ref.imag).max())
+            row[rep_] = {"ports": n, "max_rel_error_real": e_re, "max_rel_error_imag": e_im,
+                         "pass": e_re <= 1e-4 and e_im <= 1e-4}
+        out[name] = row
+    return out
+
+
 def main():
     run_root = ROOT / "runs" / ("network-transfer-" + uuid.uuid4().hex[:12])
     ka = known_answer(run_root)
     sm = saved_matrices(run_root)
-    ok = all(v["pass"] for v in ka.values()) and all(r[k]["pass"] for r in sm.values() for k in ("full_r", "baseline"))
+    tz = terminal_z(run_root)
+    ok = (all(v["pass"] for v in ka.values()) and all(r[k]["pass"] for r in sm.values() for k in ("full_r", "baseline"))
+          and all(r[k]["pass"] for r in tz.values() for k in ("full_r", "baseline")))
     report = {"schema": "epc90133-network-transfer-qualification/1",
               "scope": "AC port impedance of the SPICE network against its extracted matrices at 100 MHz; "
                        "not frequency dependence, geometry accuracy or switching",
@@ -137,13 +174,15 @@ def main():
               "network_generator_sha256": hashlib.sha256((ROOT / "scripts/epc90133_switching.py").read_bytes()).hexdigest(),
               "audit_solver_sha256": hashlib.sha256((ROOT / "scripts/audit_epc90133_network_transfer.py").read_bytes()).hexdigest(),
               "run_directory": run_root.relative_to(ROOT).as_posix(),
-              "Q1_known_answer": ka, "Q2_saved_matrices": sm, "outcome": "pass" if ok else "fail"}
+              "Q1_known_answer": ka, "Q2_saved_matrices": sm,
+              "Q3_terminal_impedance": tz, "outcome": "pass" if ok else "fail"}
     OUTPUT.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
     print("Q1", {k: (v["max_rel_error"], v["pass"]) for k, v in ka.items()})
     for name, r in sm.items():
         for rep in ("full_r", "baseline"):
             print(name, rep, {k: round(v, 5) for k, v in r[rep]["ltspice"].items()},
                   "ref", {k: round(v, 5) for k, v in r[rep]["reference"].items()}, r[rep]["pass"])
+    print("Q3", json.dumps(tz))
     print("outcome", report["outcome"])
 
 
