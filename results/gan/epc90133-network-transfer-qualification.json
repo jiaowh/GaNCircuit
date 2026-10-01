@@ -1,10 +1,10 @@
 {
  "schema": "epc90133-network-transfer-qualification/1",
  "scope": "AC port impedance of the SPICE network against its extracted matrices at 100 MHz; not frequency dependence, geometry accuracy or switching",
- "evaluator_sha256": "7499c14e0146a0d5a31e49d00eac97054c25daf02d5d09c5dd026f379a71c02a",
- "network_generator_sha256": "bc55ce724c8d41cc04ceb4d007f057397d8a4a99b6c709b50e02b7a5598b03f5",
+ "evaluator_sha256": "6e4579e0843f91cb6d2f4a3d504382d6d285aea2b29e0411c425b529509eeec1",
+ "network_generator_sha256": "0383b1dd023e7b311b187054fc20437fa87d7d45a5df448657da99f450fa132f",
  "audit_solver_sha256": "14533625bda63e7ff10f0b22292251e9705ee146ae487d4648c1d3bbeb3de047",
- "run_directory": "runs/network-transfer-3e1f5e2e7094",
+ "run_directory": "runs/network-transfer-7cff18e2139b",
  "Q1_known_answer": {
   "full_r": {
    "max_rel_error": 2.581498858643281e-07,
@@ -125,6 +125,36 @@
      "R_cs_Q1_mohm": true,
      "R_cs_Q2_mohm": true
     },
+    "pass": true
+   }
+  }
+ },
+ "Q3_terminal_impedance": {
+  "B-m1-mid": {
+   "full_r": {
+    "ports": 35,
+    "max_rel_error_real": 1.3059546448017204e-06,
+    "max_rel_error_imag": 6.962433925450605e-07,
+    "pass": true
+   },
+   "baseline": {
+    "ports": 35,
+    "max_rel_error_real": 1.3059708610458261e-06,
+    "max_rel_error_imag": 6.962823840744768e-07,
+    "pass": true
+   }
+  },
+  "G-m1-mid": {
+   "full_r": {
+    "ports": 47,
+    "max_rel_error_real": 1.1215609218946428e-06,
+    "max_rel_error_imag": 6.34192442263247e-07,
+    "pass": true
+   },
+   "baseline": {
+    "ports": 47,
+    "max_rel_error_real": 1.1215761529609393e-06,
+    "max_rel_error_imag": 6.342287703821606e-07,
     "pass": true
    }
   }
