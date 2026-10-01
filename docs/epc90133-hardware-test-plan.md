@@ -69,7 +69,8 @@ not, beyond that uncertainty.
 - Low-side false turn-on: in simulation (test 7, docs/build.md) the board's low-side gate path produces a
   spike of about 2.0 V at Q2's model terminals during Q1's turn-on at 48 V and 11 A. Test 9 shows that inside
   the vendor model, behind its internal gate resistance, the channel-control voltage stays below about 1 V and
-  the channel does not conduct. The physical device's internal gate network is not characterized, and the
+  the sampled traces show no appreciable positive channel current. The physical device's internal gate
+  network is not characterized, and the
   datasheet allows a threshold down to 0.8 V, so the measurement stays. Q2's gate-source voltage is therefore
   measured from the first energized step, and its trend with bus voltage and current is a stop criterion before
   each step up. The simulated values are sensitivities, not limits.

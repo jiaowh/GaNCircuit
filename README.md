@@ -199,8 +199,8 @@ approximations stated; none of them yet reproduces the measurement on every crit
     does not separate the coupling from the gate path's own impedance during switching;
   - the low-side path adds damping. It also produces a spike of about 2 V at the low-side transistor's model
     terminals during the high-side turn-on. Inside the model, behind its internal gate resistance, the
-    channel-control voltage stays below about 1 V and the channel does not conduct, so this is not evidence of
-    false turn-on in the model; the real device still needs a measurement. Its gate return shares 48 pH with
+    channel-control voltage stays below about 1 V and the sampled traces show no appreciable positive channel
+    current, so this is not evidence of false turn-on in the model; the real device still needs a measurement. Its gate return shares 48 pH with
     the power loop. A lower overshoot bought this way is not a better design.
 - **Common-source inductance in the package** is the remaining lead. Adding an assumed 50 pH of package source
   inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice

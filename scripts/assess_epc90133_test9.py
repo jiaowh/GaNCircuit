@@ -69,10 +69,12 @@ def main():
               "reproduction_of_test7": repro, "case_status": status, "full_R_materiality": mat,
               "step_check_G_fullR": "not evaluated: G-m1-mid-fullR and -ms50 timed out (3600 s)",
               "q2_q1_during_rise": internal,
-              "reading": ("Within the vendor model, Q2's channel does not conduct during Q1's turn-on in any completed case: "
-                          "its internal VGS stays below about 1 V while the terminal VGS reaches up to 2 V. The terminal "
-                          "peak does not reach the channel-control node. This is a model diagnostic; it says nothing "
-                          "about the physical device's internal gate network.")}
+              "reading": ("The sampled vendor-model traces show no appreciable positive Q2 channel current indicating "
+                          "false turn-on during Q1's turn-on (positive maxima 0 to 70 uA at the traces' 10 uA resolution; "
+                          "negative values to about -3 A are Q2's reverse conduction at the window start). Its internal "
+                          "VGS stays below about 1 V while the terminal VGS reaches up to 2 V. Wording corrected after an "
+                          "external audit (2 October 2026). A model diagnostic; it says nothing about the physical "
+                          "device's internal gate network.")}
     OUTPUT.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
     print("reproduction", {k: (round(v["max_abs_rel_change"], 6), v["pass"]) for k, v in repro.items()})
     print("status", {k: v["failure"] or "ok" for k, v in status.items()})

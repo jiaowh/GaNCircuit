@@ -733,8 +733,8 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   *Corrected by test 9 (below):* these are the vendor model's terminal voltages, not its channel-control
   voltage behind the internal 0.5 Ω rg, and the 1.07 V figure is Q2's own turn-off tail at the start of the
   diagnostics window, not the rise. During the rise, Q2's internal VGS stays below about 1 V and its channel
-  does not conduct in any completed case, so comparing the 2.0 V terminal peak with DC conduction overstated
-  the evidence for false turn-on within the model.
+  shows no appreciable positive current in any completed case, so comparing the 2.0 V terminal peak with DC
+  conduction overstated the evidence for false turn-on within the model.
 - **With assumed package source inductance, G moves closer to Fig. 9 than B did.** In the Fig. 9 comparison
   ([summary](../results/gan/epc90133-fig9-summary.md)), G+50 pH passes rise time, fall time and frequency
   (1.66 ns, 3.93 ns, 262 MHz), as B-Ls50-csi did, with a lower overshoot (11.3 V against 17.4 V). G+25 pH passes
@@ -866,9 +866,12 @@ Test 9 (`--study fullr`, declared before its runs) also saves the vendor model's
 - **The three full-R G cases timed out** at 3600 s (the dense behavioural coupling of 47 branches makes each
   step slow). They are kept as failed runs; the G step check was not evaluated. Test 10's small-signal analysis
   gives the full-R effect on G's ring without a transient.
-- **Q2 does not conduct during Q1's turn-on, within the model.** During the rise (from 1 ns before the switch
-  node passes 10 % to +60 ns), Q2's internal VGS peaks at 0.56 V (B), 0.87 V (G) and 1.01 V (G + 50 pH),
-  against terminal peaks of 0.26, 2.00 and 1.93 V, and its channel current never goes positive. The terminal
+- **The sampled vendor-model traces show no appreciable positive Q2 channel current indicating false turn-on.**
+  During the rise (from 1 ns before the switch node passes 10 % to +60 ns), Q2's internal VGS peaks at 0.56 V
+  (B), 0.87 V (G) and 1.01 V (G + 50 pH), against terminal peaks of 0.26, 2.00 and 1.93 V. Its channel current
+  reaches at most 0 to 70 µA positive (the traces are stored to 10 µA), and −2.3 to −3.1 A negative at the
+  start of the window, where Q2 is still in reverse conduction from the dead time. That is not "no conduction".
+  (Wording corrected after an external audit, 2 October 2026.) The terminal
   spike on G is a fast voltage between the extracted gate path and the model's internal rg that does not reach
   the channel-control node. The report's own diagnostics window (from −5 ns) starts in Q2's turn-off tail,
   which is where its 2.4–2.7 V internal maxima and test 7's 1.07 V "without the low-side path" come from; the
@@ -902,24 +905,28 @@ way and flagged; every state check passed (switch node 47.64–47.67 V).
 | G + 50 pH (assumed) | 0.0220 (262 MHz) | 0.0175 | 0.0264 (261 MHz) | yes (ζ −17 %) |
 | G + 50 pH, full R | 0.0228 | 0.0184 | timed out | — |
 
-What this shows, within this model:
+What this shows, within this model (narrowed after an external audit, 2 October 2026):
 
-- **Without package inductance, the transient ring decays two to three times faster than the local linear
-  mode** at the post-edge state. The frequency agrees within 1–3 %. So most of the simulated decay on B and G
-  is not the small-signal damping of that state. The ring there is large (25–36 V on a 48 V bus), which makes
-  amplitude-dependent behaviour, such as Q2's voltage-dependent capacitance over the swing, a candidate; it
-  has not been isolated. A damping comparison with Fig. 9 therefore depends on the ring amplitude, not only on
-  the linear circuit.
-- **With the assumed 50 pH package source inductance, the local mode accounts for the transient ring.** Most of
-  its damping remains with the gates clamped (0.0175 of 0.0220). So it is not mainly the gate loop; it comes
-  through the source-inductance branch. Part of it is the parallel damping resistor added to each package
-  inductor (10 GHz corner) to suppress numerical spikes in test 5. The corner checks there moved ζ by −8 % to
-  +16 %, so that resistor contributes but does not dominate. The rest is not attributed.
+- **On B and G, this single local linearization does not account for the transient's decay**: the transient's
+  ζ is two to three times the local mode's, with the frequency within 1–3 %. The linearization is about a DC
+  equilibrium with the load as a current source, not the transient's actual state at 60 ns, so the difference
+  can involve a changing bias point, several modes or the transient decay estimator, as well as amplitude
+  dependence. Q2's voltage-dependent capacitance over the large swing (25–36 V on a 48 V bus) remains a
+  candidate; none of these is isolated.
+- **On G + 50 pH (assumed package source inductance) the local mode and the transient agree** (frequency within
+  0.5 %, ζ within 17 %).
+- **Substantial damping remains in the clamped circuit** (ζ 0.0175 against 0.0220 active on G + 50 pH). This
+  does not say where it comes from: clamping changes the circuit and its mode, the internal gate resistance
+  remains, and active minus clamped is not an additive gate-loop contribution. Attribution, including to the
+  package inductors' numerical damping resistors (10 GHz corner, test 5), needs the energy accounting or a
+  targeted control.
 - **Full extracted resistance adds about 0.001 to the local ζ** (+23 % on B, +15 % on G, +4 % on G + 50 pH),
   small against the measured 0.072–0.077, as the review's scale estimate predicted.
-- **The gate loop adds damping only where it couples:** active minus clamped is about 0.001 on G and 0.0045 on
-  G + 50 pH, where Q2's internal gate voltage participates 0.041 V per volt at the switch node, against 0.002
-  without package inductance.
+- **Q2's internal gate voltage participates more in the G + 50 pH mode** (0.041 V per volt at the switch node,
+  against 0.002–0.016 in the other active cases).
+
+Revision 4 (evaluation only) checks every form's own solved operating point, kept separately from its starting
+guess: all twelve pass (switch node 47.63–47.67 V, Q1 internal VGS 4.98–5.00 V, Q2 about 0 V).
 
 These are statements about the linearized model at one state, not about the board. The half-power cross-check
 is resolved only for the G + 50 pH cases (B and G bands are under 10 frequency steps wide).

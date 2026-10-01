@@ -16,14 +16,6 @@
    "state_time_s": 4.791549707602339e-06,
    "active": {
     "status": "completed",
-    "state": {
-     "op_status": "failed",
-     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
-     "v_sw_V": 47.637454986572266,
-     "q1_internal_vgs_V": 4.996772766113281,
-     "q2_internal_vgs_V": 1.2895399067180957e-06,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 290425000.0,
     "peak_impedance_ohm": 77.7807248503245,
     "other_peaks_Hz": [],
@@ -39,17 +31,25 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.00021737421934937454,
      "q2_internal_vgs_per_V_sw": 0.002317012677040251
+    },
+    "initial_guess_state": {
+     "op_status": "failed",
+     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
+     "v_sw_V": 47.637454986572266,
+     "q1_internal_vgs_V": 4.996772766113281,
+     "q2_internal_vgs_V": 1.2895399067180957e-06,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.63745552153637,
+     "q1_internal_vgs_V": 4.996772766113281,
+     "q2_internal_vgs_V": 1.2895399067180957e-06,
+     "checks_pass": true
     }
    },
    "clamped": {
     "status": "accepted_with_verified_op_fallback",
     "adapter_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.",
-    "own_state": {
-     "v_sw_V": 47.63745820612239,
-     "q1_internal_vgs_V": 4.997753143310547,
-     "q2_internal_vgs_V": 7.155141446973934e-07,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 290425000.0,
     "peak_impedance_ohm": 77.76885125258931,
     "other_peaks_Hz": [],
@@ -65,6 +65,18 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.00022347305667603503,
      "q2_internal_vgs_per_V_sw": 0.0021873202996159176
+    },
+    "initial_guess_state": {
+     "v_sw_V": 47.63745820612239,
+     "q1_internal_vgs_V": 4.997753143310547,
+     "q2_internal_vgs_V": 7.155141446973934e-07,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.63745820612239,
+     "q1_internal_vgs_V": 4.997753143310547,
+     "q2_internal_vgs_V": 7.155141446973934e-07,
+     "checks_pass": true
     }
    },
    "transient_comparison": {
@@ -86,12 +98,6 @@
    "active": {
     "status": "accepted_with_verified_op_fallback",
     "adapter_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.",
-    "own_state": {
-     "v_sw_V": 47.67041034025732,
-     "q1_internal_vgs_V": 4.996768951416016,
-     "q2_internal_vgs_V": 1.2903473797371001e-06,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 290425000.0,
     "peak_impedance_ohm": 62.49338806127221,
     "other_peaks_Hz": [],
@@ -107,17 +113,23 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.00021737194700234628,
      "q2_internal_vgs_per_V_sw": 0.002315552054593826
+    },
+    "initial_guess_state": {
+     "v_sw_V": 47.67041034025732,
+     "q1_internal_vgs_V": 4.996768951416016,
+     "q2_internal_vgs_V": 1.2903473797371001e-06,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.67041034025732,
+     "q1_internal_vgs_V": 4.996768951416016,
+     "q2_internal_vgs_V": 1.2903473797371001e-06,
+     "checks_pass": true
     }
    },
    "clamped": {
     "status": "accepted_with_verified_op_fallback",
     "adapter_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.",
-    "own_state": {
-     "v_sw_V": 47.67041302484656,
-     "q1_internal_vgs_V": 4.9977569580078125,
-     "q2_internal_vgs_V": 7.159621967789409e-07,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 290425000.0,
     "peak_impedance_ohm": 62.48544363369326,
     "other_peaks_Hz": [],
@@ -133,6 +145,18 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.0002234707208342662,
      "q2_internal_vgs_per_V_sw": 0.002185915624293846
+    },
+    "initial_guess_state": {
+     "v_sw_V": 47.67041302484656,
+     "q1_internal_vgs_V": 4.9977569580078125,
+     "q2_internal_vgs_V": 7.159621967789409e-07,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.67041302484656,
+     "q1_internal_vgs_V": 4.9977569580078125,
+     "q2_internal_vgs_V": 7.159621967789409e-07,
+     "checks_pass": true
     }
    },
    "transient_comparison": {
@@ -152,12 +176,6 @@
    "active": {
     "status": "accepted_with_verified_op_fallback",
     "adapter_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.",
-    "own_state": {
-     "v_sw_V": 47.63816953799117,
-     "q1_internal_vgs_V": 4.989631652832031,
-     "q2_internal_vgs_V": 1.301394029859515e-06,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 303208333.3333334,
     "peak_impedance_ohm": 39.904455908747124,
     "other_peaks_Hz": [],
@@ -173,19 +191,22 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.0013960639790702642,
      "q2_internal_vgs_per_V_sw": 0.016394597245102963
+    },
+    "initial_guess_state": {
+     "v_sw_V": 47.63816953799117,
+     "q1_internal_vgs_V": 4.989631652832031,
+     "q2_internal_vgs_V": 1.301394029859515e-06,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.63816953799117,
+     "q1_internal_vgs_V": 4.989631652832031,
+     "q2_internal_vgs_V": 1.301394029859515e-06,
+     "checks_pass": true
     }
    },
    "clamped": {
     "status": "completed",
-    "state": {
-     "op_status": "failed",
-     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
-     "v_sw_V": 47.63816833496094,
-     "q1_internal_vgs_V": 4.989631652832031,
-     "q2_internal_vgs_V": 1.301394029859515e-06,
-     "checks_pass": true,
-     "borrowed_from": "G-m1-mid active"
-    },
     "peak_frequency_Hz": 303700000.0,
     "peak_impedance_ohm": 48.004312275144514,
     "other_peaks_Hz": [],
@@ -201,6 +222,21 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.00023312306427187044,
      "q2_internal_vgs_per_V_sw": 0.002196952954292414
+    },
+    "initial_guess_state": {
+     "op_status": "failed",
+     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
+     "v_sw_V": 47.63816833496094,
+     "q1_internal_vgs_V": 4.989631652832031,
+     "q2_internal_vgs_V": 1.301394029859515e-06,
+     "checks_pass": true,
+     "borrowed_from": "G-m1-mid active"
+    },
+    "solved_state": {
+     "v_sw_V": 47.63819483309635,
+     "q1_internal_vgs_V": 4.997753143310547,
+     "q2_internal_vgs_V": 7.15524145600277e-07,
+     "checks_pass": true
     }
    },
    "transient_comparison": {
@@ -222,12 +258,6 @@
    "active": {
     "status": "accepted_with_verified_op_fallback",
     "adapter_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.",
-    "own_state": {
-     "v_sw_V": 47.67064499342292,
-     "q1_internal_vgs_V": 4.995876312255859,
-     "q2_internal_vgs_V": -0.002680616449488693,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 303208333.3333334,
     "peak_impedance_ohm": 34.71662950560916,
     "other_peaks_Hz": [],
@@ -243,19 +273,22 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.0013905865371664316,
      "q2_internal_vgs_per_V_sw": 0.016416066747500242
+    },
+    "initial_guess_state": {
+     "v_sw_V": 47.67064499342292,
+     "q1_internal_vgs_V": 4.995876312255859,
+     "q2_internal_vgs_V": -0.002680616449488693,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.67064499342292,
+     "q1_internal_vgs_V": 4.995876312255859,
+     "q2_internal_vgs_V": -0.002680616449488693,
+     "checks_pass": true
     }
    },
    "clamped": {
     "status": "completed",
-    "state": {
-     "op_status": "failed",
-     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
-     "v_sw_V": 47.63816833496094,
-     "q1_internal_vgs_V": 4.989631652832031,
-     "q2_internal_vgs_V": 1.301394029859515e-06,
-     "checks_pass": true,
-     "borrowed_from": "G-m1-mid active"
-    },
     "peak_frequency_Hz": 303700000.0,
     "peak_impedance_ohm": 40.74000336834218,
     "other_peaks_Hz": [],
@@ -271,6 +304,21 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.00023312161007544755,
      "q2_internal_vgs_per_V_sw": 0.002195563445890369
+    },
+    "initial_guess_state": {
+     "op_status": "failed",
+     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
+     "v_sw_V": 47.63816833496094,
+     "q1_internal_vgs_V": 4.989631652832031,
+     "q2_internal_vgs_V": 1.301394029859515e-06,
+     "checks_pass": true,
+     "borrowed_from": "G-m1-mid active"
+    },
+    "solved_state": {
+     "v_sw_V": 47.67065179985539,
+     "q1_internal_vgs_V": 4.9977569580078125,
+     "q2_internal_vgs_V": 7.159654357019596e-07,
+     "checks_pass": true
     }
    },
    "transient_comparison": {
@@ -287,14 +335,6 @@
    "state_time_s": 4.791549707602339e-06,
    "active": {
     "status": "completed",
-    "state": {
-     "op_status": "failed",
-     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
-     "v_sw_V": 47.62708282470703,
-     "q1_internal_vgs_V": 4.9786224365234375,
-     "q2_internal_vgs_V": 1.299823879863382e-06,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 262400000.0,
     "peak_impedance_ohm": 10.755409332872269,
     "other_peaks_Hz": [],
@@ -310,19 +350,24 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.009759608611721253,
      "q2_internal_vgs_per_V_sw": 0.04081884312749515
-    }
-   },
-   "clamped": {
-    "status": "completed",
-    "state": {
+    },
+    "initial_guess_state": {
      "op_status": "failed",
      "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
      "v_sw_V": 47.62708282470703,
      "q1_internal_vgs_V": 4.9786224365234375,
      "q2_internal_vgs_V": 1.299823879863382e-06,
-     "checks_pass": true,
-     "borrowed_from": "G-m1-mid-Ls50 active"
+     "checks_pass": true
     },
+    "solved_state": {
+     "v_sw_V": 47.627080843135786,
+     "q1_internal_vgs_V": 4.9786224365234375,
+     "q2_internal_vgs_V": 1.2998238538841633e-06,
+     "checks_pass": true
+    }
+   },
+   "clamped": {
+    "status": "completed",
     "peak_frequency_Hz": 263875000.0,
     "peak_impedance_ohm": 13.433342746432885,
     "other_peaks_Hz": [],
@@ -338,6 +383,21 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.0002319995665610799,
      "q2_internal_vgs_per_V_sw": 0.0024566858605144146
+    },
+    "initial_guess_state": {
+     "op_status": "failed",
+     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
+     "v_sw_V": 47.62708282470703,
+     "q1_internal_vgs_V": 4.9786224365234375,
+     "q2_internal_vgs_V": 1.299823879863382e-06,
+     "checks_pass": true,
+     "borrowed_from": "G-m1-mid-Ls50 active"
+    },
+    "solved_state": {
+     "v_sw_V": 47.62715181374421,
+     "q1_internal_vgs_V": 4.997753143310547,
+     "q2_internal_vgs_V": 7.153740217979987e-07,
+     "checks_pass": true
     }
    },
    "transient_comparison": {
@@ -360,12 +420,6 @@
    "active": {
     "status": "accepted_with_verified_op_fallback",
     "adapter_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.",
-    "own_state": {
-     "v_sw_V": 47.65955641243144,
-     "q1_internal_vgs_V": 4.984870910644531,
-     "q2_internal_vgs_V": -0.0026806142533197796,
-     "checks_pass": true
-    },
     "peak_frequency_Hz": 262400000.0,
     "peak_impedance_ohm": 10.347947197505368,
     "other_peaks_Hz": [],
@@ -381,19 +435,22 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.009769139426621007,
      "q2_internal_vgs_per_V_sw": 0.04087018935353965
+    },
+    "initial_guess_state": {
+     "v_sw_V": 47.65955641243144,
+     "q1_internal_vgs_V": 4.984870910644531,
+     "q2_internal_vgs_V": -0.0026806142533197796,
+     "checks_pass": true
+    },
+    "solved_state": {
+     "v_sw_V": 47.65955641243144,
+     "q1_internal_vgs_V": 4.984870910644531,
+     "q2_internal_vgs_V": -0.0026806142533197796,
+     "checks_pass": true
     }
    },
    "clamped": {
     "status": "completed",
-    "state": {
-     "op_status": "failed",
-     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
-     "v_sw_V": 47.62708282470703,
-     "q1_internal_vgs_V": 4.9786224365234375,
-     "q2_internal_vgs_V": 1.299823879863382e-06,
-     "checks_pass": true,
-     "borrowed_from": "G-m1-mid-Ls50 active"
-    },
     "peak_frequency_Hz": 263875000.0,
     "peak_impedance_ohm": 12.821388039165498,
     "other_peaks_Hz": [],
@@ -409,6 +466,21 @@
     "participation_at_peak": {
      "q1_internal_vgs_per_V_sw": 0.00023198583699515798,
      "q2_internal_vgs_per_V_sw": 0.0024550326836714404
+    },
+    "initial_guess_state": {
+     "op_status": "failed",
+     "op_message": "log reports: Gmin stepping level 2 failed to find operating point. Use\".option gminsteps=0\" to skip all Gmin stepping.; Source stepping level 2 failed to find operating point. Use \".options srcsteps=0\" to skip all source stepping.",
+     "v_sw_V": 47.62708282470703,
+     "q1_internal_vgs_V": 4.9786224365234375,
+     "q2_internal_vgs_V": 1.299823879863382e-06,
+     "checks_pass": true,
+     "borrowed_from": "G-m1-mid-Ls50 active"
+    },
+    "solved_state": {
+     "v_sw_V": 47.65960146169208,
+     "q1_internal_vgs_V": 4.9977569580078125,
+     "q2_internal_vgs_V": 7.158150765462779e-07,
+     "checks_pass": true
     }
    },
    "transient_comparison": {
@@ -418,5 +490,6 @@
    }
   }
  },
- "revision3_evaluator_sha256": "97087ee7bb2529ce245727d92336677608d3ba045d549467177f1a9fcc7659e2"
+ "revision3_evaluator_sha256": "97087ee7bb2529ce245727d92336677608d3ba045d549467177f1a9fcc7659e2",
+ "revision4_evaluator_sha256": "83430ec8f1959efb99a1ecf051ee8ff3034a74ec5e6929384a4b5b1f4d9a9a87"
 }

@@ -4,7 +4,7 @@
   "results/gan/epc90133-switching-fullr.json": "5a28c986351d88c09a48feecc15d848b5dfe32e730dedfa02c779cdc48a44e7c",
   "results/gan/epc90133-switching-gateloop.json": "484f151498b4b4027cfde958916158bdaa79913d6cff3df6960cee15e481b255"
  },
- "evaluator_sha256": "b874bf8bfb75f700ee96e801949b8ae432bee12d93238fde7dcf791084218ca0",
+ "evaluator_sha256": "ef3f69b9da2de35b0971a0e5c2f398789a175e46ddcbd459c33d1a4c13ca1f91",
  "reproduction_of_test7": {
   "B-m1-mid-ms100": {
    "max_abs_rel_change": 0.0,
@@ -187,5 +187,5 @@
    }
   }
  },
- "reading": "Within the vendor model, Q2's channel does not conduct during Q1's turn-on in any completed case: its internal VGS stays below about 1 V while the terminal VGS reaches up to 2 V. The terminal peak does not reach the channel-control node. This is a model diagnostic; it says nothing about the physical device's internal gate network."
+ "reading": "The sampled vendor-model traces show no appreciable positive Q2 channel current indicating false turn-on during Q1's turn-on (positive maxima 0 to 70 uA at the traces' 10 uA resolution; negative values to about -3 A are Q2's reverse conduction at the window start). Its internal VGS stays below about 1 V while the terminal VGS reaches up to 2 V. Wording corrected after an external audit (2 October 2026). A model diagnostic; it says nothing about the physical device's internal gate network."
 }
