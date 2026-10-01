@@ -248,8 +248,16 @@ def is_gate_extraction(ext):
     return any(p["terminal"] == "U80.PH" for p in ext["ports"])
 
 
-def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False):
+def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False, full_r=False):
     """Branch inductors, resistances and couplings from an extraction report.
+
+    Baseline (full_r False, unchanged): each branch carries its diagonal resistance R[k, k]; the off-diagonal
+    resistance terms are dropped (method audit, 1 October 2026: loop R at 100 MHz 2.03 -> 1.12 mohm on B).
+    Network revision full_r (separate, opt-in; qualified by scripts/qualify_epc90133_network_transfer.py): branch
+    k keeps its resistor R[k, k] and adds in series a behavioural source V = sum_{j != k} R[k, j] I(Lb_j), so the
+    branch voltages are R I + L dI/dt with the full extracted R and L. (A behavioural source carrying the whole
+    row, with no resistor, forms voltage-source/inductor loops that LTspice rejects; qualification run 1.) Both at
+    the extraction frequency (100 MHz).
 
     no_gate_power_k (test 7 follow-up): drop every coupling between a gate-drive branch (driver balls and gate
     resistors, STAGE_OF) and a power branch; couplings within each group are kept."""
@@ -257,10 +265,18 @@ def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False):
     R = np.array(ext["R_ohm"])
     lines = [f"* extracted branch network: {ext['case']}"]
     names = []
+    if full_r and ideal:
+        raise ValueError("full_r applies to the extracted network, not to ideal copper")
     for k, p in enumerate(ext["ports"]):
         lk, rk = (1e-12, 1e-4) if ideal else (L[k, k], R[k, k] * r_scale)
         lines.append(f"Lb{k} {node(p['terminal'])} xb{k} {lk:.6g}")
-        lines.append(f"Rb{k} xb{k} {node(p['reference'])} {rk:.6g}")
+        terms = "+".join(f"({R[k, j] * r_scale:.9g})*I(Lb{j})" for j in range(len(ext["ports"]))
+                         if j != k and R[k, j] != 0) if full_r else ""
+        if terms:
+            lines.append(f"Rb{k} xb{k} yb{k} {rk:.6g}")
+            lines.append(f"Bb{k} yb{k} {node(p['reference'])} V={terms}")
+        else:
+            lines.append(f"Rb{k} xb{k} {node(p['reference'])} {rk:.6g}")
         names.append(f"Lb{k}")
     gate_br = {k for k, p in enumerate(ext["ports"]) if p["terminal"].split(".")[0] in GATE_PARTS}
     if not ideal:
