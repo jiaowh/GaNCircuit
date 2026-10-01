@@ -32,6 +32,13 @@ by less than 2 percentage points between 100 and 50 ps on G-m1-mid-Ls50.
 Reading: shares attribute the simulated ring's dissipation within this model; voltage-envelope decay (tests 10
 and the cycle analysis) is a different quantity. Nothing here is a statement about the board.
 
+Run 1 (2 October 2026) stopped in post-processing after its first case: with a save start time, the raw file's
+time axis ran from 0 to 90 ns rather than from the save start, so the ring window fell outside it. The reader
+now shifts such an axis by the declared save start; nothing else changed. Run 1's B case then failed E1 (max residual 1.7 % of the largest
+element power): only 1.6 % of samples exceed the tolerance, all within about 2 ns of the switching edge, and the
+maximum after command + 5 ns is 1.2e-3; E2 passed (2.5e-9). The criterion is unchanged; the residual's location
+is now reported (E1_location).
+
     PYTHONPATH=src python scripts/epc90133_energy_budget.py
 """
 import hashlib
@@ -140,6 +147,8 @@ def group(name, kind):
 
 def budget(raw, els, t_cmd, f_ring):
     t, v = read_raw(raw)
+    if t[-1] < t_cmd:  # run 1: with a save start time this raw file's time axis starts at 0 (observed)
+        t = t + (t_cmd - SAVE_FROM)
     V = lambda n: np.zeros_like(t) if n == "0" else v[f"v({n})"]
     p = {}
     for name, a, b, kind in els:
@@ -149,7 +158,12 @@ def budget(raw, els, t_cmd, f_ring):
         p[name] = (V(a) - V(b)) * i * (-1.0 if kind == "S" else 1.0)
     missing = [e[0] for e in els if e[0] not in p]
     tot = sum(p.values())
-    e1 = float(np.abs(tot).max() / max(np.abs(x).max() for x in p.values()))
+    rel = np.abs(tot) / max(np.abs(x).max() for x in p.values())
+    e1 = float(rel.max())
+    # Added after run 1, reporting only (E1's criterion is unchanged): where the residual sits.
+    e1_where = {"fraction_of_samples_above_tol": float(np.mean(rel > TOL_E1)),
+                "worst_times_after_command_s": [float(x) for x in (t[np.argsort(-rel)[:5]] - t_cmd)],
+                "max_after_command_plus_5ns": float(rel[t > t_cmd + 5e-9].max())}
     # ring window
     g = np.arange(t[0], t[-1], GRID)
     sw_v = np.interp(g, t, V("q2_d"))
@@ -179,7 +193,7 @@ def budget(raw, els, t_cmd, f_ring):
     loss = {k: x for k, x in rgroups.items() if not k.startswith(("source", "storage"))}
     total_loss = sum(loss.values())
     e2 = abs(sum(rgroups.values())) / abs(total_loss) if total_loss else None
-    return {"elements": len(p), "missing_currents": missing, "E1_tellegen_rel": e1, "E1_pass": e1 <= TOL_E1,
+    return {"elements": len(p), "missing_currents": missing, "E1_tellegen_rel": e1, "E1_pass": e1 <= TOL_E1, "E1_location": e1_where,
             "ring_window_s": [float(g[lo]), float(g[hi])], "ring_period_s": T,
             "whole_window_energy_J": groups, "ring_energy_J": rgroups,
             "ring_loss_total_J": total_loss, "ring_loss_share": {k: x / total_loss for k, x in loss.items()},
