@@ -1,9 +1,12 @@
-# EPC90133 hardware test plan (draft v0.2, 30 September 2026)
+# EPC90133 hardware test plan (draft v0.3, 1 October 2026)
 
 Status: **draft for owner review; not approved, and not yet an executable lab procedure** (the envelope values
 below are still open). v0.2 applies an external audit: the driver has no input lockout, the driver's PHASE/BOOT
 ratings are tighter than the FET's, and categorical signatures became quantitative predictions. A further audit (1 October 2026) made Q2's gate-source voltage a prerequisite throughout E3 and recorded the simulated PHASE-ball stress as unresolved; test 8 narrowed it, and the PHASE-to-GND undershoot near the driver became a stop criterion. Nothing is energized until G4's test plan and interlocks are
-approved (plan section 8). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
+approved (plan section 8). v0.3 applies the project audit at 8284dbd (docs/project-audit-8284dbd.md): E1's
+setup is declared, the hypothesis signatures are treated as non-exclusive, prediction freezing has two stages, the
+held-out set is chosen from feasible conditions (60 V is optional), efficiency is a named deliverable, and the
+first-power procedure has a required structure (its values are still open). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
 reviews of 30 September 2026. It measures the stock board first, as the plan requires.
 
 ## Purpose
@@ -18,12 +21,13 @@ each explanation predicts a *different pattern* across operating conditions, not
 | H1 | Common-source inductance (board source copper shared with the driver return, and/or inside the package) slows the turn-on | Rise time and overshoot depend on the turn-on di/dt: rise time grows with switched current; the gate-source voltage at the die shows a dip during the current rise. Extraction G estimates the high side's board part at only 0.9 pH (low side 48 pH), so for Q1's turn-on H1 now mainly concerns the package |
 | H1b | Coupling between the power loop and the high-side gate-drive loop slows Q1's turn-on (test 7: the extracted high-side gate path lowers the simulated overshoot by 7 V; mechanism not isolated) | Like H1 in the switching data; separable from package inductance only with the gate-loop geometry changed (for example E4's gate-resistor change shifts H1 and H1b differently in the bench) or with E8-type passive measurements of the gate-loop coupling |
 | H2 | The real driver is weaker or slower than the behavioural model | The driver's output edge, measured with the power stage off (E1), is slower than modelled; with that measured edge in the bench, the predicted rise times match across E3 without other changes. Rise time is not expected to be independent of current or bus voltage under H2 (the Miller interval and di/dt still vary), so H2 is tested by its predicted dependence, not by the absence of one |
-| H3 | Losses missing from the model (output-capacitance or dielectric loss) damp the ringing | Damping depends on bus voltage and temperature, not on the probe; the ringing frequency stays at the loop's LC value |
-| H4 | The measurement chain (probe loading, ground path, bandwidth) shaped EPC's recording | Changing the probe or its connection changes the recorded overshoot and frequency while the circuit is unchanged |
+| H3 | Losses missing from the model (output-capacitance or dielectric loss) damp the ringing | Damping changes with bus voltage and temperature at nearly constant frequency, by more than the probe-to-probe difference |
+| H4 | The measurement chain (probe loading, ground path, bandwidth) shaped EPC's recording | The recorded overshoot and frequency change with the probe or its connection by more than the probe's change in loading alone predicts. A different probe also changes the circuit, so its loading is bounded separately (from its input impedance and E0) from its observation response |
 | H5 | The model's gate charge (the EPC2302 Fig. 7 discrepancy) slows or speeds the Miller interval | Rise time scales with the measured Miller charge; device-level gate-charge measurement differs from the model |
 | H6 | The actual dead time is shorter than the nominal 10 ns | The dead-time plateau measured at the driver outputs, with no power stage load, differs from 10 ns |
 
-These explanations are not exclusive. The aim is to bound each one with its own evidence (the per-layer error
+These explanations are not exclusive, and the right-hand column gives hypotheses about tendencies, not exclusive
+signatures: several explanations can produce the same tendency. The aim is to bound each one with its own evidence (the per-layer error
 budget). The right-hand column describes qualitative tendencies. Before measurement, each is replaced by a
 quantitative prediction from the bench (the hypothesis's parameter varied over its stated range, with the
 bench's uncertainty), and an explanation is favoured only where its prediction fits and the competing ones do
@@ -61,7 +65,8 @@ not, beyond that uncertainty.
 - A current-limited bus supply with hardware over-voltage and over-current trips, a bus-discharge path, the
   enclosure interlock and an emergency stop (plan section 7).
 - A hardware limit on double-pulse width, so the inductor current cannot run away if the PWM source misbehaves.
-- The first energization is at **12 V bus**. The bus rises in steps (12, 24, 36, 48 V), with a human checkpoint at
+- Proposed, not approved: the first energization at **12 V bus** (the approved starting value is set in the
+  first-power procedure below). The bus rises in steps (12, 24, 36, 48 V), with a human checkpoint at
   each step. At each step the measured switch-node peak and undershoot must leave margin to the tighter of the
   FET limit (100 V) and the driver's PHASE/BOOT ratings (above) before the next step.
   **The simulated overshoots are sensitivity results, not a safe envelope**: the unvalidated full-board simulation
@@ -81,7 +86,8 @@ not, beyond that uncertainty.
 - **Not yet specified (required before approval):** the double-pulse width limit and its hardware
   implementation, the maximum inductor current per step, the supply current-trip and over-voltage-trip
   settings, the case-temperature limit and how it is measured, the stop criteria at each checkpoint, and the
-  ramp for any step above 48 V (the 60 V held-out condition below lies outside the listed steps).
+  ramp for any step above 48 V (a held-out step above 48 V lies outside the listed steps). The first-power
+  procedure section below lists every value that must be filled in.
 
 ## Equipment checklist (to compare with the lab inventory)
 
@@ -139,6 +145,28 @@ Consequences for the plan, to be settled with the inventory:
   be connected at these points; with fewer channels or probes, the plan states which measurement is
   repeated at which condition.
 
+## First-power procedure: required structure (values open)
+
+The executable procedure is written after the inventory and the board's identity are known, with the lab's
+responsible person. It is approved as one document; each entry below needs a value, its basis and who accepted it.
+Entries marked *hardware* are implemented and acceptance-tested independently of any software and of the operator;
+*operator* entries are human stop decisions, recorded separately from the hardware acceptance tests.
+
+| Entry | Kind | Content required | Status |
+|---|---|---|---|
+| Board identity | record | silkscreen revision, fitted population against the published BOM, any modification with its approval | open (board not yet received) |
+| Bus over-voltage trip | hardware | trip level per step, implementation (supply OVP or a separate disconnect), response time, acceptance test | open |
+| Bus over-current trip | hardware | trip level per step, implementation, response time, acceptance test | open |
+| Pulse-width limit | hardware | maximum double-pulse width, enforced independently of the PWM source; resulting maximum inductor current for the chosen inductor at each bus step | open |
+| Interlock and emergency stop | hardware | what they disconnect; acceptance test before each session | open |
+| Discharge verification | hardware + operator | discharge path and time constant; bus voltage measured below a stated value at the board terminals before any contact | open |
+| Gate-drive states at power-up and power-down | operator, from E1 | evidence that no input state, including an open input, commands both gates on (the driver has no lockout) | open |
+| Starting bus voltage and steps | operator | approved first value and steps (12/24/36/48 V is a proposal) | open |
+| Numerical stop thresholds per step | operator | switch-node peak and undershoot, PHASE-to-GND undershoot, Q2 VGS peak, case temperature; each with its margin to the governing rating and the measurement uncertainty included | open |
+| Temperature limit | operator | case-temperature limit, sensor and location | open |
+| Measurement uncertainty per channel | record | probe and connection-point allowances (probe-points section), bandwidth, deskew, from E0 | open (needs the probes) |
+| Checkpoint record | record | who decides at each step, what is recorded, the decision | open |
+
 ## Experiments
 
 Each experiment records the raw waveforms, all instrument settings, the probe and its connection, the board
@@ -147,7 +175,14 @@ identity (silkscreen revision, fitted population), the case temperature and the 
 - **E0, measurement chain first.** Probe deskew on a known edge. The step response of each probe and connection
   gives its bandwidth and ringing. Without this, no device or layout conclusion is drawn (plan section 4).
 - **E1, driver alone (H2, H6).** Power stage unpowered (VIN = 0 V): measure PWM-to-gate delays, gate-voltage
-  edges and the dead time at the gate pins. This isolates driver timing and strength from the power stage.
+  edges and the dead time at the accessible gate points. This isolates driver timing from the power stage, but it
+  does not uniquely identify the loaded switching drive: at VIN = 0 the gate load is the FETs' input capacitance at
+  zero drain bias, without a Miller plateau, and the high-side supply is the bootstrap capacitor's state. Each E1
+  record therefore declares: the gate load (the fitted EPC2302s and anything fitted to J1/J2), the bootstrap state
+  (pre-charge sequence and BOOT-PHASE voltage before the first high-side pulse), the supply conditions (VDD, VCC at
+  C80) and which accessible voltage is measured (for example the J2/R22 point, not the die). A representation
+  chosen from E1 is a hypothesis about the loaded drive; it is tested against the energized gate observations (Q2's
+  VGS in E3, Q1's if a probe allows) before it is used for predictions.
   It is also a model input: in simulation (test 11, docs/build.md) two driver representations that both meet
   the datasheet's edge times and resistance limits change the simulated turn-on overshoot by about a third
   without package source inductance. Record the gate-voltage waveform shape, not only 10-90 % times, so the
@@ -195,16 +230,32 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   fixture effects included; otherwise the difference is not a bound. Both measurements' errors carry into it.
   Sources and limits: docs/gan-research-round-2-2026-09-30.md.
 
+- **E9, efficiency (named deliverable; procedure not yet written).** Efficiency is core scope (plan section 2)
+  and is not replaced by waveform matching. Before G4 approval of this experiment, a procedure states: input power
+  from bus voltage and current measured at the board terminals (four-wire voltage sense, DC meters, ranges), output
+  power at the load, gate-drive supply power counted separately, the thermal steady-state criterion and case
+  temperature, the operating points (within the approved envelope), and the propagated uncertainty of the loss
+  (the difference of two large powers). The simulated loss stays gate-charge dependent and is not labelled validated.
+
 ## Held-out conditions and frozen predictions
 
-Before any measurement, freeze the simulation's predictions (model and extraction revisions, bench settings,
-predicted metrics with their stated sensitivity ranges) for all conditions. Use E0–E4 at 24–48 V for calibration
-and diagnosis. Hold out, and score unchanged:
+Predictions are frozen in two stages, each recorded with model, extraction and driver revisions, bench settings,
+and predicted metrics with their stated sensitivity ranges:
 
-- the bus at 60 V (below the 80 V rating), only with its own ramp and checkpoint above 48 V, and only if the
-  measured peaks and undershoot at 48 V leave margin to the driver's PHASE/BOOT ratings as well as to 100 V;
-- turn-off at 25 A with R80 = 2.2 Ω;
-- the second temperature.
+1. **Prior baseline**, frozen before any measurement, for the conditions actually selected.
+2. **Revised prediction**, only if E1 (or E0) calibrates the driver or the measurement chain: frozen as a separate
+   revision before any diagnostic switching data (E3 onwards) and before any held-out data. The prior baseline
+   is scored too, and is not overwritten.
+
+Quantitative hypothesis predictions are made only for conditions that are feasible within the approved envelope
+and the available equipment. Use E0–E4 at the approved bus steps for calibration and diagnosis. The held-out set is
+selected from feasible conditions and recorded before any of its data are observed. Candidates (none is mandatory):
+
+- a bus step above the diagnostic range (for example 60 V, below the 80 V board rating), only if the approved
+  envelope includes it, with its own ramp and checkpoint, and only if the measured peaks and undershoot at the
+  step below leave margin to the driver's PHASE/BOOT ratings as well as to 100 V;
+- turn-off at 25 A with R80 = 2.2 Ω, if the resistor change is approved;
+- the second temperature, if a controlled temperature is available.
 
 Report the first held-out score as it is; later corrections create new revisions and do not overwrite it.
 
