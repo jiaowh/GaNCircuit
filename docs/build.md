@@ -1235,6 +1235,23 @@ Within this one task family the agent behaved as specified every time. Nine runs
 rate, and the agent still made no engineering decision; the next step is a task that requires one, judged against
 a declared expected answer.
 
+### KiCad groundwork (G5 preparation)
+
+Owner, 1 October 2026: prepare the route to our own board design, without design work that waits on measurements.
+- **KiCad 10.0.6** is installed for the current user from the official installer (checksum matched the published
+  SHA-256; a winget download stalled, so the file was fetched directly into the git-ignored `.tools/kicad`).
+  `kicad-cli` runs.
+- **EPC's own KiCad library** (EPC_2024Q4a; source recorded in `devices/epc/epc-library-sources.json`) loads in
+  KiCad 10: `kicad-cli fp upgrade` converts all 47 footprints, and the EPC2302 footprint (D0606F_100V) renders. Its
+  seven pads sit at the datasheet's 0.85 mm pitch with the datasheet's pinout; mask and paste are custom polygons.
+  EPC's newer Altium library (2026 Q3b) is also recorded. Using EPC's published footprint avoids drawing one by hand.
+- **Route, still the owner's choice (plan section 3):** editable Altium board files would need an EPC request, which
+  the owner has ruled out, so the remaining routes are re-entering the schematic (the transcribed power stage in
+  `devices/epc/epc90133-schematic.json` is a start) with EPC's library footprints, or using the Gerbers as geometry
+  reference only.
+- Not done: comparing D0606F_100V geometrically with the land patterns on EPC90133 and EPC9165; a uP1966E footprint
+  (not in EPC's library); any schematic or layout.
+
 ### LTspice installation
 
 Install LTspice from the
