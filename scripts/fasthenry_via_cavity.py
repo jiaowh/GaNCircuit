@@ -69,6 +69,8 @@ E1 and E2 use (w/8, 9), and the report goes to results/gan/fasthenry-via-cavity-
 reused from the original run directory. Expected: about 340k filaments for D = 3 mm, run one case at a time
 (-p diag). A pass would converge this single-via benchmark only; the scope above is unchanged, and it would
 not qualify board via arrays or plane holes.
+Launch 1 of the fourth mesh ran only the three old meshes (--meshes still defaulted to 3) and wrote no evaluation;
+its log and report are kept under runs/ as via-mesh4-run1-failed.*. Fixed: --meshes defaults to all meshes.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
@@ -209,13 +211,15 @@ def case_impedance(run_root, D, div, n, precond):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/fasthenry-via-cavity.json")
-    ap.add_argument("--meshes", type=int, default=len(MESHES), help="run only the first N meshes (for timing)")
+    ap.add_argument("--meshes", type=int, default=None, help="run only the first N meshes (for timing)")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel (FastHenry is single-threaded)")
     ap.add_argument("--run-dir", type=Path, default=None, help="reuse finished or running cases in this directory")
     ap.add_argument("--precond", default=None, help="FastHenry -p option for new runs, e.g. diag (solver path only)")
     ap.add_argument("--fourth-mesh", action="store_true", help="add the declared (w/8, 9) mesh (see the docstring)")
     args = ap.parse_args()
     meshes = MESHES + ((MESH4,) if args.fourth_mesh else ())
+    if args.meshes is None:
+        args.meshes = len(meshes)
     if args.fourth_mesh and args.output == ap.get_default("output"):
         args.output = ROOT / "results/gan/fasthenry-via-cavity-mesh4.json"
     delta = skin_depth(FREQ) * 1e3  # mm
