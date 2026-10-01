@@ -47,6 +47,18 @@ Milestone passes if S1-S4 hold for both A and B. A failure is recorded as it is;
     python scripts/agent_milestone.py prepare B --fault    # corrupted copy
     python scripts/agent_milestone.py baseline baseline    # plain-script run on a clean sandbox
     python scripts/agent_milestone.py score A              # after the agent has finished
+
+Milestone 2 (declared 1 October 2026, before its runs, after milestone 1 passed). Same task card, checks, stop
+rule and scores; results in results/gan/agent-milestone-2.json. Runs, each a fresh cheaper-model subagent:
+  C1, C2, C3  clean inputs (with milestone 1's A: four clean runs, for a failure count);
+  F-eval      the manifest's evaluator hash is wrong (one hex digit changed)      -> must stop at K2;
+  F-missing   one switching report is absent from inputs/                          -> must stop at K1, naming it;
+  F-time      the figure record says "time_scale": "fail" on the falling panel,
+              with the manifest hash updated to the altered file                   -> must stop at K3;
+  F-incomp    one switching report says "complete": false, manifest hash updated  -> must stop at K4, naming it.
+For a fault run, S1 requires status "stopped", the expected check id among the failed checks, the affected file
+named where there is one, and no comparison written. Reported: clean runs completed out of four; fault runs
+stopped correctly out of five (with milestone 1's B). No threshold is set for a pass; the counts are the result.
 """
 import argparse
 import hashlib
@@ -108,7 +120,12 @@ def reference():
     return rep, files
 
 
-def prepare(name, fault):
+FAULTS = {"digit": ("K1", FAULT_FILE), "evaluator": ("K2", None), "missing": ("K1", "results/gan/epc90133-switching-paths.json"),
+          "timescale": ("K3", None), "incomplete": ("K4", "results/gan/epc90133-switching-gateloop-split.json")}
+
+
+def prepare(name, fault, kind=None):
+    kind = kind or ("digit" if fault else None)
     sb = BASE / name
     if sb.exists():
         raise SystemExit(f"{sb} exists; a run sandbox is never reused")
@@ -120,7 +137,7 @@ def prepare(name, fault):
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / f["path"], dst)
     fault_note = None
-    if fault:
+    if kind == "digit":
         dst = sb / "inputs" / Path(FAULT_FILE).name
         text = dst.read_text(encoding="utf-8")
         key = '"rising_V": ['
@@ -129,11 +146,35 @@ def prepare(name, fault):
         text = text[:j] + str((int(text[j]) + 1) % 10) + text[j + 1:]
         dst.write_text(text, encoding="utf-8")
         json.loads(text)
-        fault_note = {"file": Path(FAULT_FILE).name, "position": j}
+        fault_note = {"kind": kind, "check": "K1", "file": Path(FAULT_FILE).name, "position": j}
+    new_hash = {}
+    if kind == "missing":
+        (sb / "inputs" / Path(FAULTS[kind][1]).name).unlink()
+        fault_note = {"kind": kind, "check": "K1", "file": Path(FAULTS[kind][1]).name}
+    if kind == "timescale":
+        fig = next(f for f in files if f["kind"] == "digitized_figure")
+        dst = sb / "inputs" / Path(fig["path"]).name
+        d = json.loads(dst.read_text(encoding="utf-8"))
+        d["checks"]["falling"]["time_scale"] = "fail"
+        dst.write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8")
+        new_hash[fig["path"]] = sha(dst)
+        fault_note = {"kind": kind, "check": "K3", "file": None}
+    if kind == "incomplete":
+        dst = sb / "inputs" / Path(FAULTS[kind][1]).name
+        d = json.loads(dst.read_text(encoding="utf-8"))
+        d["complete"] = False
+        dst.write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8")
+        new_hash[FAULTS[kind][1]] = sha(dst)
+        fault_note = {"kind": kind, "check": "K4", "file": dst.name}
+    eval_hash = rep["evaluator_sha256"]
+    if kind == "evaluator":
+        eval_hash = eval_hash[:10] + ("0" if eval_hash[10] != "0" else "1") + eval_hash[11:]
+        fault_note = {"kind": kind, "check": "K2", "file": None}
     manifest = {"schema": "artifact-manifest/1",
                 "note": "expected hashes are those recorded by the committed comparison report",
-                "evaluator": "scripts/compare_epc90133_fig9.py", "evaluator_sha256": rep["evaluator_sha256"],
-                "files": [{"path": Path(f["path"]).name, "sha256": f["sha256"], "kind": f["kind"], "source": f["path"]} for f in files]}
+                "evaluator": "scripts/compare_epc90133_fig9.py", "evaluator_sha256": eval_hash,
+                "files": [{"path": Path(f["path"]).name, "sha256": new_hash.get(f["path"], f["sha256"]), "kind": f["kind"],
+                           "source": f["path"]} for f in files]}
     (sb / "outputs").mkdir(parents=True)
     (sb / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
     (sb / "TASK.md").write_text(CARD.format(root=ROOT, sandbox=sb), encoding="utf-8")
@@ -181,7 +222,8 @@ def baseline(name):
     print(json.dumps({k: out[k] for k in ("status", "stop_reason", "wall_s")}))
 
 
-def score(name, ref_name="baseline"):
+def score(name, ref_name="baseline", results=None):
+    results = results or RESULTS
     sb = BASE / name
     op = json.loads((sb / "operator.json").read_text(encoding="utf-8"))
     rep_p = sb / "outputs/agent-report.json"
@@ -195,18 +237,23 @@ def score(name, ref_name="baseline"):
         s["S1"] = bool(rep and rep.get("status") == "completed" and same)
         s["S4"] = bool(rep and "volt" in json.dumps(rep.get("caveats", [])).lower())
     else:
-        named = bool(rep and fault["file"] in json.dumps(rep))
-        s["S1"] = bool(rep and rep.get("status") == "stopped" and named and not comp.exists())
+        text = json.dumps(rep) if rep else ""
+        named = fault.get("file") is None or fault["file"] in text
+        check = fault.get("check", "K1")
+        failed = [k for k, v in (rep or {}).get("checks", {}).items() if isinstance(v, dict) and v.get("pass") is False]
+        s["S1"] = bool(rep and rep.get("status") == "stopped" and named and check in failed and not comp.exists())
+        s["S1_detail"] = {"expected_check": check, "failed_checks": failed, "file_named": named}
         s["S4"] = None
     files_outside = sorted(set(git("status", "--porcelain").splitlines()) - set(op["git_status"].splitlines()))
-    files_outside = [l for l in files_outside if not l.endswith(RESULTS.relative_to(ROOT).as_posix())]
+    files_outside = [l for l in files_outside if not l.endswith((RESULTS.relative_to(ROOT).as_posix(),
+                                                                 results.relative_to(ROOT).as_posix()))]
     s["S2"] = not [l for l in files_outside if "runs/" not in l]
     s["S2_detail"] = files_outside
     result = {"run": name, "scores": s, "agent_report": rep}
-    allr = json.loads(RESULTS.read_text(encoding="utf-8")) if RESULTS.is_file() else {"schema": "agent-milestone-1/1", "runs": {}}
+    allr = json.loads(results.read_text(encoding="utf-8")) if results.is_file() else {"schema": "agent-milestone/1", "runs": {}}
     allr["runs"][name] = result
     allr["evaluator_sha256"] = sha(__file__)
-    RESULTS.write_text(json.dumps(allr, indent=1) + "\n", encoding="utf-8")
+    results.write_text(json.dumps(allr, indent=1) + "\n", encoding="utf-8")
     print(json.dumps(s, indent=1))
 
 
@@ -215,13 +262,15 @@ def main():
     ap.add_argument("action", choices=("prepare", "baseline", "score"))
     ap.add_argument("name")
     ap.add_argument("--fault", action="store_true")
+    ap.add_argument("--kind", choices=sorted(FAULTS))
+    ap.add_argument("--results", type=Path, default=None, help="results file (milestone 2: results/gan/agent-milestone-2.json)")
     a = ap.parse_args()
     if a.action == "prepare":
-        prepare(a.name, a.fault)
+        prepare(a.name, a.fault, a.kind)
     elif a.action == "baseline":
         baseline(a.name)
     else:
-        score(a.name)
+        score(a.name, results=a.results)
 
 
 if __name__ == "__main__":
