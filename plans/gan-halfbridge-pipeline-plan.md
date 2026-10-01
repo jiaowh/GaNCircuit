@@ -469,6 +469,14 @@ hardware is energized before G4's test plan and interlocks are approved.
    is a project goal but not the current priority.
 9. Define I-1/I-2/I-3 schemas, layout variables,
    held-out validation conditions and whether board-performance improvement is required.
+10. Second board (owner, 1 October 2026): EPC9165KIT (EPC2302 in both positions, MPQ1918
+   driver, two-phase buck/boost) is the recorded candidate for a comparative measurement
+   (docs/second-board-selection-2026-10-01.md). Purchase is deferred. Order: (a) now, at no
+   cost: retrieve and audit its BOM and Gerbers and locate gate and switch-node probe access;
+   (b) after the first EPC90133 measurements: buy only if a residual remains that E1, E4 and
+   E7 on EPC90133 cannot attribute. Driver and layout change together on EPC9165, and the
+   MPQ1918 has no vendor model, so its driver would need its own measurement. A second
+   EPC90133 (E8) is the more direct test of layout against device.
 
 ## 10. Immediate work and dependencies
 
