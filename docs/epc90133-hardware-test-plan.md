@@ -2,7 +2,7 @@
 
 Status: **draft for owner review; not approved, and not yet an executable lab procedure** (the envelope values
 below are still open). v0.2 applies an external audit: the driver has no input lockout, the driver's PHASE/BOOT
-ratings are tighter than the FET's, and categorical signatures became quantitative predictions. A further audit (1 October 2026) made Q2's gate-source voltage a prerequisite throughout E3 and recorded the simulated PHASE-ball stress as unresolved. Nothing is energized until G4's test plan and interlocks are
+ratings are tighter than the FET's, and categorical signatures became quantitative predictions. A further audit (1 October 2026) made Q2's gate-source voltage a prerequisite throughout E3 and recorded the simulated PHASE-ball stress as unresolved; test 8 narrowed it, and the PHASE-to-GND undershoot near the driver became a stop criterion. Nothing is energized until G4's test plan and interlocks are
 approved (plan section 8). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
 reviews of 30 September 2026. It measures the stock board first, as the plan requires.
 
@@ -41,7 +41,12 @@ not, beyond that uncertainty.
   below −5 V exceeds the PHASE rating. The PHASE ball is not the Q2 drain pad: ringing there is not measured by a
   probe at Q2 and needs its own estimate (the extraction G network has the U80.PH terminal). The simulated
   PHASE-ball undershoot is unresolved: the raw minima reach −8 to −28 V as sub-picosecond excursions of the ideal
-  driver stage, and only a filtered version is inside the rating (docs/build.md, test 7).
+  driver stage, and only a filtered version is inside the rating (docs/build.md, test 7). With a regularized
+  driver output (test 8: assumed 10–100 pF pin capacitance and clamp diodes) the turn-off undershoot becomes a
+  2 ns dip of about −3.6 V, inside −5 V with only 1.4 V margin; the criteria for calling this resolved were not
+  all met. The PHASE-to-GND voltage is therefore measured at each bus step, at the accessible point nearest
+  U80's PHASE and GND balls (chosen and characterized in E0; the WLCSP balls themselves cannot be probed), and
+  its undershoot trend is a stop criterion, like Q2's VGS.
 - **The driver has no input lockout** (datasheet p. 5): "There is no lockout between HI and LI inputs: both GaN
   devices can be driven on at the same time." Shoot-through protection depends on the board's input and
   dead-time circuitry and on the PWM source, which must be assessed from the schematic and on the bench (E1).
@@ -118,7 +123,8 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   0.26–0.28 nH loop; G when available), not with a single number.
 - **E3, double-pulse matrix (H1, H2, H3).** Bus at 24, 36 and 48 V; turn-on current at 5, 11 and 20 A; turn-off
   current at 10, 20 and 29 A. Record the rise and fall times, overshoot, ringing frequency and damping, and Q2's
-  gate-source voltage, which is a prerequisite at every point (safety section); no point runs without it. Before the measurement, each hypothesis's bench variant
+  gate-source voltage, which is a prerequisite at every point (safety section); no point runs without it. Also
+  record the PHASE-to-GND voltage near the driver (safety section). Before the measurement, each hypothesis's bench variant
   predicts the rise-time slope against current and against bus voltage, and the damping against bus voltage,
   with uncertainty. Tendencies, to be quantified:
   - H1 (common-source) predicts a stronger rise-time dependence on switched current than H2 does;

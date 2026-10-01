@@ -1,0 +1,62 @@
+{
+ "schema": "epc90133-test8-phase-partial/1",
+ "run_directory": "runs/epc90133-switching-77ac08acba88",
+ "evaluator_sha256": "971df6c57956836faa5399f7c95fd6a4a708baabcb143a1d557f7b408675548e",
+ "window_s": [
+  -5e-09,
+  6e-08
+ ],
+ "rating_V": [
+  -5.0,
+  85.0
+ ],
+ "scope": "timing runs of test 8 run 1, event A only; supplementary to the declared criteria; simulated PHASE-to-GND ball voltage of the unvalidated bench, not a safe limit",
+ "cases": {
+  "G-m1-mid-Ls50": {
+   "raw_sha256": "3dab27a7c64d525b2578a43b454552fc986ee08bee75b6fd833b9e1b61f4034b",
+   "data_end_s": 4.81154971e-06,
+   "event_a_s": 1.8815597076e-06,
+   "status": "event A complete",
+   "raw_min_V": -26.281734466552734,
+   "raw_min_time_after_event_s": 9.995059635103272e-09,
+   "raw_min_half_width_s": 3.346310922145389e-13,
+   "raw_max_V": 48.55842971801758
+  },
+  "G-m1-mid-Ls50-pin10": {
+   "raw_sha256": "8a22e91830debac40aca852b6dea648d91ed4a9a9e25a01dee9184144f86d3a5",
+   "data_end_s": 4.81154971e-06,
+   "event_a_s": 1.8815597076e-06,
+   "status": "event A complete",
+   "raw_min_V": -3.64306640625,
+   "raw_min_time_after_event_s": 1.3108377209484726e-08,
+   "raw_min_half_width_s": 2.2531735082953984e-09,
+   "raw_max_V": 47.19842529296875
+  },
+  "G-m1-mid-Ls50-pin100": {
+   "raw_sha256": "875b06b22e1e528af91e3689920ada5923a3ef9fb8a165fa25c4b6002f123c2e",
+   "data_end_s": 3.0875914875863374e-06,
+   "event_a_s": 1.8815597076e-06,
+   "status": "event A complete",
+   "raw_min_V": -3.6635794639587402,
+   "raw_min_time_after_event_s": 1.315763152883748e-08,
+   "raw_min_half_width_s": 2.236190590450093e-09,
+   "raw_max_V": 47.18819808959961
+  },
+  "G-m1-mid-Ls50-pin100-ms50": {
+   "raw_sha256": "1c2285d1c37417ab697e218021531c37690e39a343ddb80b121b620cb491ed07",
+   "data_end_s": 2.086478180030895e-08,
+   "event_a_s": 1.8815597076e-06,
+   "status": "incomplete: data end before the event A window ends"
+  },
+  "G-m1-mid-pin100": {
+   "raw_sha256": "af23095f3a4a1b52bc43ed05c0ebde0075324b32f0e081a47831e8c0c971002e",
+   "data_end_s": 2.07405113686096e-06,
+   "event_a_s": 1.8815597076e-06,
+   "status": "event A complete",
+   "raw_min_V": -3.4221839904785156,
+   "raw_min_time_after_event_s": 1.2942162942201721e-08,
+   "raw_min_half_width_s": 2.186939660742988e-09,
+   "raw_max_V": 47.38583755493164
+  }
+ }
+}

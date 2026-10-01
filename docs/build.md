@@ -747,7 +747,7 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   values identical), not on the package-inductance cases with the largest minima. Resolving it needs a physically
   regularized driver output stage (finite switching speed) or a targeted numerical check on those cases. The raw
   values in the test 7 reports are kept. Simulated sensitivity results, not a safe limit (narrowed after an
-  external audit, 1 October 2026).
+  external audit, 1 October 2026). Test 8, below, follows this up.
 
 Running notes: the LTspice adapter's per-run bound was raised from 600 s to 3600 s (`MAX_TIMEOUT_S`), because
 G's first timing run exceeded 600 s. A timeout still returns a failed run. Test 7 run 1 was stopped after that
@@ -774,6 +774,55 @@ PYTHONPATH=src python scripts/verify_ltspice_fixtures.py
 PYTHONPATH=src python scripts/verify_diode_bridge.py
 PYTHONPATH=src python scripts/epc2204_baseline.py
 ```
+
+### EPC90133 switching test 8: driver output stage regularized (PHASE-ball stress)
+
+Question: is test 7's PHASE-ball undershoot (raw minima to −28 V) a property of the circuit or of the ideal driver
+stage? In test 7 each driver pin is a source behind a switch that opens from 1 mΩ to 100 MΩ in about a picosecond,
+with nothing on the pin, so the current in the extracted gate-return copper is cut almost instantly. A CMOS output
+pin has output capacitance and body/ESD diodes that carry that current. Test 8 (`--study phase`, declared in
+`scripts/epc90133_switching.py` before its runs) adds to every driver ball a capacitance to its stage reference
+and clamp diodes to the reference and to a 5 V rail. The uP1966E datasheet gives neither value, so the capacitance
+is bracketed at 10 and 100 pF (assumptions). The declared criteria judge the raw extremes, without averaging.
+
+```sh
+PYTHONPATH=src python scripts/epc90133_switching.py --study phase --jobs 3 --timeout 3600     --output results/gan/epc90133-switching-phase.json                       # run 1
+PYTHONPATH=src python scripts/epc90133_switching.py --study phase --jobs 2 --timeout 3600     --only G-m1-mid-Ls50-pin10 G-m1-mid-Ls50-pin10-ms50     --output results/gan/epc90133-switching-phase-2.json                     # substitute step check
+PYTHONPATH=src python scripts/epc90133_phase_partial.py                       # event A from the timing runs
+```
+
+Raw PHASE-to-GND extremes on G + 50 pH package source (assumed), the test 7 case with the largest minimum:
+
+| Case | event A (Q1 turn-off) min / max | event B (Q1 turn-on) min / max | source |
+|---|---|---|---|
+| unregularized, 100 ps | −28.3 / +47.7 V (0.33 ps wide) | −3.0 / +55.9 V | [run 1](../results/gan/epc90133-switching-phase.json) |
+| unregularized, 50 ps | −28.3 / **+114.3 V** | −8.0 / +55.9 V | run 1 |
+| 10 pF + clamps, 100 ps | −3.59 / +48.4 V (2.2 ns wide) | −2.25 / +56.2 V | run 1 and [step check](../results/gan/epc90133-switching-phase-2.json) |
+| 10 pF + clamps, 50 ps | −3.59 / +48.0 V | **−7.46** / +56.2 V (one sample; −2.32 V without it) | step check |
+| 100 pF + clamps (timing run, stopped) | −3.66 / +47.2 V (2.2 ns wide) | not reached | [partial](../results/gan/epc90133-test8-phase-partial.json) |
+| G alone, 100 pF (timing run, stopped) | −3.42 / +47.4 V | not reached | partial |
+
+What happened, against the declared criteria:
+
+- **The three 100 pF cases timed out** at 3600 s in their timing runs (femtosecond steps from the first turn-on at
+  20.7 ns). They are kept as failed runs. Their partial raw files reach event A in two cases; those values come
+  from timing runs (same circuit, different edge timing) and are supplementary, outside the declared criteria.
+- **The substitute step check** (10 pF at 50 ps, declared after run 1 and before its run) **fails formally at event
+  B**: −7.46 V against −2.25 V. That minimum is one sample, taken where the step had collapsed to about 1e-19 s
+  0.36 ns after the turn-on command; Q1's gate shows the same one-sample jump to −9 V, and the next lowest point is
+  −2.32 V. Excluding it is a judgement made after the run, so the criterion stays failed in the record. Event A
+  passes it (−3.594 V at both steps).
+- **The 10 pF regularization changes no switching metric materially** (overshoot +2.8 %, others under 0.2 %;
+  Q2's die VGS peak 2.08 V, unchanged).
+
+Reading, scoped to this unvalidated bench: the large test 7 extremes come from the ideal switches. Without
+regularization they move with the time step (event A maximum 48 → 114 V, event B minimum −3.0 → −8.0 V); with
+any pin capacitance tested, event A's undershoot becomes a resolved 2 ns dip of about −3.6 V, nearly independent
+of the assumed 10–100 pF and inside the −5 V rating with 1.4 V margin. Event B was resolved only at 10 pF, apart
+from the single solver point. **PHASE stress is therefore narrowed but formally still open**: the declared
+criteria are not met (100 pF incomplete, event B step check failed on one sample). A further simulation step is
+not proposed; the margin is small enough, and the driver's real output stage unknown enough, that the PHASE-ball
+undershoot is a measurement item in the hardware plan. Simulated sensitivity results, not a safe limit.
 
 ### LTspice installation
 
