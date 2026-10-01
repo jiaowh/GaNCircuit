@@ -23,6 +23,9 @@ the local zeta is within 30 % of their mean zeta. Otherwise Q1's channel bias al
 transient's damping. Either way a model statement: the real device's channel and gate charging are not
 characterized (Fig. 7 gate charge fails its checks).
 
+Run 1 (2 October 2026) completed B (local zeta 0.0092, 0.0052, 0.0042, 0.0038, 0.0036 at 2.5-4.5 V; verdict not
+supported) and then crashed writing the report (a NumPy boolean); fixed by a cast, nothing else changed.
+
     PYTHONPATH=src python scripts/epc90133_q1_bias_ring.py
 """
 import hashlib
@@ -125,7 +128,7 @@ def main():
             m = [cc["zeta"] for cc in cyc if abs(cc["q1_internal_vgs_V"] - x) <= VGS_MATCH]
             comp[f"{x:g}"] = {"local_zeta": f["fit"]["zeta"] if "fit" in f else None, "matching_cycles": len(m),
                               "transient_mean_zeta": float(np.mean(m)) if m else None,
-                              "within_tol": (abs(f["fit"]["zeta"] / np.mean(m) - 1) <= ZETA_TOL) if (m and "fit" in f) else None}
+                              "within_tol": bool(abs(f["fit"]["zeta"] / np.mean(m) - 1) <= ZETA_TOL) if (m and "fit" in f) else None}
         zs = [comp[f"{x:g}"]["local_zeta"] for x in list(X_VALUES) + [5.0]]
         rising = all(a is not None and b is not None and a > b for a, b in zip(zs, zs[1:]))
         matched = [v["within_tol"] for v in comp.values() if v["within_tol"] is not None]
