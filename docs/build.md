@@ -957,6 +957,38 @@ peak-to-peak, a description corrected after run 1 with no number changed), and f
 
 Envelope decay is not energy loss; that is the energy budget's question.
 
+### EPC90133 switching test 11: driver output-stage representation (excitation)
+
+The uP1966E datasheet constrains its output stage in two separate ways: output resistance at 500 mA (0.7/1.4 Ω
+typical/maximum sourcing, 0.4/0.8 Ω sinking) and edge times into 3000 pF (8 ns rise, 4 ns fall typical). The
+bench's driver (ramp) meets both with the typical resistances behind a source ramp calibrated to the edge
+times. A near-step source behind larger resistances meets them too: calibrated on the same 3000 pF bench to
+8.0/4.0 ns, it needs 1.213/0.606 Ω, inside the maxima (declared check D1 passes). Test 11 (`--study driver`,
+declared before its runs; [report](../results/gan/epc90133-switching-driver.json)) runs both on B, G and
+G + 50 pH (assumed package source inductance). All cases are usable, the ramp cases reproduce tests 7/9 exactly,
+and the step check (G + 50 pH, step, 50 ps) changes no metric by more than 0.1 %.
+
+| Network | overshoot, ramp → step | rise time | frequency, ζ | materiality |
+|---|---|---|---|---|
+| B | 35.7 → 25.8 V (−28 %) | 0.83 → 0.95 ns (+15 %) | +1.3 %, +3 % | overshoot and rise material |
+| G | 25.2 → 16.8 V (−34 %) | 0.88 → 1.04 ns (+18 %) | +0.6 %, +2 % | overshoot and rise material |
+| G + 50 pH | 11.1 → 10.8 V (−3 %) | 1.66 → 1.78 ns (+7 %) | −0.2 %, −2 % | none |
+
+What this shows, within this model:
+
+- **Two drivers the datasheet cannot tell apart excite the turn-on ring very differently** on B and G (a third
+  less overshoot with the step form), while the ring's frequency and damping barely change. The driver form
+  acts on excitation, not on the ring dynamics, as the first-principles review's separation expects.
+- **With the assumed 50 pH package source inductance the driver form hardly matters.** A plausible reading is
+  that the source inductance's feedback on the gate then sets the turn-on, but this test does not isolate that.
+  Whether the board is in the sensitive or the insensitive regime therefore depends on the package
+  inductance, which is itself assumed.
+- **Consequence for the measurement plan:** the driver's actual output behaviour into a gate load is a model
+  input, not only a check. Its edge times into 3000 pF do not fix it; the gate-current waveform (or the gate
+  voltage into a known load with the power stage unpowered, hardware plan E1) is what separates these forms.
+- Neither form is identified as the real driver; both are within the datasheet's typical edge times and
+  maximum resistances. The step case on G (16.8 V, 1.04 ns) is still far from Fig. 9 (5.7 V, 1.67 ns).
+
 ### LTspice installation
 
 Install LTspice from the

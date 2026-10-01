@@ -148,6 +148,10 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   gives its bandwidth and ringing. Without this, no device or layout conclusion is drawn (plan section 4).
 - **E1, driver alone (H2, H6).** Power stage unpowered (VIN = 0 V): measure PWM-to-gate delays, gate-voltage
   edges and the dead time at the gate pins. This isolates driver timing and strength from the power stage.
+  It is also a model input: in simulation (test 11, docs/build.md) two driver representations that both meet
+  the datasheet's edge times and resistance limits change the simulated turn-on overshoot by about a third
+  without package source inductance. Record the gate-voltage waveform shape, not only 10-90 % times, so the
+  representation can be chosen from data.
 - **E2, loop inductance by frequency shift (parasitic layer).** At a low bus (12–24 V) and low current, measure
   the ringing frequency, then add a known C0G capacitor across Q2 (drain to source) and measure again. The shift
   gives an estimate of the loop inductance and the effective capacitance. It assumes the same ringing mode before
