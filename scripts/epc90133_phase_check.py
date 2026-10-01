@@ -1,4 +1,4 @@
-"""Test 7 follow-up: are the driver PHASE-ball extremes waveforms or sub-picosecond artefacts?
+"""Test 7 follow-up: how narrow are the driver PHASE-ball extremes, and what does a short average leave?
 
 Test 7's report gives the raw extremes of V(U80.PH) - V(U80.GND) around each event. In the first run the minima
 (-8 V on G, -24 and -28 V with package inductance) sat 10.005 ns after Q1's turn-off command, when the ideal
@@ -6,7 +6,7 @@ low-side driver stage switches, and lasted well under a picosecond. This script 
 reports, per case and event, the raw minimum and maximum, the half-width of the minimum (against 0 V), and the
 extremes after a 10 ps moving average on a 1 ps grid. The 10 ps window is declared here, before its use in any
 conclusion: it is ten times shorter than the fastest physical edge in the bench (the 10 GHz damping corner
-gives about 16 ps) and far longer than the artefacts. The uP1966E absolute maximum PHASE-to-GND is -5 V to
+gives about 16 ps) and far longer than the sub-picosecond excursions. The uP1966E absolute maximum PHASE-to-GND is -5 V to
 +85 V (datasheet p. 7). Simulated sensitivity results, not a safe limit.
 
 What this shows (narrowed after an external audit, 1 October 2026): the averaged extremes describe the filtered

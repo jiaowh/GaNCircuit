@@ -151,7 +151,28 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
   its report, and no materiality comparison, Fig. 9 verdict or PHASE check uses the case. "usable" keeps its
   meaning (numerical checks passed). G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
-  attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
+  attributed to common-source inductance without a matched control.
+
+Test 8 (--study phase; declared 1 October 2026 after an external audit, before any run): is test 7's PHASE-ball
+undershoot a property of the circuit or of the ideal driver stage? In test 7 each driver pin is a source behind a
+switch that opens from 1 mohm to 100 Mohm in about a picosecond, with nothing on the pin, so the current in the
+extracted gate-return inductance is cut almost instantly. A CMOS output pin has output capacitance and body/ESD
+diodes to its reference and its supply rail, which carry that current. Regularized stage (pin_c): every driver
+output ball (UGH, UGL, LGH, LGL) gets a capacitance pin_c to its stage reference (PHASE or GND) and two clamp
+diodes (reference to pin, pin to a 5 V rail above the reference; DCLAMP below). The uP1966E datasheet gives
+neither value, so pin_c is bracketed at 10 and 100 pF (assumptions). Cases, on G + 50 pH (largest test 7 minimum,
+-28 V) unless named otherwise:
+  G-m1-mid-Ls50 (unregularized, reproduces test 7), G-m1-mid-Ls50-ms50 (unregularized at 50 ps: the targeted
+  numerical check the audit asked for), G-m1-mid-Ls50-pin10, G-m1-mid-Ls50-pin100, G-m1-mid-Ls50-pin100-ms50,
+  G-m1-mid-pin100 (G alone, test 7 minimum -8 V).
+Criteria, fixed now, on the RAW PHASE-to-GND extremes (no averaging): the stress is resolved for this bench if
+both regularized G+50 pH cases and G-pin100 stay inside -5/+85 V, and pin100 changes its raw minimum by less
+than 0.3 V or 10 % when the step is halved. If a regularized case is outside the rating and step-stable, the
+undershoot is a property of this model and goes into the hardware plan as a predicted risk. If the verdict
+differs between 10 and 100 pF, it depends on an unknown driver value and stays unresolved. Switching metrics
+are reported against the unregularized case (material or not); simulated sensitivity, not a safe limit.
+
+Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
 import argparse
@@ -270,7 +291,22 @@ STAGE_OF = {"R80": "u", "R81": "u", "U80.UGH": "u", "U80.UGL": "u", "U80.PH": "u
             "R82": "l", "R83": "l", "U80.LGH": "l", "U80.LGL": "l", "U80.GND": "l"}
 
 
-def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l")):
+PIN_DIODE = ".model DCLAMP D(Is=1e-14 N=1 Rs=0.5 Cjo=0)"  # test 8: generic clamp, about 0.7 V at 10 mA
+
+
+def pin_regularization(stages, pin_c):
+    """Test 8: output capacitance and clamp diodes on each driver ball (see the module docstring)."""
+    out = []
+    for tag, ref, vdd, pins in (("u", "u80_ph", VBOOT, ("u80_ugh", "u80_ugl")), ("l", "u80_gnd", VCC, ("u80_lgh", "u80_lgl"))):
+        if tag not in stages:
+            continue
+        out.append(f"V{tag}rail rail{tag} {ref} {vdd:g}")
+        for pin in pins:
+            out += [f"Cp_{pin} {pin} {ref} {pin_c:g}", f"Dlo_{pin} {ref} {pin} DCLAMP", f"Dhi_{pin} {pin} rail{tag} DCLAMP"]
+    return out + [PIN_DIODE]
+
+
+def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"), pin_c=None):
     """Test 7: uP1966E stages at the extracted ball terminals, gate resistors between their pad terminals.
 
     drive_stage ties its pull-up and pull-down resistors to one gate node; here the pull-down resistor is
@@ -290,7 +326,7 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"))
         if STAGE_OF[ref] not in stages:
             continue
         out.append(f"{ref} {ref.lower()}_d {ref.lower()}_g {max(ohm, 1e-3):g}")
-    return out
+    return out + (pin_regularization(stages, pin_c) if pin_c else [])
 
 
 def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
@@ -302,7 +338,8 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
-          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False):
+          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
+          pin_c=None):
     net, terms = network(ext, ideal, r_scale, no_gate_power_k)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -420,7 +457,7 @@ Rbret bn {node(at + '.GND')} 1u"""
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext and not gate_ctl else
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, pin_c=pin_c) if g_ext and not gate_ctl else
           gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=[x for x in ("u", "l") if x != gate_ctl])
           + [ideal_stage(gate_ctl, hi, lo, te_rise, te_fall, r_src, r_snk, t_end)]
           if g_ext and gate_ctl in ("u", "l") else [
@@ -714,6 +751,22 @@ def gateloop_cases(exts):
                            "interpretation_invalid": INVALID_NOGPK}}
 
 
+def phase_cases(exts):
+    """Test 8 cases (see the module docstring)."""
+    g = "G-m1-mid"
+    if g not in exts:
+        raise SystemExit("test 8 needs extraction G-m1-mid")
+    common = {"ext": g, "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True}
+    b50 = f"{g}-Ls50"
+    return {b50: {**common, "l_s": 50e-12},
+            f"{b50}-ms50": {**common, "l_s": 50e-12, "base": b50, "maxstep": MAXSTEP_PKG / 2},
+            f"{b50}-pin10": {**common, "l_s": 50e-12, "base": b50, "pin_c": 10e-12},
+            f"{b50}-pin100": {**common, "l_s": 50e-12, "base": b50, "pin_c": 100e-12},
+            f"{b50}-pin100-ms50": {**common, "l_s": 50e-12, "base": f"{b50}-pin100", "pin_c": 100e-12,
+                                   "maxstep": MAXSTEP_PKG / 2},
+            f"{g}-pin100": {**common, "pin_c": 100e-12}}
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -723,7 +776,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -766,6 +819,10 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "phase":
+        cases = phase_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "paths":
         cases = path_cases(exts)
         if args.only:
@@ -812,7 +869,7 @@ def main():
                   esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
-                  no_gate_power_k=c.get("no_gate_power_k", False))
+                  no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
