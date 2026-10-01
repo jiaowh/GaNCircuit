@@ -931,6 +931,32 @@ guess: all twelve pass (switch node 47.63–47.67 V, Q1 internal VGS 4.98–5.00
 These are statements about the linearized model at one state, not about the board. The half-power cross-check
 is resolved only for the G + 50 pH cases (B and G bands are under 10 frequency steps wide).
 
+### EPC90133 ring decay, cycle by cycle (existing traces)
+
+After an external audit (2 October 2026): before calling the B/G mismatch amplitude-dependent, read the saved
+transient traces cycle by cycle. `scripts/epc90133_ring_decay.py` (method declared before its first run, no
+simulation; [result](../results/gan/epc90133-ring-decay.json)) finds alternating extrema of the turn-on
+switch-node trace, measures each extremum against the mean of its neighbours (a moving baseline; about
+peak-to-peak, a description corrected after run 1 with no number changed), and forms per-cycle frequency and ζ.
+
+| Case | first cycle: p-p, ζ, f | last three cycles: p-p, ζ, f | test 10 local mode ζ, f | late cycles approach local mode |
+|---|---|---|---|---|
+| B | 65 V, 0.0086, 282 MHz | 34–35 V, 0.0072, 289 MHz | 0.0035, 290 MHz | no |
+| G | 47 V, 0.0119, 299 MHz | 17–18 V, 0.0107, 303 MHz | 0.0066, 303 MHz | no |
+| G + 50 pH | 21 V, 0.0255, 261 MHz | 3.4–4.0 V, 0.0327, 219 MHz | 0.0220, 262 MHz | no |
+
+- **On B and G, the per-cycle ζ hardly changes over the observed range** (rank correlation with amplitude −0.08
+  and −0.29) and stays about twice the local mode's. Over that range this does not look like amplitude
+  dependence; under the declared reading it points to a different mode or state than the one linearized. The
+  70 ns trace ends while the ring is still large (B: 34 V p-p), so the small-amplitude limit is not observed.
+- **The estimator matters:** B's per-cycle ζ (0.0072–0.0086) is below the 0.0104 that the switching bench's
+  estimator (first-to-third extreme about the level of the last 20 ns) reports; part of the earlier factor of
+  three is the estimator, not the circuit.
+- **On G + 50 pH the late cycles move away from the local mode** (ζ up to 0.033, frequency down to 219 MHz at
+  a few volts), which suggests a second mode or a baseline effect at small amplitude; not examined further.
+
+Envelope decay is not energy loss; that is the energy budget's question.
+
 ### LTspice installation
 
 Install LTspice from the

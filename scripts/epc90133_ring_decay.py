@@ -24,6 +24,10 @@ Approaching would support amplitude (or state) dependence of the decay within th
 point to a different mode or state rather than amplitude alone. Neither identifies a mechanism, and the voltage-
 envelope decay read here is not the energy loss (that is the energy budget's question).
 
+Correction after run 1 (2 October 2026; no number changes): a_k as defined above is the excursion of extremum
+k from the mean of its neighbours, about the peak-to-peak amplitude, not half of it as first written. zeta_k and
+f_k use ratios and times only and are unaffected; the reported amplitudes are about peak-to-peak.
+
     python scripts/epc90133_ring_decay.py
 """
 import hashlib
