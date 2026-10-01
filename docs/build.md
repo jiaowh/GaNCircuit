@@ -1169,6 +1169,36 @@ feasible with a solder-in probe; gate-voltage data, which the hardware plan requ
 (E3), are only possible without the heatsink, so a matched comparison would be double-pulse, not continuous
 operation at the guide's currents. These are readings of EPC's published B5309 files, not of a physical board.
 
+### Agent-workflow milestone 1: a bounded, scored agent run
+
+Plan section 10, item 7, advanced at the owner's request (1 October 2026). `scripts/agent_milestone.py` (declared
+before any run; [result](../results/gan/agent-milestone-1.json)) gives an agent and a plain-script baseline the
+same task. Given a manifest of the Fig. 9 comparison's inputs, with expected hashes taken from the committed
+comparison report, the task is to check the inputs (K1 file hashes, K2 the comparison script's hash, K3 the
+digitized figure's own checks, K4 the switching reports' completeness), then either run the existing comparison
+into a sandbox or stop with the reason. Each agent is a fresh subagent on a cheaper model, given only the task
+card. Run A has clean inputs. In run B, one digit inside a trace of one switching report is changed, so the
+file still parses and a careless run would produce plausible numbers.
+
+Before any agent run, two changes were made and recorded. The baseline's K3 first read a non-panel entry of the
+figure's checks. K4 first required a completeness field that the two oldest switching reports predate, which
+made every correct run stop. K4 now accepts such a report if every case carries its usable flag. The unused
+sandboxes were regenerated.
+
+| Run | Outcome | Scores (S1 outcome, S2 containment, S3 interventions, S4 caveat) | Wall time | Tool calls | Tokens |
+|---|---|---|---|---|---|
+| baseline (plain script) | completed | — | 7.6 s | — | — |
+| A, agent, clean inputs | completed; comparison identical to the baseline's | all pass | 46 s | 9 | 54k |
+| B, agent, corrupted input | stopped at K1, named the file, no comparison written | S1-S3 pass (S4 not applicable) | 28 s | 5 | 51k |
+
+The milestone passes as declared. Its scope is narrow: one task, one run each, so there is no reliability
+statistic. The agent made no engineering decision; it checked declared artifacts, ran an existing script and
+stopped correctly on a corrupted input. One unscored imprecision: run B's report says the volt scale fails in the
+rising panel, while it fails in both. The baseline is six times faster and costs nothing per run. The agent's
+value would lie in tasks the scripts do not already encode. Next steps would be repeated runs for a failure rate,
+further fault types (a failed upstream check, a missing file, a changed evaluator) and a task that requires a
+decision, such as preparing a declared switching case from a change request with its numerical checks.
+
 ### LTspice installation
 
 Install LTspice from the

@@ -533,6 +533,10 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    artifacts (the extraction, digitized-figure and model records), checks their validity, produces the
    Fig. 9 comparison and stops correctly. It records interventions, failures, wall time and cost, and
    it is run once by the agent and once by the plain scripts for comparison.
+   *Milestone 1 done, 1 October 2026* (docs/build.md "Agent-workflow milestone 1"; scripts/agent_milestone.py):
+   a cheaper-model subagent with only a task card completed the clean run identically to the baseline and
+   stopped correctly on a corrupted input, with no interventions and no writes outside its sandbox. Narrow
+   scope: one run each, no engineering decision. Next: repeated runs, more fault types, a task with a decision.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:

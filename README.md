@@ -275,8 +275,10 @@ Next steps:
    a separate G4 measurement, not replaced by waveform matching.
 3. **Complete the parasitic set** if a decision needs it: switch-node capacitance with FasterCap, within the scope
    its known-answer checks support. All values go into one `parasitics.inc` file, with the couplings kept.
-4. **A first bounded agent run.** Reproduce the comparison from declared inputs, with interventions, failures, time and
-   cost recorded against the plain scripts. The current evidence is for the tools, not yet for an agent workflow.
+4. **Agent runs.** A first bounded run works: an agent given only a task card checks the declared inputs of the Fig. 9
+   comparison, runs it with the same result as the plain script, and stops correctly when an input has been altered
+   ([result](results/gan/agent-milestone-1.json)). That is one narrow task run once each. Next are repeated runs and
+   tasks in which the agent has to make a decision.
 5. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
 
 ## Tools
