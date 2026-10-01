@@ -1079,6 +1079,51 @@ Script hardening after the same audit (not rerun; the stored report is from 8284
 now requires the adapter's failed status and a nonempty list of recognized reasons, and the report separates an
 incomplete comparison from a rejected hypothesis. Neither change alters the stored verdicts.
 
+### EPC90133 driver-only bench: supply and bootstrap at VIN = 0 (E1 preparation)
+
+One bounded preparation task for hardware-plan E1 (work-order item 4 of the project audit at 8284dbd).
+`scripts/epc90133_driver_only.py` (declared before any run, with stop rules; [report](../results/gan/epc90133-driver-only.json),
+[assessment](../results/gan/epc90133-driver-only-assessment.json) by `scripts/assess_epc90133_driver_only.py`) puts the
+uP1966E output stages (test 11's ramp and step forms) on their supplies: VCC from the 5 V LDO behind C80, BOOT from
+C81 charged by the internal bootstrap switch (a diode through the datasheet's 0.2 V at 100 µA and 0.9 V at 100 mA:
+Is 4.2e-8 A, Rs 5.2 Ω). The stages' ramps scale with the actual supply voltage and their pull-up current is drawn
+from it. The power stage is unpowered (VIN = 0, two unmodified EPC2302 models, no inductor). Run 1 crashed in
+post-processing (lists subtracted as arrays) and wrote no report; run 2 is the one allowed fix run. All 13 LTspice
+runs complete without fallbacks (C3), and the stages still give 8.0/4.0 ns into 3000 pF (C2).
+
+**C1 fails as declared and stays failed.** It compared C81's charge loss across the first high-side turn-on with the
+pull-up current only. At VIN = 0 the bootstrap switch recharges C81 during that turn-on (about 8 of the 17 nC), which
+the check omitted: an error in the check's design. Post hoc, the pull-up charge minus the bootstrap-diode charge
+equals C81's loss within 0.013 % in all six edge runs, so the supply wiring is consistent.
+
+What the run answers, within this model:
+
+- **E1 at VIN = 0 can tell test 11's two driver forms apart** (Q1). At the Q2 gate pad (the R22/J2 net) the 10-90 %
+  rise is 21.6 ns (ramp) against 24.7 ns (step) without gate-loop inductance, and 20.6 against 23.9 ns with an
+  assumed 1 nH; the largest voltage difference near an edge is 2.2 and 1.8 V. Both exceed the provisional
+  placeholders (0.3 ns, 0.5 V), which E0's characterized resolution will replace. Into the real gate load at zero
+  drain bias (about 17 nC drawn per turn-on) the step form is the slower one, because of its larger resistance; at
+  3000 pF the two are identical by construction. The edges are about 20-25 ns, not the datasheet's 8 ns into 3000 pF.
+- **The high-side supply in a short sequence is well below the switching bench's ideal 5.0 V** (Q2). After a 0.5 µs
+  low-side pre-charge, BOOT-PHASE is 4.30 V before the first high-side pulse and Q1's gate pad settles at 4.42 V
+  (4.54 V on the second pulse); with an extra 2.2 Ω in the charging path (R70/R75, connections not transcribed) 4.30 V,
+  and with C81 at 50 nF 4.55 V with a 0.22 V drop per turn-on (0.09 V at 100 nF). C81 recharges through the switch's
+  5 Ω with a time constant near 0.5 µs, so a 0.5 µs pre-charge is about one time constant. VCC droops by about 10 mV.
+- **Start-up without a low-side pulse is not answered.** With both FETs off at VIN = 0 the switch node was held only
+  by the bench's assumed 1 MΩ; it rose to about 1.1 V and left BOOT-PHASE at 3.7 V after 200 µs, below the 3.94 V
+  maximum BOOT POR threshold. The declared premise that PHASE stays near ground was an assumption the bench does not
+  support; the real node depends on leakage paths the model does not represent.
+- **Dead-time overcharge is not answered** (Q3). Both excursion runs started at 3.82 V, below VCC minus the switch
+  drop, so their 0.17-0.19 V rise is ordinary recharge, not charging above VCC. A run from the settled state needs a
+  new declaration.
+
+Consequences for E1 (hardware plan): use a low-side pre-charge of several microseconds and record BOOT-PHASE (at C81)
+before the first high-side pulse; record the supply state as a model input, because predictions made with the ideal
+5.0 V high-side supply assume a gate level that a short sequence does not reach; and treat BOOT-PHASE in continuous
+operation (dead-time overcharge, unspecified clamp) as an open quantity to measure. During the sequence the switch
+node stays within 0.9 V of ground, so at VIN = 0 a ground-referenced probe at J1 would read Q1's gate with an offset
+of that order. These are statements about the behavioural driver and the vendor model, not about the board.
+
 ### LTspice installation
 
 Install LTspice from the

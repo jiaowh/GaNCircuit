@@ -530,7 +530,9 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    voltage and temperature limits; independent hardware protection, accepted separately from operator
    stop decisions; discharge verification; per-channel measurement uncertainty;
    (d) the driver-only bootstrap/supply bench as one bounded preparation task for E1, with declared
-   outputs and stop rules, not a fit to Fig. 9;
+   outputs and stop rules, not a fit to Fig. 9 (done 1 October 2026, docs/build.md: E1 can separate the
+   driver forms within the model; short pre-charges leave the high side near 4.4 V; start-up state and
+   dead-time overcharge not answered; its charge check C1 failed by design error and is kept);
    (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
    conditions, then the approved energized measurements.
    Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to

@@ -1,0 +1,164 @@
+{
+ "schema": "epc90133-driver-only-assessment/1",
+ "evaluator_sha256": "5dd88b670c8168be1a0454c96fd16e3bb37ce27e4589ed6b3de0bfaa9a2367b0",
+ "inputs": {
+  "results/gan/epc90133-driver-only.json": "f84f54cc67b10b1ac3a7ae24230c9fcd41ebb72f86e9d22fc696aa02ac3b74ba"
+ },
+ "checks": {
+  "C1": {
+   "declared_verdict": "fail",
+   "reason": "check omitted the simultaneous bootstrap recharge at VIN = 0 (check-design error); kept failed",
+   "post_hoc_mirror_minus_diode_balance": {
+    "ramp-L0": 1.000124865520469,
+    "step-L0": 1.000076718155919,
+    "ramp-L1n": 1.0000963360497355,
+    "step-L1n": 1.0000875669013678,
+    "ramp-L0-C81low": 1.0000327131197388,
+    "ramp-L0-Rboot2.2": 1.0000656484082913
+   },
+   "post_hoc_pass_within_0.1pct": true
+  },
+  "C2": true,
+  "C3": true
+ },
+ "Q1_E1_discrimination": {
+  "answered": true,
+  "q2_gate_pad_rise_s": {
+   "ramp-L0": 2.1557205407792142e-08,
+   "step-L0": 2.4679987153899255e-08,
+   "ramp-L1n": 2.061103108116957e-08,
+   "step-L1n": 2.3942370362797323e-08
+  },
+  "q2_gate_pad_fall_s": {
+   "ramp-L0": 7.0186091108721155e-09,
+   "step-L0": 7.758148249558422e-09,
+   "ramp-L1n": 4.969496976246813e-09,
+   "step-L1n": 6.021639666656183e-09
+  },
+  "differences": {
+   "L0": {
+    "q2_rise_difference_s": 3.1227817461071127e-09,
+    "q2_max_voltage_difference_V": 2.2066477790516394,
+    "q1_max_voltage_difference_V": 2.0072538739173678,
+    "distinguishable": true
+   },
+   "L1n": {
+    "q2_rise_difference_s": 3.331339281627752e-09,
+    "q2_max_voltage_difference_V": 1.8160145207017422,
+    "q1_max_voltage_difference_V": 1.6521122018231806,
+    "distinguishable": true
+   }
+  },
+  "reading": "distinguishable under the provisional placeholders for both gate-loop inductances (within this model): the step form is slower into the real gate load because of its larger resistance; the edges are about 20-25 ns, not the 8 ns datasheet figure into 3000 pF"
+ },
+ "Q2_bootstrap": {
+  "startup_answered": false,
+  "startup_reason": "with both FETs off at VIN = 0 the switch node was held only by the bench's assumed 1 Mohm, rose to about 1.05-1.10 V and left BOOT-PHASE at 3.69-3.75 V after 200 us (below the 3.94 V maximum BOOT POR threshold); the declared premise that PHASE stays near ground was an assumption the bench does not support",
+  "startup_report": {
+   "0": {
+    "boot_phase_at_wait_V": 3.7521727085113525,
+    "sw_at_wait_V": 1.0535132884979248,
+    "time_above_por_max_s": null
+   },
+   "20": {
+    "boot_phase_at_wait_V": 3.7413837909698486,
+    "sw_at_wait_V": 1.061629056930542,
+    "time_above_por_max_s": null
+   },
+   "100": {
+    "boot_phase_at_wait_V": 3.6907390356063843,
+    "sw_at_wait_V": 1.1003509759902954,
+    "time_above_por_max_s": null
+   }
+  },
+  "droop_answered": true,
+  "first_high_side_pulse": {
+   "ramp-L0": {
+    "boot_phase_before_V": 4.302900499844493,
+    "net_drop_100ns_V": 0.08930360477546007,
+    "q1_gate_pad_high_V": 4.415758642442709,
+    "q1_gate_pad_high_second_pulse_V": 4.535245123709534
+   },
+   "ramp-L0-C81low": {
+    "boot_phase_before_V": 4.520767178647329,
+    "net_drop_100ns_V": 0.21689694447518448,
+    "q1_gate_pad_high_V": 4.550015509704996,
+    "q1_gate_pad_high_second_pulse_V": 4.583800200657618
+   },
+   "ramp-L0-Rboot2.2": {
+    "boot_phase_before_V": 4.200304865069481,
+    "net_drop_100ns_V": 0.09388727212271863,
+    "q1_gate_pad_high_V": 4.302486290426405,
+    "q1_gate_pad_high_second_pulse_V": 4.457592986933885
+   }
+  },
+  "gate_charge_drawn_C": 1.7096033863007334e-08,
+  "vcc_min_after_1ns_V": 4.98972749710083
+ },
+ "Q3_dead_time_overcharge": {
+  "answered": false,
+  "reason": "both excursion runs started at BOOT-PHASE 3.82 V, below VCC minus the switch drop, so the 0.17-0.19 V rise is ordinary recharge, not charging above VCC; a run from the settled state needs a new declaration (the stop rules' fix run was used by run 2)",
+  "report": {
+   "5": {
+    "before_V": 3.819106844272279,
+    "after_V": 3.9859778881073,
+    "rise_V": 0.16687104383502094,
+    "max_during_V": 3.9859778881073,
+    "margin_to_gate_max_6V": 2.0140221118927,
+    "margin_to_boot_phase_abs_max_7V": 3.0140221118927
+   },
+   "10": {
+    "before_V": 3.819106844272279,
+    "after_V": 4.011413097381592,
+    "rise_V": 0.19230625310931293,
+    "max_during_V": 4.011413097381592,
+    "margin_to_gate_max_6V": 1.9885869026184082,
+    "margin_to_boot_phase_abs_max_7V": 2.988586902618408
+   }
+  }
+ },
+ "post_hoc_diagnostics": {
+  "ramp-L0": {
+   "mirror_charge_C": 1.7096033863007334e-08,
+   "bootstrap_diode_charge_C": 8.164558291352323e-09,
+   "c81_charge_loss_C": 8.930360477546006e-09,
+   "balance_ratio": 1.000124865520469,
+   "vcc_min_after_1ns_V": 4.989743232727051
+  },
+  "step-L0": {
+   "mirror_charge_C": 1.70940934521855e-08,
+   "bootstrap_diode_charge_C": 8.185341805071663e-09,
+   "c81_charge_loss_C": 8.90806823654593e-09,
+   "balance_ratio": 1.000076718155919,
+   "vcc_min_after_1ns_V": 4.989813804626465
+  },
+  "ramp-L1n": {
+   "mirror_charge_C": 1.70974644813186e-08,
+   "bootstrap_diode_charge_C": 8.180449352588901e-09,
+   "c81_charge_loss_C": 8.916156181464352e-09,
+   "balance_ratio": 1.0000963360497355,
+   "vcc_min_after_1ns_V": 4.98972749710083
+  },
+  "step-L1n": {
+   "mirror_charge_C": 1.709610831338498e-08,
+   "bootstrap_diode_charge_C": 8.193516120919457e-09,
+   "c81_charge_loss_C": 8.90181268831185e-09,
+   "balance_ratio": 1.0000875669013678,
+   "vcc_min_after_1ns_V": 4.98980188369751
+  },
+  "ramp-L0-C81low": {
+   "mirror_charge_C": 1.7494787590064307e-08,
+   "bootstrap_diode_charge_C": 6.649585597519303e-09,
+   "c81_charge_loss_C": 1.0844847223759224e-08,
+   "balance_ratio": 1.0000327131197388,
+   "vcc_min_after_1ns_V": 4.991875648498535
+  },
+  "ramp-L0-Rboot2.2": {
+   "mirror_charge_C": 1.6606330634385815e-08,
+   "bootstrap_diode_charge_C": 7.216987067116586e-09,
+   "c81_charge_loss_C": 9.388727212271863e-09,
+   "balance_ratio": 1.0000656484082913,
+   "vcc_min_after_1ns_V": 4.990140914916992
+  }
+ }
+}

@@ -182,7 +182,14 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   (pre-charge sequence and BOOT-PHASE voltage before the first high-side pulse), the supply conditions (VDD, VCC at
   C80) and which accessible voltage is measured (for example the J2/R22 point, not the die). A representation
   chosen from E1 is a hypothesis about the loaded drive; it is tested against the energized gate observations (Q2's
-  VGS in E3, Q1's if a probe allows) before it is used for predictions.
+  VGS in E3, Q1's if a probe allows) before it is used for predictions. The driver-only bench (docs/build.md,
+  "EPC90133 driver-only bench") supports this experiment within its model: at VIN = 0 the two test-11 forms differ
+  at the Q2 gate pad by about 3 ns in rise time and up to 2 V (edges of about 20-25 ns, so a 500 MHz probe is ample);
+  a 0.5 µs low-side pre-charge leaves BOOT-PHASE near 4.3 V and Q1's gate near 4.4 V, so E1 uses a pre-charge of
+  several microseconds and records BOOT-PHASE at C81 before the first high-side pulse; without a low-side pulse
+  the switch node and BOOT state at VIN = 0 depend on leakage the model lacks, so they are measured, not assumed.
+  BOOT-PHASE overcharge during negative dead-time excursions in continuous operation is not answered and is a
+  quantity to observe in E6 (the driver's BOOT clamp is unspecified).
   It is also a model input: in simulation (test 11, docs/build.md) two driver representations that both meet
   the datasheet's edge times and resistance limits change the simulated turn-on overshoot by about a third
   without package source inductance. Record the gate-voltage waveform shape, not only 10-90 % times, so the

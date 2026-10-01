@@ -68,6 +68,10 @@ Stop rules: one run of the declared case set. A run that fails is kept with its 
 recorded as such. No parameters are fitted, no case is added after results are seen without a new declaration, and
 no comparison with Fig. 9 is made.
 
+Run 1 (1 October 2026) crashed in post-processing after three LTspice runs had completed (the raw reader returns
+lists, which the script subtracted as arrays); no report was written, and its run directory is kept under runs/. The
+fix converts each trace to an array; nothing else changed. Run 2 is the one fix run the stop rules allow.
+
     PYTHONPATH=src python scripts/epc90133_driver_only.py   # results/gan/epc90133-driver-only.json
 """
 import hashlib
@@ -244,7 +248,7 @@ def main():
             print(name, r.status, r.message, flush=True)
             return None
         print(name, "completed", f"{r.duration_s:.0f} s", flush=True)
-        return parse_raw(r.result_path).step(0)
+        return {k: np.asarray(v) for k, v in parse_raw(r.result_path).step(0).items()}
 
     report = {"schema": "epc90133-driver-only/1", "declared": "2026-10-01, before any run (script docstring)",
               "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
