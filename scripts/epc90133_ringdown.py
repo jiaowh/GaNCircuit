@@ -28,6 +28,17 @@ for every other form of that network (clamped, fullR, fullR clamped), whose DC s
 most. The guess does not relax the rule: each AC run must converge without fallback to be used, and a form
 that falls back is recorded as failed. The report is written after every network; all messages are flushed.
 
+Revision 3 (evaluation rule only, declared after run 2 and before it was applied; no new simulation): seeding
+did not make Newton reliable (run 2: B clamped, B fullR active and clamped, G active fell back; G clamped did
+not). The adapter fails a fallback because it may converge to the wrong state; here that risk is checked
+directly, since every AC run writes its own operating point (bench.op.raw, with V(q2_d) and both FETs'
+internal gate and source nodes). `--reassess RUN_DIR` re-evaluates a finished run directory: a form is used if
+its run completed, or if (a) every reason the adapter gave is an operating-point fallback message (Gmin or
+source stepping), (b) its own operating point passes the declared state checks, and (c) its AC sweep is
+complete; such a form is flagged "accepted_with_verified_op_fallback". Anything else stays failed.
+Provenance note: run 2 executed the code of commit 94cb92f (runs/ringdown-test10-r2.launch.json); its report's
+"evaluator_sha256" is computed when each checkpoint is written and so reflects this file as it was then.
+
 Drive: 1 A AC between Q2's drain pad (q2_d) and circuit ground (Q2's source); Z(f) = V(q2_d). The ring after
 event B is the resonance of this port. Read from Z: the dominant peak frequency; a one-pole-pair fit (Levy's
 linear least squares, Z = (b0 + b1 s) / (1 + a1 s + a2 s^2) within +-15 % of the peak) giving alpha and omega_d,
@@ -167,7 +178,73 @@ def analyse(raw):
             "participation_at_peak": part}
 
 
+FALLBACK_PHRASES = ("Gmin stepping", "Source stepping", "source stepping", "operating point")
+
+
+def state_of(vals):
+    state = {"v_sw_V": vals["v(q2_d)"], "q1_internal_vgs_V": vals["v(x1:gate)"] - vals["v(x1:source)"],
+             "q2_internal_vgs_V": vals["v(x2:gate)"] - vals["v(x2:source)"]}
+    state["checks_pass"] = (state["v_sw_V"] >= sw.VIN - 1 and abs(state["q1_internal_vgs_V"] - sw.VBOOT) <= 0.1
+                            and abs(state["q2_internal_vgs_V"]) <= 0.1)
+    return state
+
+
+def reassess(run_dir):
+    """Revision 3: apply the verified-fallback rule to a finished run directory (see the module docstring)."""
+    rep_path = OUTPUT
+    report = json.loads(rep_path.read_text(encoding="utf-8"))
+    if report["run_directory"] != run_dir.relative_to(ROOT).as_posix():
+        raise SystemExit("the report does not belong to this run directory")
+    for name, row in report["cases"].items():
+        for form in ("active", "clamped"):
+            r = row.get(form)
+            if not r or r.get("status") == "completed":
+                continue
+            d = run_dir / f"{name}-{form}"
+            prov = d / "provenance.json"
+            if not prov.exists() or not (d / "bench.op.raw").exists() or not (d / "bench.raw").exists():
+                r["revision3"] = "not accepted: run outputs missing"
+                continue
+            msg = json.loads(prov.read_text(encoding="utf-8")).get("message") or ""
+            reasons = [x.strip() for x in msg.split(";") if x.strip()]
+            only_fallback = bool(reasons) and all(any(ph in x for ph in FALLBACK_PHRASES) for x in reasons)
+            op = parse_raw(d / "bench.op.raw").step(0)
+            st = state_of({k: float(v[0]) for k, v in op.items() if k.startswith("v(")})
+            ac = parse_raw(d / "bench.raw").step(0)
+            complete = len(ac["frequency"]) == N_PTS
+            if only_fallback and st["checks_pass"] and complete:
+                row[form] = {"status": "accepted_with_verified_op_fallback", "adapter_message": msg, "own_state": st,
+                             **analyse(parse_raw(d / "bench.raw"))}
+            else:
+                r["revision3"] = {"accepted": False, "only_fallback_messages": only_fallback, "own_state": st,
+                                  "ac_points": len(ac["frequency"])}
+        rep_, case = TRANSIENT[name]
+        a = row.get("active", {})
+        tc = row.get("transient_comparison", {})
+        if a.get("status") == "accepted_with_verified_op_fallback" and "transient_f_Hz" not in tc:
+            p = ROOT / "results/gan" / rep_
+            tr = json.loads(p.read_text(encoding="utf-8"))["cases"].get(case)
+            if tr and tr.get("metrics"):
+                m = tr["metrics"]["event_b_turn_on_at_valley"]
+                df = a["peak_frequency_Hz"] / m["ringing_frequency_Hz"] - 1
+                dz = a["fit"]["zeta"] / m["ringing_damping_ratio"] - 1
+                row["transient_comparison"] = {"report": rep_, "case": case, "transient_f_Hz": m["ringing_frequency_Hz"],
+                                               "transient_zeta": m["ringing_damping_ratio"], "rel_f": df, "rel_zeta": dz,
+                                               "consistent": abs(df) <= 0.03 and abs(dz) <= 0.25}
+    report["revision3_evaluator_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    rep_path.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
+    for name, row in report["cases"].items():
+        for form in ("active", "clamped"):
+            r = row.get(form, {})
+            if "fit" in r:
+                print(f"{name:22s} {form:7s} {r['status']:34s} f {r['peak_frequency_Hz'] / 1e6:7.1f} MHz zeta {r['fit']['zeta']:.4f}")
+            else:
+                print(f"{name:22s} {form:7s} {r.get('status')} {r.get('revision3', '')}")
+
+
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == "--reassess":
+        return reassess(ROOT / sys.argv[2])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
     run_root = ROOT / "runs" / ("epc90133-ringdown-" + uuid.uuid4().hex[:12])
