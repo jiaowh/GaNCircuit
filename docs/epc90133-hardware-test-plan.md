@@ -85,10 +85,10 @@ not, beyond that uncertainty.
 | Need | Why | Minimum | Preferred |
 |---|---|---|---|
 | Oscilloscope | edges of 1–4 ns, ringing near 250 MHz | 1 GHz, 5 GS/s, 4 channels | 2 GHz or more, 10 GS/s or more |
-| Switch-node probe | the main waveform; H4 | 1 GHz passive probe with a spring-tip or solder-in connection at the Q2 pads | optically isolated high-bandwidth probe (IsoVu class) for comparison |
+| Switch-node probe | the main waveform; H4 | 1 GHz passive probe with a spring-tip or solder-in connection close to Q2 (connection points below) | optically isolated high-bandwidth probe (IsoVu class) for comparison |
 | Second switch-node connection | H4: the same node through a different connection | a different ground path (e.g., a long ground lead) for a deliberate comparison | — |
-| Low-side gate probe | H1, H2 (gate-source voltage); Q2 false-turn-on margin (required from the first energized step) | 500 MHz passive probe at Q2's gate and source pads | — |
-| High-side gate probe | H1, H2 on Q1 | — | optically isolated probe (common-mode rejection at 48 V, 10+ V/ns) |
+| Low-side gate probe | H1, H2 (gate-source voltage); Q2 false-turn-on margin (required from the first energized step) | 500 MHz probe at J2 (R22 and an MMCX to be fitted; Q2's source pins are under the package and cannot be probed) | MMCX-mating probe |
+| High-side gate probe | H1, H2 on Q1 | — | optically isolated probe with an MMCX tip at J1 (R11 and an MMCX to be fitted; its return is the switch node) |
 | Inductor-current probe | double-pulse current (H1 needs the switched current) | 50 MHz current probe, 30 A | — |
 | Deskew and edge source | probe timing and bandwidth (H4) | a deskew fixture; a pulse generator with sub-ns edges | — |
 | Bus supply | power stage | 0–60 V, 10 A, current limit and OVP | 0–80 V |
@@ -102,6 +102,38 @@ not, beyond that uncertainty.
 | Double-pulse tester (lab has a PD1550A) | not suitable here: its standard interface boards take 62 mm and FM3 modules, other packages need a custom board designed with Keysight, and its probes are specified at 200 MHz, too slow for 1.7 ns edges and 264 MHz ringing | — | — |
 | Network or impedance analyzer (E8, optional) | loop inductance of the unpowered board, separating layout from device and driver | VNA to at least 100 MHz with fixture de-embedding, or an impedance analyzer to 120 MHz | — |
 | Second EPC90133 (E8, optional) | shunt-thru measurement needs the FETs removed | one board, not used for switching tests | — |
+
+## Probe connection points (published layout)
+
+`scripts/epc90133_probe_points.py` locates them in EPC's published B5253 Rev 2.0 files, with declared checks
+([report](../results/gan/epc90133-probe-points.json), [map](../results/gan/epc90133-probe-points.png)). The
+designators come from the schematic and are assigned to footprints by net. **This is the published layout, not
+our board:** the purchased board's revision (silkscreen) and fitted parts are checked against it on arrival,
+before any part is fitted or any probe connected.
+
+| Measurement | Connection on the published layout | State as published | What it reads, and what it does not |
+|---|---|---|---|
+| Q2 gate-source (lower gate) | J2, an SMD MMCX footprint (Molex 734152063), fed from Q2's gate net through R22 (0 Ω) | J2 and R22 optional, not fitted | Q2's gate net at R22 (0.95 mm from Q2's gate pad, then a 6.1 mm trace to J2) against GND at J2's ground pads, about 6 mm from Q2. Not the die voltage: it adds the package's internal gate path and the voltage along the GND copper between Q2's source pins and J2, which the shared source copper (extracted L_cs about 48 pH, exploratory) can make comparable to the 2 V being looked for at these edge rates. A 100 mil through-hole pair on the same net (signal at (16.05, 24.80) mm, GND at (16.05, 22.26) mm) is not named in the schematic or BOM. |
+| Q1 gate-source (upper gate) | J1, an SMD MMCX footprint fed from Q1's gate net through R11 (0 Ω), with switch-node ground pads | J1 and R11 optional, not fitted | Q1's gate net against the switch node; needs an isolated probe. Same caveats as J2. |
+| Switch node | J33, a 100 mil two-pin through-hole header (GND (27.55, 25.48), SW (27.55, 28.02) mm), 8.6 mm from Q2's drain | footprint only; not in the BOM | the switch-node copper at the header, including the SW and GND copper between it and Q2. J32 (switch-node MMCX) has no footprint in this layout. |
+| PHASE-to-GND near the driver | tip at C81's PHASE-side pad (bootstrap capacitor, 1.45 mm from U80's PHASE ball), ground at C80's GND pad (VCC capacitor, 1.21 mm from U80's GND ball); 3.9 mm apart | both fitted | the voltage between those pads, not between the balls the rating applies to: both pads carry gate-drive current to the balls, and the probe loop spans the gate-drive area next to the power loop. |
+
+Consequences for the plan, to be settled with the inventory:
+
+- **Fitting parts changes the circuit.** Fitting R22 (or R11) connects a 6 mm trace, the MMCX and the probe's
+  input to the gate net. The load and the stub resonance it adds are estimated for the chosen probe before
+  fitting, and a series resistor in place of the 0 Ω part is considered if the estimate requires it (it then
+  forms a divider with the probe input). The added parts are recorded in the board identity.
+- **Uncertainty allowance per point.** Each row's "does not" column becomes a numerical allowance in the
+  procedure: from the probe's specifications and loading for the probe part, and, for the copper between
+  the connection point and the device or ball, from an estimate stated with its basis. The exploratory
+  extraction has no terminals at J2, J33, C80 or C81, so it cannot give these voltages today; a G-type
+  extraction with those terminals is the way to estimate them, and is run only if an allowance decides
+  something.
+- **Simultaneous channels.** Switch node (J33 or a solder-in point), Q2 gate (J2), PHASE-to-GND (C81/C80)
+  and inductor current need four channels at once, and the Q2 gate and PHASE channels need probes that can
+  be connected at these points; with fewer channels or probes, the plan states which measurement is
+  repeated at which condition.
 
 ## Experiments
 
@@ -170,8 +202,13 @@ Report the first held-out score as it is; later corrections create new revisions
 
 ## Open items for the owner
 
-1. The lab's oscilloscope and probes (bandwidth, isolated probe, current probe), supplies and pulse generator,
-   compared with the checklist above.
+1. The lab's exact equipment, by model number, compared with the checklist above: oscilloscope (bandwidth,
+   sample rate, channel count); every probe (passive, active, isolated, current) with its tips and
+   accessories (spring tips, solder-in tips, MMCX adapters such as Tektronix 206-0663-xx, deskew fixture);
+   bus and gate-drive supplies (range, current limit, over-voltage trip, remote shutdown); pulse generator;
+   enclosure, interlock and emergency-stop hardware; thermal measurement. Also whether parts may be fitted
+   to the board (R22/J2, R11/J1, a J33 header; probe connection points section). This is the input the
+   probe-and-channel plan and the first-power procedure are waiting for.
 2. Whether spare EPC2302 devices and a B1506A fixture for them can be obtained (E7), and which B1506A fixture
    option (H21, H51 or H71) the lab has. Open as of 30 September 2026.
 3. Whether a VNA or impedance analyzer is available, and whether a second board may be depopulated (E8). Open as

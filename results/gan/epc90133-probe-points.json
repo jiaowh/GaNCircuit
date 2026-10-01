@@ -1,0 +1,399 @@
+{
+ "schema": "epc90133-probe-points/1",
+ "scope": "connection points in EPC's published B5253 Rev 2.0 files; not our board; nothing measured or extracted",
+ "evaluator_sha256": "dd070ef26fad3372d0007593e6f8debd9319988494b673f69de9642f0714c844",
+ "gate_loop_sha256": "1d3747d5c8f4e27129fdf990ecfe2f2eb9a1085f87ffc41b353c9a05d1b56b9b",
+ "checks": {
+  "P1_J2": {
+   "candidates": 1,
+   "pass": true
+  },
+  "P2_J1": {
+   "candidates": 1,
+   "pass": true
+  },
+  "P3_J33": {
+   "candidates": 1,
+   "pass": true
+  },
+  "P4_C81": {
+   "candidates": 1,
+   "pass": true
+  },
+  "P4_C80": {
+   "candidates": 1,
+   "pass": true
+  },
+  "P5_J32_absent": {
+   "switch_node_mmcx_patterns": 0,
+   "consistent_with_audit": true
+  }
+ },
+ "points": {
+  "J2": {
+   "measures": "VGl (gate net, Q2) against GND",
+   "status_on_published_board": "J2 (MMCX) and R22 (0 ohm) optional, not fitted",
+   "R22": {
+    "gate_pad": {
+     "side": "top",
+     "net": "VGl",
+     "centre_mm": [
+      17.285,
+      26.899
+     ],
+     "size_mm": [
+      0.432,
+      0.61
+     ],
+     "pasted": true
+    },
+    "probe_pad": {
+     "side": "top",
+     "net": "other",
+     "centre_mm": [
+      16.358,
+      26.873
+     ],
+     "size_mm": [
+      0.406,
+      0.61
+     ],
+     "pasted": true
+    }
+   },
+   "mmcx_signal_pad": {
+    "side": "top",
+    "net": "other",
+    "centre_mm": [
+     12.217,
+     23.508
+    ],
+    "size_mm": [
+     1.168,
+     1.092
+    ],
+    "pasted": true
+   },
+   "mmcx_ground_pads": [
+    {
+     "side": "top",
+     "net": "GND",
+     "centre_mm": [
+      10.884,
+      22.212
+     ],
+     "size_mm": [
+      1.346,
+      1.346
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "GND",
+     "centre_mm": [
+      13.487,
+      22.212
+     ],
+     "size_mm": [
+      1.372,
+      1.346
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "GND",
+     "centre_mm": [
+      10.884,
+      24.816
+     ],
+     "size_mm": [
+      1.346,
+      1.372
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "GND",
+     "centre_mm": [
+      13.487,
+      24.816
+     ],
+     "size_mm": [
+      1.372,
+      1.372
+     ],
+     "pasted": true
+    }
+   ],
+   "other_contacts_on_probe_net": [
+    {
+     "side": "top",
+     "net": "other",
+     "centre_mm": [
+      16.002,
+      24.816
+     ],
+     "size_mm": [
+      1.778,
+      1.778
+     ],
+     "pasted": false
+    }
+   ],
+   "distance_mm": {
+    "R22 gate pad to Q2.G pad": 0.95,
+    "R22 gate pad to MMCX signal pad": 6.1
+   },
+   "unnamed_through_hole_pair": {
+    "note": "100 mil pair on the J2 net with a GND mate; not named in the schematic or BOM",
+    "pins": [
+     {
+      "net": "J2 net",
+      "centre_mm": [
+       16.05,
+       24.795
+      ]
+     },
+     {
+      "net": "GND",
+      "centre_mm": [
+       16.05,
+       22.255
+      ]
+     }
+    ]
+   }
+  },
+  "J1": {
+   "measures": "VGu (gate net, Q1) against SW",
+   "status_on_published_board": "J1 (MMCX) and R11 (0 ohm) optional, not fitted",
+   "R11": {
+    "gate_pad": {
+     "side": "top",
+     "net": "VGu",
+     "centre_mm": [
+      16.561,
+      32.271
+     ],
+     "size_mm": [
+      0.457,
+      0.635
+     ],
+     "pasted": true
+    },
+    "probe_pad": {
+     "side": "top",
+     "net": "other",
+     "centre_mm": [
+      15.659,
+      32.296
+     ],
+     "size_mm": [
+      0.432,
+      0.635
+     ],
+     "pasted": true
+    }
+   },
+   "mmcx_signal_pad": {
+    "side": "top",
+    "net": "other",
+    "centre_mm": [
+     10.262,
+     34.087
+    ],
+    "size_mm": [
+     1.168,
+     1.118
+    ],
+    "pasted": true
+   },
+   "mmcx_ground_pads": [
+    {
+     "side": "top",
+     "net": "SW",
+     "centre_mm": [
+      8.954,
+      32.817
+     ],
+     "size_mm": [
+      1.295,
+      1.27
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "SW",
+     "centre_mm": [
+      11.519,
+      32.779
+     ],
+     "size_mm": [
+      1.346,
+      1.194
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "SW",
+     "centre_mm": [
+      8.954,
+      35.357
+     ],
+     "size_mm": [
+      1.295,
+      1.27
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "SW",
+     "centre_mm": [
+      11.481,
+      35.395
+     ],
+     "size_mm": [
+      1.27,
+      1.194
+     ],
+     "pasted": true
+    }
+   ],
+   "other_contacts_on_probe_net": [],
+   "distance_mm": {
+    "R11 gate pad to Q1.G pad": 1.62,
+    "R11 gate pad to MMCX signal pad": 6.56
+   }
+  },
+  "J33": {
+   "measures": "SW against GND (switch node)",
+   "status_on_published_board": "footprint only; not in the BOM",
+   "pins": [
+    {
+     "net": "GND",
+     "centre_mm": [
+      27.55,
+      25.48
+     ]
+    },
+    {
+     "net": "SW",
+     "centre_mm": [
+      27.55,
+      28.02
+     ]
+    }
+   ],
+   "distance_mm": {
+    "SW pin to Q2 drain pad centre": 8.57
+   }
+  },
+  "C81": {
+   "role": "PHASE-side access (bootstrap capacitor)",
+   "pads": [
+    {
+     "side": "top",
+     "net": "SW",
+     "centre_mm": [
+      13.97,
+      31.394
+     ],
+     "size_mm": [
+      0.457,
+      0.66
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "BOOT",
+     "centre_mm": [
+      14.859,
+      31.394
+     ],
+     "size_mm": [
+      0.406,
+      0.66
+     ],
+     "pasted": true
+    }
+   ],
+   "access_pad": {
+    "side": "top",
+    "net": "SW",
+    "centre_mm": [
+     13.97,
+     31.394
+    ],
+    "size_mm": [
+     0.457,
+     0.66
+    ],
+    "pasted": true
+   },
+   "distance_mm": {
+    "access pad to U80.PHASE.D4 ball": 1.45
+   }
+  },
+  "C80": {
+   "role": "GND-side access (VCC capacitor)",
+   "pads": [
+    {
+     "side": "top",
+     "net": "GND",
+     "centre_mm": [
+      15.672,
+      27.889
+     ],
+     "size_mm": [
+      0.457,
+      0.66
+     ],
+     "pasted": true
+    },
+    {
+     "side": "top",
+     "net": "VCC",
+     "centre_mm": [
+      14.757,
+      27.902
+     ],
+     "size_mm": [
+      0.457,
+      0.635
+     ],
+     "pasted": true
+    }
+   ],
+   "access_pad": {
+    "side": "top",
+    "net": "GND",
+    "centre_mm": [
+     15.672,
+     27.889
+    ],
+    "size_mm": [
+     0.457,
+     0.66
+    ],
+    "pasted": true
+   },
+   "distance_mm": {
+    "access pad to U80.GND.A2 ball": 1.21
+   }
+  },
+  "PHASE_to_GND": {
+   "tip": "C81 PHASE-side pad",
+   "ground": "C80 GND pad",
+   "tip_to_ground_mm": 3.9,
+   "caveat": "both pads carry gate-drive current between them and the balls; the voltage measured there differs from the ball-to-ball voltage the rating applies to"
+  }
+ },
+ "outcome": "pass"
+}
