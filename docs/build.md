@@ -989,6 +989,49 @@ What this shows, within this model:
 - Neither form is identified as the real driver; both are within the datasheet's typical edge times and
   maximum resistances. The step case on G (16.8 V, 1.04 ns) is still far from Fig. 9 (5.7 V, 1.67 ns).
 
+### EPC90133 test 12: energy budget of the turn-on ring
+
+`scripts/epc90133_energy_budget.py` (declared before its first run; [result](../results/gan/epc90133-energy-budget.json))
+saves every node voltage and element current, inside the vendor model too, from 10 ns before Q1's turn-on, and
+forms each element's absorbed power. The ring's losses are the deviations of voltage and current from their
+one-period moving averages, multiplied and integrated from the first switch-node peak to 60 ns after the command,
+so that the 11 A conduction loss and the bus charging L1 are excluded. Element groups are assigned by name. The
+vendor model's charge elements each depend only on their own voltage (the one cross term has a zero coefficient),
+so its storage is lossless and its losses sit in rg, rd, rs, the channel, the gate diodes and leakage resistors.
+LTspice reports switch currents with the opposite sign to other elements (checked on a small circuit).
+
+Run 1 stopped in post-processing (a raw file saved from a start time has its time axis starting at 0; fixed). The
+checks: E1, the whole-window Tellegen sum, **fails** in every case (1.7–3.0 % of the largest element power). The
+residual sits at the switching edge: 1.6 % of samples exceed the tolerance, all within about 2 ns of the edge, and
+after command + 5 ns it is at most 1.2e-3. E2, the same balance for the ring's deviations, passes (2.5e-9 to
+6.2e-8), and E3, the ring-loss shares at a halved step on G + 50 pH, passes (largest change 0.2 points). So the ring
+accounting is internally consistent; the edge itself is not resolved by this bookkeeping.
+
+| Ring loss share | B | G | G + 50 pH (assumed) |
+|---|---|---|---|
+| Q1 channel | 64 % | 63 % | 59 % |
+| gate loops (Q1/Q2 rg, driver outputs, R80–R83) | 0 % | 19 % | 29 % |
+| network copper (diagonal R) | 13 % | 6 % | 2 % |
+| capacitor ESR | 8 % | 4 % | 1 % |
+| Q1 + Q2 rd and rs | 15 % | 8 % | 2 % |
+| package inductors' numerical damping resistors | — | — | 6.5 % |
+| total ring loss | 457 nJ | 388 nJ | 151 nJ |
+
+What this shows, within this model:
+
+- **The ring's energy is dissipated, not returned to the ideal sources:** the sources' share of the ring energy is
+  under 0.1 nJ on B, and the storage elements' net release equals the losses.
+- **Q1's channel takes most of the ring loss in every case.** When the ring starts, Q1's internal gate voltage is
+  only about 2.5 V (test 9 traces), and it reaches 4.6 V 20 ns later. But on B the transient's per-cycle ζ stays at
+  about 0.0071 even when Q1 is fully on (4.9–5.0 V), twice test 10's local mode. Q1's partial turn-on therefore does
+  not explain the whole gap.
+- **With the extracted gate paths, the gate loops dissipate 19–29 % of the ring energy**, mostly in Q2's internal
+  gate resistor and the driver outputs, so the driver's output resistance is part of the ring's damping as well as
+  its excitation (test 11).
+- **The numerical damping resistors take 6.5 % on G + 50 pH**: a contribution, not the main loss path.
+
+Shares attribute the simulated ring's dissipation, not the board's; envelope decay is a different quantity.
+
 ### LTspice installation
 
 Install LTspice from the
