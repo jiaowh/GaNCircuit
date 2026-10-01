@@ -535,10 +535,13 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    it is run once by the agent and once by the plain scripts for comparison.
    *Milestone 1 done, 1 October 2026* (docs/build.md "Agent-workflow milestone 1"; scripts/agent_milestone.py):
    a cheaper-model subagent with only a task card completed the clean run identically to the baseline and
-   stopped correctly on a corrupted input, with no interventions and no writes outside its sandbox. Narrow
+   stopped correctly on a corrupted input, with no interventions and no new git-status changes outside runs/
+   (the check cannot see git-ignored files). Narrow
    scope: one run each, no engineering decision. Next: repeated runs, more fault types, a task with a decision.
    *Milestone 2 done, same day:* 4 of 4 clean runs and 5 of 5 fault runs (five fault kinds) behaved as specified;
-   the plain baseline crashed on a missing file until fixed. Next: a task that requires an engineering decision.
+   the plain baseline crashed on a missing file until fixed. Next: a task that requires an engineering decision,
+   designed so the expected answer is not reachable by the agent (hidden scorer, held-out material, structural
+   scoring); a first draft did not meet this and was not run (external review, 1 October 2026).
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:

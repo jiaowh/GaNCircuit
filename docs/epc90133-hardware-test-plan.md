@@ -184,9 +184,13 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   chosen from E1 is a hypothesis about the loaded drive; it is tested against the energized gate observations (Q2's
   VGS in E3, Q1's if a probe allows) before it is used for predictions. The driver-only bench (docs/build.md,
   "EPC90133 driver-only bench") supports this experiment within its model: at VIN = 0 the two test-11 forms differ
-  at the Q2 gate pad by about 3 ns in rise time and up to 2 V (edges of about 20-25 ns, so a 500 MHz probe is ample);
-  a 0.5 µs low-side pre-charge leaves BOOT-PHASE near 4.3 V and Q1's gate near 4.4 V, so E1 uses a pre-charge of
-  several microseconds and records BOOT-PHASE at C81 before the first high-side pulse; without a low-side pulse
+  at the Q2 gate pad by about 3 ns in rise time and up to 2 V (edges of about 20-25 ns: a 500 MHz probe's nominal
+  bandwidth may suffice for these unpowered edges, but bandwidth alone does not establish its loading, accuracy or
+  suitability for energized gate spikes); in that bench's assumed bootstrap circuit, a 0.5 µs low-side pre-charge
+  left BOOT-PHASE near 4.3 V and Q1's gate near 4.4 V, so the first high-side pulse requires a verified bootstrap
+  state (BOOT-PHASE measured at C81 within a stated limit of its settled value), not a fixed pre-charge time. The
+  Q1 gate probe connection is specified with the probes: a ground-referenced probe return on J1's switch-node
+  reference would tie the switch node to earth, and gate-to-ground is not gate-to-source. Without a low-side pulse
   the switch node and BOOT state at VIN = 0 depend on leakage the model lacks, so they are measured, not assumed.
   BOOT-PHASE overcharge during negative dead-time excursions in continuous operation is not answered and is a
   quantity to observe in E6 (the driver's BOOT clamp is unspecified).
