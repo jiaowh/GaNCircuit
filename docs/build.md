@@ -187,6 +187,16 @@ Scope, unchanged from the specification: this does not qualify antipads, via arr
 multi-layer vias, open plane edges or thin barrels. A converged E2 would need a fourth mesh, of roughly
 340k filaments and several hours on this host, declared before it runs.
 
+**Fourth mesh (1 October 2026, declared before its run as a separate revision;
+[result](../results/gan/fasthenry-via-cavity-mesh4.json)).** The three-mesh result above stays recorded as failed.
+Launch 1 reran only the old meshes (a default left at three) and wrote no evaluation; it is kept under runs/.
+Launch 2 ran the (w/8, 9) mesh: 52.068 pH (1.5 mm) and 71.721 pH (3 mm, 336k filaments, about 5.5 h at 4.9 GB),
+reusing the earlier meshes. Declared outcome: **pass**. From w/6 to w/8 the values change by 0.05 % and 0.03 % and
+the E1 difference by 0.02 % (limit 1 %); E1 is +2.47 % (tolerance 3 %); both values lie inside the E2 bracket, at 34 %
+and 25 % of its width. So this single-via benchmark has converged, and the earlier failure was mesh resolution in the
+via, junction and pad region. The scope is unchanged: board via arrays, plane holes, Kelvin and multi-layer vias are
+still not qualified, and the bracket width (23.5 and 33.7 pH here) remains the per-via representation uncertainty.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh

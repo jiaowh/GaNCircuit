@@ -1,0 +1,123 @@
+{
+ "schema": "fasthenry-via-cavity/1",
+ "evaluator_sha256": "010adb1f3454418793f4debf4b74062327cb66d72427d9bcbb8ad0ed5c721cc1",
+ "fasthenry_binary_sha256": "bcd646263ac24d6e724ac6f3c11101be1fb42d5bf8e0d80884e53505d7a7e299",
+ "geometry_mm": {
+  "t": 0.0711,
+  "h": 0.127,
+  "via_w": 0.25,
+  "sizes_D": [
+   1.5,
+   3.0
+  ]
+ },
+ "frequency_Hz": 100000000.0,
+ "skin_depth_mm": 0.006608549310080563,
+ "meshes": [
+  [
+   2,
+   3
+  ],
+  [
+   4,
+   5
+  ],
+  [
+   6,
+   7
+  ],
+  [
+   8,
+   9
+  ]
+ ],
+ "values": {
+  "2,1.5": {
+   "L_H": 5.459921731227635e-11,
+   "R_ohm": 0.00053215,
+   "preconditioner": "default (cube)"
+  },
+  "2,3.0": {
+   "L_H": 7.490388664205417e-11,
+   "R_ohm": 0.000803979,
+   "preconditioner": "default (cube)"
+  },
+  "4,1.5": {
+   "L_H": 5.287159040501382e-11,
+   "R_ohm": 0.000905545,
+   "preconditioner": "default (cube)"
+  },
+  "4,3.0": {
+   "L_H": 7.263576954805158e-11,
+   "R_ohm": 0.00139884,
+   "preconditioner": "diag"
+  },
+  "6,1.5": {
+   "L_H": 5.209380019812372e-11,
+   "R_ohm": 0.00107254,
+   "preconditioner": "default (cube)"
+  },
+  "6,3.0": {
+   "L_H": 7.174243285247676e-11,
+   "R_ohm": 0.00159689,
+   "preconditioner": "diag"
+  },
+  "8,1.5": {
+   "L_H": 5.206801709734285e-11,
+   "R_ohm": 0.00115638,
+   "preconditioner": "diag"
+  },
+  "8,3.0": {
+   "L_H": 7.172142439998862e-11,
+   "R_ohm": 0.00167457,
+   "preconditioner": "diag"
+  }
+ },
+ "solver_note": "-p diag was adopted after it reproduced the finished fine D = 1.5 mm case exactly (Z = 0.00107254 + 0.0327315j ohm, 187 s against 759 s for the default); each case records its preconditioner",
+ "references": {
+  "1.5": {
+   "low_H": 4.417372609666294e-11,
+   "high_H": 6.768084402954038e-11
+  },
+  "3.0": {
+   "low_H": 6.335248536737423e-11,
+   "high_H": 9.706561026005247e-11
+  },
+  "E1_H": 1.9178759270711286e-11
+ },
+ "evidence_directory": "runs\\fasthenry-via-b48bc657da7446bc9555d513f4e74456",
+ "mesh_check": {
+  "per_L": {
+   "1.5": 0.0004949360707573458,
+   "3.0": 0.00029283161516613365
+  },
+  "difference": 0.0002430015552088438,
+  "outcome": "pass"
+ },
+ "E1": {
+  "fasthenry_H": 1.9653407302645773e-11,
+  "reference_H": 1.9178759270711286e-11,
+  "relative_error": 0.024748630776097347,
+  "tolerance": 0.03,
+  "outcome": "pass"
+ },
+ "E2": {
+  "sizes": {
+   "1.5": {
+    "L_H": 5.206801709734285e-11,
+    "low_H": 4.417372609666294e-11,
+    "high_H": 6.768084402954038e-11,
+    "position_f": 0.3358255581658875,
+    "inside": true
+   },
+   "3.0": {
+    "L_H": 7.172142439998862e-11,
+    "low_H": 6.335248536737423e-11,
+    "high_H": 9.706561026005247e-11,
+    "position_f": 0.2482397896740787,
+    "inside": true
+   }
+  },
+  "outcome": "pass"
+ }
+}

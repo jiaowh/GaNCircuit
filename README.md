@@ -129,9 +129,9 @@ as sensitivities:
 - **Via representation.** Three via-to-plane junction models change the result by under 2 % on A and up to 7 % on B.
 - **Mesh.** Only the coarse mesh has been run on the full board, so these numbers carry no mesh-convergence evidence.
 - **Qualification.** FastHenry passes known-answer checks for bars and plane pairs ([result](results/gan/fasthenry-known-answer.json)).
-  The via/plane-pair benchmark ([result](results/gan/fasthenry-via-cavity.json)) fails its mesh criterion. Vias, plane
-  holes and the slotted return plane under the transistors are therefore not qualified, and board extractions are
-  exploratory.
+  A single via in a plane pair converges with a fourth, finer mesh ([result](results/gan/fasthenry-via-cavity-mesh4.json));
+  with three meshes it had failed its mesh criterion. That benchmark does not cover the board's via arrays, plane holes
+  or the slotted return plane under the transistors, so those are not qualified and board extractions stay exploratory.
 
 ### Simulating the switching
 
