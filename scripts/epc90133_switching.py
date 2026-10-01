@@ -171,6 +171,11 @@ than 0.3 V or 10 % when the step is halved. If a regularized case is outside the
 undershoot is a property of this model and goes into the hardware plan as a predicted risk. If the verdict
 differs between 10 and 100 pF, it depends on an unknown driver value and stays unresolved. Switching metrics
 are reported against the unregularized case (material or not); simulated sensitivity, not a safe limit.
+Run 1 (1 October 2026): the three 100 pF cases timed out at 3600 s in their timing runs (femtosecond steps from
+the first turn-on at 20.7 ns); kept as failed (results/gan/epc90133-switching-phase.json). Substitute step check,
+declared after run 1 and before its run, with the same 0.3 V / 10 % criterion: G-m1-mid-Ls50-pin10-ms50 against
+G-m1-mid-Ls50-pin10 (run with --only, report epc90133-switching-phase-2.json). The 100 pF bracket end is then
+read only from the partial timing runs (event A), as supplementary evidence outside the declared criteria.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -764,7 +769,10 @@ def phase_cases(exts):
             f"{b50}-pin100": {**common, "l_s": 50e-12, "base": b50, "pin_c": 100e-12},
             f"{b50}-pin100-ms50": {**common, "l_s": 50e-12, "base": f"{b50}-pin100", "pin_c": 100e-12,
                                    "maxstep": MAXSTEP_PKG / 2},
-            f"{g}-pin100": {**common, "pin_c": 100e-12}}
+            f"{g}-pin100": {**common, "pin_c": 100e-12},
+            # Substitute step check, declared after run 1 (see the module docstring).
+            f"{b50}-pin10-ms50": {**common, "l_s": 50e-12, "base": f"{b50}-pin10", "pin_c": 10e-12,
+                                  "maxstep": MAXSTEP_PKG / 2}}
 
 
 def main():
