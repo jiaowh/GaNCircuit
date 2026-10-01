@@ -177,6 +177,18 @@ declared after run 1 and before its run, with the same 0.3 V / 10 % criterion: G
 G-m1-mid-Ls50-pin10 (run with --only, report epc90133-switching-phase-2.json). The 100 pF bracket end is then
 read only from the partial timing runs (event A), as supplementary evidence outside the declared criteria.
 
+Test 9 (--study fullr; declared 1 October 2026 after the method audit and the network-transfer qualification,
+before any run): does the full extracted resistance change the switching waveform, and what do the vendor model's
+internal nodes show? A separate network revision; the baseline cases and reports are unchanged. All cases at test
+7's settings (100 ps, Q2 sense source) with internal saves (V(x*:gate), V(x*:source), I(x*:bswitch)):
+  B-m1-mid-ms100 and G-m1-mid (baseline network: reproduction of test 7, every switching metric within 0.1 %),
+  B-m1-mid-ms100-fullR, G-m1-mid-fullR, G-m1-mid-Ls50 (baseline) and G-m1-mid-Ls50-fullR (pairs judged with the
+  existing materiality rule against their baseline case), and G-m1-mid-fullR-ms50 (step check, 2 % rule).
+Read as a representation correction under the same unvalidated model, not as tuning: whatever the damping
+does, no parameter is adjusted to Fig. 9. The internal Q2 VGS and channel current during Q1's turn-on are
+reported, not judged (no threshold declared); they replace the terminal-VGS-against-DC-current reading of test 7
+for the false-turn-on question inside the model.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -360,8 +372,8 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
-          pin_c=None):
-    net, terms = network(ext, ideal, r_scale, no_gate_power_k)
+          pin_c=None, full_r=False, internal=False):
+    net, terms = network(ext, ideal, r_scale, no_gate_power_k, full_r)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
     for c in caps:
@@ -490,7 +502,9 @@ Rbret bn {node(at + '.GND')} 1u"""
         SWITCH_MODELS.rstrip(),
         ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (" I(Vq2d)" if sense_q2 else "") + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
         + (" V(q2_s) V(u80_ph) V(u80_gnd) I(Vs12) I(Vs146) I(Vs22) I(Vs246)" if g_ext else "")
-        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s", "q2dd", "q1dd"})),
+        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s", "q2dd", "q1dd"}))
+        # Test 9 (opt-in): vendor-model internal nodes, behind rg/rs; the vendor model itself is unchanged.
+        + (" V(x1:gate) V(x1:source) V(x2:gate) V(x2:source) I(x1:bswitch) I(x2:bswitch)" if internal else ""),
         ".temp 25",
         f".options plotwinsize=0 reltol={reltol:g}",
         f".tran 0 {t_end:.9g} 0 {maxstep:g}",
@@ -544,7 +558,7 @@ def metrics(s, times, at):
                "q2_gate_pad_peak_during_rise_V": max(x for _, x in window(t, gl, tb, tb + 60e-9))}
     return {"event_a_turn_off_at_peak": event_a, "event_b_turn_on_at_valley": event_b,
             "gate_and_current_diagnostics": diagnostics(s, t, vgs1, vgs2, id1, ta, tb),
-            "terminals": {"device_metrics": "die (q1 vgs and vds for the energies, q2 gate-source peak)",
+            "terminals": {"device_metrics": "vendor-model terminals (q1 vgs and vds for the energies, q2 gate-source peak)",
                           "switch_node_metrics": "Q2 drain pad to circuit ground (Q2 source pad)",
                           "die_nodes": die, "energies_exclude": "energy stored in package or gate-loop inductors"},
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
@@ -559,6 +573,10 @@ def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
     Reported, not judged: no pass/fail threshold was declared before the first run."""
     id2 = s.get("i(vq2d)")
     out = {"window_s": [-5e-9, 60e-9], "vgs_ratings_V": {"max": 6.0, "min": -4.0, "source": "EPC2302 datasheet"},
+           "vgs_definition": ("q*_vgs: the vendor model's terminal gate-source voltage (gatein-sourcein), after any "
+                              "added package inductance; earlier notes called it 'die VGS'. It is not the internal "
+                              "channel-control voltage behind the model's rg (0.5 ohm) and rs (method audit, "
+                              "1 October 2026); q*_vgs_internal (test 9, when saved) is."),
            "q2_drain_current": "I(Vq2d), drain terminal into Q2" if id2 else "not saved (no Q2 sense source)"}
     for tag, te in (("event_a", ta), ("event_b", tb)):
         w = lambda y: [x for _, x in window(t, y, te - 5e-9, te + 60e-9)]
@@ -567,6 +585,12 @@ def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
              "q1_id_max_A": max(w(id1)), "q1_id_min_A": min(w(id1))}
         if id2:
             d.update(q2_id_max_A=max(w(id2)), q2_id_min_A=min(w(id2)))
+        if "v(x2:gate)" in s:
+            for q in ("1", "2"):
+                vi = [a - b for a, b in zip(s[f"v(x{q}:gate)"], s[f"v(x{q}:source)"])]
+                ich = s[f"i(x{q}:bswitch)"]
+                d.update({f"q{q}_vgs_internal_max_V": max(w(vi)), f"q{q}_vgs_internal_min_V": min(w(vi)),
+                          f"q{q}_channel_current_max_A": max(w(ich)), f"q{q}_channel_current_min_A": min(w(ich))})
         if "v(u80_ph)" in s:
             # Variant G only: the driver's PHASE ball against its GND ball (uP1966E absolute maximum
             # -5 V to +85 V, datasheet p. 7). A simulated sensitivity result, not a safe limit.
@@ -598,6 +622,10 @@ def edge_traces(s, times):
         nv = lambda nd: zero if nd == "0" else np.array(s[f"v({'q1_d' if nd == 'q1dd' else nd})"])
         sig = {"q1_vgs_V": nv(die["g1"]) - nv(die["s1"]), "q2_vgs_V": nv(die["g2"]) - nv(die["s2"]),
                "q1_id_A": np.array(s["i(vq1d)"]), "q2_id_A": np.array(s["i(vq2d)"])}
+        if "v(x2:gate)" in s:
+            for q in ("1", "2"):
+                sig[f"q{q}_vgs_internal_V"] = np.array(s[f"v(x{q}:gate)"]) - np.array(s[f"v(x{q}:source)"])
+                sig[f"q{q}_channel_current_A"] = np.array(s[f"i(x{q}:bswitch)"])
         out["device"] = {f"{ev}_{k}": [round(float(x), 5) for x in np.interp(times[tk] + rel, t, y)]
                          for ev, tk in (("falling", "t_off1"), ("rising", "t_on2")) for k, y in sig.items()}
     return out
@@ -791,6 +819,21 @@ def phase_cases(exts):
                                   "maxstep": MAXSTEP_PKG / 2}}
 
 
+def fullr_cases(exts):
+    """Test 9 cases (see the module docstring)."""
+    if "G-m1-mid" not in exts or "B-m1-mid" not in exts:
+        raise SystemExit("test 9 needs extractions G-m1-mid and B-m1-mid")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "internal": True}
+    b, g = "B-m1-mid-ms100", "G-m1-mid"
+    return {b: {"ext": "B-m1-mid", **common},
+            f"{b}-fullR": {"ext": "B-m1-mid", "base": b, **common, "full_r": True},
+            g: {"ext": g, **common},
+            f"{g}-fullR": {"ext": g, "base": g, **common, "full_r": True},
+            f"{g}-fullR-ms50": {"ext": g, "base": f"{g}-fullR", **common, "full_r": True, "maxstep": MAXSTEP_PKG / 2},
+            f"{g}-Ls50": {"ext": g, **common, "l_s": 50e-12},
+            f"{g}-Ls50-fullR": {"ext": g, "base": f"{g}-Ls50", **common, "l_s": 50e-12, "full_r": True}}
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -800,7 +843,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -843,6 +886,10 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "fullr":
+        cases = fullr_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "phase":
         cases = phase_cases(exts)
         if args.only:
@@ -893,7 +940,8 @@ def main():
                   esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
-                  no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"))
+                  no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
+                  full_r=c.get("full_r", False), internal=c.get("internal", False))
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
