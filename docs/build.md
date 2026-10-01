@@ -812,17 +812,28 @@ What happened, against the declared criteria:
   0.36 ns after the turn-on command; Q1's gate shows the same one-sample jump to −9 V, and the next lowest point is
   −2.32 V. Excluding it is a judgement made after the run, so the criterion stays failed in the record. Event A
   passes it (−3.594 V at both steps).
-- **The 10 pF regularization changes no switching metric materially** (overshoot +2.8 %, others under 0.2 %;
-  Q2's die VGS peak 2.08 V, unchanged).
+- **The 10 pF regularization changes no switching metric materially** (overshoot +2.8 %, damping ratio +2.4 %,
+  the others under 0.2 %; all below the declared materiality threshold; Q2's die VGS peak 2.08 V, unchanged).
+- **Step stability of G + 50 pH's switching metrics:** halving the step changes the five reported metrics by
+  under 0.04 % (unregularized and 10 pF alike). This shows stability over these two steps, not general
+  convergence, and says nothing about PHASE stability.
 
-Reading, scoped to this unvalidated bench: the large test 7 extremes come from the ideal switches. Without
-regularization they move with the time step (event A maximum 48 → 114 V, event B minimum −3.0 → −8.0 V); with
-any pin capacitance tested, event A's undershoot becomes a resolved 2 ns dip of about −3.6 V, nearly independent
-of the assumed 10–100 pF and inside the −5 V rating with 1.4 V margin. Event B was resolved only at 10 pF, apart
-from the single solver point. **PHASE stress is therefore narrowed but formally still open**: the declared
-criteria are not met (100 pF incomplete, event B step check failed on one sample). A further simulation step is
-not proposed; the margin is small enough, and the driver's real output stage unknown enough, that the PHASE-ball
-undershoot is a measurement item in the hardware plan. Simulated sensitivity results, not a safe limit.
+Reading, scoped to this unvalidated bench. Test 8 changed two things at once, pin capacitance and clamp paths,
+with the clamps tied to ideal rails: assumed circuit changes, not a qualified model of the uP1966E output stage.
+What it supports: **the PHASE extremes are sensitive to driver-model assumptions, and some of them are
+numerically unstable.** Without regularization, the event A maximum (48 → 114 V) and the event B minimum
+(−3.0 → −8.0 V) move with the step, while the event A minimum (−28.3 V) does not. With either assumed pin
+capacitance, event A's undershoot is a 2 ns dip of about −3.6 V. Neither the assumed capacitances nor the
+resulting 1.4 V distance from the −5 V rating establishes a hardware margin. The structured verdict is
+[results/gan/epc90133-test8-assessment.json](../results/gan/epc90133-test8-assessment.json)
+(`scripts/assess_epc90133_test8.py`, no simulation): declared test incomplete (C1 rating and C3 bracket lack the
+100 pF cases, the declared step check never ran), substitute step check passes at event A and fails at event B,
+**PHASE stress unresolved**. Switching-metric eligibility (the `usable` flag) is kept separate from it.
+
+This simulation baseline is frozen here (external review, 1 October 2026): the original driver model and the
+test 8 variants stay as separate, recorded cases, and no finer G mesh, broad sweep or tuning is justified by the
+current decisions. The PHASE-to-GND undershoot near the driver is a measurement item and a stop criterion in the
+hardware plan. Simulated sensitivity results, not a safe limit.
 
 ### LTspice installation
 

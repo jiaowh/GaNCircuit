@@ -41,10 +41,10 @@ not, beyond that uncertainty.
   below −5 V exceeds the PHASE rating. The PHASE ball is not the Q2 drain pad: ringing there is not measured by a
   probe at Q2 and needs its own estimate (the extraction G network has the U80.PH terminal). The simulated
   PHASE-ball undershoot is unresolved: the raw minima reach −8 to −28 V as sub-picosecond excursions of the ideal
-  driver stage, and only a filtered version is inside the rating (docs/build.md, test 7). With a regularized
-  driver output (test 8: assumed 10–100 pF pin capacitance and clamp diodes) the turn-off undershoot becomes a
-  2 ns dip of about −3.6 V, inside −5 V with only 1.4 V margin; the criteria for calling this resolved were not
-  all met. The PHASE-to-GND voltage is therefore measured at each bus step, at the accessible point nearest
+  driver stage, and only a filtered version is inside the rating (docs/build.md, test 7). Test 8 (assumed pin
+  capacitance and clamps to ideal rails, not a qualified driver model) shows these extremes are sensitive to
+  driver-model assumptions and partly numerically unstable; its verdict is unresolved
+  (results/gan/epc90133-test8-assessment.json). No simulated value here is a hardware margin. The PHASE-to-GND voltage is therefore measured at each bus step, at the accessible point nearest
   U80's PHASE and GND balls (chosen and characterized in E0; the WLCSP balls themselves cannot be probed), and
   its undershoot trend is a stop criterion, like Q2's VGS.
 - **The driver has no input lockout** (datasheet p. 5): "There is no lockout between HI and LI inputs: both GaN

@@ -202,8 +202,8 @@ approximations stated; none of them yet reproduces the measurement on every crit
     the power loop. A lower overshoot bought this way is not a better design.
 - **Common-source inductance in the package** is the remaining lead. Adding an assumed 50 pH of package source
   inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice
-  the measured value. Overshoot and damping still fail. This case ran at one time step only; it needs its own
-  halved-step check before a decision rests on the match. The package value is assumed, not published, so this is
+  the measured value. Overshoot and damping still fail. Halving the time step changes its five reported
+  switching metrics by under 0.04 % (stability over two steps, not general convergence). The package value is assumed, not published, so this is
   consistency, not identification. The same inductance placed where the gate driver does not share it behaves like
   extra loop inductance and makes the overshoot worse.
 - **Gate-loop inductance** alone, without coupling, of 0.5–2 nH changes the overshoot by only 3–10 %.
@@ -247,13 +247,16 @@ switching simulation → comparison with a measurement. Its board-level predicti
 Gate G3 (stock-board simulation) stays open until the gap is explained or bounded.
 
 Next steps:
-1. **Carry the gate-path findings into the measurement plan:** the low-side gate voltage during the high-side
-   turn-on (false turn-on margin) and the high-side gate-loop coupling as a separate hypothesis. The extraction is
-   one mesh with unqualified vias, so its numbers are estimates.
-2. **Complete the parasitic set.** Switch-node capacitance comes from capacitance extraction with FasterCap, within
-   the scope its known-answer checks support and with its own convergence check. It replaces today's rough parallel-plate estimate, which changes the overshoot by only about
-   1 V. All values go into one `parasitics.inc` file, with the couplings kept.
-3. **Measure the board** following the hardware test plan once equipment and interlocks are in place (gate G4).
+1. **Measurement readiness.** The simulation baseline is frozen: the original driver model and the
+   regularized-driver variants stay as separate recorded cases. The next work turns the equipment inventory into
+   a probe-and-channel plan (switch node, low-side gate voltage, driver PHASE-to-ground and current measured together,
+   with connection points, probe loading, bandwidth, grounding and uncertainty), and the hardware draft into an
+   executable first-power procedure with numerical limits and independent hardware trips.
+2. **Measure the board** once that procedure and its interlocks are approved (gate G4): measurement chain and
+   unpowered driver checks first, then the first energized condition, with predictions and held-out conditions
+   frozen before diagnostic switching data are taken.
+3. **Complete the parasitic set** if a decision needs it: switch-node capacitance with FasterCap, within the scope
+   its known-answer checks support. All values go into one `parasitics.inc` file, with the couplings kept.
 4. **A first bounded agent run.** Reproduce the comparison from declared inputs, with interventions, failures, time and
    cost recorded against the plain scripts. The current evidence is for the tools, not yet for an agent workflow.
 5. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.

@@ -1,0 +1,224 @@
+{
+ "schema": "epc90133-test8-assessment/1",
+ "inputs": {
+  "results/gan/epc90133-switching-phase.json": "741f393f54622aafc9f5c6cbd850ad5edc9629ec683508eff68fc075a75a2c7f",
+  "results/gan/epc90133-switching-phase-2.json": "9fd369ec437331db09d143c000e57c56a3236ae28c65b0ff8d01df1fb2606bb7",
+  "results/gan/epc90133-test8-phase-partial.json": "d8d8dff392bff1e811a2c23f280b1b521effe98fc037fc03ac7e230c578a00bc"
+ },
+ "evaluator_sha256": "3f67b89fc1cd1d4799f6ed31c613f6bd9851729e47da83fa35feaf057157be20",
+ "criteria": {
+  "rating_V": [
+   -5.0,
+   85.0
+  ],
+  "step_abs_V": 0.3,
+  "step_rel": 0.1
+ },
+ "case_status": {
+  "G-m1-mid-Ls50": {
+   "completed": true,
+   "switching_usable": true,
+   "phase_extremes": {
+    "event_a": {
+     "min_V": -28.284255981445312,
+     "max_V": 47.70820663496852
+    },
+    "event_b": {
+     "min_V": -3.0335986614227295,
+     "max_V": 55.915151834487915
+    }
+   }
+  },
+  "G-m1-mid-Ls50-ms50": {
+   "completed": true,
+   "switching_usable": true,
+   "phase_extremes": {
+    "event_a": {
+     "min_V": -28.288355827331543,
+     "max_V": 114.28391790390015
+    },
+    "event_b": {
+     "min_V": -8.014344170689583,
+     "max_V": 55.915085792541504
+    }
+   }
+  },
+  "G-m1-mid-Ls50-pin10": {
+   "completed": true,
+   "switching_usable": true,
+   "phase_extremes": {
+    "event_a": {
+     "min_V": -3.5935607850551605,
+     "max_V": 48.439059894531965
+    },
+    "event_b": {
+     "min_V": -2.2456978177651763,
+     "max_V": 56.18129205703735
+    }
+   }
+  },
+  "G-m1-mid-Ls50-pin100": {
+   "completed": false,
+   "switching_usable": false,
+   "phase_extremes": null
+  },
+  "G-m1-mid-Ls50-pin100-ms50": {
+   "completed": false,
+   "switching_usable": false,
+   "phase_extremes": null
+  },
+  "G-m1-mid-pin100": {
+   "completed": false,
+   "switching_usable": false,
+   "phase_extremes": null
+  },
+  "G-m1-mid-Ls50-pin10 (step-check run)": {
+   "completed": true,
+   "switching_usable": true,
+   "phase_extremes": {
+    "event_a": {
+     "min_V": -3.5935607850551605,
+     "max_V": 48.439059894531965
+    },
+    "event_b": {
+     "min_V": -2.2456978177651763,
+     "max_V": 56.18129205703735
+    }
+   }
+  },
+  "G-m1-mid-Ls50-pin10-ms50 (step-check run)": {
+   "completed": true,
+   "switching_usable": true,
+   "phase_extremes": {
+    "event_a": {
+     "min_V": -3.593563437461853,
+     "max_V": 47.9590060710907
+    },
+    "event_b": {
+     "min_V": -7.463453516364098,
+     "max_V": 56.18117034435272
+    }
+   }
+  }
+ },
+ "C1_rating": {
+  "verdict": "incomplete",
+  "per_case": {
+   "G-m1-mid-Ls50-pin10": true,
+   "G-m1-mid-Ls50-pin100": null,
+   "G-m1-mid-pin100": null
+  }
+ },
+ "C2_step_declared": {
+  "verdict": "incomplete",
+  "reason": "pin100 and pin100-ms50 timed out in their timing runs"
+ },
+ "C2_step_substitute": {
+  "cases": "G-m1-mid-Ls50-pin10 vs -pin10-ms50 (declared after run 1, before its run)",
+  "event_a": "pass",
+  "event_b": "fail",
+  "detail": {
+   "event_a": {
+    "min_V": {
+     "base": -3.5935607850551605,
+     "half_step": -3.593563437461853,
+     "change_V": -2.652406692504883e-06,
+     "pass": true
+    },
+    "max_V": {
+     "base": 48.439059894531965,
+     "half_step": 47.9590060710907,
+     "change_V": -0.480053823441267,
+     "pass": true
+    },
+    "pass": true
+   },
+   "event_b": {
+    "min_V": {
+     "base": -2.2456978177651763,
+     "half_step": -7.463453516364098,
+     "change_V": -5.217755698598921,
+     "pass": false
+    },
+    "max_V": {
+     "base": 56.18129205703735,
+     "half_step": 56.18117034435272,
+     "change_V": -0.00012171268463134766,
+     "pass": true
+    },
+    "pass": false
+   }
+  },
+  "note": "event B's half-step minimum is one sample at a step of about 1e-19 s (next lowest -2.32 V); excluding it would be a judgement made after the run, so the failure stands"
+ },
+ "C3_bracket": {
+  "verdict": "incomplete",
+  "reason": "no completed 100 pF case"
+ },
+ "supplementary_not_criteria": {
+  "partial_timing_runs_event_a": {
+   "G-m1-mid-Ls50": {
+    "status": "event A complete",
+    "raw_min_V": -26.281734466552734,
+    "raw_min_half_width_s": 3.346310922145389e-13,
+    "raw_max_V": 48.55842971801758
+   },
+   "G-m1-mid-Ls50-pin10": {
+    "status": "event A complete",
+    "raw_min_V": -3.64306640625,
+    "raw_min_half_width_s": 2.2531735082953984e-09,
+    "raw_max_V": 47.19842529296875
+   },
+   "G-m1-mid-Ls50-pin100": {
+    "status": "event A complete",
+    "raw_min_V": -3.6635794639587402,
+    "raw_min_half_width_s": 2.236190590450093e-09,
+    "raw_max_V": 47.18819808959961
+   },
+   "G-m1-mid-Ls50-pin100-ms50": {
+    "status": "incomplete: data end before the event A window ends"
+   },
+   "G-m1-mid-pin100": {
+    "status": "event A complete",
+    "raw_min_V": -3.4221839904785156,
+    "raw_min_half_width_s": 2.186939660742988e-09,
+    "raw_max_V": 47.38583755493164
+   }
+  },
+  "unregularized_step_change": {
+   "event_a": {
+    "min_V": {
+     "base": -28.284255981445312,
+     "half_step": -28.288355827331543,
+     "change_V": -0.004099845886230469,
+     "pass": true
+    },
+    "max_V": {
+     "base": 47.70820663496852,
+     "half_step": 114.28391790390015,
+     "change_V": 66.57571126893163,
+     "pass": false
+    },
+    "pass": false
+   },
+   "event_b": {
+    "min_V": {
+     "base": -3.0335986614227295,
+     "half_step": -8.014344170689583,
+     "change_V": -4.980745509266853,
+     "pass": false
+    },
+    "max_V": {
+     "base": 55.915151834487915,
+     "half_step": 55.915085792541504,
+     "change_V": -6.604194641113281e-05,
+     "pass": true
+    },
+    "pass": false
+   }
+  }
+ },
+ "phase_stress": "unresolved",
+ "summary": "Declared test incomplete (100 pF cases timed out); substitute step check passes at event A and fails at event B. PHASE extremes are sensitive to driver-model assumptions (assumed pin capacitance and clamps to ideal rails), and some unregularized extremes are numerically unstable; the unregularized event-A minimum (-28 V) is step-stable. No hardware margin follows.",
+ "switching_metrics": "separate from PHASE stress: eligibility is each case's 'usable' flag; the regularization is not a qualified driver model"
+}
