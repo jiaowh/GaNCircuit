@@ -39,6 +39,13 @@ complete; such a form is flagged "accepted_with_verified_op_fallback". Anything 
 Provenance note: run 2 executed the code of commit 94cb92f (runs/ringdown-test10-r2.launch.json); its report's
 "evaluator_sha256" is computed when each checkpoint is written and so reflects this file as it was then.
 
+Revision 4 (evaluation only, after an external audit on 2 October 2026; no new simulation): revision 3 checked
+the solved operating point only of the forms it re-evaluated; forms that completed reported their starting
+state, for some forms borrowed from another form. `--verify-states RUN_DIR` reads every AC form's own solved
+operating point (bench.op.raw), applies the same state checks to it, records it as "solved_state" next to the
+starting guess ("initial_guess_state"), and marks a form whose solved state fails as failed. The state is a DC
+equilibrium with the load as an 11.06 A current source; it is not the transient's state at 60 ns.
+
 Drive: 1 A AC between Q2's drain pad (q2_d) and circuit ground (Q2's source); Z(f) = V(q2_d). The ring after
 event B is the resonance of this port. Read from Z: the dominant peak frequency; a one-pole-pair fit (Levy's
 linear least squares, Z = (b0 + b1 s) / (1 + a1 s + a2 s^2) within +-15 % of the peak) giving alpha and omega_d,
@@ -242,7 +249,41 @@ def reassess(run_dir):
                 print(f"{name:22s} {form:7s} {r.get('status')} {r.get('revision3', '')}")
 
 
+def verify_states(run_dir):
+    """Revision 4: every AC form's own solved operating point, checked; initial guess kept separately."""
+    report = json.loads(OUTPUT.read_text(encoding="utf-8"))
+    if report["run_directory"] != run_dir.relative_to(ROOT).as_posix():
+        raise SystemExit("the report does not belong to this run directory")
+    for name, row in report["cases"].items():
+        for form in ("active", "clamped"):
+            r = row.get(form)
+            if not r:
+                continue
+            guess = r.pop("state", None) or r.pop("own_state", None)
+            if guess is not None:
+                r["initial_guess_state"] = guess
+            op = run_dir / f"{name}-{form}" / "bench.op.raw"
+            if not op.exists():
+                r["solved_state"] = None
+                continue
+            st = parse_raw(op).step(0)
+            r["solved_state"] = state_of({k: float(v[0]) for k, v in st.items() if k.startswith("v(")})
+            if "fit" in r and not r["solved_state"]["checks_pass"]:
+                r["status"] = "failed: solved state check"
+    report["revision4_evaluator_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    OUTPUT.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
+    for name, row in report["cases"].items():
+        for form in ("active", "clamped"):
+            r = row.get(form, {})
+            ss = r.get("solved_state")
+            print(f"{name:22s} {form:7s} {r.get('status', '')[:34]:34s} solved "
+                  + (f"Vsw {ss['v_sw_V']:.3f} V, VGS1 {ss['q1_internal_vgs_V']:.4f}, VGS2 {ss['q2_internal_vgs_V']:.2e}, "
+                     f"pass {ss['checks_pass']}" if ss else "missing"))
+
+
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == "--verify-states":
+        return verify_states(ROOT / sys.argv[2])
     if len(sys.argv) == 3 and sys.argv[1] == "--reassess":
         return reassess(ROOT / sys.argv[2])
     lib, _ = bl.library_path()
