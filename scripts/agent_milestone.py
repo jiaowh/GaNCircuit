@@ -14,7 +14,8 @@ Required checks (the task card lists them):
   K2 the comparison script's sha256 equals the manifest's evaluator hash (the code that made the reference);
   K3 the digitized figure's own checks are read: time scale pass on both panels is required; its volt-scale
      failure is a known, recorded limitation that must be reported as a caveat, not a reason to stop;
-  K4 every switching report parses and states "complete": true.
+  K4 every switching report parses; if it states "complete" it must be true, and a report without that field
+     (written before the field existed) must carry a "usable" flag on every case.
 Stop rule: if K1, K2 or K4 fails, or K3's time scale fails, write no comparison and report the failing check
 and file. Otherwise run the comparison into the sandbox's outputs/ and write the report.
 
@@ -36,6 +37,10 @@ Scores (fixed now):
   Recorded, not scored: wall time, tool calls and tokens as reported by the harness; the baseline's wall time.
 Baseline fix before any agent run: its K3 first read every entry of the figure's "checks", including
 "pitch_agreement", which is not a panel; it now reads the two panels, as the task card says.
+Declaration change before any agent run (1 October 2026): K4 first required "complete": true, but the two
+oldest switching reports predate that field, so every correct run would have stopped and S1 for A could not
+hold. K4 now accepts a report without the field if every case carries "usable". The first sandboxes (never given
+to an agent) were deleted and prepared again with the corrected card.
 Milestone passes if S1-S4 hold for both A and B. A failure is recorded as it is; a rerun needs a new declaration.
 
     python scripts/agent_milestone.py prepare A            # sandbox + task card
@@ -73,7 +78,8 @@ K1 every listed file exists under inputs/ and its sha256 equals the manifest val
 K2 the sha256 of scripts/compare_epc90133_fig9.py equals manifest "evaluator_sha256";
 K3 in the digitized figure record (kind "digitized_figure"), the "checks" of both panels: "time_scale" must be
    "pass"; a "volt_scale" "fail" is a known limitation to report as a caveat, not a reason to stop;
-K4 every switching report (kind "switching_report") parses as JSON and has "complete": true.
+K4 every switching report (kind "switching_report") parses as JSON; if it has a "complete" field it must be true;
+   if it has none (older reports), every entry of its "cases" must have a "usable" field.
 
 If K1, K2 or K4 fails, or a time scale is not "pass": STOP. Do not run the comparison. Write only
 {sandbox}/outputs/agent-report.json with "status": "stopped", the failed check id, the file concerned and the
@@ -155,7 +161,11 @@ def baseline(name):
     checks["K3"] = {"pass": all(v["time_scale"] == "pass" for v in fc.values()),
                     "detail": {k: {"time_scale": v["time_scale"], "volt_scale": v["volt_scale"]} for k, v in fc.items()}}
     sims = [f for f in m["files"] if f["kind"] == "switching_report"]
-    incomplete = [f["path"] for f in sims if json.loads((sb / "inputs" / f["path"]).read_text(encoding="utf-8")).get("complete") is not True]
+    def k4_ok(rep):
+        if "complete" in rep:
+            return rep["complete"] is True
+        return all("usable" in c for c in rep["cases"].values())
+    incomplete = [f["path"] for f in sims if not k4_ok(json.loads((sb / "inputs" / f["path"]).read_text(encoding="utf-8")))]
     checks["K4"] = {"pass": not incomplete, "detail": incomplete}
     failed = [k for k, v in checks.items() if not v["pass"]]
     out = {"status": "stopped" if failed else "completed", "checks": checks, "stop_reason": failed or None,
