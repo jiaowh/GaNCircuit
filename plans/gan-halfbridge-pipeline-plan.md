@@ -79,9 +79,11 @@ physical-board identity.
 Download status: the EPC2302 datasheet (29 April 2026), EPC90133 QSG v1.0
 (6 September 2022) and schematic are downloaded, readable and checksummed in
 [the target source record](../devices/epc/epc90133-sources.json). The existing
-unmodified LTspice library contains `EPC2302 gatein drainin sourcein`; it has
-not yet been executed for this target. BOM/Gerber retrieval and consistency
-checks remain open. The QSG lists an 80 V maximum bus input under its stated
+unmodified LTspice library contains `EPC2302 gatein drainin sourcein`; it runs
+through the LTspice adapter and is the provisional G2 baseline (section 8). The
+BOM and Gerbers (B5253 Rev 2.0) are retrieved, checksummed and audited
+(`scripts/audit_epc90133_board_files.py`); they do not establish the purchased
+board's revision or population, which are checked on arrival. The QSG lists an 80 V maximum bus input under its stated
 conditions; the device's 100 V rating is not a project-approved operating limit.
 
 Sources: [EPC90133](https://epc-co.com/epc/products/evaluation-boards/epc90133),
@@ -425,7 +427,7 @@ Status, 28 September 2026 (updated after the EPC90133/EPC2302 selection):
 - **G1** is met (28 September 2026). LTspice 26.1.1 is installed and pinned. The adapter passes its known-answer fixtures and runs the unmodified vendor model. After two reviews, it rejects failed runs it previously reported as completed. An interactive GUI run of the RDS(on) bench matched the batch values ([record](../results/toolset/ltspice-gui-check.json)).
 - **G2, EPC2204 historical result:** accepted for the EPC9097 stock-board simulation, with a documented exception (owner review, 28 September 2026). The datasheet-table baseline runs with convergence and equation checks. Every datasheet curve is digitized with frame/grid calibration and legend-verified labels; 23 of 23 pass pre-declared tolerances (worst point uses 22.8% of its allowed error). The reviewer independently reproduced the extraction, comparisons and 88 tests under WSL. **Exception:** table QGS/QGD/QG(TH) values remain unresolved because EPC's own curve does not reproduce them; they may use different definitions or source data. Total QG matches. No tuning is justified. This result is not EPC2302 validation.
 - **G2, EPC2302:** provisional baseline for G3 (owner review, 28 September 2026). The unmodified model runs in LTspice; limited table rows are inside their limits and QG is 4% low; 24 digitized curves in Figs. 1–6 and 8–10 pass. Fig. 7 gate charge fails its declared checks, and the table QGD/QG(TH) are unresolved. No tuning is justified; gate-charge-dependent switching times and losses must not be labelled validated.
-- **G3, EPC90133:** open. BOM/Gerbers (B5253 Rev 2.0) are audited, the Gerber reader gives copper, drills and nets, and a BOM-based schematic passes a static check. The FastHenry via/plane-pair check fails its mesh criterion and stays recorded as failed; owner decision (29 September 2026): defer the fourth mesh and extract exploratorily, then use prediction sensitivity to choose further qualification. *Update, 30 September 2026:* power-loop variants A/I/B are extracted on the coarse mesh only (no m2 board extraction has run); QSG Fig. 9 is digitized with a declared uncertainty; the double pulse matches continuous operation on A and on B (ideal supplies, 25 °C, ideal output source); no tested single change or combination reproduces Fig. 9 (docs/build.md, tests 5–6). The gate and source-return paths were not extracted then; *update, 1 October 2026:* variant G extracts them (one mesh, unqualified vias, exploratory; docs/build.md test 7). Separated sensitivity cases (test 6, assumed values) show that common-source inductance is material: 25–50 pH cut the simulated overshoot by 39–51 % with the frequency staying within 11 % of the measurement, while the same inductance with a Kelvin return, or in the drain, raises it. Gate-loop inductance is minor. Layout is therefore not excluded. *Test 7 (1 October 2026):* with the extracted gate paths the overshoot falls from 35.7 to 25.2 V; the split controls attribute about 7 V to the high-side gate path, with magnetic coupling of the forward gate path a supported mechanism within this model (not isolated from the gate path's own impedance); the low-side path lifts Q2's die VGS to 2.0 V. G + an assumed 50 pH package source matches Fig. 9's rise and frequency, but overshoot and damping fail; consistency, not identification. PHASE-ball stress is unresolved.
+- **G3, EPC90133:** open. BOM/Gerbers (B5253 Rev 2.0) are audited, the Gerber reader gives copper, drills and nets, and a BOM-based schematic passes a static check. The FastHenry via/plane-pair check fails its mesh criterion and stays recorded as failed; owner decision (29 September 2026): defer the fourth mesh and extract exploratorily, then use prediction sensitivity to choose further qualification. *Update, 30 September 2026:* power-loop variants A/I/B are extracted on the coarse mesh only (no m2 board extraction has run); QSG Fig. 9 is digitized with a declared uncertainty; the double pulse matches continuous operation on A and on B (ideal supplies, 25 °C, ideal output source); no tested single change or combination reproduces Fig. 9 (docs/build.md, tests 5–6). The gate and source-return paths were not extracted then; *update, 1 October 2026:* variant G extracts them (one mesh, unqualified vias, exploratory; docs/build.md test 7). Separated sensitivity cases (test 6, assumed values) show that common-source inductance is material: 25–50 pH cut the simulated overshoot by 39–51 % with the frequency staying within 11 % of the measurement, while the same inductance with a Kelvin return, or in the drain, raises it. Gate-loop inductance is minor. Layout is therefore not excluded. *Test 7 (1 October 2026):* with the extracted gate paths the overshoot falls from 35.7 to 25.2 V; the split controls attribute about 7 V to the high-side gate path, with magnetic coupling of the forward gate path a supported mechanism within this model (not isolated from the gate path's own impedance); the low-side path produces a 2.0 V spike at Q2's model terminals, while Q2's internal VGS stays at or below 1.01 V and the sampled rise windows show no appreciable positive Q2 channel current (test 9; not a categorical absence of false turn-on). *Tests 10–13 (1 October 2026), within the model:* the driver output form changes the excitation by about a third on B and G (two forms meeting the selected resistance and edge-time constraints); the ring's damping is two to three times a local small-signal mode on B and G and remains unexplained; Q1's partial turn-on raises local damping but does not explain the later cycles (not supported). Further simulation diagnosis is on hold; measurement readiness comes first. G + an assumed 50 pH package source matches Fig. 9's rise and frequency, but overshoot and damping fail; consistency, not identification. PHASE-ball stress is unresolved.
 - **G3, EPC9097 historical work:** paused for the selected target. The prior switching bench and layout investigation remain historical sensitivity evidence and do not block EPC90133 work.
   - *Done:* the board files are recorded with checksums and terms. A double-pulse bench runs two unmodified EPC2204 models with a datasheet-calibrated behavioural uP1966E driver (no vendor driver model exists), at EPC's published 48 V → 12 V, 1 MHz conditions, with the loop inductance swept.
   - *Comparison:* EPC's published switch-node screenshots are digitized and compared diagnostically ([docs](../docs/build.md#epc9097-switching-bench-g3-before-layout-extraction)).
@@ -470,7 +472,7 @@ hardware is energized before G4's test plan and interlocks are approved.
 
 ## 10. Immediate work and dependencies
 
-Updated 29 September 2026 (owner review of the via check):
+Updated 29 September 2026 (owner review of the via check); item 8 added 1 October 2026:
 
 1. Annotated power-loop overlay of the stock EPC90133: component contacts located
    from paste layers and checked against copper, solder-mask openings and the EPC2302
@@ -518,6 +520,22 @@ Updated 29 September 2026 (owner review of the via check):
    artifacts (the extraction, digitized-figure and model records), checks their validity, produces the
    Fig. 9 comparison and stops correctly. It records interventions, failures, wall time and cost, and
    it is run once by the agent and once by the plain scripts for comparison.
+
+8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
+   diagnosis as the priority). In order:
+   (a) correct narrowed claims and keep summaries synchronized (done 1 October 2026);
+   (b) the lab's exact equipment inventory and the purchased board's identity, with the lab's
+   responsible person;
+   (c) the probe-and-channel plan and an executable first-power procedure: numerical pulse, current,
+   voltage and temperature limits; independent hardware protection, accepted separately from operator
+   stop decisions; discharge verification; per-channel measurement uncertainty;
+   (d) the driver-only bootstrap/supply bench as one bounded preparation task for E1, with declared
+   outputs and stop rules, not a fit to Fig. 9;
+   (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
+   conditions, then the approved energized measurements.
+   Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to
+   be written. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
+   G mesh, broad sweeps.
 
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a

@@ -866,7 +866,8 @@ Test 9 (`--study fullr`, declared before its runs) also saves the vendor model's
 - **The three full-R G cases timed out** at 3600 s (the dense behavioural coupling of 47 branches makes each
   step slow). They are kept as failed runs; the G step check was not evaluated. Test 10's small-signal analysis
   gives the full-R effect on G's ring without a transient.
-- **The sampled vendor-model traces show no appreciable positive Q2 channel current indicating false turn-on.**
+- **No appreciable positive Q2 channel current in the sampled rise windows of these three cases.** This is not
+  a statement that false turn-on is absent under other conditions.
   During the rise (from 1 ns before the switch node passes 10 % to +60 ns), Q2's internal VGS peaks at 0.56 V
   (B), 0.87 V (G) and 1.01 V (G + 50 pH), against terminal peaks of 0.26, 2.00 and 1.93 V. Its channel current
   reaches at most 0 to 70 µA positive (the traces are stored to 10 µA), and −2.3 to −3.1 A negative at the
@@ -976,7 +977,8 @@ and the step check (G + 50 pH, step, 50 ps) changes no metric by more than 0.1 %
 
 What this shows, within this model:
 
-- **Two drivers the datasheet cannot tell apart excite the turn-on ring very differently** on B and G (a third
+- **Two drivers that both meet the selected datasheet constraints (output resistance at 500 mA, edge times
+  into 3000 pF) excite the turn-on ring very differently** on B and G (a third
   less overshoot with the step form), while the ring's frequency and damping barely change. The driver form
   acts on excitation, not on the ring dynamics, as the first-principles review's separation expects.
 - **With the assumed 50 pH package source inductance the driver form hardly matters.** A plausible reading is
@@ -986,8 +988,9 @@ What this shows, within this model:
 - **Consequence for the measurement plan:** the driver's actual output behaviour into a gate load is a model
   input, not only a check. Its edge times into 3000 pF do not fix it; the gate-current waveform (or the gate
   voltage into a known load with the power stage unpowered, hardware plan E1) is what separates these forms.
-- Neither form is identified as the real driver; both are within the datasheet's typical edge times and
-  maximum resistances. The step case on G (16.8 V, 1.04 ns) is still far from Fig. 9 (5.7 V, 1.67 ns).
+- Neither form is identified as the real driver; both meet the typical edge times and stay inside the maximum
+  resistances. That is not a check against every datasheet limit (propagation delays, supply and bootstrap
+  behaviour were not compared). The step case on G (16.8 V, 1.04 ns) is still far from Fig. 9 (5.7 V, 1.67 ns).
 
 ### EPC90133 test 12: energy budget of the turn-on ring
 
@@ -1007,7 +1010,10 @@ after command + 5 ns it is at most 1.2e-3. E2, the same balance for the ring's d
 6.2e-8), and E3, the ring-loss shares at a halved step on G + 50 pH, passes (largest change 0.2 points). So the ring
 accounting is internally consistent; the edge itself is not resolved by this bookkeeping.
 
-| Ring loss share | B | G | G + 50 pH (assumed) |
+Shares of the declared ring-deviation metric (the integral of v~ i~, defined above), not an independently
+established partition of physical excess heat:
+
+| Share of the ring-deviation loss metric | B | G | G + 50 pH (assumed) |
 |---|---|---|---|
 | Q1 channel | 64 % | 63 % | 59 % |
 | gate loops (Q1/Q2 rg, driver outputs, R80–R83) | 0 % | 19 % | 29 % |
@@ -1015,20 +1021,26 @@ accounting is internally consistent; the edge itself is not resolved by this boo
 | capacitor ESR | 8 % | 4 % | 1 % |
 | Q1 + Q2 rd and rs | 15 % | 8 % | 2 % |
 | package inductors' numerical damping resistors | — | — | 6.5 % |
-| total ring loss | 457 nJ | 388 nJ | 151 nJ |
+| total ring-deviation loss | 457 nJ | 388 nJ | 151 nJ |
 
 What this shows, within this model:
 
-- **The ring's energy is dissipated, not returned to the ideal sources:** the sources' share of the ring energy is
-  under 0.1 nJ on B, and the storage elements' net release equals the losses.
-- **Q1's channel takes most of the ring loss in every case.** When the ring starts, Q1's internal gate voltage is
+- **This decomposition cannot show whether energy returns to the ideal sources.** Writing v = v̄ + v~ and
+  i = ī + i~, the element power vi has four terms and the metric keeps only v~ i~. An ideal constant-voltage
+  source has v~ = 0 away from the filter's ends whatever its current, so its small share (under 0.1 nJ on B) is
+  a property of the metric, not evidence that no energy returns to it. (An earlier reading claimed that it was;
+  withdrawn after an external audit, 1 October 2026.) The deviation balance (E2) and the step check (E3) pass;
+  the whole-window power balance (E1) fails near the switching edge. A physical energy claim would need the
+  cross terms, a declared reference trajectory or storage-energy boundary, and the sources' actual power over
+  the window; it is not pursued while no decision depends on it.
+- **Q1's channel contributes 59–64 % of the ring-deviation metric in every case.** When the ring starts, Q1's internal gate voltage is
   only about 2.5 V (test 9 traces), and it reaches 4.6 V 20 ns later. But on B the transient's per-cycle ζ stays at
   about 0.0071 even when Q1 is fully on (4.9–5.0 V), twice test 10's local mode. Q1's partial turn-on therefore does
   not explain the whole gap.
-- **With the extracted gate paths, the gate loops dissipate 19–29 % of the ring energy**, mostly in Q2's internal
+- **With the extracted gate paths, the gate loops take 19–29 % of the metric**, mostly in Q2's internal
   gate resistor and the driver outputs, so the driver's output resistance is part of the ring's damping as well as
   its excitation (test 11).
-- **The numerical damping resistors take 6.5 % on G + 50 pH**: a contribution, not the main loss path.
+- **The numerical damping resistors take 6.5 % of the metric on G + 50 pH**: a contribution, not the main one.
 
 Shares attribute the simulated ring's dissipation, not the board's; envelope decay is a different quantity.
 
@@ -1048,16 +1060,24 @@ that the declared 5 V comparison fails; this is recorded in AGENTS.md. Run 1 cra
 
 Verdict as declared: **not supported** on either network. Within the model:
 
-- **Q1's partial turn-on accounts for the first cycles on B**: the local ζ at 2.5–3 V brackets the first transient
-  cycle (0.0086 at about 2.8 V).
-- **It does not account for the rest**: once Q1's gate passes about 3.5 V, the local ζ is within 20 % of its
-  fully-on value, but the transient's cycles stay about twice as damped. That gap remains unexplained.
+- **Partial turn-on raises the local damping** (B: ζ 0.0092 at 2.5 V down to 0.0035 at 5 V), which is
+  qualitatively consistent with the stronger damping of the first transient cycle (0.0086 at about 2.8 V). It is
+  not a matched-state result: under the declared ±0.15 V rule, B has **no matching cycles at 2.5 or 3 V**, so the
+  first cycles were not compared, and Q1's gate voltage changes during each cycle. (An earlier wording said the
+  first cycles were explained; corrected after an external audit, 1 October 2026.)
+- **It does not explain the later gap**: every matched B comparison (3.5–5 V) fails; once Q1's gate passes about
+  3.5 V the local ζ is within 20 % of its fully-on value, while the transient's cycles stay about twice as damped.
 - **On G + 50 pH the comparison mixes forms**, a limitation of this test's design: the clamped local cases also
   remove the gate-loop path, which test 12 puts at 29 % of the transient's ring loss, so a lower local ζ is
   expected there for that reason alone. B, which has no extracted gate path, is the clean case.
 
-Next, within the model: compare element by element the losses of the local AC mode with the transient's (test 12),
-to find which element the linearization under-represents in B's later cycles.
+On hold (owner decision after the project audit, 1 October 2026): an element-by-element comparison of the local AC
+mode's losses with the transient's would address B's later cycles, but no hardware or layout decision depends on it
+now. Measurement readiness comes first.
+
+Script hardening after the same audit (not rerun; the stored report is from 8284dbd): a fallback-only acceptance
+now requires the adapter's failed status and a nonempty list of recognized reasons, and the report separates an
+incomplete comparison from a rejected hypothesis. Neither change alters the stored verdicts.
 
 ### LTspice installation
 

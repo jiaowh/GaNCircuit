@@ -26,6 +26,13 @@ characterized (Fig. 7 gate charge fails its checks).
 Run 1 (2 October 2026) completed B (local zeta 0.0092, 0.0052, 0.0042, 0.0038, 0.0036 at 2.5-4.5 V; verdict not
 supported) and then crashed writing the report (a NumPy boolean); fixed by a cast, nothing else changed.
 
+Hardening after an external audit (project audit at 8284dbd, 1 October 2026), not applied to the stored report,
+which came from the previous revision (8284dbd) and is not rerun for this: a fallback-only acceptance now needs
+the adapter's failed status and a nonempty list of recognized reasons (an empty list made the old check true),
+and the report separates an incomplete comparison from a rejected hypothesis ("verdict"). No stored form was
+affected: its one fallback-accepted form (B, 4.5 V) has a recognized nonempty reason, every stored form has a
+fit, and both cases have matched X values, so both stored verdicts read "not supported" under the new rule too.
+
     PYTHONPATH=src python scripts/epc90133_q1_bias_ring.py
 """
 import hashlib
@@ -82,7 +89,9 @@ def run_form(text, ts, die, x, d, lib):
         return {"status": "failed", "message": r.message, "initial_guess_state": guess}
     own, _ = solved_state(d / "bench.op.raw", x)
     reasons = [y.strip() for y in (r.message or "").split(";") if y.strip()]
-    only_fallback = all(any(ph in y for ph in rd.FALLBACK_PHRASES) for y in reasons)
+    # a fallback-only failure needs an explicit failed status and at least one recognized reason
+    only_fallback = (r.status == "failed" and bool(reasons)
+                     and all(any(ph in y for ph in rd.FALLBACK_PHRASES) for y in reasons))
     ac = parse_raw(d / "bench.raw").step(0)
     ok = (r.status == "completed" or only_fallback) and own["checks_pass"] and len(ac["frequency"]) == rd.N_PTS
     status = ("completed" if r.status == "completed" else "accepted_with_verified_op_fallback") if ok else "failed"
@@ -132,8 +141,12 @@ def main():
         zs = [comp[f"{x:g}"]["local_zeta"] for x in list(X_VALUES) + [5.0]]
         rising = all(a is not None and b is not None and a > b for a, b in zip(zs, zs[1:]))
         matched = [v["within_tol"] for v in comp.values() if v["within_tol"] is not None]
+        # incomplete (a form failed, or no X has matching cycles) is kept apart from a rejected hypothesis
+        complete = all(f["status"] != "failed" and "fit" in f for f in forms.values()) and bool(matched)
+        supported = bool(rising and matched and all(matched))
         out[name] = {"forms": forms, "transient_cycles": cyc, "comparison": comp, "local_zeta_rises_as_vgs_falls": rising,
-                     "supported": bool(rising and matched and all(matched))}
+                     "supported": supported,
+                     "verdict": "supported" if supported else ("not supported" if complete else "incomplete")}
         print(name, {k: (round(v["local_zeta"], 4) if v["local_zeta"] else None, v["matching_cycles"],
                          round(v["transient_mean_zeta"], 4) if v["transient_mean_zeta"] else None) for k, v in comp.items()},
               "supported", out[name]["supported"], flush=True)

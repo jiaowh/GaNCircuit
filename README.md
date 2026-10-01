@@ -57,6 +57,9 @@ stages are kept separate, and the vendor model is never tuned to make a board wa
 EPC supplies an LTspice model of the EPC2302. The project runs it through its own LTspice adapter
 (`src/circuit_tools/ltspice.py`). The adapter writes the test circuit, runs LTspice in batch mode, reads the waveforms
 and reports failures honestly: a simulation that needed convergence fallbacks counts as failed, not as a result.
+One scoped exception exists, for small-signal checks only: an operating point that LTspice reached through fallbacks
+is accepted if a rule declared beforehand checks the solved state itself (bias voltages within stated limits, a
+complete sweep), and such results are flagged.
 
 - **Datasheet table.** Every table value that has a limit falls inside it. Capacitances, output charge and on-resistance
   are within 0.2–7 % of their typical values; total gate charge is 4 % low
@@ -202,14 +205,22 @@ approximations stated; none of them yet reproduces the measurement on every crit
     channel-control voltage stays below about 1 V and the sampled traces show no appreciable positive channel
     current, so this is not evidence of false turn-on in the model; the real device still needs a measurement. Its gate return shares 48 pH with
     the power loop. A lower overshoot bought this way is not a better design.
-- **Common-source inductance in the package** is the remaining lead. Adding an assumed 50 pH of package source
+- **Common-source inductance in the package** is one candidate among several. Adding an assumed 50 pH of package source
   inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice
   the measured value. Overshoot and damping still fail. Halving the time step changes its five reported
   switching metrics by under 0.04 % (stability over two steps, not general convergence). The package value is assumed, not published, so this is
   consistency, not identification. The same inductance placed where the gate driver does not share it behaves like
   extra loop inductance and makes the overshoot worse.
 - **Gate-loop inductance** alone, without coupling, of 0.5–2 nH changes the overshoot by only 3–10 %.
-- **A weaker driver** lowers the overshoot without moving the frequency, but not far enough.
+- **The driver's output stage** sets how strongly the edge excites the ring. Two driver representations that both
+  meet the selected uP1966E constraints (output resistance and edge times into 3000 pF) differ by about a third in
+  overshoot on B and G (G: 25 V against 17 V) with the same ringing frequency and damping. With the assumed 50 pH
+  package source inductance the difference nearly vanishes. Edge times into a capacitor therefore do not fix the
+  driver; its gate waveform has to be measured.
+- **The ring's damping** in the B and G simulations is two to three times what a small-signal analysis of the settled
+  circuit gives; in every simulated case it stays three to seven times below the measured value. Within the model, most of the ring's loss sits in
+  the upper transistor's channel, and the transistor still turning on raises the damping, but neither fully accounts
+  for the decay. This is not pursued further in simulation until a decision needs it.
 - **Extra capacitor loss** can reproduce the measured damping (about 60–70 mΩ in the loop) but barely lowers the
   first peak. Loss located elsewhere, such as in the transistor's output capacitance, is untested.
 - **Probe bandwidth** alone cannot explain the gap. Probe loading, connection point and resonances are untested.
@@ -246,17 +257,22 @@ Simulated peak voltages are sensitivity results, not a safe operating envelope.
 
 The tool chain works end to end: vendor files → model qualification → layout geometry → inductance extraction →
 switching simulation → comparison with a measurement. Its board-level predictions do not yet match EPC's waveform.
-Gate G3 (stock-board simulation) stays open until the gap is explained or bounded.
+Gate G3 (stock-board simulation) stays open until the gap is explained or bounded. Further simulation now gains little
+without measurements, so measurement readiness comes first.
 
 Next steps:
 1. **Measurement readiness.** The simulation baseline is frozen: the original driver model and the
-   regularized-driver variants stay as separate recorded cases. The next work turns the equipment inventory into
+   regularized-driver variants stay as separate recorded cases. The next work starts from the lab's exact equipment
+   and the purchased board's identity, and turns them into
    a probe-and-channel plan (switch node, low-side gate voltage, driver PHASE-to-ground and current measured together,
    with connection points, probe loading, bandwidth, grounding and uncertainty), and the hardware draft into an
-   executable first-power procedure with numerical limits and independent hardware trips.
+   executable first-power procedure with numerical limits, independent hardware trips, discharge verification and
+   measurement uncertainty. A small simulation of the driver alone, with its bootstrap and supply capacitors, prepares
+   the unpowered driver measurement.
 2. **Measure the board** once that procedure and its interlocks are approved (gate G4): measurement chain and
    unpowered driver checks first, then the first energized condition, with predictions and held-out conditions
-   frozen before diagnostic switching data are taken.
+   frozen before diagnostic switching data are taken. Efficiency (input and output power with an uncertainty) is
+   a separate G4 measurement, not replaced by waveform matching.
 3. **Complete the parasitic set** if a decision needs it: switch-node capacitance with FasterCap, within the scope
    its known-answer checks support. All values go into one `parasitics.inc` file, with the couplings kept.
 4. **A first bounded agent run.** Reproduce the comparison from declared inputs, with interventions, failures, time and
