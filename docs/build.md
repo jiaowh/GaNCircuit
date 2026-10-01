@@ -875,6 +875,55 @@ Test 9 (`--study fullr`, declared before its runs) also saves the vendor model's
   assessment uses the rise window instead. These are model diagnostics: the physical device's internal gate
   network is not characterized, so the Q2 gate measurement in the hardware plan stays.
 
+### EPC90133 test 10: local small-signal ring check (ring dynamics, separated from excitation)
+
+Following the first-principles review ([review](epc90133-first-principles-review-2026-10-01.md)): separate how
+strongly the edge excites the ring, what sets its frequency and decay, and what the probe records. Test 10
+(`scripts/epc90133_ringdown.py`, declared before its runs) addresses the second question only, and only locally.
+The bench is frozen 60 ns after Q1's turn-on command (Q1 on, Q2 off, 48 V, the 11.06 A load as a DC current
+source, so the load branch is open in AC). LTspice linearizes it there, without changing the vendor model, and
+the driving-point impedance at Q2's drain-source port gives the local ring mode (one-pole-pair fit; residuals
+2e-4 to 0.025). There are two forms: the active driver at rest, and a control with ideal clamps on both FETs'
+model-terminal VGS. [Report](../results/gan/epc90133-ringdown.json).
+
+Finding the operating state: LTspice reaches it only through fallbacks (Gmin or source stepping, pseudo-
+transient). Run 1 was stopped (state search too slow). In run 2, each network's baseline active state seeds its
+other forms. Revision 3, an evaluation rule declared before it was applied, accepts a form whose only failure
+reasons are operating-point fallbacks, if its own operating point passes the state checks (switch node ≥ 47 V,
+Q1 internal VGS 5 ± 0.1 V, Q2 internal VGS 0 ± 0.1 V) and its sweep is complete. Six forms are accepted that
+way and flagged; every state check passed (switch node 47.64–47.67 V).
+
+| Network | local ζ, active (f) | local ζ, clamped | transient ζ (f), same case | consistent (f ±3 %, ζ ±25 %) |
+|---|---|---|---|---|
+| B | 0.0035 (290 MHz) | 0.0035 | 0.0104 (283 MHz) | no (ζ ×0.33) |
+| B, full R | 0.0043 | 0.0043 | 0.0112 | no |
+| G | 0.0066 (303 MHz) | 0.0054 | 0.0138 (299 MHz) | no (ζ ×0.48) |
+| G, full R | 0.0076 | 0.0064 | timed out (test 9) | — |
+| G + 50 pH (assumed) | 0.0220 (262 MHz) | 0.0175 | 0.0264 (261 MHz) | yes (ζ −17 %) |
+| G + 50 pH, full R | 0.0228 | 0.0184 | timed out | — |
+
+What this shows, within this model:
+
+- **Without package inductance, the transient ring decays two to three times faster than the local linear
+  mode** at the post-edge state. The frequency agrees within 1–3 %. So most of the simulated decay on B and G
+  is not the small-signal damping of that state. The ring there is large (25–36 V on a 48 V bus), which makes
+  amplitude-dependent behaviour, such as Q2's voltage-dependent capacitance over the swing, a candidate; it
+  has not been isolated. A damping comparison with Fig. 9 therefore depends on the ring amplitude, not only on
+  the linear circuit.
+- **With the assumed 50 pH package source inductance, the local mode accounts for the transient ring.** Most of
+  its damping remains with the gates clamped (0.0175 of 0.0220). So it is not mainly the gate loop; it comes
+  through the source-inductance branch. Part of it is the parallel damping resistor added to each package
+  inductor (10 GHz corner) to suppress numerical spikes in test 5. The corner checks there moved ζ by −8 % to
+  +16 %, so that resistor contributes but does not dominate. The rest is not attributed.
+- **Full extracted resistance adds about 0.001 to the local ζ** (+23 % on B, +15 % on G, +4 % on G + 50 pH),
+  small against the measured 0.072–0.077, as the review's scale estimate predicted.
+- **The gate loop adds damping only where it couples:** active minus clamped is about 0.001 on G and 0.0045 on
+  G + 50 pH, where Q2's internal gate voltage participates 0.041 V per volt at the switch node, against 0.002
+  without package inductance.
+
+These are statements about the linearized model at one state, not about the board. The half-power cross-check
+is resolved only for the G + 50 pH cases (B and G bands are under 10 frequency steps wide).
+
 ### LTspice installation
 
 Install LTspice from the

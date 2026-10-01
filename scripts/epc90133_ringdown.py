@@ -205,7 +205,7 @@ def reassess(run_dir):
             if not prov.exists() or not (d / "bench.op.raw").exists() or not (d / "bench.raw").exists():
                 r["revision3"] = "not accepted: run outputs missing"
                 continue
-            msg = json.loads(prov.read_text(encoding="utf-8")).get("message") or ""
+            msg = r.get("message") or ""  # the adapter's reasons, as recorded in the report row
             reasons = [x.strip() for x in msg.split(";") if x.strip()]
             only_fallback = bool(reasons) and all(any(ph in x for ph in FALLBACK_PHRASES) for x in reasons)
             op = parse_raw(d / "bench.op.raw").step(0)
