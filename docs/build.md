@@ -1032,6 +1032,33 @@ What this shows, within this model:
 
 Shares attribute the simulated ring's dissipation, not the board's; envelope decay is a different quantity.
 
+### EPC90133 test 13: Q1's gate bias and the ring's damping (local AC control)
+
+Hypothesis from test 12, within the model: the ring is damped mainly by Q1's channel while Q1 is still turning on.
+`scripts/epc90133_q1_bias_ring.py` (declared before any run; [result](../results/gan/epc90133-q1-bias-ring.json))
+repeats test 10's local AC analysis with Q1's gate clamped at 2.5–4.5 V. It compares each result with the
+transient cycles at the same Q1 internal gate voltage. Before the run it was already clear from test 12's data
+that the declared 5 V comparison fails; this is recorded in AGENTS.md. Run 1 crashed writing its report after B
+(a NumPy boolean); run 2 reproduces B exactly.
+
+| Q1 gate clamped at | 2.5 V | 3.0 V | 3.5 V | 4.0 V | 4.5 V | 5 V (test 10) | transient cycles |
+|---|---|---|---|---|---|---|---|
+| B: local ζ | 0.0092 | 0.0052 | 0.0042 | 0.0038 | 0.0036 | 0.0035 | 0.0086 at about 2.8 V, then 0.0070–0.0075 |
+| G + 50 pH: local ζ | 0.0228 | 0.0191 | 0.0182 | 0.0179 | 0.0177 | 0.0175 | 0.0255 at about 3 V, then 0.025–0.027 |
+
+Verdict as declared: **not supported** on either network. Within the model:
+
+- **Q1's partial turn-on accounts for the first cycles on B**: the local ζ at 2.5–3 V brackets the first transient
+  cycle (0.0086 at about 2.8 V).
+- **It does not account for the rest**: once Q1's gate passes about 3.5 V, the local ζ is within 20 % of its
+  fully-on value, but the transient's cycles stay about twice as damped. That gap remains unexplained.
+- **On G + 50 pH the comparison mixes forms**, a limitation of this test's design: the clamped local cases also
+  remove the gate-loop path, which test 12 puts at 29 % of the transient's ring loss, so a lower local ζ is
+  expected there for that reason alone. B, which has no extracted gate path, is the clean case.
+
+Next, within the model: compare element by element the losses of the local AC mode with the transient's (test 12),
+to find which element the linearization under-represents in B's later cycles.
+
 ### LTspice installation
 
 Install LTspice from the
