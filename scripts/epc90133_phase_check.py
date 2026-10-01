@@ -9,6 +9,12 @@ conclusion: it is ten times shorter than the fastest physical edge in the bench 
 gives about 16 ps) and far longer than the artefacts. The uP1966E absolute maximum PHASE-to-GND is -5 V to
 +85 V (datasheet p. 7). Simulated sensitivity results, not a safe limit.
 
+What this shows (narrowed after an external audit, 1 October 2026): the averaged extremes describe the filtered
+waveform only. Averaging discards the narrow excursions; it does not establish that they are numerical artefacts.
+Their step dependence was checked only on G (50 and 100 ps), not on the package-inductance cases whose raw minima
+are largest. PHASE stress therefore stays UNRESOLVED until a physically regularized driver output stage (finite
+switching speed) or a targeted numerical check on those cases resolves the excursions.
+
     PYTHONPATH=src python scripts/epc90133_phase_check.py
 """
 import argparse
@@ -35,7 +41,7 @@ def main():
     out = {}
     for case, r in rep["cases"].items():
         raw = ev_dir / case / "bench.raw"
-        if not r.get("usable") or not raw.exists():
+        if not r.get("usable") or r.get("interpretation_invalid") or not raw.exists():
             continue
         s = parse_raw(raw).step(0)
         if "v(u80_ph)" not in s:
@@ -59,7 +65,7 @@ def main():
             res[tag] = {"raw_min_V": float(ph[i]), "raw_min_time_after_event_s": float(t[i] - te),
                         "raw_min_half_width_s": float(t[j1] - t[j0]), "raw_max_V": float(ph[w].max()),
                         "averaged_min_V": float(ys.min()), "averaged_max_V": float(ys.max()),
-                        "averaged_within_rating": bool(RATING_V[0] <= ys.min() and ys.max() <= RATING_V[1])}
+                        "averaged_waveform_within_rating": bool(RATING_V[0] <= ys.min() and ys.max() <= RATING_V[1])}
         out[case] = res
         print(case, {e: (round(res[e]["raw_min_V"], 2), round(res[e]["averaged_min_V"], 2),
                          round(res[e]["averaged_max_V"], 1)) for e in ("event_a", "event_b")})
@@ -67,7 +73,11 @@ def main():
               "source_report_sha256": hashlib.sha256(args.report.read_bytes()).hexdigest(),
               "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "average_window_s": AVERAGE_S, "rating_V": RATING_V,
-              "scope": "simulated PHASE-to-GND ball voltage of the unvalidated bench; not a safe limit", "cases": out}
+              "scope": "simulated PHASE-to-GND ball voltage of the unvalidated bench; not a safe limit",
+              "phase_stress": "unresolved: the averaged extremes describe the filtered waveform only; averaging does "
+                              "not show that the discarded sub-ps excursions are artefacts (step dependence checked "
+                              "on G only); needs a regularized driver stage or a targeted numerical check",
+              "cases": out}
     args.output.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
 
 

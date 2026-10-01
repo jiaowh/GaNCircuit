@@ -2,13 +2,14 @@
  "schema": "epc90133-phase-check/1",
  "source_report": "results/gan/epc90133-switching-gateloop.json",
  "source_report_sha256": "484f151498b4b4027cfde958916158bdaa79913d6cff3df6960cee15e481b255",
- "evaluator_sha256": "3871a7f8bf4b516d1270baead3964e1e60a01dcec6dbb6817763c12361f66cb9",
+ "evaluator_sha256": "d50b1ba1a46c1d3deff43e7a483a90479962c6f255806c075e5ce84c70261ca5",
  "average_window_s": 1e-11,
  "rating_V": [
   -5.0,
   85.0
  ],
  "scope": "simulated PHASE-to-GND ball voltage of the unvalidated bench; not a safe limit",
+ "phase_stress": "unresolved: the averaged extremes describe the filtered waveform only; averaging does not show that the discarded sub-ps excursions are artefacts (step dependence checked on G only); needs a regularized driver stage or a targeted numerical check",
  "cases": {
   "G-m1-mid": {
    "raw_sha256": "0d419d3226b0157bb512ef6e419f0f4484327b618863d54bcfe5e2d22a9f657a",
@@ -19,7 +20,7 @@
     "raw_max_V": 47.13242003880441,
     "averaged_min_V": -3.5344818111986873,
     "averaged_max_V": 47.13241452547241,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    },
    "event_b": {
     "raw_min_V": -7.506721369922161,
@@ -28,7 +29,7 @@
     "raw_max_V": 64.01191997528076,
     "averaged_min_V": -2.219068620655889,
     "averaged_max_V": 64.0115863780789,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    }
   },
   "G-m1-mid-ms50": {
@@ -40,7 +41,7 @@
     "raw_max_V": 48.13632122648414,
     "averaged_min_V": -3.5344818006531824,
     "averaged_max_V": 47.13241505371673,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    },
    "event_b": {
     "raw_min_V": -7.647903509438038,
@@ -49,7 +50,7 @@
     "raw_max_V": 64.0119137763977,
     "averaged_min_V": -2.2190669914254517,
     "averaged_max_V": 64.01159329873133,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    }
   },
   "G-m1-mid-Ls25": {
@@ -61,7 +62,7 @@
     "raw_max_V": 47.69889698177576,
     "averaged_min_V": -3.7375655466241677,
     "averaged_max_V": 47.139756636302465,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    },
    "event_b": {
     "raw_min_V": -2.680759944021702,
@@ -70,7 +71,7 @@
     "raw_max_V": 56.88742733001709,
     "averaged_min_V": -2.2358430673629845,
     "averaged_max_V": 56.88716447515466,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    }
   },
   "G-m1-mid-Ls50": {
@@ -82,7 +83,7 @@
     "raw_max_V": 47.70820663496852,
     "averaged_min_V": -3.5924801609919403,
     "averaged_max_V": 47.17518631557388,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    },
    "event_b": {
     "raw_min_V": -3.0335986614227295,
@@ -91,7 +92,7 @@
     "raw_max_V": 55.915151834487915,
     "averaged_min_V": -2.2461813140336386,
     "averaged_max_V": 55.914811519232146,
-    "averaged_within_rating": true
+    "averaged_waveform_within_rating": true
    }
   }
  }

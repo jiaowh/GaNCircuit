@@ -32,6 +32,8 @@ Added 30 September 2026 after an external review (no criterion above changed):
   it excludes the unknown probe response, the failed volt-scale check and other raster or fit errors): the rule in
   scripts/digitize_epc90133_qsg_fig9.py (the measured range over its extraction choices, widened by one
   pixel for time and voltage metrics);
+* a case whose report carries "interpretation_invalid" (added 1 October 2026 after an external audit; first
+  used for the coupling check G-m1-mid-nogpk) is excluded the same way, whatever its "usable" flag says;
 * the report binds its inputs by hash (the digitized figure, every switching report, and the imported
   digitizer module), and writes results/gan/epc90133-fig9-summary.md, the single source for headline
   tables in the documentation.
@@ -167,7 +169,8 @@ def evaluate_case(case, fig9, meas):
     tr = case.get("traces")
     if not tr:
         return {"usable": False, "reason": case.get("error") or "no traces"}
-    usable = case.get("usable") is True
+    invalid = case.get("interpretation_invalid")
+    usable = case.get("usable") is True and not invalid
     t = tr["start_s"] + tr["step_s"] * np.arange(len(tr["rising_V"]))
     per_bw = {}
     for bw in BANDWIDTHS:
@@ -177,10 +180,12 @@ def evaluate_case(case, fig9, meas):
             per_bw[key] = {"metrics": m, "resembles": None, "consistency": None, "excluded": "metrics unavailable"}
         elif not usable:
             per_bw[key] = {"metrics": m, "resembles": None, "consistency": None,
-                           "excluded": "switching checks failed; kept for inspection only"}
+                           "excluded": f"declared invalid: {invalid}" if invalid
+                           else "switching checks failed; kept for inspection only"}
         else:
             per_bw[key] = {"metrics": m, "resembles": resembles(m, meas), "consistency": consistency(m, fig9)}
-    return {"usable": usable, "checks": case.get("checks"), "parameters": case.get("parameters"), "bandwidths": per_bw}
+    return {"usable": usable, "interpretation_invalid": invalid, "checks": case.get("checks"),
+            "parameters": case.get("parameters"), "bandwidths": per_bw}
 
 
 def summary_md(report, fig9):
@@ -216,7 +221,8 @@ def summary_md(report, fig9):
             continue
         e = r["bandwidths"]["none"]
         if not r["usable"]:
-            lines.append(row(name, e["metrics"]["rising"], e["metrics"]["falling"], "excluded: checks failed"))
+            why = "declared invalid" if r.get("interpretation_invalid") else "checks failed"
+            lines.append(row(name, e["metrics"]["rising"], e["metrics"]["falling"], f"excluded: {why}"))
             continue
         passed = sorted({k for b in r["bandwidths"].values() if b["resembles"] for k, v in b["resembles"].items()
                          if v and k != "all"})

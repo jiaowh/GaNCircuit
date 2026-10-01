@@ -120,7 +120,7 @@ as sensitivities:
 | A | top layer and mid-layer 1, Ci capacitors | 0.49–0.50 nH |
 | I | all copper, Ci capacitors | 0.30 nH |
 | B | all copper, Ci and Cm capacitors | 0.26–0.28 nH |
-| G | B plus the gate-drive loops and split source pins, with a finer mesh on the top layer | in progress |
+| G | B plus the gate-drive loops and split source pins, with a finer mesh on the top layer | 0.26 nH (one mesh) |
 
 - **Deeper layers.** The deeper copper layers lower the loop inductance by about 40 %.
 - **Via representation.** Three via-to-plane junction models change the result by under 2 % on A and up to 7 % on B.
@@ -139,7 +139,8 @@ A and 0.7 % on B, so the simpler test stands in for continuous operation.
 
 Every case carries its own numerical checks:
 - no single-step voltage spikes;
-- a halved-time-step rerun;
+- a rerun at half the time step for selected cases (in the gate-path study, G itself was rerun; its
+  package-inductance variants and controls were not);
 - convergence without fallbacks.
 
 Cases that fail are kept for inspection but receive no verdict. Device quantities are taken at the transistor's die
@@ -192,14 +193,17 @@ approximations stated; none of them yet reproduces the measurement on every crit
   control (same network, ideal gate drive) and two split cases separate the causes:
   - about a third of the drop comes from G's slightly different network (8 % less loop inductance);
   - the rest comes from the high-side gate-drive path. Its gate return shares almost no source copper with the
-    power loop (0.9 pH), but the forward gate path (driver, gate resistor, gate) couples magnetically with it. In
-    effect, it acts as about 10 pH of common-source inductance, which slows the high-side turn-on;
+    power loop (0.9 pH). A calculation from the extracted network supports magnetic coupling of the forward gate
+    path (driver, gate resistor, gate) as the mechanism within this model: at 100 MHz and zero gate current it is
+    equivalent to about 10 pH of common-source inductance, which would slow the high-side turn-on. That calculation
+    does not separate the coupling from the gate path's own impedance during switching;
   - the low-side path adds damping. It also lifts the low-side transistor's gate to about 2 V during the high-side
     turn-on, above the model's 1.5 V threshold, so the low side may partly conduct. Its gate return shares 48 pH with
     the power loop. A lower overshoot bought this way is not a better design.
 - **Common-source inductance in the package** is the remaining lead. Adding an assumed 50 pH of package source
   inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice
-  the measured value. Overshoot and damping still fail. The package value is assumed, not published, so this is
+  the measured value. Overshoot and damping still fail. This case ran at one time step only; it needs its own
+  halved-step check before a decision rests on the match. The package value is assumed, not published, so this is
   consistency, not identification. The same inductance placed where the gate driver does not share it behaves like
   extra loop inductance and makes the overshoot worse.
 - **Gate-loop inductance** alone, without coupling, of 0.5–2 nH changes the overshoot by only 3–10 %.

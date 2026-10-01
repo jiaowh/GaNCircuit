@@ -686,8 +686,10 @@ does not include the gate nets.
 | G + package source 50 pH (assumed) | 11.1 | 1.66 | 261.2 | 0.026 | 1.93 / −1.88 |
 
 The G-ctl, ctl-hs and ctl-ls controls were declared before their runs (ctl before G's first result, the split
-after ctl). Every case passes its edge-current and spike checks; the 50 ps step changes no metric by more than
-0.1 %.
+after ctl). Every case passes its edge-current and spike checks. The 50 ps rerun was made for G alone and changes
+no G metric by more than 0.1 %; G+25/50 pH and the controls ran at 100 ps only. Earlier halved-step checks on B
+(B-Ls50-csi) do not directly cover G+package, so G-m1-mid-Ls50 needs its own 50 ps check before a decision rests
+on its Fig. 9 match.
 
 What this shows, scoped to this unvalidated model and exploratory extraction:
 
@@ -696,7 +698,10 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   +4.3 %). The board's gate-drive copper (G against G-ctl) accounts for −7.0 V and a 6 % slower rise.
 - **The high-side gate-drive path carries that −7 V; the low-side path adds the damping.** ctl-ls matches G
   in overshoot and rise time, and ctl-hs matches G-ctl; the two parts add up to within 0.3 V.
-- **The high-side mechanism is magnetic coupling of the forward gate path, about 10 pH in effect.**
+- **Supported mechanism within this model: magnetic coupling of the forward gate path, about 10 pH in effect.**
+  The split controls establish that the high-side gate path causes the simulated reduction. The calculation below
+  (100 MHz, zero gate current) supports coupling as the explanation, but it does not separately quantify the
+  coupling's contribution against the gate path's own impedance during switching.
   `scripts/epc90133_gate_coupling.py` ([result](../results/gan/epc90133-gate-coupling.json)) repeats the
   extractor's L_cs solve (1 A commutation-loop current, 100 MHz) and adds the voltages induced in the forward
   gate branches (driver ball → gate resistor → gate), which g_summary's L_cs leaves out. The induced die VGS per
@@ -716,7 +721,9 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   It was declared as a coupling test, but the branch network's terms also represent shared copper (the branches
   share reference nodes, for example 238 pH between the PHASE-ball return and Q1's source pin 2), so removing
   them adds spurious common-source inductance instead of removing coupling. Its result carries no physical
-  meaning; the calculation above replaces it.
+  meaning; the calculation above replaces it. After an external audit (1 October 2026) the case declaration and
+  its committed report carry `interpretation_invalid`, and the materiality, Fig. 9 and PHASE scripts exclude any
+  case that carries it, whatever its `usable` flag (which only records the numerical checks).
 - **The low-side path disturbs Q2's gate.** With it extracted, Q2's die VGS reaches 2.0 V during the rise
   (2.37 V with the high side ideal, whose faster turn-on raises di/dt), against 1.07 V without it. The
   unmodified model conducts 3.9 A at VGS 2.0 V and 38 A at 2.3 V (DC, VDS 48 V, 25 °C); its VGS(th) is
@@ -731,12 +738,16 @@ What this shows, scoped to this unvalidated model and exploratory extraction:
   measurement. The package value is assumed, one waveform cannot separate the layers, and the simulated
   dead-time plateau (about 12 ns against 7.1 ns) is still unexplained. So this shows consistency, not
   identification, and G3 stays open.
-- **The driver's PHASE ball stays inside its rating once artefacts are removed.** The raw PHASE-to-GND
-  minima (−8 V on G, −24 and −28 V with package inductance) are sub-picosecond spikes (half-widths 0.2–0.35 ps)
-  at the ideal low-side stage's switching instant, and they change with the time step. Averaged over a declared
-  10 ps window, the extremes are −2.2 to −3.7 V and +47 to +64 V, inside −5/+85 V, and identical at 50 and
-  100 ps ([check](../results/gan/epc90133-test7-phase-check.json)). The raw values in the test 7 reports are kept
-  and must be read with this check. Simulated sensitivity results, not a safe limit.
+- **PHASE-ball stress is unresolved.** The raw PHASE-to-GND minima (−8 V on G, −24 and −28 V with package
+  inductance) are sub-picosecond spikes (half-widths 0.2–0.35 ps) at the ideal low-side stage's switching
+  instant. Averaged over a declared 10 ps window, the extremes are −2.2 to −3.7 V and +47 to +64 V, inside
+  −5/+85 V ([check](../results/gan/epc90133-test7-phase-check.json)). This shows only that the *filtered*
+  waveform is inside the rating; averaging does not establish that the discarded excursions are numerical
+  artefacts. The step dependence was checked on G alone (raw minimum −8.2 V at 100 ps, −9.4 V at 50 ps; averaged
+  values identical), not on the package-inductance cases with the largest minima. Resolving it needs a physically
+  regularized driver output stage (finite switching speed) or a targeted numerical check on those cases. The raw
+  values in the test 7 reports are kept. Simulated sensitivity results, not a safe limit (narrowed after an
+  external audit, 1 October 2026).
 
 Running notes: the LTspice adapter's per-run bound was raised from 600 s to 3600 s (`MAX_TIMEOUT_S`), because
 G's first timing run exceeded 600 s. A timeout still returns a failed run. Test 7 run 1 was stopped after that

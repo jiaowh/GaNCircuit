@@ -146,7 +146,10 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
   separate magnetic from shared-conductor coupling; the board L_cs of Q1 (0.9 pH) bounds the latter.
   Result (1 October 2026): INVALID as a test. Removing the terms does not remove coupling; it adds spurious
   common-source inductance, because the branches share reference nodes (overshoot fell to 9.4 V). Kept as run;
-  scripts/epc90133_gate_coupling.py computes the coupling correctly from the extraction instead. G differs from B in extraction window, local mesh
+  scripts/epc90133_gate_coupling.py computes the coupling correctly from the extraction instead. Its declaration
+  carries "interpretation_invalid" (added after an external audit, 1 October 2026): a rerun writes the reason into
+  its report, and no materiality comparison, Fig. 9 verdict or PHASE check uses the case. "usable" keeps its
+  meaning (numerical checks passed). G differs from B in extraction window, local mesh
   and source-terminal representation as well as in the gate paths, so a material G-B difference is not
   attributed to common-source inductance without a matched control. Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -658,18 +661,30 @@ def path_cases(exts):
     return cases
 
 
+INVALID_NOGPK = ("removing the gate-power branch mutuals also removes shared-copper inductance between branches with "
+                 "common reference nodes, adding spurious common-source inductance; the result has no physical meaning "
+                 "(see scripts/epc90133_gate_coupling.py)")
+
+
+def eligible(r):
+    """A case that may be interpreted: its numerical checks passed and it carries no invalidity disposition."""
+    return r.get("usable") is True and not r.get("interpretation_invalid")
+
+
 def comparisons(results, exts, reference):
-    """Materiality of each case against its base; formed only when both passed every check (test 6)."""
+    """Materiality of each case against its base; formed only when both are eligible (test 6; audit 1 October 2026)."""
     out = {}
     for name, r in results.items():
         base = r["parameters"].get("base") or (reference if (name in exts or name == "ideal-copper") else r["parameters"]["ext"])
         if name == base or base not in results:
             continue
-        if r.get("usable") is True and results[base].get("usable") is True:
+        if eligible(r) and eligible(results[base]):
             out[name] = {"compared_with": base, **material(flat(results[base]["metrics"]), flat(r["metrics"]))}
         else:
-            out[name] = {"compared_with": base, "excluded": "case or base failed its checks",
-                         "case_usable": r.get("usable") is True, "base_usable": results[base].get("usable") is True}
+            out[name] = {"compared_with": base, "excluded": "case or base failed its checks or is declared invalid",
+                         "case_usable": r.get("usable") is True, "base_usable": results[base].get("usable") is True,
+                         "case_invalid": bool(r.get("interpretation_invalid")),
+                         "base_invalid": bool(results[base].get("interpretation_invalid"))}
     return out
 
 
@@ -693,8 +708,10 @@ def gateloop_cases(exts):
             # Split controls (declared 1 October 2026 after G-ctl, before their runs): one stage ideal.
             f"{g}-ctl-hs": {"ext": g, "base": g, **common, "gate_ctl": "u", "on_request": True},
             f"{g}-ctl-ls": {"ext": g, "base": g, **common, "gate_ctl": "l", "on_request": True},
-            # Coupling check (declared 1 October 2026 after the split controls, before its run).
-            f"{g}-nogpk": {"ext": g, "base": g, **common, "no_gate_power_k": True, "on_request": True}}
+            # Coupling check (declared 1 October 2026 after the split controls, before its run). Invalid as a test
+            # (see the module docstring); kept runnable so the run can be reproduced, never interpreted.
+            f"{g}-nogpk": {"ext": g, "base": g, **common, "no_gate_power_k": True, "on_request": True,
+                           "interpretation_invalid": INVALID_NOGPK}}
 
 
 def main():
@@ -851,6 +868,7 @@ def main():
                          "extraction_summary": ext.get("summary"), "times_s": times, "bus_attachment": at,
                          "metrics": m, "checks": ok, "spikes": spk,
                          "usable": bool(ok and all(ok.values())),
+                         "interpretation_invalid": c.get("interpretation_invalid"),
                          "traces": edge_traces(s, times) if m else None}
         if m:
             f = flat(m)

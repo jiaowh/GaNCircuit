@@ -80455,41 +80455,47 @@
       -5.09891
      ]
     }
-   }
+   },
+   "interpretation_invalid": "removing the gate-power branch mutuals also removes shared-copper inductance between branches with common reference nodes, adding spurious common-source inductance; the result has no physical meaning (see scripts/epc90133_gate_coupling.py)",
+   "interpretation_invalid_note": "annotation added 1 October 2026 after an external audit; run data unchanged"
   }
  },
  "comparison_to_reference": {
   "G-m1-mid-nogpk": {
    "compared_with": "G-m1-mid",
-   "sw_fall_time_90_10_s": {
-    "reference": 4.074796340556521e-09,
-    "case": 4.0687610185620535e-09,
-    "relative_change": -0.001481134635956644,
-    "material": false
-   },
-   "sw_rise_time_10_90_s": {
-    "reference": 8.808676434388511e-10,
-    "case": 1.5375479499413571e-09,
-    "relative_change": 0.7454925962984268,
-    "material": true
-   },
-   "sw_overshoot_above_bus_V": {
-    "reference": 25.23192018271626,
-    "case": 9.391404479748402,
-    "relative_change": -0.6277966792958759,
-    "material": true
-   },
-   "ringing_frequency_Hz": {
-    "reference": 299391801.18842757,
-    "case": 302581726.31585586,
-    "relative_change": 0.010654684312549552,
-    "material": false
-   },
-   "ringing_damping_ratio": {
-    "reference": 0.013778431398293413,
-    "case": 0.012552375606737217,
-    "relative_change": -0.08898369895052453,
-    "material": false
+   "excluded": "case is declared invalid (annotation, 1 October 2026)",
+   "case_invalid": true,
+   "withdrawn_values": {
+    "sw_fall_time_90_10_s": {
+     "reference": 4.074796340556521e-09,
+     "case": 4.0687610185620535e-09,
+     "relative_change": -0.001481134635956644,
+     "material": false
+    },
+    "sw_rise_time_10_90_s": {
+     "reference": 8.808676434388511e-10,
+     "case": 1.5375479499413571e-09,
+     "relative_change": 0.7454925962984268,
+     "material": true
+    },
+    "sw_overshoot_above_bus_V": {
+     "reference": 25.23192018271626,
+     "case": 9.391404479748402,
+     "relative_change": -0.6277966792958759,
+     "material": true
+    },
+    "ringing_frequency_Hz": {
+     "reference": 299391801.18842757,
+     "case": 302581726.31585586,
+     "relative_change": 0.010654684312549552,
+     "material": false
+    },
+    "ringing_damping_ratio": {
+     "reference": 0.013778431398293413,
+     "case": 0.012552375606737217,
+     "relative_change": -0.08898369895052453,
+     "material": false
+    }
    }
   }
  },

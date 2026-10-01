@@ -15,7 +15,7 @@
    "scripts/digitize_epc90133_qsg_fig9.py": "b8a4f687a80f211e9cc273528626f59cbfb7bd5b72225150e0b4bc57f8d3311c"
   }
  },
- "evaluator_sha256": "e9babeb2992e6e9741741cecad9e126439f84b33d072dd435c86a7314afea104",
+ "evaluator_sha256": "9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc",
  "criteria": {
   "edge_rel": 0.25,
   "overshoot_V": 3.0,
@@ -46,6 +46,7 @@
  "cases": {
   "B-m1-mid": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -579,6 +580,7 @@
   },
   "B-m1-mid-ms100": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -1115,6 +1117,7 @@
   },
   "B-pkg50pH": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -1652,6 +1655,7 @@
   },
   "B-pkg150pH": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -2188,6 +2192,7 @@
   },
   "B-rskin": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -2723,6 +2728,7 @@
   },
   "B-drvmax": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -3259,6 +3265,7 @@
   },
   "B-esr0.3": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -3798,6 +3805,7 @@
   },
   "B-combined": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -4337,6 +4345,7 @@
   },
   "A-m1-mid": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -4870,6 +4879,7 @@
   },
   "A-pkg50pH": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -5405,6 +5415,7 @@
   },
   "A-pkg50pH-r20GHz": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -5941,6 +5952,7 @@
   },
   "A-pkg50pH-ms100": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -6477,6 +6489,7 @@
   },
   "B-esr1-ms100": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -7013,6 +7026,7 @@
   },
   "B-cgd": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -7549,6 +7563,7 @@
   },
   "B-Ld50": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -8087,6 +8102,7 @@
   },
   "B-Ls25-csi": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -8625,6 +8641,7 @@
   },
   "B-Ls50-csi": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -9163,6 +9180,7 @@
   },
   "B-Ls50-kelvin": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -9702,6 +9720,7 @@
   },
   "B-Lg0.5n": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -10239,6 +10258,7 @@
   },
   "B-Lg2n": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -10776,6 +10796,7 @@
   },
   "B-Lg0.5n-ms50": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -11313,6 +11334,7 @@
   },
   "B-pkg50pH-ms50": {
    "usable": false,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -11459,6 +11481,7 @@
   },
   "G-m1-mid-ctl": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -11998,6 +12021,7 @@
   },
   "G-m1-mid": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -12535,6 +12559,7 @@
   },
   "G-m1-mid-ctl-hs": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -13074,6 +13099,7 @@
   },
   "G-m1-mid-ctl-ls": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -13613,6 +13639,7 @@
   },
   "G-m1-mid-ms50": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -14150,6 +14177,7 @@
   },
   "G-m1-mid-Ls25": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
@@ -14688,6 +14716,7 @@
   },
   "G-m1-mid-Ls50": {
    "usable": true,
+   "interpretation_invalid": null,
    "checks": {
     "edge_current_A_within_2pct": true,
     "edge_current_B_within_5pct": true,
