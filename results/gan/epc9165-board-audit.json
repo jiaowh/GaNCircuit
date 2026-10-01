@@ -1,0 +1,690 @@
+{
+ "schema": "epc9165-board-audit/1",
+ "scope": "EPC's published EPC9165 files; consistency and probe-access screen only. Not the identity of a physical board.",
+ "declared": "2026-10-01, before the first run (script docstring)",
+ "evaluator_sha256": "de0d1803af6b6798b5923672ed7bf4dd397c9abb70da5402ea2a360c69b7fc09",
+ "board_numbers": {
+  "gerber_files": [
+   "B5309_Rev1_0"
+  ],
+  "schematic": [
+   "B5284 Rev1.0"
+  ],
+  "quick_start_guide": []
+ },
+ "copper": {
+  "gerber_copper_layers": [
+   {
+    "extension": "GTL",
+    "description": "Top Layer"
+   },
+   {
+    "extension": "G1",
+    "description": "Mid-Layer 1"
+   },
+   {
+    "extension": "G2",
+    "description": "Mid-Layer 2"
+   },
+   {
+    "extension": "G3",
+    "description": "Mid-Layer 3"
+   },
+   {
+    "extension": "G4",
+    "description": "Mid-layer 4"
+   },
+   {
+    "extension": "G5",
+    "description": "Mid-Layer 5"
+   },
+   {
+    "extension": "G6",
+    "description": "Mid-Layer 6"
+   },
+   {
+    "extension": "GBL",
+    "description": "Bottom Layer"
+   }
+  ],
+  "stackup_copper_layers": 8,
+  "stackup_height": "Height : 62.15mil",
+  "consistent": true
+ },
+ "reference_designators": {
+  "bom_fitted": 245,
+  "bom_optional": 8,
+  "layout_components": 266,
+  "bom_not_in_layout": [
+   "SO1",
+   "SO2",
+   "SO3",
+   "SO4"
+  ],
+  "layout_not_in_bom": [
+   "FD1",
+   "J10CS1",
+   "J10CS2",
+   "J10CSi",
+   "J10F1",
+   "J10F2",
+   "J61",
+   "R40CS1",
+   "R40CS2",
+   "R40CSi",
+   "R50CS1",
+   "R50CS2",
+   "R50CSi",
+   "S5",
+   "S6",
+   "S7",
+   "S9"
+  ]
+ },
+ "switching_parts": {
+  "Q1_P1": {
+   "description": null,
+   "manufacturer": "EPC",
+   "part_number": "EPC2302"
+  },
+  "Q2_P1": {
+   "description": null,
+   "manufacturer": "EPC",
+   "part_number": "EPC2302"
+  },
+  "Q1_P2": {
+   "description": null,
+   "manufacturer": "EPC",
+   "part_number": "EPC2302"
+  },
+  "Q2_P2": {
+   "description": null,
+   "manufacturer": "EPC",
+   "part_number": "EPC2302"
+  },
+  "U80_G1": {
+   "description": "GaN gate driver",
+   "manufacturer": "MPS",
+   "part_number": "MPQ1918"
+  },
+  "U80_G2": {
+   "description": "GaN gate driver",
+   "manufacturer": "MPS",
+   "part_number": "MPQ1918"
+  },
+  "R80_P1": {
+   "description": "1 Ω",
+   "manufacturer": "Yageo",
+   "part_number": "RC0402FR-071RL"
+  },
+  "R81_P1": {
+   "description": "0 Ω",
+   "manufacturer": "Stackpole",
+   "part_number": "RMCF0402ZT0R00"
+  },
+  "R82_P1": {
+   "description": "1 Ω",
+   "manufacturer": "Yageo",
+   "part_number": "RC0402FR-071RL"
+  },
+  "R83_P1": {
+   "description": "0 Ω",
+   "manufacturer": "Stackpole",
+   "part_number": "RMCF0402ZT0R00"
+  },
+  "R70_G1": {
+   "description": "2.00 Ω+02",
+   "manufacturer": "Panasonic",
+   "part_number": "ERJ-2GEJ2R2X"
+  },
+  "R75_G1": {
+   "description": "2.00 Ω+02",
+   "manufacturer": "Panasonic",
+   "part_number": "ERJ-2GEJ2R2X"
+  },
+  "C81_G1": {
+   "description": "0.1 μF, 25 V",
+   "manufacturer": "Yageo",
+   "part_number": "CC0402KRX7R8BB104"
+  },
+  "C80_G1": {
+   "description": "4.7 μF, 10 V",
+   "manufacturer": "TDK",
+   "part_number": "C1005X5R1A475K050BC"
+  }
+ },
+ "driver_labels": {
+  "bom": [
+   "MPQ1918"
+  ],
+  "schematic": [
+   "MPQ191",
+   "MPQ1918",
+   "MPQ1918_GateDriver"
+  ],
+  "quick_start_guide": []
+ },
+ "geometry": {
+  "board_bounds_mm": [
+   19.87296,
+   9.872979999999998,
+   99.127056,
+   118.12701799999999
+  ],
+  "fet_side": "bottom",
+  "paste_pads_in_fet_outlines": {
+   "top": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "bottom": [
+    7,
+    7,
+    7,
+    7
+   ]
+  },
+  "heatsink_side": null,
+  "G1_placement": {
+   "mm_per_pt": 0.10602483167446368,
+   "residuals_mm": [
+    0.0061065133981828305,
+    0.007453116534329379,
+    0.011071852923303094,
+    0.004582299516297328,
+    0.0038229302951472742,
+    0.010213890866293894
+   ],
+   "pass": true
+  },
+  "G2_outlines": {
+   "fet_outlines": [
+    [
+     38.01,
+     58.3,
+     41.01,
+     63.3
+    ],
+    [
+     43.1,
+     58.3,
+     46.1,
+     63.3
+    ],
+    [
+     66.0,
+     58.3,
+     69.0,
+     63.3
+    ],
+    [
+     71.09,
+     58.3,
+     74.09,
+     63.3
+    ]
+   ],
+   "driver_outlines": [
+    [
+     40.38,
+     53.35,
+     43.48,
+     56.45
+    ],
+    [
+     68.37,
+     53.35,
+     71.47,
+     56.45
+    ]
+   ],
+   "heatsink_rect_mm": [
+    27.649932,
+    47.200058,
+    85.549994,
+    67.900042
+   ],
+   "pass": true,
+   "fets_inside_heatsink": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "drivers_inside_heatsink": [
+    true,
+    true
+   ]
+  },
+  "G3_headers": {
+   "pairs": [
+    [
+     [
+      52.37505399999999,
+      81.20506999999999
+     ],
+     [
+      52.37505399999999,
+      83.74507
+     ]
+    ],
+    [
+     [
+      57.57494199999999,
+      83.67013999999999
+     ],
+     [
+      57.57494199999999,
+      81.129886
+     ]
+    ]
+   ],
+   "pass": true
+  },
+  "G4_switch_nodes": {
+   "pass": true,
+   "phases_fet_indices": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ]
+   ]
+  },
+  "header_pin_nets": [
+   [
+    {
+     "xy_mm": [
+      52.37505399999999,
+      81.20506999999999
+     ],
+     "nets": [
+      "other"
+     ],
+     "touches_fets": []
+    },
+    {
+     "xy_mm": [
+      52.37505399999999,
+      83.74507
+     ],
+     "nets": [
+      "other"
+     ],
+     "touches_fets": []
+    }
+   ],
+   [
+    {
+     "xy_mm": [
+      57.57494199999999,
+      83.67013999999999
+     ],
+     "nets": [
+      "other"
+     ],
+     "touches_fets": []
+    },
+    {
+     "xy_mm": [
+      57.57494199999999,
+      81.129886
+     ],
+     "nets": [
+      "other"
+     ],
+     "touches_fets": []
+    }
+   ]
+  ],
+  "probe_access": {
+   "SW_phase1": {
+    "fets": [
+     0,
+     1
+    ],
+    "contacts": 13,
+    "contacts_outside_heatsink": 13,
+    "nearest_outside": [
+     {
+      "side": "bottom",
+      "xy_mm": [
+       44.0,
+       58.52
+      ],
+      "size_mm": [
+       1.95,
+       0.6
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       39.47,
+       59.5
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       44.57,
+       60.35
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       39.47,
+       61.2
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       44.57,
+       62.05
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     }
+    ]
+   },
+   "SW_phase2": {
+    "fets": [
+     2,
+     3
+    ],
+    "contacts": 13,
+    "contacts_outside_heatsink": 13,
+    "nearest_outside": [
+     {
+      "side": "bottom",
+      "xy_mm": [
+       72.0,
+       58.52
+      ],
+      "size_mm": [
+       1.95,
+       0.6
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       67.47,
+       59.5
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       72.57,
+       60.35
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       67.47,
+       61.2
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       72.57,
+       62.05
+      ],
+      "size_mm": [
+       3.1,
+       0.35
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     }
+    ]
+   },
+   "one_fet_net_0": {
+    "fets": [
+     0
+    ],
+    "contacts": 3,
+    "contacts_outside_heatsink": 3,
+    "nearest_outside": [
+     {
+      "side": "bottom",
+      "xy_mm": [
+       40.6,
+       58.52
+      ],
+      "size_mm": [
+       0.85,
+       0.6
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       40.7,
+       56.87
+      ],
+      "size_mm": [
+       0.65,
+       0.4
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 1.43
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       41.45,
+       56.87
+      ],
+      "size_mm": [
+       0.65,
+       0.4
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 1.49
+     }
+    ]
+   },
+   "one_fet_net_1": {
+    "fets": [
+     1
+    ],
+    "contacts": 3,
+    "contacts_outside_heatsink": 3,
+    "nearest_outside": [
+     {
+      "side": "bottom",
+      "xy_mm": [
+       45.7,
+       58.52
+      ],
+      "size_mm": [
+       0.85,
+       0.6
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       45.5,
+       57.05
+      ],
+      "size_mm": [
+       0.45,
+       0.65
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 1.25
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       45.5,
+       56.25
+      ],
+      "size_mm": [
+       0.45,
+       0.65
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 2.05
+     }
+    ]
+   },
+   "one_fet_net_2": {
+    "fets": [
+     2
+    ],
+    "contacts": 3,
+    "contacts_outside_heatsink": 3,
+    "nearest_outside": [
+     {
+      "side": "bottom",
+      "xy_mm": [
+       68.6,
+       58.52
+      ],
+      "size_mm": [
+       0.85,
+       0.6
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       68.7,
+       56.87
+      ],
+      "size_mm": [
+       0.65,
+       0.4
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 1.43
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       69.45,
+       56.87
+      ],
+      "size_mm": [
+       0.65,
+       0.4
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 1.5
+     }
+    ]
+   },
+   "one_fet_net_3": {
+    "fets": [
+     3
+    ],
+    "contacts": 3,
+    "contacts_outside_heatsink": 3,
+    "nearest_outside": [
+     {
+      "side": "bottom",
+      "xy_mm": [
+       73.7,
+       58.52
+      ],
+      "size_mm": [
+       0.85,
+       0.6
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 0.0
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       73.5,
+       57.05
+      ],
+      "size_mm": [
+       0.45,
+       0.65
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 1.25
+     },
+     {
+      "side": "bottom",
+      "xy_mm": [
+       73.5,
+       56.25
+      ],
+      "size_mm": [
+       0.45,
+       0.65
+      ],
+      "inside_heatsink": false,
+      "distance_to_its_fet_mm": 2.05
+     }
+    ]
+   }
+  }
+ }
+}

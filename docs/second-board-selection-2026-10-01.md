@@ -94,3 +94,12 @@ pages 4/5 and guide pages 4/9 using PyMuPDF rendering. Public support links are 
 of unrestricted reuse or of KiCad importability. No EPC inquiry was sent, no hardware
 was ordered, no extraction or circuit simulation was launched, and the active target
 was not changed.
+
+## File audit and probe access (added 1 October 2026)
+
+Done after the owner's decision to defer the purchase (plan section 9, item 10); details in docs/build.md,
+"EPC9165 board files and probe access". The published Gerbers are B5309 Rev 1.0, while the guide's schematic is
+B5284 Rev 1.0, so the shipped board's identity is open. The EPC2302s and their gate resistors are on the bottom
+under the heatsink and there is no gate-probe footprint: gate measurements need the heatsink removed, so a matched
+comparison would be double pulse. The switch node is reachable on the top side 1.1-2.2 mm from the FETs with a
+solder-in probe. The two 100 mil headers (J1_F1/F2) are loop-gain injection points, not switch-node test points.

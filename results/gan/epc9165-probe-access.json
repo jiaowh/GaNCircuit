@@ -1,0 +1,260 @@
+{
+ "schema": "epc9165-probe-access/1",
+ "post_hoc": true,
+ "evaluator_sha256": "d3957905dc9e8026fa005830c6d35111afed7c89632f78a2065cec5129cb40e8",
+ "inputs": {
+  "results/gan/epc9165-board-audit.json": "a41fd1aebf73f071d14b1ea53c446f607a9ecd9bf5dda0d9731e70faa3e42ae9"
+ },
+ "mask_open_at_mounting_hole_centres": {
+  "top": [
+   false,
+   false,
+   false,
+   false
+  ],
+  "bottom": [
+   true,
+   true,
+   true,
+   true
+  ]
+ },
+ "heatsink_side": "bottom",
+ "contact_counts_match_run2": true,
+ "nets": {
+  "SW_phase1": {
+   "fets": [
+    0,
+    1
+   ],
+   "contacts": 13,
+   "uncovered": 7,
+   "uncovered_contacts": [
+    {
+     "side": "top",
+     "xy_mm": [
+      41.8,
+      57.5
+     ],
+     "size_mm": [
+      0.45,
+      0.65
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 1.12
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      44.35,
+      64.75
+     ],
+     "size_mm": [
+      0.85,
+      1.35
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 1.45
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      41.42,
+      64.7
+     ],
+     "size_mm": [
+      2.8,
+      2.65
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 1.46
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      41.9,
+      56.35
+     ],
+     "size_mm": [
+      0.35,
+      1.05
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 2.14
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      33.27,
+      80.1
+     ],
+     "size_mm": [
+      9.6,
+      8.55
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 17.45
+    },
+    {
+     "side": "bottom",
+     "xy_mm": [
+      33.27,
+      80.1
+     ],
+     "size_mm": [
+      9.6,
+      8.55
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 17.45
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      45.52,
+      82.87
+     ],
+     "size_mm": [
+      0.6,
+      0.4
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 19.57
+    }
+   ]
+  },
+  "SW_phase2": {
+   "fets": [
+    2,
+    3
+   ],
+   "contacts": 13,
+   "uncovered": 7,
+   "uncovered_contacts": [
+    {
+     "side": "top",
+     "xy_mm": [
+      69.8,
+      57.5
+     ],
+     "size_mm": [
+      0.45,
+      0.65
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 1.13
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      72.35,
+      64.75
+     ],
+     "size_mm": [
+      0.85,
+      1.35
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 1.45
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      69.42,
+      64.7
+     ],
+     "size_mm": [
+      2.8,
+      2.65
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 1.46
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      69.9,
+      56.35
+     ],
+     "size_mm": [
+      0.35,
+      1.05
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 2.15
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      72.47,
+      80.1
+     ],
+     "size_mm": [
+      9.6,
+      8.55
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 16.8
+    },
+    {
+     "side": "bottom",
+     "xy_mm": [
+      72.47,
+      80.1
+     ],
+     "size_mm": [
+      9.6,
+      8.55
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 16.8
+    },
+    {
+     "side": "top",
+     "xy_mm": [
+      65.17,
+      83.02
+     ],
+     "size_mm": [
+      0.6,
+      0.4
+     ],
+     "covered_by_heatsink": false,
+     "distance_to_its_fet_mm": 19.74
+    }
+   ]
+  },
+  "one_fet_net_0": {
+   "fets": [
+    0
+   ],
+   "contacts": 3,
+   "uncovered": 0,
+   "uncovered_contacts": []
+  },
+  "one_fet_net_1": {
+   "fets": [
+    1
+   ],
+   "contacts": 3,
+   "uncovered": 0,
+   "uncovered_contacts": []
+  },
+  "one_fet_net_2": {
+   "fets": [
+    2
+   ],
+   "contacts": 3,
+   "uncovered": 0,
+   "uncovered_contacts": []
+  },
+  "one_fet_net_3": {
+   "fets": [
+    3
+   ],
+   "contacts": 3,
+   "uncovered": 0,
+   "uncovered_contacts": []
+  }
+ }
+}

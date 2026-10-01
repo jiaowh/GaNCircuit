@@ -477,6 +477,11 @@ hardware is energized before G4's test plan and interlocks are approved.
    E7 on EPC90133 cannot attribute. Driver and layout change together on EPC9165, and the
    MPQ1918 has no vendor model, so its driver would need its own measurement. A second
    EPC90133 (E8) is the more direct test of layout against device.
+   Step (a) done 1 October 2026 (docs/build.md "EPC9165 board files and probe access"): Gerbers B5309
+   Rev 1.0 against schematic B5284 Rev 1.0 (identity unresolved); FETs and gate resistors on the bottom
+   under the heatsink, no gate-probe footprint, so gate data need the heatsink off (double pulse only);
+   switch node reachable on top 1.1-2.2 mm from the FETs with a solder-in probe; the 100 mil headers are
+   not on the switch node.
 
 ## 10. Immediate work and dependencies
 

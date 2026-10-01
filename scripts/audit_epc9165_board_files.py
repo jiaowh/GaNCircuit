@@ -37,7 +37,8 @@ none), so it never saw the gate pads and its "inside the heatsink" ignored the s
 changes only this: the FET side is the side whose paste has at least six pads inside every FET outline, and that
 side's copper gives the FET nets; the heatsink side is the side whose solder mask is open around all four 3.0 mm
 mounting holes; a contact counts as covered by the heatsink only if it is on the heatsink side and inside its
-footprint. Its G4 switch-node nets agree with run 1's (checked by hand from the bottom pads before run 2).
+footprint. Its G4 switch-node nets agree with run 1's (checked by hand from the bottom pads before run 2). Run 2 crashed writing its report (a NumPy integer in the paste counts); fixed by a cast,
+nothing else changed.
 
     PYTHONPATH=src python scripts/audit_epc9165_board_files.py   # results/gan/epc9165-board-audit.json
 """
@@ -282,7 +283,7 @@ def main():
         lab, _ = ndimage.label(rasterize(load_layer(GERBERS / f"{PREFIX}Gerbers.{paste}"), bounds, PITCH).grid)
         cents = [((sl[1].start + sl[1].stop) / 2 * PITCH + bounds[0], (sl[0].start + sl[0].stop) / 2 * PITCH + bounds[1])
                  for sl in ndimage.find_objects(lab)]
-        paste_pads[side] = [sum(inside(c, r) for c in cents) for r in fets]
+        paste_pads[side] = [int(sum(bool(inside(c, r)) for c in cents)) for r in fets]
     fet_side = next((sd for sd, n in paste_pads.items() if n and min(n) >= 6), None)
     fet_cu = sides[fet_side][0] if fet_side else "GTL"
     hs_side = None

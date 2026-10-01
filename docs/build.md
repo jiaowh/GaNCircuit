@@ -1124,6 +1124,51 @@ operation (dead-time overcharge, unspecified clamp) as an open quantity to measu
 node stays within 0.9 V of ground, so at VIN = 0 a ground-referenced probe at J1 would read Q1's gate with an offset
 of that order. These are statements about the behavioural driver and the vendor model, not about the board.
 
+### EPC9165 board files and probe access (deferred second-board candidate)
+
+Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node
+probe access before any purchase. Files are recorded in `devices/epc/epc9165-sources.json` (BOM and Gerbers fetched
+directly; the board page refuses automated fetches). `scripts/audit_epc9165_board_files.py` (declared before its
+first run; [report](../results/gan/epc9165-board-audit.json)) and `scripts/assess_epc9165_probe_access.py`
+(post hoc; [result](../results/gan/epc9165-probe-access.json)).
+
+Runs: run 1 passed its checks but is kept as failed
+([report](../results/gan/epc9165-board-audit-run1-failed.json)): it read the FETs' nets from top copper, while the
+EPC2302s are on the bottom side, so it never saw the gate pads. Run 2 (the one fix run; a crash while writing its
+report was fixed by a cast) takes the FET side from the paste layers: 7 bottom paste pads inside every FET outline,
+none on top. Its heatsink-side rule sampled the mask outside the small (about 1.35 mm) bottom openings at the
+mounting holes and returned no side, so its "inside heatsink" flags are unusable. The post-hoc assessment records
+the mask at the hole centres (open on the bottom at all four holes, on top at none), takes the heatsink to be on
+the bottom, and re-reads the same contacts; their counts match run 2.
+
+Document consistency:
+- **Board identity is unresolved.** The Gerbers are B5309 Rev 1.0 ("EPC9165B", files dated 19 August 2021); the
+  schematic in the guide is B5284 Rev 1.0 (2022). Which one EPC ships, and which produced the guide's waveforms, is
+  not established; a purchased board's silkscreen settles the first.
+- 8 copper layers, matching the stackup (62 mil). MPQ1918 in BOM and schematic. Every fitted BOM part is in the
+  layout except the heatsink-kit spacers SO1-SO4; the layout adds unfitted footprints (J1_F1/F2, J1_CS*, R4/R5_CS*),
+  the controller edge connector J61 and S5-S9.
+
+Geometry (assembly page placed on the drill file within 0.011 mm; checks G1-G4 pass):
+- **The four EPC2302s and their gate resistors are on the bottom, under the heatsink** (Wakefield 567-94AB on 1 mm
+  spacers, footprint 57.9 x 20.7 mm on mechanical layer 13). The two phases' FET pairs sit at x 38-46 and 66-74 mm.
+- **Gates: no access with the heatsink fitted.** Each gate net has three exposed contacts, all on the bottom under
+  the heatsink: the FET's gate pad and the gate-side pads of its two 0402 gate resistors, 1.5-2 mm away. There is no
+  gate-probe footprint (EPC90133 has the J1/J2 MMCX footprints). Measuring a gate needs the heatsink removed, which
+  limits operation to thermally light conditions such as double pulse.
+- **Switch node: reachable on the top side close to the FETs.** Each phase's switch-node net has top-side contacts
+  1.1-2.2 mm from its FETs (the largest a 2.8 x 2.65 mm pad 1.5 mm away; not yet tied to a designator), then the
+  output inductor's terminal pad about 17 mm away. No connector footprint exists, so a probe would be soldered in;
+  the nearest ground contact for its return was not assessed.
+- **The two 100 mil headers (J1_F1/F2) are not on the switch node**: none of their pins shares a net with any FET.
+  The guide calls J1_F1 a voltage-loop-gain injection point.
+- Not determined: which FET of each pair is the high side, and the drivers' side.
+
+Consequence for the comparison (plan section 9, item 10): a switch-node comparison with the heatsink fitted is
+feasible with a solder-in probe; gate-voltage data, which the hardware plan requires at every switching point
+(E3), are only possible without the heatsink, so a matched comparison would be double-pulse, not continuous
+operation at the guide's currents. These are readings of EPC's published B5309 files, not of a physical board.
+
 ### LTspice installation
 
 Install LTspice from the
