@@ -34,6 +34,8 @@ Scores (fixed now):
   S3 interventions: 0.
   S4 caveat: A's report mentions the volt-scale failure.
   Recorded, not scored: wall time, tool calls and tokens as reported by the harness; the baseline's wall time.
+Baseline fix before any agent run: its K3 first read every entry of the figure's "checks", including
+"pitch_agreement", which is not a panel; it now reads the two panels, as the task card says.
 Milestone passes if S1-S4 hold for both A and B. A failure is recorded as it is; a rerun needs a new declaration.
 
     python scripts/agent_milestone.py prepare A            # sandbox + task card
@@ -148,7 +150,8 @@ def baseline(name):
     checks["K1"] = {"pass": not bad, "detail": bad}
     checks["K2"] = {"pass": sha(COMPARE) == m["evaluator_sha256"], "detail": sha(COMPARE)}
     fig = next(f for f in m["files"] if f["kind"] == "digitized_figure")
-    fc = json.loads((sb / "inputs" / fig["path"]).read_text(encoding="utf-8"))["checks"]
+    fc = {k: v for k, v in json.loads((sb / "inputs" / fig["path"]).read_text(encoding="utf-8"))["checks"].items()
+          if k in ("rising", "falling")}  # the two panels; "pitch_agreement" is not a panel
     checks["K3"] = {"pass": all(v["time_scale"] == "pass" for v in fc.values()),
                     "detail": {k: {"time_scale": v["time_scale"], "volt_scale": v["volt_scale"]} for k, v in fc.items()}}
     sims = [f for f in m["files"] if f["kind"] == "switching_report"]
