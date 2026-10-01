@@ -94,7 +94,8 @@ def transient_cycles(case):
     t = tr["start_s"] + tr["step_s"] * np.arange(len(tr["rising_V"]))
     vg = np.array(tr["device"]["rising_q1_vgs_internal_V"])
     cyc = json.loads(DECAY.read_text(encoding="utf-8"))["cases"][case]["cycles"]
-    return [{**c, "q1_internal_vgs_V": float(np.interp(c["t_s"] - tr["event_times_s"]["rising"], t, vg))} for c in cyc]
+    # ring-decay cycle times and the trace axis are both relative to the turn-on command
+    return [{**c, "q1_internal_vgs_V": float(np.interp(c["t_s"], t, vg))} for c in cyc]
 
 
 def main():
