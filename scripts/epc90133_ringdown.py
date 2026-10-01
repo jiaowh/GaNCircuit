@@ -20,6 +20,14 @@ state is checked (declared now: switch node at least VIN - 1 V; Q1 internal VGS 
 VGS within 0.1 V of 0 V), and the AC run then starts from .nodeset values of every node of that state; the AC run
 must converge without fallback (adapter status completed) to be used.
 
+Run 1 (1 October 2026, stopped after 30 min, no report): B active completed (290.4 MHz, zeta 0.0035); B clamped
+failed the rule (its AC run, started from its own checked state, still needed Gmin/source stepping); the B fullR
+state search was still in pseudo-transient after 30 min. Revision 2, declared before its run: only each
+network's baseline active form (B, G, G + 50 pH) runs the state search; its checked state is the .nodeset guess
+for every other form of that network (clamped, fullR, fullR clamped), whose DC state differs by millivolts at
+most. The guess does not relax the rule: each AC run must converge without fallback to be used, and a form
+that falls back is recorded as failed. The report is written after every network; all messages are flushed.
+
 Drive: 1 A AC between Q2's drain pad (q2_d) and circuit ground (Q2's source); Z(f) = V(q2_d). The ring after
 event B is the resonance of this port. Read from Z: the dominant peak frequency; a one-pole-pair fit (Levy's
 linear least squares, Z = (b0 + b1 s) / (1 + a1 s + a2 s^2) within +-15 % of the peak) giving alpha and omega_d,
@@ -166,20 +174,53 @@ def main():
     cal = json.loads((ROOT / "results/gan/epc90133-switching-gateloop.json").read_text(encoding="utf-8"))["driver_calibration"]
     te_rise, te_fall = cal["pull_up_edge_s"], cal["pull_down_edge_s"]
     out = {}
+    states = {}
+
+    def save(out):
+        report = {"schema": "epc90133-ringdown/1",
+                  "scope": "local small-signal impedance at Q2's drain-source port about one operating state after event B; "
+                           "ring dynamics only (not excitation, not observation); load branch open in AC",
+                  "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                  "generator_sha256": hashlib.sha256((ROOT / "scripts/epc90133_switching.py").read_bytes()).hexdigest(),
+                  "run_directory": run_root.relative_to(ROOT).as_posix(), "state": {"after_event_b_s": T_STATE,
+                  "load_dc_current_A": sw.I_VALLEY, "bus_V": sw.VIN}, "cases": out}
+        OUTPUT.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
+
     for name, c in CASES.items():
         ext = json.loads((ROOT / f"results/gan/epc90133-extraction/{c['ext']}.json").read_text(encoding="utf-8"))
         text, times, _ = sw.bench(ext, te_rise, te_fall, maxstep=sw.MAXSTEP_PKG, t_after_b=sw.T_AFTER_B, sense_q2=True,
                                   l_s=c.get("l_s"), full_r=c.get("full_r", False), internal=True)
         row = {"extraction": c["ext"], "options": {k: v for k, v in c.items() if k != "ext"},
                "state_time_s": times["t_on2"] + T_STATE}
+        base = name.replace("-fullR", "")
         for form in ("active", "clamped"):
             ts, clamp, die = times["t_on2"] + T_STATE, form == "clamped", times["die_nodes"]
+            if (name, form) != (base, "active"):
+                if base not in states:
+                    row[form] = {"status": "no base state"}
+                    print(name, form, "no base state", flush=True)
+                    continue
+                vals, state = states[base]
+                state = {**state, "borrowed_from": f"{base} active"}
+                net = small_signal_netlist(text, ts, clamp, die, nodeset=vals)
+                d = run_root / f"{name}-{form}"
+                r = run_ltspice(net, d, libraries=[lib], timeout_s=1800)
+                if r.status != "completed":
+                    row[form] = {"status": r.status, "message": r.message, "state": state}
+                    print(name, form, "failed:", r.message, flush=True)
+                    continue
+                row[form] = {"status": "completed", "state": state, **analyse(parse_raw(d / "bench.raw"))}
+                a = row[form]
+                print(f"{name:22s} {form:7s} f {a['peak_frequency_Hz'] / 1e6:7.1f} MHz zeta {a['fit']['zeta']:.4f} "
+                      f"(hp {a['half_power_zeta']:.4f}, resid {a['fit']['max_rel_residual']:.3f}) "
+                      f"part Q2 {a['participation_at_peak']['q2_internal_vgs_per_V_sw']:.4f}", flush=True)
+                continue
             dop = run_root / f"{name}-{form}-op"
             rop = run_ltspice(small_signal_netlist(text, ts, clamp, die, op_only=True), dop, libraries=[lib], timeout_s=3600)
             raw_op = dop / "bench.raw"
             if not raw_op.exists():
                 row[form] = {"status": "state not found", "op_message": rop.message}
-                print(name, form, "state not found:", rop.message)
+                print(name, form, "state not found:", rop.message, flush=True)
                 continue
             st = parse_raw(raw_op).step(0)
             vals = {k: float(v[0]) for k, v in st.items() if k.startswith("v(")}
@@ -191,14 +232,15 @@ def main():
                                     and abs(state["q2_internal_vgs_V"]) <= 0.1)
             if not state["checks_pass"]:
                 row[form] = {"status": "state check failed", "state": state}
-                print(name, form, "state check failed", state)
+                print(name, form, "state check failed", state, flush=True)
                 continue
+            states[name] = (vals, state)
             net = small_signal_netlist(text, ts, clamp, die, nodeset=vals)
             d = run_root / f"{name}-{form}"
             r = run_ltspice(net, d, libraries=[lib], timeout_s=1800)
             if r.status != "completed":
                 row[form] = {"status": r.status, "message": r.message, "state": state}
-                print(name, form, "failed:", r.message)
+                print(name, form, "failed:", r.message, flush=True)
                 continue
             row[form] = {"status": "completed", "state": state, **analyse(parse_raw(d / "bench.raw"))}
             a = row[form]
@@ -219,14 +261,7 @@ def main():
         else:
             row["transient_comparison"] = {"report": rep, "case": case, "status": "transient result not available"}
         out[name] = row
-    report = {"schema": "epc90133-ringdown/1",
-              "scope": "local small-signal impedance at Q2's drain-source port about one operating state after event B; "
-                       "ring dynamics only (not excitation, not observation); load branch open in AC",
-              "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-              "generator_sha256": hashlib.sha256((ROOT / "scripts/epc90133_switching.py").read_bytes()).hexdigest(),
-              "run_directory": run_root.relative_to(ROOT).as_posix(), "state": {"after_event_b_s": T_STATE,
-              "load_dc_current_A": sw.I_VALLEY, "bus_V": sw.VIN}, "cases": out}
-    OUTPUT.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
+        save(out)
 
 
 if __name__ == "__main__":
