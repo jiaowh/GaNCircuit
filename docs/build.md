@@ -2231,6 +2231,23 @@ What this shows:
   it is not evidence of qualification. Not covered: 3D board geometry with FR-4 and solder mask, holes and vias.
   Before board use: a board-like 3D check with a declared refinement sequence, a follow-up check declared for F
   (finite thickness or manual mesh) and a diagnosis of E, if a board model needs curved interfaces.
+- **Case H, a 3D board-like check (1 October 2026, `scripts/fastercap_board3d_check.py`, declared before its run;
+  [result](../results/gan/fastercap-board3d-check.json)): failed and invalid in its 3D part.** It modelled a thin strip
+  over a finite FR-4-like slab in 3D and compared it per metre, through two strip lengths, with the same cross-section
+  in 2D, using a declared refinement sequence.
+  - H3 fails: the 2D reference changes by 15.8 % between -a0.005 and -a0.001 (123.2 pF/m at -a0.001, matching case
+    G). Another case where the coarser setting stopped early.
+  - H1 and H2 were not evaluated: the -a0.002 run on the 4 mm strip exceeded the declared 3 h limit.
+  - The 3D Maxwell matrices are unphysical (negative diagonal, positive off-diagonal terms, less capacitance for the
+    longer strip), so the derived 178 pF/m is not an accuracy result.
+  - A post-hoc diagnostic (runs/fastercap-h-diag, not a declared check) shows where the fault is. The same strips
+    without the slab give a physical 3D matrix, and the 2D air value reproduces case G's 37.75 pF/m. So the fault
+    lies in this 3D dielectric-interface input, although it uses the same syntax and reference-point convention as
+    case C, which passed. The exact cause is not isolated. The air 4 mm run was stopped at 5.7 GB of the 8 GB WSL
+    limit, before it gave a result.
+  - FasterCap stays unqualified for 3D board geometry. Before any board capacitance extraction, the 3D dielectric
+    description needs its own small known-answer check (for example a parallel-plate capacitor partly filled with
+    dielectric). Nothing depends on this now.
 - **Runner fixes after an external audit (30 September 2026), no case or tolerance changed.** A timeout now stops
   only that run's FasterCap process (by its recorded PID, checked to still be FasterCap), not every process of that
   name on the shared host; an unknown or empty `--only` is rejected instead of reporting `all_pass` over no cases;

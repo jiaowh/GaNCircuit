@@ -1,0 +1,132 @@
+{
+ "schema": "fastercap-board3d-check/1",
+ "declared": "2026-10-01, before the first run (docstring)",
+ "evaluator_sha256": "3cb2b675030aed1cc18f38a383c6ab4782c3d8382e429e3140b2375b99ebd991",
+ "binary_sha256": "9f7be612ead06f1f56f34f921f9cdf12be250c38903b47eae11b3b7df87e073d",
+ "geometry_m": {
+  "h": 0.0001,
+  "w": 0.0002,
+  "t": 1e-06,
+  "half_span": 0.001,
+  "end_extension": 0.001,
+  "L1": 0.002,
+  "L2": 0.004,
+  "eps_r": 4.3
+ },
+ "hammerstad_jensen_F_per_m": 1.2304490474198107e-10,
+ "run_directory": "runs/fastercap-board3d-941b6d7c90c8",
+ "two_d": {
+  "0.005": {
+   "matrix": [
+    [
+     5.19053e-11
+    ]
+   ],
+   "value_F_per_m": 1.038106e-10
+  },
+  "0.001": {
+   "matrix": [
+    [
+     6.16148e-11
+    ]
+   ],
+   "value_F_per_m": 1.232296e-10
+  }
+ },
+ "three_d": {
+  "0.01": {
+   "0.002": {
+    "matrix": [
+     [
+      -3.34138e-13,
+      3.69165e-13
+     ],
+     [
+      3.69131e-13,
+      -3.34106e-13
+     ]
+    ],
+    "C_pair_F": -3.5163499952892144e-13
+   },
+   "0.004": {
+    "matrix": [
+     [
+      -1.46108e-13,
+      1.98694e-13
+     ],
+     [
+      1.98713e-13,
+      -1.46129e-13
+     ]
+    ],
+    "C_pair_F": -1.724110001901683e-13
+   },
+   "C_per_m": 1.7922399933875315e-10
+  },
+  "0.005": {
+   "0.002": {
+    "matrix": [
+     [
+      -3.32871e-13,
+      3.67858e-13
+     ],
+     [
+      3.67858e-13,
+      -3.32872e-13
+     ]
+    ],
+    "C_pair_F": -3.50364750003573e-13
+   },
+   "0.004": {
+    "matrix": [
+     [
+      -1.46108e-13,
+      1.98694e-13
+     ],
+     [
+      1.98713e-13,
+      -1.46129e-13
+     ]
+    ],
+    "C_pair_F": -1.724110001901683e-13
+   },
+   "C_per_m": 1.7795374981340472e-10
+  },
+  "0.002": {
+   "0.002": {
+    "matrix": [
+     [
+      -3.32854e-13,
+      3.67771e-13
+     ],
+     [
+      3.67771e-13,
+      -3.32855e-13
+     ]
+    ],
+    "C_pair_F": -3.5031275000358e-13
+   }
+  }
+ },
+ "errors": [
+  "3D L=0.004 -a0.002: FasterCap did not finish within 10800 s at -a0.002"
+ ],
+ "checks": {
+  "H1": {
+   "relative_error": null,
+   "tolerance": 0.02,
+   "pass": false
+  },
+  "H2": {
+   "change": null,
+   "tolerance": 0.01,
+   "pass": false
+  },
+  "H3": {
+   "change": 0.1575838921817485,
+   "tolerance": 0.005,
+   "pass": false
+  }
+ },
+ "all_pass": false
+}
