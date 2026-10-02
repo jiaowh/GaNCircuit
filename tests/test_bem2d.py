@@ -40,5 +40,35 @@ class Bem2d(unittest.TestCase):
         self.assertTrue(np.all(C - np.diag(np.diag(C)) <= 1e-9 * abs(C).max()))
 
 
+
+class Bem2dDielectric(unittest.TestCase):
+    def test_coated_coax(self):
+        # inner conductor a in a dielectric shell (eps 4.3) to b, air to the outer conductor c: exact
+        # C = 2 pi eps0 / (ln(b/a)/eps + ln(c/b)); constant interface panels converge first order, so compare the
+        # Richardson value of n and 4n panels
+        from circuit_tools.bem2d import outward_normals, solve_dielectric
+        a, b, c, er = 1e-3, 1.5e-3, 2e-3, 4.3
+        ref = 2 * math.pi * EPS0 / (math.log(b / a) / er + math.log(c / b))
+        vals = []
+        for n in (96, 384):
+            mid = polygon_circle(b, n)
+            pm = panels(mid, 1)
+            nx, ny = outward_normals(pm, mid)
+            q = solve_dielectric([[(panels(polygon_circle(a, n), 1), er)], [(panels(polygon_circle(c, n), 1), 1.0)]],
+                                 [(pm, nx, ny, 1.0, er)], [1.0, 0.0])
+            vals.append(q[0] / ref - 1)
+        self.assertLess(abs(vals[1]), 0.005)
+        self.assertLess(abs(vals[1] - (vals[0] - vals[1]) / 3), 5e-4)
+
+    def test_equal_permittivity_interface_changes_nothing(self):
+        from circuit_tools.bem2d import outward_normals, solve_dielectric
+        mid = polygon_circle(1.5e-3, 128)
+        pm = panels(mid, 1)
+        nx, ny = outward_normals(pm, mid)
+        q = solve_dielectric([[(panels(polygon_circle(1e-3, 128), 1), 1.0)], [(panels(polygon_circle(2e-3, 128), 1), 1.0)]],
+                             [(pm, nx, ny, 1.0, 1.0)], [1.0, 0.0])
+        self.assertAlmostEqual(q[0] / (2 * math.pi * EPS0 / math.log(2)), 1.0, delta=1e-5)
+
+
 if __name__ == "__main__":
     unittest.main()
