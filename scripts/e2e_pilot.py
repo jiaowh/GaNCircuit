@@ -84,6 +84,8 @@ artifact the stopped run never wrote (a builder bug, caught by the validator). F
 fails on any other nonzero status or when its declared output was not written during the step; status 2 with a
 fresh output continues and the record's checks carry the outcome. The builders cite only existing files. The
 agent cards state the same exit-status rule. No stage, check or score changed; the reference is rerun as REF2.
+Card change before the Stage 2 agent of C1 (2 October 2026): the Stage 2 card states the step durations measured in
+REF2 and that a foreground shell command is cut off at 10 min (an environment fact; the switching step takes ~18 min).
 Change after the declaration, before any agent run (2 October 2026): papers/ (476 MB of tracked literature PDFs,
 used by no step) is excluded from agent workspaces; the reference workspace was prepared with it. Workspace
 content only; no stage, check or score changed.
@@ -494,6 +496,8 @@ results/gan/ that a later stage or reviewer needs.""",
     "stage2": """Stage 2, layout-aware simulation (handoff I-2, schema handoff-i2/1). Upstream: handoffs/I-1.json.
 First verify the upstream record (validate it; its own hash; every file it cites still has the cited hash; its
 status usable) and that the model library is the one it qualified. Then run, in order: {cmds}
+Durations on this host: extraction about 2 min; switching about 18 min (nine cases). A foreground shell command is
+cut off at 10 min, so run the switching step in the background and wait for it to finish.
 Required checks: S2-UPSTREAM (the upstream verification above), S2-MODEL-BINDING (library sha256 equals I-1's
 model.sha256), S2-GEOMETRY (results/gan/epc90133-geometry.json checks all true), S2-POWER-LOOP
 (results/gan/epc90133-power-loop.json outcome "pass"), S2-EXTRACTION (results/gan/epc90133-extraction/A-m1-mid.json
