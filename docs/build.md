@@ -358,6 +358,42 @@ for the slot's added squares dN, with slot edges on cell faces so that no stairc
   candidate is 3D field fringing at the slot edges, which both the network and the sheet reference omit. The fine meshes
   and the half-gap case (check P1c) test it.
 
+**Via-array benchmark** (`python scripts/via_array_benchmark.py`, declared at d220f0e; revision 5 at the commit before
+567de11; [report](../results/gan/via-array-benchmark.json)). Closed plane-pair cavities at the board stack hold one via,
+a row of six at 0.6 mm (as under each pin), a row of six at 1.2 mm, or a 3 × 3 grid at 0.6 mm. Each cavity is used at two
+wall clearances, with the board's via section. Each via is its own FastHenry port, so the full inductance matrix comes
+out. Representations: the production rule at the board pitches m1 and m2 (nearest-node attachment, grid through the
+via rows), and a resolved single mesh (pitch about w/2, ideal pads). The reference is the 2D field between perfectly
+conducting plates, L = μ0 ε0 (h + δ) C2D⁻¹. It is compared through quantities in which the via's length inside the
+copper cancels: mutual-inductance ratios, and cavity-size differences.
+
+- *Runs 1–4, kept as failed.* Run 1 solved every case but could not read FastHenry's full impedance matrix. Runs 2 and 3
+  took some references from memory-terminated FasterCap runs (the runner gap above). Run 4 completed and failed V0:
+  FasterCap's automatic 2D refinement sometimes stalls. Some single-via references sat 1.3–2.1 % above the closed form
+  at one or both `-a` settings, while converged ones agreed with it to 0.02 %. Two `-a` settings therefore cannot
+  certify a reference.
+- *Revision 5: a new reference solver,* [circuit_tools/bem2d.py](../src/circuit_tools/bem2d.py). It is a 2D
+  boundary-element solver with explicit corner-graded panels: exact coax to 4 × 10⁻⁷, square via to 0.004 % of the closed
+  form (tests/test_bem2d.py). **V0 passes:** every reference changes by ≤ 0.05 % between 16 and 32 panels per via side,
+  and every single-via reference is within 0.004 % of the closed form. In three of 23 cavities FasterCap's run-4
+  reference differed from it by 1.3–2.1 %.
+- *Resolved FastHenry mesh (single mesh, as declared).* Mutual-inductance ratios agree within 2.9 %, except the farthest
+  pair in the smaller cavity, 7.2 % (**V1 fails**). Cavity differences agree within 1.3 % for the six-via row, but the
+  single via is 4.5 % off (**V2 fails**). The parallel-array inductance lies inside the physical bracket (**V3 passes**).
+  For comparison, the single-via cavity check at this pitch was also several percent off before refinement, so these
+  failures may be mesh error. That is not established: no second resolved mesh was run (the six-via row took 2.9 h at
+  this pitch).
+- *Board pitches (reported, not judged).* Individual mutual ratios are off by up to 12 % at m2 and 19 % at m1, and the
+  six-via row's cavity difference of via 1's self inductance is off by 22 % at m1. The parallel-array inductance lands
+  anywhere between 0.19 and 1.06 of the physical bracket; the 3 × 3 grid at m1 lies above it. For arrays it sits nearer
+  the gap-only end (0.19–0.44) than for a single via (0.45–0.82), so one bracket position cannot be carried from a single
+  via to an array.
+- *Dividing by the via count is wrong by a factor 1.6–2.6.* In the same cavity, six vias at 0.6 mm have 2.05 times the
+  inductance of one via divided by six, six at 1.2 mm 1.56 times, and nine at 0.6 mm 2.62 times (reference values).
+- *Applicability.* These are errors of closed cavities with these arrangements at 100 MHz. On the board, vias pass
+  through slotted planes and meet several layers. The numbers show the size of representation effects at the board
+  pitches; they are not error bars for the extracted board network.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh
