@@ -199,6 +199,62 @@ the earlier discretization error (via, pad, junction or planes) was not isolated
 difference only: R still changes by 7.8 % and 4.9 % between the last two meshes, so R is not converged. The scope is unchanged: board via arrays, plane holes, Kelvin and multi-layer vias are
 still not qualified, and the bracket width (23.5 and 33.7 pH here) remains the per-via representation uncertainty.
 
+### Via-array, plane-hole and FasterCap qualification: plan review and first bounded step (2 October 2026)
+
+A session drafted three qualification plans while hardware is blocked: via arrays in a closed cavity against an
+independent 2D reference, plane holes and slots, and a FasterCap diagnosis. An external review accepted the topics and
+asked for revised acceptance criteria before any expensive run. Disposition, after checking both against the code and the
+stored logs:
+
+- **Accepted from the review.** Benchmark errors are reported as discretization and representation errors of declared
+  benchmark geometries, with a separate statement of their applicability to the board. They are not board error bars.
+  The drafted V2 check is dropped, because nothing derives its premise (the same fractional position in the bracket for
+  every arrangement). A via-array benchmark needs new cavity sizes (six vias at 0.6 mm span 3 mm between centres, wider
+  than the existing 1.5 and 3 mm cavities), the board's via section (square, side 0.847 × drill, drill 0.198 mm) and a
+  stated excitation (individual ports or a parallel array). It also needs a later case for the 35-via source cluster.
+  "Exact square coax" is not available: the via script uses an equivalent-diameter approximation. The extractor checks copper only
+  on each segment's centre line ([epc90133_extract.py](../scripts/epc90133_extract.py), `connect`). Vias whose nearest
+  nodes coincide keep separate vertical segments. FasterCap's reference point sets each panel's side by the sign of
+  (point − vertex)·normal (`Autorefine.cpp` around line 6142). Case H's point is the centre of a convex box, so every slab
+  face was already oriented correctly. The drafted D3 (moving the point outside) is dropped for that reason. K1 needs
+  side-edge fringing removed, not only end effects. Compute estimates are guesses until one case is profiled.
+- **Added from the stored logs.** The air diagnostics took 11–25 minutes per refinement step at `-a0.01` and reached
+  2–4 million panels, so "minutes each" was wrong. Case H's dielectric runs did not refine: iteration 0 (3,576 panels)
+  and iteration 1 (4,132 panels) gave identical, unphysical matrices. The stopping rule therefore fired at once, with
+  FasterCap's relative-refinement indicator at 14,299 (about 1.5 in air). In air the same geometry also started
+  unphysical but refined to a physical matrix. The FasterCap evidence therefore points first at automatic refinement
+  stopping on an unresolved starting mesh, ahead of the dielectric description. That is not yet tested. The drafted D1
+  (slab at εr = 1) cannot test the interface: the earlier εr 1/1 run reports "0 dielectric" panels, so FasterCap drops
+  an interface whose two permittivities are equal.
+- **Order.** (1) The topology audit below, at no solver cost. (2) A FasterCap diagnosis with user-controlled meshes,
+  declared separately. (3) A precise declaration of the via-array and slot benchmarks, using the audit's geometry.
+  Profile one case before committing compute. Measurement readiness keeps priority when the equipment inventory arrives.
+
+**Mesh topology audit** (`python scripts/audit_epc90133_mesh_topology.py`, declared in its docstring and committed at
+89e5e32 before its run; [result](../results/gan/epc90133-mesh-topology-audit.json)). The audit parses the decks that
+the unchanged production extractor builds (A, B at m1 and m2, G at m1, B with pad junctions, and B with the grid shifted
+by half a pitch). It computes no inductance. Findings:
+
+- **Slots.** On the ground return planes (mid-layers 1–4), each row of six switch-node or VIN vias under a transistor
+  pin has antipads that merge into one slot, about 0.66 × 3.66 mm (six such slots, plus nine two-via slots, about
+  0.69 × 1.37 mm, under the capacitors). Every hole of at least half a pitch is crossed by a grid line, so no hole is
+  invisible to the mesh (F1 = 0 in every deck).
+- **Width overreach (T1).** Segment widths extend into those holes. On mid-layer 1, 27 % of the hole area is covered at
+  m1 with the production grid. The grid's x-lines are aligned to the pin rows, so they run down the slot centres, and
+  segments 0.425 mm wide either side reach about 0.12 mm into each slot. With the grid shifted by s/2 in x the cover is
+  9–11 %; at m2 it is 8–9 % at every offset tested. 3–12 segments per m1 deck, and 0–23 per m2 or shifted deck, have more
+  than half their width off their own copper. The electrical effect of this cover is not known; the slot benchmark is
+  where it gets measured.
+- **Via attachments (T4).** No grid node is shared by two vias in any deck, offsets included (F4 = 0), so the merge
+  risk raised for 0.6 mm via rows does not occur on these grids. One via end (group SW-03, top layer, m1) attaches
+  0.59 mm from its centre (F3); at m2 the largest distance is 0.13 mm.
+- **Mesh splitting (T3).** On the top layer a 15-node (m1) or 72-node (m2) fragment of one island is joined to the rest
+  only through vias.
+
+Consequences for the benchmarks: the slot benchmark uses the measured slot (0.66 × 3.66 mm, six 0.198 mm drills at
+0.6 mm) at m1 and m2, with the production alignment (slot-centred) and a shifted grid. The via-array benchmark does not
+need a merged-attachment case for these grids.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh

@@ -579,6 +579,16 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    be written. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
    G mesh, broad sweeps.
 
+9. Extraction-tool qualification while hardware is blocked (2 October 2026; docs/build.md "Via-array,
+   plane-hole and FasterCap qualification"). The external review of the drafted via-array, plane-hole and FasterCap
+   plans is adopted. Benchmark errors stay benchmark errors until a transfer argument or a representative board
+   subgeometry check links them to the board. V2 and D3 are dropped, and K1 must remove side-edge fringing. One case is
+   profiled before compute is committed. Done: the mesh topology audit. The return-plane slots under the transistors are
+   seen by every grid, but at m1 the segment widths cover 27 % of the hole area on mid-layer 1 (9 % at m2). No two vias
+   share an attachment node. Next: FasterCap with user-controlled meshes, because the stored case H logs show automatic
+   refinement stopping on an unrefined mesh; then the slot and via-array benchmark declarations. Yields to item 8 when the
+   equipment inventory arrives.
+
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a
 request requires an explicit instruction. No simulation sensitivity result alone

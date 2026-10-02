@@ -132,6 +132,9 @@ as sensitivities:
   A single via in a plane pair converges with a fourth, finer mesh ([result](results/gan/fasthenry-via-cavity-mesh4.json));
   with three meshes it had failed its mesh criterion. That benchmark does not cover the board's via arrays, plane holes
   or the slotted return plane under the transistors, so those are not qualified and board extractions stay exploratory.
+  An audit of the mesh itself, without the solver ([result](results/gan/epc90133-mesh-topology-audit.json)), shows that
+  the coarse grid sees every slot in that return plane, but its strips of copper reach into the slots and fill about a
+  quarter of their area (under a tenth on the finer mesh).
 
 ### Simulating the switching
 
