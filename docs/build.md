@@ -308,6 +308,14 @@ case-H part passes.
 - *Reading so far.* Case H's unphysical matrices are explained, at least in part, by settings rather than by the
   dielectric input: the automatic mode never left a coarse interaction threshold. Whether the dielectric description is
   also sound is what the dielectric form of revision 2 decides.
+- *An independent 2D reference for D4* ([script](../scripts/microstrip_bem_reference.py),
+  [result](../results/gan/microstrip-bem-reference.json); declared before run 4 produced any finer dielectric value).
+  D4 compares with FasterCap's own 2D value, and FasterCap's automatic 2D refinement is now known to stall. The new
+  boundary-element solver ([circuit_tools/bem2d.py](../src/circuit_tools/bem2d.py)) gained dielectric interfaces: bound
+  charge with normal-field continuity, exact coated coax reproduced to 0.005 % after extrapolation. For case H's cross-section it gives
+  **123.10 pF/m**: B1, the wide-slab version, lies within 0.06 % of Hammerstad–Jensen, and B2, panel convergence, is
+  0.009 %. FasterCap's case H value at `-a0.001` (123.23) agrees within 0.11 %, so D4's reference stands. Its `-a0.005`
+  value was 15.7 % low, another automatic stall.
 
 - *Run state, 2 October 2026.* Revision 2 was stopped at the end of the working day during the dielectric M2 call ([report](../results/gan/fastercap-manual-mesh-check-run2-incomplete.json), outcome 'incomplete, stopped'; no check evaluated). Completed: air M1–M3 and dielectric M1. Dielectric M1 took 10 and 27 minutes for its two lengths and gave physical matrices, unlike case H, with C′ = 116.8 pF/m, 5.2 % below the 2D reference (123.2 pF/m). The air form was within 0.5 % on the same mesh, so the dielectric value is either not converged at M1 or still carries an error; the finer meshes decide. Not run: dielectric M2/M3, D5, the automatic run from M1, and K1. The rerun takes an estimated 3–5 hours and should be launched detached, so it is not a child of a session shell.
 - *Run 3, 2–3 October 2026, failed, kept* ([report](../results/gan/fastercap-manual-mesh-check-run3-failed.json)). It was
