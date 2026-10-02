@@ -57,6 +57,13 @@ columns, so every FastHenry case was solved but not read (12 cases). Fixed: this
 all ports) and reads the impedance matrix by port name. A case whose run-1 directory holds a byte-identical case.inp and
 a complete Zc.mat is read from there instead of being solved again (recorded per case as "reused"). Nothing else changed.
 
+Run 2 (3 October 2026) is kept as results/gan/via-array-benchmark-run2-failed.json: with three jobs on the host, WSL's
+free memory fell to tens of MB, FasterCap stopped some reference runs with "Cannot go out-of-core" and still exited 0,
+and the shared runner read the last, unconverged matrix as the result (fixed in scripts/fastercap_known_answer.py,
+run_problem). Revision 3: references come only from the fixed runner; a reference call rejected for lack of memory is
+retried up to three times, 120 s apart, each attempt in its own directory and recorded; FastHenry cases are read from
+the run-1 or run-2 directory when their case.inp is byte-identical. Nothing else changed.
+
     python scripts/via_array_benchmark.py            # results/gan/via-array-benchmark.json
 """
 import argparse
@@ -81,9 +88,12 @@ import platform  # noqa: E402
 import subprocess  # noqa: E402
 import time  # noqa: E402
 
-def solve(text, workdir, reuse_dir=None):
-    """FastHenry with every port: (port names, complex Z, seconds, reused)."""
-    if reuse_dir is not None and (reuse_dir / "case.inp").is_file() and (reuse_dir / "case.inp").read_text(encoding="ascii") == text:
+def solve(text, workdir, reuse_dirs=()):
+    """FastHenry with every port: (port names, complex Z, seconds, reused). A saved case is read only when its case.inp
+    is byte-identical to `text` and its matrix file is complete."""
+    for reuse_dir in reuse_dirs:
+        if not ((reuse_dir / "case.inp").is_file() and (reuse_dir / "case.inp").read_text(encoding="ascii") == text):
+            continue
         for f in (reuse_dir / "Zc_j0.mat", reuse_dir / "Zc.mat"):
             if f.is_file() and "matrix for frequency" in f.read_text(errors="replace"):
                 rows, _, kind, mat = parse_matrix_file(f.read_text(errors="replace"))
@@ -222,16 +232,16 @@ def main():
         if rep["evaluator_sha256"] != ev:
             raise SystemExit("report was written by a different evaluator")
     else:
-        rep = {"schema": "via-array-benchmark/2", "declared": "2026-10-02, before the first run (docstring)",
+        rep = {"schema": "via-array-benchmark/3", "declared": "2026-10-02, before the first run (docstring)",
                "evaluator_sha256": ev,
                "dependencies_sha256": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES},
                "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
                "fastercap_binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
                "run_directory": f"runs/via-array-{uuid.uuid4().hex[:12]}", "references": {}, "runs": {}, "errors": []}
     root = ROOT / rep["run_directory"]
-    run1 = ROOT / "results/gan/via-array-benchmark-run1-failed.json"
-    RUN1 = ROOT / json.loads(run1.read_text(encoding="utf-8"))["run_directory"] if run1.is_file() else None
-    rep["run1_directory_reused"] = str(RUN1.relative_to(ROOT)) if RUN1 else None
+    earlier = [ROOT / f"results/gan/via-array-benchmark-run{k}-failed.json" for k in (1, 2)]
+    PREV = [ROOT / json.loads(f.read_text(encoding="utf-8"))["run_directory"] for f in earlier if f.is_file()]
+    rep["earlier_directories_reused"] = [str(d.relative_to(ROOT)) for d in PREV]
     delta = skin_depth(FREQ) * 1e3
 
     def save():
@@ -252,14 +262,21 @@ def main():
             continue
         row = {}
         for auto in AUTO_2D:
-            try:
-                C = reference(arr, a, auto, root / "ref" / key.replace("|", "_") / auto)
-                val = matrix_validity(C)
-                row[auto] = {"C2D": C, "validity": val,
-                             "L_per_heff_H_per_m": (MU0 * EPS0 * np.linalg.inv(np.array(C))).tolist() if not val else None}
-            except RuntimeError as exc:
-                row[auto] = {"error": str(exc)}
-                rep["errors"].append(f"reference {key} -a{auto}: {exc}")
+            attempts = []
+            for attempt in range(1, 4):
+                try:
+                    C = reference(arr, a, auto, root / "ref" / key.replace("|", "_") / auto / f"attempt{attempt}")
+                    val = matrix_validity(C)
+                    row[auto] = {"C2D": C, "validity": val, "attempts": attempts + ["ok"],
+                                 "L_per_heff_H_per_m": (MU0 * EPS0 * np.linalg.inv(np.array(C))).tolist() if not val else None}
+                    break
+                except RuntimeError as exc:
+                    attempts.append(str(exc)[-300:])
+                    if "lack of memory" not in str(exc) and "Cannot go" not in str(exc) or attempt == 3:
+                        row[auto] = {"error": str(exc), "attempts": attempts}
+                        rep["errors"].append(f"reference {key} -a{auto}: {exc}")
+                        break
+                    time.sleep(120)
         rep["references"][key] = row
         print("reference", key, {k: v.get("validity", v.get("error")) for k, v in row.items()}, flush=True)
         save()
@@ -270,7 +287,7 @@ def main():
         text, ports, a = deck(arr, c, r)
         sub_ = rid.replace("|", "_").replace("=", "")
         try:
-            order, Z, secs, reused = solve(text, root / sub_, RUN1 / sub_ if RUN1 else None)
+            order, Z, secs, reused = solve(text, root / sub_, [d / sub_ for d in PREV])
             idx = [order.index(f"v{v}") for v in range(len(ports))]
             Z = Z[np.ix_(idx, idx)]
             L = (Z.imag + Z.imag.T) / 2 / (2 * math.pi * FREQ)
