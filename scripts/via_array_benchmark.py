@@ -41,7 +41,7 @@ The reference cannot fix the via length inside the copper, so comparisons use:
                         L_par = 1 / (1^T L^-1 1) and the self inductance of via 1 (the E1 construction);
     absolute L_par      reported against the reference at h + delta and h + T + delta (the bracket), not judged.
 Checks, fixed here:
-V0  reference: every C2D valid; -a0.001 to -a0.0005 changes every entry of L_ref by <= 0.2 %.
+V0  reference (revisions 1-4): every C2D valid; -a0.001 to -a0.0005 changes every entry of L_ref by <= 0.2 %; see revision 5 below.
 V1  resolved, mutual ratios: every r_j of row6-0.6 within 3 % of the reference (a single via has no ratio).
 V2  resolved, cavity differences: dL_par and dL_self within 3 % of the reference, for single and row6-0.6.
 V3  resolved, absolute: L_par inside the reference bracket for single and row6-0.6.
@@ -73,6 +73,18 @@ free memory, so they stay in core; these 2D references need tens of MB), and a f
 FasterCap log reports the memory termination. Nothing else changed; FastHenry outputs are read from runs 1-3 for
 byte-identical decks.
 
+Run 4 (revision 4) completed and is kept as results/gan/via-array-benchmark-run4-failed.json: V0 failed because
+FasterCap's automatic 2D refinement sometimes stalls (single-via references 1.3-2.1 % above the closed form at one or
+both settings, while converged ones agree with it to 0.02 %), so two -a settings cannot certify a reference; V1 and V2
+failed and V3 passed against those references. Revision 5 (3 October 2026, declared before its run) replaces the
+reference solver, as the draft design allowed: circuit_tools.bem2d, a 2D boundary-element solver with explicit
+corner-graded panels (tests/test_bem2d.py: coax to 4e-7, the square via to 0.004 % of the closed form). V0 becomes:
+    V0  every reference matrix physical; 16 to 32 panels per via side (wall panels scaled with length) changes every
+        entry of L_ref by <= 0.05 %; and each single-via reference within 0.1 % of the closed form
+        mu0/(2 pi) ln(1.0787 (2a - T) / (1.1804 w)).
+V1-V3, the representations and the FastHenry cases are unchanged (FastHenry read from runs 1-3). Run 4's FasterCap
+references at -a0.0005 are reported beside the new ones as a cross-check.
+
     python scripts/via_array_benchmark.py            # results/gan/via-array-benchmark.json
 """
 import argparse
@@ -92,6 +104,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from epc90133_extract import parse_matrix_file  # noqa: E402
 from fastercap_board3d_check import matrix_validity  # noqa: E402
 from fastercap_known_answer import FC_BIN, run_fastercap, seg  # noqa: E402
+from circuit_tools.bem2d import maxwell_matrix, panels, square  # noqa: E402
 from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth, wsl_path  # noqa: E402
 import platform  # noqa: E402
 import subprocess  # noqa: E402
@@ -139,7 +152,7 @@ ARRANGEMENTS = {
 }
 REPS = {"m1": (0.425, 3, "production"), "m2": (0.2125, 5, "production"), "r1": (0.085, 3, "resolved")}
 RESOLVED_CASES = ("single", "row6-0.6")
-AUTO_2D = ("0.001", "0.0005")
+AUTO_2D = ("bem16", "bem32")  # revision 5: boundary-element refinements (panels per via side)
 DEPENDENCIES = ("scripts/epc90133_extract.py", "scripts/fastercap_board3d_check.py", "scripts/fastercap_known_answer.py",
                 "scripts/fasthenry_known_answer.py")
 
@@ -219,6 +232,16 @@ def reference(arr, a, auto, workdir):
     return mat
 
 
+def bem_reference(arr, a, n):
+    """2D Maxwell matrix (F/m) of the via squares with the wall's inner face as reference (boundary elements)."""
+    m = 1e-3
+    vias = [panels(square(x * m, y * m, W * m), n) for x, y in ARRANGEMENTS[arr]]
+    wall = panels(square(0.0, 0.0, (2 * a - T) * m), lambda s: max(n, round(n * s / (W * m) / 4)))
+    M = maxwell_matrix(vias + [wall])
+    k = len(vias)
+    return M[:k, :k]
+
+
 def metrics(L):
     """Parallel-array inductance, self of via 0, and mutual ratios, from a symmetric N x N matrix (henry)."""
     L = np.asarray(L)
@@ -241,14 +264,14 @@ def main():
         if rep["evaluator_sha256"] != ev:
             raise SystemExit("report was written by a different evaluator")
     else:
-        rep = {"schema": "via-array-benchmark/4", "declared": "2026-10-02, before the first run (docstring)",
+        rep = {"schema": "via-array-benchmark/5", "declared": "2026-10-02, before the first run (docstring)",
                "evaluator_sha256": ev,
                "dependencies_sha256": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES},
                "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
                "fastercap_binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
                "run_directory": f"runs/via-array-{uuid.uuid4().hex[:12]}", "references": {}, "runs": {}, "errors": []}
     root = ROOT / rep["run_directory"]
-    earlier = [ROOT / f"results/gan/via-array-benchmark-run{k}-failed.json" for k in (1, 2, 3)]
+    earlier = [ROOT / f"results/gan/via-array-benchmark-run{k}-failed.json" for k in (1, 2, 3)]  # run 4 solved nothing new
     PREV = [ROOT / json.loads(f.read_text(encoding="utf-8"))["run_directory"] for f in earlier if f.is_file()]
     rep["earlier_directories_reused"] = [str(d.relative_to(ROOT)) for d in PREV]
     delta = skin_depth(FREQ) * 1e3
@@ -270,25 +293,11 @@ def main():
         if key in rep["references"]:
             continue
         row = {}
-        for auto in AUTO_2D:
-            attempts = []
-            for attempt in range(1, 4):
-                try:
-                    C = reference(arr, a, auto, root / "ref" / key.replace("|", "_") / auto / f"attempt{attempt}")
-                    val = matrix_validity(C)
-                    row[auto] = {"C2D": C, "validity": val, "attempts": attempts + ["ok"],
-                                 "L_per_heff_H_per_m": (MU0 * EPS0 * np.linalg.inv(np.array(C))).tolist() if not val else None}
-                    break
-                except RuntimeError as exc:
-                    attempts.append(str(exc)[-300:])
-                    wd = root / "ref" / key.replace("|", "_") / auto / f"attempt{attempt}"
-                    log = "".join(f.read_text(errors="replace") for f in wd.glob("stdout-*.log"))
-                    memory = "lack of memory" in str(exc) or "Cannot go" in log or "not enough to allocate" in log
-                    if not memory or attempt == 3:
-                        row[auto] = {"error": str(exc), "attempts": attempts}
-                        rep["errors"].append(f"reference {key} -a{auto}: {exc}")
-                        break
-                    time.sleep(120)
+        for level in AUTO_2D:
+            C = bem_reference(arr, a, int(level[3:])).tolist()
+            val = matrix_validity(C)
+            row[level] = {"C2D": C, "validity": val,
+                          "L_per_heff_H_per_m": (MU0 * EPS0 * np.linalg.inv(np.array(C))).tolist() if not val else None}
         rep["references"][key] = row
         print("reference", key, {k: v.get("validity", v.get("error")) for k, v in row.items()}, flush=True)
         save()
@@ -322,8 +331,27 @@ def main():
     for key, row in rep["references"].items():
         x, y = row.get(AUTO_2D[0], {}).get("L_per_heff_H_per_m"), row.get(AUTO_2D[1], {}).get("L_per_heff_H_per_m")
         v0_changes.append(float(np.max(np.abs(np.array(y) / np.array(x) - 1))) if x and y else None)
+    closed = {}
+    for key, row in rep["references"].items():
+        if key.startswith("single|") and row.get(AUTO_2D[-1], {}).get("L_per_heff_H_per_m"):
+            a = float(key.split("=")[1])
+            ref = MU0 / (2 * math.pi) * math.log(1.0787 * (2 * a - T) / (1.1804 * W))
+            closed[key] = row[AUTO_2D[-1]]["L_per_heff_H_per_m"][0][0] / ref - 1
+    valid = all(not row.get(lv, {}).get("validity", ["missing"]) for row in rep["references"].values() for lv in AUTO_2D)
     checks = {"V0": {"max_change": max((v for v in v0_changes if v is not None), default=None),
-                     "pass": all(v is not None and v <= 0.002 for v in v0_changes)}}
+                     "single_vs_closed_form": closed, "all_valid": valid,
+                     "pass": valid and all(v is not None and v <= 0.0005 for v in v0_changes)
+                     and bool(closed) and all(abs(e) <= 0.001 for e in closed.values())}}
+    run4 = ROOT / "results/gan/via-array-benchmark-run4-failed.json"
+    if run4.is_file():
+        old = json.loads(run4.read_text(encoding="utf-8"))["references"]
+        xc = {}
+        for key, row in rep["references"].items():
+            a_ = old.get(key, {}).get("0.0005", {}).get("L_per_heff_H_per_m")
+            b_ = row.get(AUTO_2D[-1], {}).get("L_per_heff_H_per_m")
+            if a_ and b_:
+                xc[key] = float(np.max(np.abs(np.array(a_) / np.array(b_) - 1)))
+        rep["fastercap_run4_vs_bem_max_entry_difference"] = xc
     for arr, c, r in plan:
         run = rep["runs"].get(f"{arr}|c={c:g}|{r}", {})
         if "L_H" not in run:
