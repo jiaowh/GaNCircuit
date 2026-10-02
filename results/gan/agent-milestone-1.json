@@ -1,0 +1,113 @@
+{
+ "schema": "agent-milestone-1/1",
+ "runs": {
+  "A": {
+   "run": "A",
+   "scores": {
+    "S1": true,
+    "S4": true,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "completed",
+    "checks": {
+     "K1": {
+      "pass": true,
+      "detail": "all 7 listed files exist and sha256 match manifest"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "compare_epc90133_fig9.py sha256 equals evaluator_sha256 (9244015182...)"
+     },
+     "K3": {
+      "pass": true,
+      "detail": "time_scale pass for rising and falling panels; volt_scale fail for both (known limitation)"
+     },
+     "K4": {
+      "pass": true,
+      "detail": "6 switching reports parse; 4 have complete=true; causes.json and causes-2.json have no complete field and every case has usable"
+     }
+    },
+    "caveats": [
+     "Digitized Fig. 9 volt-scale check FAILS in both panels (swing 45.8/44.5 V vs 48 V); known limitation, recorded not hidden.",
+     "causes.json and causes-2.json are older reports without a 'complete' field; accepted via the per-case usable rule.",
+     "Fig. 9 digitization is from stitched raster screenshots; assumed probe responses and unvalidated vendor model apply; comparison is consistency, not identification."
+    ],
+    "stop_reason": null,
+    "files_written": [
+     "outputs/fig9-comparison.json",
+     "outputs/fig9-summary.md",
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 46.3,
+    "tool_calls": 9,
+    "tokens": 54348,
+    "interventions": 0
+   }
+  },
+  "B": {
+   "run": "B",
+   "scores": {
+    "S1": true,
+    "S4": null,
+    "S2": true,
+    "S2_detail": [],
+    "S3": true
+   },
+   "agent_report": {
+    "status": "stopped",
+    "checks": {
+     "K1": {
+      "pass": false,
+      "detail": "inputs/epc90133-switching-gateloop.json sha256 observed bb8ad192d4bbf9ae090862b92be5c2fc58b72740b68fb867a36b479d19959c1a, expected 484f151498b4b4027cfde958916158bdaa79913d6cff3df6960cee15e481b255; the other 6 files match"
+     },
+     "K2": {
+      "pass": true,
+      "detail": "evaluator sha256 matches 9244015182924cbcf0ad41a0798b7390adb3d42730d569f6c29fd545a8a3c6cc"
+     },
+     "K3": {
+      "pass": true,
+      "detail": "time_scale pass in rising and falling panels; volt_scale fail in rising (known limitation); checked but not used because the run stopped"
+     },
+     "K4": {
+      "pass": true,
+      "detail": "all 6 switching reports parse; 4 have complete=true, 2 older ones have no complete field and every case has usable"
+     }
+    },
+    "caveats": [
+     "Comparison was not run because K1 failed.",
+     "volt_scale fail in the figure record is a known limitation (swing 45.8 V vs 48 V bus)."
+    ],
+    "stop_reason": "K1 failed: epc90133-switching-gateloop.json sha256 mismatch",
+    "files_written": [
+     "outputs/agent-report.json"
+    ]
+   },
+   "harness": {
+    "model": "sonnet (cheaper subagent)",
+    "wall_s": 28.0,
+    "tool_calls": 5,
+    "tokens": 50816,
+    "interventions": 0
+   }
+  }
+ },
+ "evaluator_sha256": "7e88366374b27bb30ede7ee0fbd37cdd724ea60785bf0df56d810a6f5c8b5cd4",
+ "baseline": {
+  "wall_s": 7.592999999993481,
+  "status": "completed"
+ },
+ "observations": [
+  "Run B's report says the volt-scale check fails in the rising panel; it fails in both. Not a scored item; the stop decision and the named file are correct.",
+  "Run A's caveats add two the card did not ask for (legacy reports accepted by the usable rule; raster digitization with an unvalidated model); both are accurate."
+ ],
+ "milestone": {
+  "pass": true,
+  "scope": "one narrow task (input checks, one existing script, correct stop on a corrupted input), one run each: no reliability statistic, no engineering decision by the agent"
+ }
+}

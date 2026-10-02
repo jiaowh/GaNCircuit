@@ -1,0 +1,25 @@
+{
+ "schema": "epc90133-gate-coupling/1",
+ "extraction": "results/gan/epc90133-extraction/G-m1-mid.json",
+ "extraction_sha256": "d1b5a9adc1e6ea24a0835de25cce0663acb3bd097ff4cd75a4e5f02d31cb2693",
+ "evaluator_sha256": "7771ab9b7012e170bb59518e5ce329533a6f5be1b961e76596ab4d5336608860",
+ "frequency_Hz": 100000000.0,
+ "definition": "g_summary in epc90133_extract.py reports each FET's board common-source inductance as the voltage between the driver return ball and the FET's source per ampere of commutation-loop current (1 A from Q1.D to Q1.S46, Q2 shorted, all capacitors shorted; 100 MHz). That covers the return side of the gate loop only. The forward path (driver output ball, gate-resistor pads, gate) also has mutual inductance with the power branches.",
+ "scope": "one frequency, one mesh, unqualified vias: an estimate",
+ "fets": {
+  "Q1": {
+   "return_side_pH": 0.8981214288941651,
+   "forward_turn_on_pH": 9.07099238820357,
+   "total_turn_on_pH": 9.969113817097734,
+   "forward_turn_off_pH": 4.388352609165504,
+   "total_turn_off_pH": 5.286474038059669
+  },
+  "Q2": {
+   "return_side_pH": 47.671221893440894,
+   "forward_turn_on_pH": -4.065266399162231,
+   "total_turn_on_pH": 43.60595549427866,
+   "forward_turn_off_pH": -8.9342366754874,
+   "total_turn_off_pH": 38.736985217953496
+  }
+ }
+}

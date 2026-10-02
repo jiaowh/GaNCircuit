@@ -1,0 +1,54 @@
+{
+  "schema": "epc90133-network-transfer-audit/1",
+  "scope": "Small, simulator-free audit of the saved extraction-to-SPICE network transfer.\n\nUses an independent incidence-matrix solve with the extractor's diagnostic loading:\n1 A into Q1.D and out of its source, Q2 and capacitors shorted; G source pins joined,\ngate branches open. This is NOT a switching-waveform or frequency-convergence test.\nCompares full R with the diagonal R emitted by epc90133_switching.network, and\nchecks the six-significant-digit inductance/coupling serialization.\nRequires numpy only. Does not import geometry modules or launch external tools.",
+  "evaluator_sha256": "14533625bda63e7ff10f0b22292251e9705ee146ae487d4648c1d3bbeb3de047",
+  "network_generator_sha256": "201221950d692460fe7431e9ebabf78c498ce737411d7403914a98a8f5ed3e46",
+  "cases": {
+    "B-m1-mid": {
+      "extraction_sha256": "01460bb853f4826535d1ae1100d91592cf7293ed20231dbea344b31d8ec57797",
+      "frequency_Hz": 100000000.0,
+      "full_R": {
+        "R_loop_mohm": 2.0344462844652362,
+        "L_loop_nH": 0.2808726921224787
+      },
+      "diagonal_R": {
+        "R_loop_mohm": 1.1244649559104438,
+        "L_loop_nH": 0.2808756406437635
+      },
+      "loop_resistance_change_fraction": -0.4472869770528177,
+      "R_min_eigenvalue_ohm": 0.00011236726767654743,
+      "L_min_eigenvalue_pH": 14.089711678380516,
+      "serialized_L_min_eigenvalue_pH": 14.08973408109253,
+      "serialized_diagonal_R": {
+        "R_loop_mohm": 1.1244645898222574,
+        "L_loop_nH": 0.2808756944999786
+      }
+    },
+    "G-m1-mid": {
+      "extraction_sha256": "d1b5a9adc1e6ea24a0835de25cce0663acb3bd097ff4cd75a4e5f02d31cb2693",
+      "frequency_Hz": 100000000.0,
+      "full_R": {
+        "R_loop_mohm": 2.0342266224763286,
+        "L_loop_nH": 0.25744810890700315,
+        "R_cs_Q1_mohm": 0.015698706958194374,
+        "R_cs_Q2_mohm": 0.40407352638752175
+      },
+      "diagonal_R": {
+        "R_loop_mohm": 1.0344433830694542,
+        "L_loop_nH": 0.25745247449190267,
+        "R_cs_Q1_mohm": 0.580068674157939,
+        "R_cs_Q2_mohm": 0.17883914794080516
+      },
+      "loop_resistance_change_fraction": -0.491480756549045,
+      "R_min_eigenvalue_ohm": 0.00010783929331842323,
+      "L_min_eigenvalue_pH": 6.273655906387535,
+      "serialized_L_min_eigenvalue_pH": 6.273672817578743,
+      "serialized_diagonal_R": {
+        "R_loop_mohm": 1.0344433920769598,
+        "L_loop_nH": 0.25745251584492856,
+        "R_cs_Q1_mohm": 0.5800700487744767,
+        "R_cs_Q2_mohm": 0.1788394702019272
+      }
+    }
+  }
+}

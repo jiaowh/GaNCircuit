@@ -122,7 +122,90 @@ balls, the gate-resistor pads and each FET's source split into pin 2 and pins 4+
 * cases: G-m1-mid, compared with B-m1-mid-ms100 (B also has no gate or source paths, so the difference is
   what the board's gate-drive copper adds); G-m1-mid-ms50, the direct step check; and G with the assumed
   package common-source inductance of test 6 (25 and 50 pH on each die source, drivers at the pins), to see
-  what package inductance would still be needed on top of the board's. Every report carries an input manifest (extraction files, vendor library and
+  what package inductance would still be needed on top of the board's;
+* added after an external audit, before the first run: every test 7 case (B included) has a 0 V source in
+  Q2's drain, and reports both die VGS extrema and both drain currents around each event, with traces
+  (gate_and_current_diagnostics; reported, not judged), and on G the driver's PHASE-to-GND ball voltage
+  extremes against its -5/+85 V absolute maximum (uP1966E datasheet p. 7);
+* matched control G-m1-mid-ctl, declared before G's first result and run only on request (--only), when the
+  G-B difference is material: G's network with B's gate drive (ideal stages at the gate pads returning at
+  the source junction, the driver-ball and gate-resistor copper left open). G-ctl against B isolates the
+  extraction window, local mesh and source-terminal representation; G against G-ctl isolates what the
+  board's gate-drive and shared source paths add. Its PHASE-ball values are not meaningful (open copper);
+* split controls, declared on 1 October 2026 after G-ctl showed that the gate-drive copper accounts for about
+  two thirds of the G-B overshoot change together with a Q2 gate peak of 2.0 V (1.07 V in G-ctl), before
+  their runs: G-m1-mid-ctl-hs (high-side stage ideal, low-side through the extracted copper) and
+  G-m1-mid-ctl-ls (the reverse), both against G. They separate the high-side gate loop (Q1's turn-on) from
+  the low-side loop (Q2's gate disturbance and possible conduction). The two parts need not add up exactly;
+  their sum against G-ctl is reported, not assumed;
+* coupling check G-m1-mid-nogpk, declared on 1 October 2026 after the split controls and before its run: G with
+  every coupling between a gate-drive branch (driver balls, gate resistors) and a power branch removed (the
+  modified L matrix stays positive definite, minimum eigenvalue 6.27 pH). If the overshoot returns towards G-ctl
+  (32 V), coupling to the power network carries the high-side effect; if it stays near G (25 V), the gate loop's
+  own impedance does. In this branch-port network shared copper also appears as coupling, so the check does not
+  separate magnetic from shared-conductor coupling; the board L_cs of Q1 (0.9 pH) bounds the latter.
+  Result (1 October 2026): INVALID as a test. Removing the terms does not remove coupling; it adds spurious
+  common-source inductance, because the branches share reference nodes (overshoot fell to 9.4 V). Kept as run;
+  scripts/epc90133_gate_coupling.py computes the coupling correctly from the extraction instead. Its declaration
+  carries "interpretation_invalid" (added after an external audit, 1 October 2026): a rerun writes the reason into
+  its report, and no materiality comparison, Fig. 9 verdict or PHASE check uses the case. "usable" keeps its
+  meaning (numerical checks passed). G differs from B in extraction window, local mesh
+  and source-terminal representation as well as in the gate paths, so a material G-B difference is not
+  attributed to common-source inductance without a matched control.
+
+Test 8 (--study phase; declared 1 October 2026 after an external audit, before any run): is test 7's PHASE-ball
+undershoot a property of the circuit or of the ideal driver stage? In test 7 each driver pin is a source behind a
+switch that opens from 1 mohm to 100 Mohm in about a picosecond, with nothing on the pin, so the current in the
+extracted gate-return inductance is cut almost instantly. A CMOS output pin has output capacitance and body/ESD
+diodes to its reference and its supply rail, which carry that current. Regularized stage (pin_c): every driver
+output ball (UGH, UGL, LGH, LGL) gets a capacitance pin_c to its stage reference (PHASE or GND) and two clamp
+diodes (reference to pin, pin to a 5 V rail above the reference; DCLAMP below). The uP1966E datasheet gives
+neither value, so pin_c is bracketed at 10 and 100 pF (assumptions). Cases, on G + 50 pH (largest test 7 minimum,
+-28 V) unless named otherwise:
+  G-m1-mid-Ls50 (unregularized, reproduces test 7), G-m1-mid-Ls50-ms50 (unregularized at 50 ps: the targeted
+  numerical check the audit asked for), G-m1-mid-Ls50-pin10, G-m1-mid-Ls50-pin100, G-m1-mid-Ls50-pin100-ms50,
+  G-m1-mid-pin100 (G alone, test 7 minimum -8 V).
+Criteria, fixed now, on the RAW PHASE-to-GND extremes (no averaging): the stress is resolved for this bench if
+both regularized G+50 pH cases and G-pin100 stay inside -5/+85 V, and pin100 changes its raw minimum by less
+than 0.3 V or 10 % when the step is halved. If a regularized case is outside the rating and step-stable, the
+undershoot is a property of this model and goes into the hardware plan as a predicted risk. If the verdict
+differs between 10 and 100 pF, it depends on an unknown driver value and stays unresolved. Switching metrics
+are reported against the unregularized case (material or not); simulated sensitivity, not a safe limit.
+Run 1 (1 October 2026): the three 100 pF cases timed out at 3600 s in their timing runs (femtosecond steps from
+the first turn-on at 20.7 ns); kept as failed (results/gan/epc90133-switching-phase.json). Substitute step check,
+declared after run 1 and before its run, with the same 0.3 V / 10 % criterion: G-m1-mid-Ls50-pin10-ms50 against
+G-m1-mid-Ls50-pin10 (run with --only, report epc90133-switching-phase-2.json). The 100 pF bracket end is then
+read only from the partial timing runs (event A), as supplementary evidence outside the declared criteria.
+
+Test 9 (--study fullr; declared 1 October 2026 after the method audit and the network-transfer qualification,
+before any run): does the full extracted resistance change the switching waveform, and what do the vendor model's
+internal nodes show? A separate network revision; the baseline cases and reports are unchanged. All cases at test
+7's settings (100 ps, Q2 sense source) with internal saves (V(x*:gate), V(x*:source), I(x*:bswitch)):
+  B-m1-mid-ms100 and G-m1-mid (baseline network: reproduction of test 7, every switching metric within 0.1 %),
+  B-m1-mid-ms100-fullR, G-m1-mid-fullR, G-m1-mid-Ls50 (baseline) and G-m1-mid-Ls50-fullR (pairs judged with the
+  existing materiality rule against their baseline case), and G-m1-mid-fullR-ms50 (step check, 2 % rule).
+Read as a representation correction under the same unvalidated model, not as tuning: whatever the damping
+does, no parameter is adjusted to Fig. 9. The internal Q2 VGS and channel current during Q1's turn-on are
+reported, not judged (no threshold declared); they replace the terminal-VGS-against-DC-current reading of test 7
+for the false-turn-on question inside the model.
+
+Test 11 (--study driver; declared 2 October 2026 after the first-principles review, before any run): does the
+excitation depend on how the driver output stage is represented, within what the uP1966E datasheet constrains?
+The datasheet (p. 8) gives output resistance at 500 mA (0.7/1.4 ohm typical/maximum sourcing, 0.4/0.8 sinking)
+and 10-90 % edge times into 3000 pF (8 ns rise, 4 ns fall typical), separately. Two representations meet both:
+  ramp (baseline): typical resistances behind a source ramp calibrated to 8/4 ns (driver_calibration);
+  step: a near-step source (0.1 ns ramp, the smallest EDGE_GRID point) behind resistances calibrated on the
+        same 3000 pF bench to 8/4 ns (driver_step_calibration, a resistance grid interpolated as for the ramp).
+        It is datasheet-consistent only if those resistances are at or below 1.4/0.8 ohm; otherwise the
+        study reports that and stops (declared check D1).
+Cases (test 7 settings, 100 ps, Q2 sense source, internal saves): B-m1-mid-ms100, G-m1-mid, G-m1-mid-Ls50 (ramp,
+reproductions of tests 7/9, every switching metric within 0.1 %), each with a -dstep counterpart judged with the
+materiality rule against it, and G-m1-mid-Ls50-dstep-ms50 (2 % step check; the step source has sharper edges).
+Reading: material differences mean the excitation depends on a driver property the datasheet does not fix, so
+measuring the driver's gate edges (hardware plan E1) is a model input, not only a check; no difference means
+this family is not a major excitation uncertainty. Both are model statements; neither identifies the real driver.
+
+Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
 import argparse
@@ -193,20 +276,42 @@ def is_gate_extraction(ext):
     return any(p["terminal"] == "U80.PH" for p in ext["ports"])
 
 
-def network(ext, ideal=False, r_scale=1.0):
-    """Branch inductors, resistances and couplings from an extraction report."""
+def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False, full_r=False):
+    """Branch inductors, resistances and couplings from an extraction report.
+
+    Baseline (full_r False, unchanged): each branch carries its diagonal resistance R[k, k]; the off-diagonal
+    resistance terms are dropped (method audit, 1 October 2026: loop R at 100 MHz 2.03 -> 1.12 mohm on B).
+    Network revision full_r (separate, opt-in; qualified by scripts/qualify_epc90133_network_transfer.py): branch
+    k keeps its resistor R[k, k] and adds in series a behavioural source V = sum_{j != k} R[k, j] I(Lb_j), so the
+    branch voltages are R I + L dI/dt with the full extracted R and L. (A behavioural source carrying the whole
+    row, with no resistor, forms voltage-source/inductor loops that LTspice rejects; qualification run 1.) Both at
+    the extraction frequency (100 MHz).
+
+    no_gate_power_k (test 7 follow-up): drop every coupling between a gate-drive branch (driver balls and gate
+    resistors, STAGE_OF) and a power branch; couplings within each group are kept."""
     L = np.array(ext["L_H"])
     R = np.array(ext["R_ohm"])
     lines = [f"* extracted branch network: {ext['case']}"]
     names = []
+    if full_r and ideal:
+        raise ValueError("full_r applies to the extracted network, not to ideal copper")
     for k, p in enumerate(ext["ports"]):
         lk, rk = (1e-12, 1e-4) if ideal else (L[k, k], R[k, k] * r_scale)
         lines.append(f"Lb{k} {node(p['terminal'])} xb{k} {lk:.6g}")
-        lines.append(f"Rb{k} xb{k} {node(p['reference'])} {rk:.6g}")
+        terms = "+".join(f"({R[k, j] * r_scale:.9g})*I(Lb{j})" for j in range(len(ext["ports"]))
+                         if j != k and R[k, j] != 0) if full_r else ""
+        if terms:
+            lines.append(f"Rb{k} xb{k} yb{k} {rk:.6g}")
+            lines.append(f"Bb{k} yb{k} {node(p['reference'])} V={terms}")
+        else:
+            lines.append(f"Rb{k} xb{k} {node(p['reference'])} {rk:.6g}")
         names.append(f"Lb{k}")
+    gate_br = {k for k, p in enumerate(ext["ports"]) if p["terminal"].split(".")[0] in GATE_PARTS}
     if not ideal:
         for i in range(len(names)):
             for j in range(i + 1, len(names)):
+                if no_gate_power_k and (i in gate_br) != (j in gate_br):
+                    continue
                 kij = L[i, j] / math.sqrt(L[i, i] * L[j, j])
                 lines.append(f"K{i}_{j} Lb{i} Lb{j} {kij:.6g}")
     return "\n".join(lines), [p["terminal"] for p in ext["ports"]]
@@ -228,7 +333,29 @@ def fet(n, gate, dpad, spad, l_d, l_s, l_g, r_corner):
     return lines, ss
 
 
-def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
+# Board parts of the gate-drive branches (test 7 coupling check).
+GATE_PARTS = ("U80", "R80", "R81", "R82", "R83")
+# Board elements of each driver stage (test 7 split controls).
+STAGE_OF = {"R80": "u", "R81": "u", "U80.UGH": "u", "U80.UGL": "u", "U80.PH": "u",
+            "R82": "l", "R83": "l", "U80.LGH": "l", "U80.LGL": "l", "U80.GND": "l"}
+
+
+PIN_DIODE = ".model DCLAMP D(Is=1e-14 N=1 Rs=0.5 Cjo=0)"  # test 8: generic clamp, about 0.7 V at 10 mA
+
+
+def pin_regularization(stages, pin_c):
+    """Test 8: output capacitance and clamp diodes on each driver ball (see the module docstring)."""
+    out = []
+    for tag, ref, vdd, pins in (("u", "u80_ph", VBOOT, ("u80_ugh", "u80_ugl")), ("l", "u80_gnd", VCC, ("u80_lgh", "u80_lgl"))):
+        if tag not in stages:
+            continue
+        out.append(f"V{tag}rail rail{tag} {ref} {vdd:g}")
+        for pin in pins:
+            out += [f"Cp_{pin} {pin} {ref} {pin_c:g}", f"Dlo_{pin} {ref} {pin} DCLAMP", f"Dhi_{pin} {pin} rail{tag} DCLAMP"]
+    return out + [PIN_DIODE]
+
+
+def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"), pin_c=None):
     """Test 7: uP1966E stages at the extracted ball terminals, gate resistors between their pad terminals.
 
     drive_stage ties its pull-up and pull-down resistors to one gate node; here the pull-down resistor is
@@ -237,20 +364,32 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
     out = []
     for tag, ref, vdd, edges, up, dn in (("u", "u80_ph", VBOOT, hi, "u80_ugh", "u80_ugl"),
                                           ("l", "u80_gnd", VCC, lo, "u80_lgh", "u80_lgl")):
+        if tag not in stages:
+            continue
         text = drive_stage(tag, ref, vdd, edges, te_rise, te_fall, up, r_src, r_snk, 0.0, 0.0, t_end).rstrip()
         old = f"R{tag}d {up} pd{tag}"
         if text.count(old) != 1:
             raise RuntimeError("drive_stage output changed; cannot split its outputs")
         out.append(text.replace(old, f"R{tag}d {dn} pd{tag}"))
     for ref, ohm in (("R80", R_GON), ("R81", R_GOFF), ("R82", R_GON), ("R83", R_GOFF)):
+        if STAGE_OF[ref] not in stages:
+            continue
         out.append(f"{ref} {ref.lower()}_d {ref.lower()}_g {max(ohm, 1e-3):g}")
-    return out
+    return out + (pin_regularization(stages, pin_c) if pin_c else [])
+
+
+def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
+    """B's ideal stage for one FET of the G network, at its gate pad, returning at its source junction."""
+    if tag == "u":
+        return drive_stage("u", "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip()
+    return drive_stage("l", "q2_s", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF, t_end).rstrip()
 
 
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
-          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None):
-    net, terms = network(ext, ideal, r_scale)
+          c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
+          pin_c=None, full_r=False, internal=False):
+    net, terms = network(ext, ideal, r_scale, no_gate_power_k, full_r)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
     for c in caps:
@@ -322,13 +461,15 @@ Rbret bn {node(at + '.GND')} 1u"""
     ld = l_pkg if l_d is None else l_d
     ls = l_pkg if l_s is None else l_s
     g_ext = is_gate_extraction(ext)
-    die = {"g1": "gu", "d1": "q1dd", "s1": "q1_s", "g2": "gl", "d2": "q2_d", "s2": "0"}
+    # Test 7 (audit, 30 September 2026): a 0 V source in Q2's drain gives its terminal current.
+    q2dd = "q2dd" if sense_q2 else "q2_d"
+    die = {"g1": "gu", "d1": "q1dd", "s1": "q1_s", "g2": "gl", "d2": q2dd, "s2": "0"}
     if g_ext:
         # Test 7: die source q1_s / q2_s joins the split pins; optional package source inductance l_s.
         if ld or l_g or c_gd or c_sw:
             raise ValueError("variant G bench supports only l_s (package common-source) among the options")
         fet1, fet2 = [], []
-        for n_, pins, gate_node, d_node in ((1, ("q1_s2", "q1_s46"), "gu", "q1dd"), (2, ("q2_s2", "0"), "gl", "q2_d")):
+        for n_, pins, gate_node, d_node in ((1, ("q1_s2", "q1_s46"), "gu", "q1dd"), (2, ("q2_s2", "0"), "gl", q2dd)):
             junction = f"q{n_}_s"
             src = f"p{n_}s" if ls else junction
             lst = fet1 if n_ == 1 else fet2
@@ -338,29 +479,48 @@ Rbret bn {node(at + '.GND')} 1u"""
                     f"X{n_} {gate_node} {d_node} {src} EPC2302"]
         s1_die, s2_die = "q1_s", "q2_s"
         die.update(s1="p1s" if ls else "q1_s", s2="p2s" if ls else "q2_s")
+        if gate_ctl:
+            # Matched control: G's network, B's gate drive (ideal stages at the gate pads, returning at the
+            # source junction, as B returns at its single source terminal). The driver-ball and gate-resistor
+            # copper is left open; 1 Gohm bleeders keep those nodes defined.
+            if ls:
+                raise ValueError("the gate control case takes no package inductance")
+            # gate_ctl True: both stages ideal; "u" or "l": only that stage (split control, test 7 follow-up).
+            ideal_st = ("u", "l") if gate_ctl is True else (gate_ctl,)
+            owner = lambda t: STAGE_OF.get(t, STAGE_OF.get(t.split(".")[0]))
+            gate_nodes = sorted({node(t) for p_ in ext["ports"] for t in (p_["terminal"], p_["reference"])
+                                 if owner(t) in ideal_st})
+            fet2 += [f"Rbleed_{nd} {nd} 0 1e9" for nd in gate_nodes]
+            s2_die = "q2_s"
     else:
         fet1, s1_die = fet(1, "gu", "q1dd", "q1_s", ld, ls, l_g, r_pkg_corner)
-        fet2, s2_die = fet(2, "gl", "q2_d", "0", ld, ls, l_g, r_pkg_corner)
+        fet2, s2_die = fet(2, "gl", q2dd, "0", ld, ls, l_g, r_pkg_corner)
         die.update(g1="p1g" if l_g else "gu", d1="p1d" if ld else "q1dd", s1=s1_die,
-                   g2="p2g" if l_g else "gl", d2="p2d" if ld else "q2_d", s2=s2_die)
+                   g2="p2g" if l_g else "gl", d2="p2d" if ld else q2dd, s2=s2_die)
     times["die_nodes"] = die
     lines += [
         "Vq1d q1_d q1dd 0",
+        *(["Vq2d q2_d q2dd 0"] if sense_q2 else []),
         *fet1, *fet2,
         *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end) if g_ext else [
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, pin_c=pin_c) if g_ext and not gate_ctl else
+          gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=[x for x in ("u", "l") if x != gate_ctl])
+          + [ideal_stage(gate_ctl, hi, lo, te_rise, te_fall, r_src, r_snk, t_end)]
+          if g_ext and gate_ctl in ("u", "l") else [
             # Drivers return at the source pads (common-source coupling through l_s) or, with kelvin, at the die source.
             drive_stage("u", s1_die if kelvin else "q1_s", VBOOT, hi, te_rise, te_fall, "gu", r_src, r_snk, R_GON, R_GOFF,
                         t_end).rstrip(),
-            drive_stage("l", s2_die if kelvin else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
+            drive_stage("l", s2_die if (kelvin or gate_ctl) else "0", VCC, lo, te_rise, te_fall, "gl", r_src, r_snk, R_GON, R_GOFF,
                         t_end).rstrip()]),
         SWITCH_MODELS.rstrip(),
-        ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
+        ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (" I(Vq2d)" if sense_q2 else "") + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
         + (" V(q2_s) V(u80_ph) V(u80_gnd) I(Vs12) I(Vs146) I(Vs22) I(Vs246)" if g_ext else "")
-        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s"})),
+        + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s", "q2dd", "q1dd"}))
+        # Test 9 (opt-in): vendor-model internal nodes, behind rg/rs; the vendor model itself is unchanged.
+        + (" V(x1:gate) V(x1:source) V(x2:gate) V(x2:source) I(x1:bswitch) I(x2:bswitch)" if internal else ""),
         ".temp 25",
         f".options plotwinsize=0 reltol={reltol:g}",
         f".tran 0 {t_end:.9g} 0 {maxstep:g}",
@@ -413,10 +573,47 @@ def metrics(s, times, at):
                "q2_gate_peak_during_rise_V": max(x for _, x in window(t, vgs2, tb, tb + 60e-9)),
                "q2_gate_pad_peak_during_rise_V": max(x for _, x in window(t, gl, tb, tb + 60e-9))}
     return {"event_a_turn_off_at_peak": event_a, "event_b_turn_on_at_valley": event_b,
-            "terminals": {"device_metrics": "die (q1 vgs and vds for the energies, q2 gate-source peak)",
+            "gate_and_current_diagnostics": diagnostics(s, t, vgs1, vgs2, id1, ta, tb),
+            "terminals": {"device_metrics": "vendor-model terminals (q1 vgs and vds for the energies, q2 gate-source peak)",
                           "switch_node_metrics": "Q2 drain pad to circuit ground (Q2 source pad)",
                           "die_nodes": die, "energies_exclude": "energy stored in package or gate-loop inductors"},
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
+
+
+def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
+    """Test 7 (audit, 30 September 2026): die gate-source extremes of both FETs and both drain currents
+    around each event, so gate disturbance and possible false turn-on are read before any conclusion.
+
+    Terminal currents include capacitive (Coss, Cgd) charging current, so a positive Q2 drain current
+    during the rising edge does not by itself show channel conduction; it is read together with Q2's VGS.
+    Reported, not judged: no pass/fail threshold was declared before the first run."""
+    id2 = s.get("i(vq2d)")
+    out = {"window_s": [-5e-9, 60e-9], "vgs_ratings_V": {"max": 6.0, "min": -4.0, "source": "EPC2302 datasheet"},
+           "vgs_definition": ("q*_vgs: the vendor model's terminal gate-source voltage (gatein-sourcein), after any "
+                              "added package inductance; earlier notes called it 'die VGS'. It is not the internal "
+                              "channel-control voltage behind the model's rg (0.5 ohm) and rs (method audit, "
+                              "1 October 2026); q*_vgs_internal (test 9, when saved) is."),
+           "q2_drain_current": "I(Vq2d), drain terminal into Q2" if id2 else "not saved (no Q2 sense source)"}
+    for tag, te in (("event_a", ta), ("event_b", tb)):
+        w = lambda y: [x for _, x in window(t, y, te - 5e-9, te + 60e-9)]
+        d = {"q1_vgs_max_V": max(w(vgs1)), "q1_vgs_min_V": min(w(vgs1)),
+             "q2_vgs_max_V": max(w(vgs2)), "q2_vgs_min_V": min(w(vgs2)),
+             "q1_id_max_A": max(w(id1)), "q1_id_min_A": min(w(id1))}
+        if id2:
+            d.update(q2_id_max_A=max(w(id2)), q2_id_min_A=min(w(id2)))
+        if "v(x2:gate)" in s:
+            for q in ("1", "2"):
+                vi = [a - b for a, b in zip(s[f"v(x{q}:gate)"], s[f"v(x{q}:source)"])]
+                ich = s[f"i(x{q}:bswitch)"]
+                d.update({f"q{q}_vgs_internal_max_V": max(w(vi)), f"q{q}_vgs_internal_min_V": min(w(vi)),
+                          f"q{q}_channel_current_max_A": max(w(ich)), f"q{q}_channel_current_min_A": min(w(ich))})
+        if "v(u80_ph)" in s:
+            # Variant G only: the driver's PHASE ball against its GND ball (uP1966E absolute maximum
+            # -5 V to +85 V, datasheet p. 7). A simulated sensitivity result, not a safe limit.
+            ph = [a - b for a, b in zip(s["v(u80_ph)"], s["v(u80_gnd)"])]
+            d.update(driver_phase_to_gnd_max_V=max(w(ph)), driver_phase_to_gnd_min_V=min(w(ph)))
+        out[tag] = d
+    return out
 
 
 def spikes(s):
@@ -427,13 +624,27 @@ def spikes(s):
 
 
 def edge_traces(s, times):
-    """V(SW) (Q2 drain pad to Q2 source pad, ideal probe) resampled around both events."""
+    """V(SW) (Q2 drain pad to Q2 source pad, ideal probe) resampled around both events; with a Q2 sense
+    source (test 7) also both die VGS and both drain currents."""
     t, v = np.array(s["time"]), np.array(s["v(q2_d)"])
     rel = np.arange(TRACE_WINDOW[0], TRACE_WINDOW[1] + TRACE_STEP / 2, TRACE_STEP)
-    return {"step_s": TRACE_STEP, "start_s": TRACE_WINDOW[0],
-            "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
-            "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
-            "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
+    out = {"step_s": TRACE_STEP, "start_s": TRACE_WINDOW[0],
+           "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
+           "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
+           "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
+    if "i(vq2d)" in s:
+        die = times["die_nodes"]
+        zero = np.zeros(len(t))
+        nv = lambda nd: zero if nd == "0" else np.array(s[f"v({'q1_d' if nd == 'q1dd' else nd})"])
+        sig = {"q1_vgs_V": nv(die["g1"]) - nv(die["s1"]), "q2_vgs_V": nv(die["g2"]) - nv(die["s2"]),
+               "q1_id_A": np.array(s["i(vq1d)"]), "q2_id_A": np.array(s["i(vq2d)"])}
+        if "v(x2:gate)" in s:
+            for q in ("1", "2"):
+                sig[f"q{q}_vgs_internal_V"] = np.array(s[f"v(x{q}:gate)"]) - np.array(s[f"v(x{q}:source)"])
+                sig[f"q{q}_channel_current_A"] = np.array(s[f"i(x{q}:bswitch)"])
+        out["device"] = {f"{ev}_{k}": [round(float(x), 5) for x in np.interp(times[tk] + rel, t, y)]
+                         for ev, tk in (("falling", "t_off1"), ("rising", "t_on2")) for k, y in sig.items()}
+    return out
 
 
 def ringing(ring, peak_t, hyst=0.5):
@@ -552,18 +763,30 @@ def path_cases(exts):
     return cases
 
 
+INVALID_NOGPK = ("removing the gate-power branch mutuals also removes shared-copper inductance between branches with "
+                 "common reference nodes, adding spurious common-source inductance; the result has no physical meaning "
+                 "(see scripts/epc90133_gate_coupling.py)")
+
+
+def eligible(r):
+    """A case that may be interpreted: its numerical checks passed and it carries no invalidity disposition."""
+    return r.get("usable") is True and not r.get("interpretation_invalid")
+
+
 def comparisons(results, exts, reference):
-    """Materiality of each case against its base; formed only when both passed every check (test 6)."""
+    """Materiality of each case against its base; formed only when both are eligible (test 6; audit 1 October 2026)."""
     out = {}
     for name, r in results.items():
         base = r["parameters"].get("base") or (reference if (name in exts or name == "ideal-copper") else r["parameters"]["ext"])
         if name == base or base not in results:
             continue
-        if r.get("usable") is True and results[base].get("usable") is True:
+        if eligible(r) and eligible(results[base]):
             out[name] = {"compared_with": base, **material(flat(results[base]["metrics"]), flat(r["metrics"]))}
         else:
-            out[name] = {"compared_with": base, "excluded": "case or base failed its checks",
-                         "case_usable": r.get("usable") is True, "base_usable": results[base].get("usable") is True}
+            out[name] = {"compared_with": base, "excluded": "case or base failed its checks or is declared invalid",
+                         "case_usable": r.get("usable") is True, "base_usable": results[base].get("usable") is True,
+                         "case_invalid": bool(r.get("interpretation_invalid")),
+                         "base_invalid": bool(results[base].get("interpretation_invalid"))}
     return out
 
 
@@ -576,12 +799,88 @@ def gateloop_cases(exts):
     g, ref = "G-m1-mid", "B-m1-mid-ms100"
     if g not in exts or "B-m1-mid" not in exts:
         raise SystemExit("test 7 needs extractions G-m1-mid and B-m1-mid")
-    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B}
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True}
     return {ref: {"ext": "B-m1-mid", **common},
             g: {"ext": g, "base": ref, **common},
             f"{g}-ms50": {"ext": g, "base": g, **common, "maxstep": MAXSTEP_PKG / 2},
             f"{g}-Ls25": {"ext": g, "base": g, **common, "l_s": 25e-12},
-            f"{g}-Ls50": {"ext": g, "base": g, **common, "l_s": 50e-12}}
+            f"{g}-Ls50": {"ext": g, "base": g, **common, "l_s": 50e-12},
+            # Matched control (declared before G's first result; run with --only when G-B is material).
+            f"{g}-ctl": {"ext": g, "base": ref, **common, "gate_ctl": True, "on_request": True},
+            # Split controls (declared 1 October 2026 after G-ctl, before their runs): one stage ideal.
+            f"{g}-ctl-hs": {"ext": g, "base": g, **common, "gate_ctl": "u", "on_request": True},
+            f"{g}-ctl-ls": {"ext": g, "base": g, **common, "gate_ctl": "l", "on_request": True},
+            # Coupling check (declared 1 October 2026 after the split controls, before its run). Invalid as a test
+            # (see the module docstring); kept runnable so the run can be reproduced, never interpreted.
+            f"{g}-nogpk": {"ext": g, "base": g, **common, "no_gate_power_k": True, "on_request": True,
+                           "interpretation_invalid": INVALID_NOGPK}}
+
+
+def phase_cases(exts):
+    """Test 8 cases (see the module docstring)."""
+    g = "G-m1-mid"
+    if g not in exts:
+        raise SystemExit("test 8 needs extraction G-m1-mid")
+    common = {"ext": g, "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True}
+    b50 = f"{g}-Ls50"
+    return {b50: {**common, "l_s": 50e-12},
+            f"{b50}-ms50": {**common, "l_s": 50e-12, "base": b50, "maxstep": MAXSTEP_PKG / 2},
+            f"{b50}-pin10": {**common, "l_s": 50e-12, "base": b50, "pin_c": 10e-12},
+            f"{b50}-pin100": {**common, "l_s": 50e-12, "base": b50, "pin_c": 100e-12},
+            f"{b50}-pin100-ms50": {**common, "l_s": 50e-12, "base": f"{b50}-pin100", "pin_c": 100e-12,
+                                   "maxstep": MAXSTEP_PKG / 2},
+            f"{g}-pin100": {**common, "pin_c": 100e-12},
+            # Substitute step check, declared after run 1 (see the module docstring).
+            f"{b50}-pin10-ms50": {**common, "l_s": 50e-12, "base": f"{b50}-pin10", "pin_c": 10e-12,
+                                  "maxstep": MAXSTEP_PKG / 2}}
+
+
+def fullr_cases(exts):
+    """Test 9 cases (see the module docstring)."""
+    if "G-m1-mid" not in exts or "B-m1-mid" not in exts:
+        raise SystemExit("test 9 needs extractions G-m1-mid and B-m1-mid")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "internal": True}
+    b, g = "B-m1-mid-ms100", "G-m1-mid"
+    return {b: {"ext": "B-m1-mid", **common},
+            f"{b}-fullR": {"ext": "B-m1-mid", "base": b, **common, "full_r": True},
+            g: {"ext": g, **common},
+            f"{g}-fullR": {"ext": g, "base": g, **common, "full_r": True},
+            f"{g}-fullR-ms50": {"ext": g, "base": f"{g}-fullR", **common, "full_r": True, "maxstep": MAXSTEP_PKG / 2},
+            f"{g}-Ls50": {"ext": g, **common, "l_s": 50e-12},
+            f"{g}-Ls50-fullR": {"ext": g, "base": f"{g}-Ls50", **common, "l_s": 50e-12, "full_r": True}}
+
+
+STEP_TE = 0.1e-9                                       # test 11: near-step source ramp (smallest EDGE_GRID point)
+STEP_R_GRID = (0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8)  # ohm, test 11 calibration grid
+DRIVER_STEP = {}
+
+
+def driver_step_bench():
+    """Test 11: near-step source into the datasheet's 3000 pF load, one run per output resistance."""
+    runs = {}
+    for k, r in enumerate(STEP_R_GRID):
+        stage = drive_stage("1", "0", VCC, [(20e-9, 1), (70e-9, 0)], STEP_TE, STEP_TE, "g", r, r, 0, 0, 150e-9)
+        runs[f"driver_step_{k}"] = "\n".join([f"* uP1966E step-source output stage into 3000 pF; R {r:g} ohm",
+                                              stage.rstrip(), "Cl g 0 3000p", SWITCH_MODELS.rstrip(),
+                                              f".options plotwinsize=0 reltol={RELTOL:g}", ".tran 0 150n 0 10p",
+                                              ".end", ""])
+    return runs
+
+
+def driver_cases(exts):
+    """Test 11 cases (see the module docstring)."""
+    if "G-m1-mid" not in exts or "B-m1-mid" not in exts:
+        raise SystemExit("test 11 needs extractions G-m1-mid and B-m1-mid")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "internal": True}
+    b, g, gl = "B-m1-mid-ms100", "G-m1-mid", "G-m1-mid-Ls50"
+    return {b: {"ext": "B-m1-mid", **common},
+            f"{b}-dstep": {"ext": "B-m1-mid", "base": b, **common, "driver": "step"},
+            g: {"ext": g, **common},
+            f"{g}-dstep": {"ext": g, "base": g, **common, "driver": "step"},
+            gl: {"ext": g, **common, "l_s": 50e-12},
+            f"{gl}-dstep": {"ext": g, "base": gl, **common, "l_s": 50e-12, "driver": "step"},
+            f"{gl}-dstep-ms50": {"ext": g, "base": f"{gl}-dstep", **common, "l_s": 50e-12, "driver": "step",
+                                 "maxstep": MAXSTEP_PKG / 2}}
 
 
 def main():
@@ -593,9 +892,11 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
+    ap.add_argument("--timeout", type=float, default=600.0,
+                    help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
@@ -604,8 +905,8 @@ def main():
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
     runs = {}
 
-    def run(name, text, timeout=600):  # the adapter allows at most 600 s
-        r = run_ltspice(text, run_root / name, libraries=[lib], timeout_s=timeout)
+    def run(name, text):  # limit per LTspice run: --timeout (the adapter allows up to MAX_TIMEOUT_S)
+        r = run_ltspice(text, run_root / name, libraries=[lib], timeout_s=args.timeout)
         runs[name] = {"status": r.status, "message": r.message, "duration_s": r.duration_s,
                       "warnings": r.provenance.get("log_warnings"), "netlist_sha256": r.provenance.get("netlist_sha256")}
         return parse_raw(r.result_path) if r.status == "completed" and r.result_path else None
@@ -619,6 +920,21 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
+    if args.study == "driver":
+        rs, fs = [], []
+        for name, text in driver_step_bench().items():
+            raw = run(name, text)
+            rf = edge_times(raw)[0] if raw else (None, None)
+            rs.append(rf[0])
+            fs.append(rf[1])
+        r_up, r_dn = solve_edge(STEP_R_GRID, rs, DRIVER_RISE), solve_edge(STEP_R_GRID, fs, DRIVER_FALL)
+        DRIVER_STEP.update(source_ramp_s=STEP_TE, r_grid_ohm=list(STEP_R_GRID), rise_s=rs, fall_s=fs,
+                           r_src_ohm=r_up, r_snk_ohm=r_dn, limits_ohm=[R_SRC_MAX, R_SNK_MAX])
+        DRIVER_STEP["D1_within_datasheet_maximum"] = bool(r_up is not None and r_dn is not None
+                                                          and r_up <= R_SRC_MAX and r_dn <= R_SNK_MAX)
+        print("step driver calibration", DRIVER_STEP, flush=True)
+        if not DRIVER_STEP["D1_within_datasheet_maximum"]:
+            raise SystemExit("test 11 D1: the step representation needs resistances above the datasheet maximum")
 
     files = sorted(glob.glob(str(EXTRACTIONS / "*.json")))
     ext_files = {Path(f).stem: Path(f) for f in files}
@@ -630,6 +946,20 @@ def main():
         cases = {tag: {"ext": pe, "maxstep": pm}, f"{tag}-periodic3": {"ext": pe, "periods": 3, "maxstep": pm, "base": tag}}
     elif args.study == "gateloop":
         cases = gateloop_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+        else:
+            cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "driver":
+        cases = driver_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "fullr":
+        cases = fullr_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "phase":
+        cases = phase_cases(exts)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "paths":
@@ -677,14 +1007,20 @@ def main():
                   r_pkg_corner=c.get("r_pkg_corner", R_PKG_CORNER_HZ), r_scale=c.get("r_scale", 1.0),
                   esr=c.get("esr"), r_src=c.get("r_src", R_SRC), r_snk=c.get("r_snk", R_SNK), c_gd=c.get("c_gd", 0.0),
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
-                  t_after_b=c.get("t_after_b"))
+                  t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
+                  no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
+                  full_r=c.get("full_r", False), internal=c.get("internal", False))
+        ter, tef = te_rise, te_fall
+        if c.get("driver") == "step":  # test 11
+            kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
+            ter = tef = STEP_TE
         first = None
         if c.get("periods"):
             # Loss-corrected duty cycle and first-pulse length from the double pulse's measured slopes.
             s_on, s_off = slopes[c.get("base", c["ext"])]
             duty = s_off / (s_on + s_off)
             timing = {"duty": duty, "t1": I_PEAK / s_on}
-            text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
+            text, times, at = bench(ext, ter, tef, periods=c["periods"], timing=timing, **kw)
             # Test 5 run 1 (duty from the double pulse's average slopes) drifted by about -0.3 A per period
             # (valleys 11.27, 10.95, 10.66 A): the edges and dead times lose volt-seconds that the average
             # slopes miss. One correction from the measured drift, then the measured run.
@@ -695,11 +1031,11 @@ def main():
                 drift = (v0[-1] - v0[0]) / (len(v0) - 1)
                 timing = {**timing, "duty": duty - drift / ((s_on + s_off) / F_SW),
                           "duty_run_valleys_A": v0, "duty_run_drift_A_per_period": drift}
-                text, times, at = bench(ext, te_rise, te_fall, periods=c["periods"], timing=timing, **kw)
+                text, times, at = bench(ext, ter, tef, periods=c["periods"], timing=timing, **kw)
         else:
             # Run 1 of the first bench run missed the edge currents (-2.6% and -5.8%): losses reduce the
             # slopes. Each case therefore runs once at the lossless timing and once corrected from its slopes.
-            text, times, at = bench(ext, te_rise, te_fall, **kw)
+            text, times, at = bench(ext, ter, tef, **kw)
             raw0 = run(name + "-timing", text)
             m0 = metrics(raw0.step(0), times, at) if raw0 else None
             if m0 is None:
@@ -712,7 +1048,7 @@ def main():
             slopes[name] = (s_on, s_off)
             timing = {"t1": I_PEAK / s_on, "t_off": (I_PEAK - I_VALLEY) / s_off}
             first = {"edge_currents_A": [ia, ib], "slopes_A_per_s": [s_on, s_off], "corrected_timing_s": timing}
-            text, times, at = bench(ext, te_rise, te_fall, timing=timing, **kw)
+            text, times, at = bench(ext, ter, tef, timing=timing, **kw)
         raw = run(name, text)
         s = raw.step(0) if raw else None
         m = metrics(s, times, at) if raw else None
@@ -733,6 +1069,7 @@ def main():
                          "extraction_summary": ext.get("summary"), "times_s": times, "bus_attachment": at,
                          "metrics": m, "checks": ok, "spikes": spk,
                          "usable": bool(ok and all(ok.values())),
+                         "interpretation_invalid": c.get("interpretation_invalid"),
                          "traces": edge_traces(s, times) if m else None}
         if m:
             f = flat(m)
@@ -775,6 +1112,7 @@ def main():
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
                                       "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"},
                 "driver_calibration": {"pull_up_edge_s": te_rise, "pull_down_edge_s": te_fall, "targets_s": [DRIVER_RISE, DRIVER_FALL]},
+                "driver_step_calibration": DRIVER_STEP or None,
                 "reference": REFERENCE, "materiality": MATERIAL, "cases": done, "comparison_to_reference": comparison,
                 "runs": runs, "evidence_directory": str(run_root.relative_to(ROOT)),
             }

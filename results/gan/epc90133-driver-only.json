@@ -1,0 +1,492 @@
+{
+ "schema": "epc90133-driver-only/1",
+ "declared": "2026-10-01, before any run (script docstring)",
+ "evaluator_sha256": "5d6cd0b2d73aeffc148febfa72d836cb74663bc60f6ab217edc84a35f3ba4c7f",
+ "input_manifest": {
+  "results/gan/epc90133-switching-driver.json": "631d5cedb67fca5ebc28cf8cc230c5461d3e88d145d59d2e34df2b9614e973b4",
+  "scripts/epc9097_switching.py": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+  "scripts/epc2302_baseline.py": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+  "src/circuit_tools/ltspice.py": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+  "vendor/epc/ltspice/EPCGaNLibrary.lib": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069"
+ },
+ "boot_diode": {
+  "Is_A": 4.16371522062682e-08,
+  "N": 1.0,
+  "Rs_ohm": 5.2253263567978925
+ },
+ "assumptions": {
+  "VCC_V": 5.0,
+  "R_vcc_ohm": 0.1,
+  "vcc_ramp_s": 5e-05,
+  "C80_F": 4.7e-06,
+  "C81_F": 1e-07,
+  "C81_low_F": 5e-08,
+  "R80_R82_ohm": 1.0,
+  "gate_loop_L_H": [
+   0.0,
+   1e-09
+  ],
+  "boot_loads_A": [
+   0.0,
+   2e-05,
+   0.0001
+  ],
+  "dead_excursion_V": -2.5,
+  "temperature_C": 25.0,
+  "forms": {
+   "ramp": {
+    "te_rise": 8.253071403810289e-09,
+    "te_fall": 3.730319663131087e-09,
+    "r_src": 0.7,
+    "r_snk": 0.4
+   },
+   "step": {
+    "te_rise": 1e-10,
+    "te_fall": 1e-10,
+    "r_src": 1.2126529734302816,
+    "r_snk": 0.6058278273752117
+   }
+  }
+ },
+ "run_directory": "runs/epc90133-driver-only-238fd6e0bc1a",
+ "C2": {
+  "forms": {
+   "ramp": {
+    "rise_s": 7.99435268973809e-09,
+    "fall_s": 3.9937033091674465e-09
+   },
+   "step": {
+    "rise_s": 7.999981240427046e-09,
+    "fall_s": 4.000002117751533e-09
+   }
+  },
+  "pass": true
+ },
+ "startup": {
+  "0": {
+   "boot_phase_at_wait_V": 3.7521727085113525,
+   "sw_at_wait_V": 1.0535132884979248,
+   "time_above_por_max_s": null
+  },
+  "20": {
+   "boot_phase_at_wait_V": 3.7413837909698486,
+   "sw_at_wait_V": 1.061629056930542,
+   "time_above_por_max_s": null
+  },
+  "100": {
+   "boot_phase_at_wait_V": 3.6907390356063843,
+   "sw_at_wait_V": 1.1003509759902954,
+   "time_above_por_max_s": null
+  }
+ },
+ "edges": {
+  "ramp-L0": {
+   "q2_gate_pad": [
+    {
+     "high_level_V": 4.99084191990685,
+     "rise_10_90_s": 2.1557205407792142e-08,
+     "fall_90_10_s": 7.0186091108721155e-09,
+     "peak_above_high_V": 0.0010070257108258929
+    },
+    {
+     "high_level_V": 4.993256968675658,
+     "rise_10_90_s": 2.1583790575250352e-08,
+     "fall_90_10_s": 7.017795959129884e-09,
+     "peak_above_high_V": 0.00021846848864903734
+    }
+   ],
+   "q1_gate_pad": [
+    {
+     "high_level_V": 4.415758642442709,
+     "rise_10_90_s": 2.8247672816840382e-08,
+     "fall_90_10_s": 6.881789760075483e-09,
+     "peak_above_high_V": 0.010950018533437245
+    },
+    {
+     "high_level_V": 4.535245123709534,
+     "rise_10_90_s": 2.3577949889942394e-08,
+     "fall_90_10_s": 6.912776651850786e-09,
+     "peak_above_high_V": 0.005986090904992913
+    }
+   ],
+   "sw_max_abs_V": 0.8609734773635864,
+   "vcc_min_V": 0.0,
+   "boot_phase": [
+    {
+     "before_V": 4.302900499844493,
+     "after_100ns_V": 4.213596895069033,
+     "drop_V": 0.08930360477546007,
+     "mirror_charge_C": 1.7096033863007334e-08,
+     "c81_charge_C": 8.930360477546006e-09
+    },
+    {
+     "before_V": 4.568457149435359,
+     "after_100ns_V": 4.428449801687197,
+     "drop_V": 0.1400073477481616,
+     "mirror_charge_C": 1.810611002753961e-08,
+     "c81_charge_C": 1.400073477481616e-08
+    }
+   ],
+   "C1_pass": false
+  },
+  "step-L0": {
+   "q2_gate_pad": [
+    {
+     "high_level_V": 4.9905456804256305,
+     "rise_10_90_s": 2.4679987153899255e-08,
+     "fall_90_10_s": 7.758148249558422e-09,
+     "peak_above_high_V": 0.0007439352054730008
+    },
+    {
+     "high_level_V": 4.992975315631176,
+     "rise_10_90_s": 2.4710615008562466e-08,
+     "fall_90_10_s": 7.756199913474623e-09,
+     "peak_above_high_V": 0.0002044824950448998
+    }
+   ],
+   "q1_gate_pad": [
+    {
+     "high_level_V": 4.415948361889711,
+     "rise_10_90_s": 3.285152030857605e-08,
+     "fall_90_10_s": 7.601809738926807e-09,
+     "peak_above_high_V": 0.01091316877853643
+    },
+    {
+     "high_level_V": 4.53522166489884,
+     "rise_10_90_s": 2.7142564099831886e-08,
+     "fall_90_10_s": 7.632995009985335e-09,
+     "peak_above_high_V": 0.005928117896560892
+    }
+   ],
+   "sw_max_abs_V": 0.8554726839065552,
+   "vcc_min_V": 0.0,
+   "boot_phase": [
+    {
+     "before_V": 4.304927897071577,
+     "after_100ns_V": 4.215847214706118,
+     "drop_V": 0.0890806823654593,
+     "mirror_charge_C": 1.70940934521855e-08,
+     "c81_charge_C": 8.90806823654593e-09
+    },
+    {
+     "before_V": 4.569244522365547,
+     "after_100ns_V": 4.429408161152145,
+     "drop_V": 0.13983636121340126,
+     "mirror_charge_C": 1.8102226763323727e-08,
+     "c81_charge_C": 1.3983636121340126e-08
+    }
+   ],
+   "C1_pass": false
+  },
+  "ramp-L1n": {
+   "q2_gate_pad": [
+    {
+     "high_level_V": 4.990842234984489,
+     "rise_10_90_s": 2.061103108116957e-08,
+     "fall_90_10_s": 4.969496976246813e-09,
+     "peak_above_high_V": 0.001069653138069171
+    },
+    {
+     "high_level_V": 4.9932555984408475,
+     "rise_10_90_s": 2.0631950248120223e-08,
+     "fall_90_10_s": 4.969190416684303e-09,
+     "peak_above_high_V": 0.00021936188630089504
+    }
+   ],
+   "q1_gate_pad": [
+    {
+     "high_level_V": 4.415891931967064,
+     "rise_10_90_s": 2.69524673845994e-08,
+     "fall_90_10_s": 4.855808620406892e-09,
+     "peak_above_high_V": 0.01083008395652385
+    },
+    {
+     "high_level_V": 4.53516360689478,
+     "rise_10_90_s": 2.2477678835630105e-08,
+     "fall_90_10_s": 4.8859393364258946e-09,
+     "peak_above_high_V": 0.006119117934436424
+    }
+   ],
+   "sw_max_abs_V": 0.8614883422851562,
+   "vcc_min_V": 0.0,
+   "boot_phase": [
+    {
+     "before_V": 4.30278011874679,
+     "after_100ns_V": 4.213618556932146,
+     "drop_V": 0.08916156181464352,
+     "mirror_charge_C": 1.70974644813186e-08,
+     "c81_charge_C": 8.916156181464352e-09
+    },
+    {
+     "before_V": 4.568439059930725,
+     "after_100ns_V": 4.428544025386505,
+     "drop_V": 0.13989503454422003,
+     "mirror_charge_C": 1.8107098759678363e-08,
+     "c81_charge_C": 1.3989503454422003e-08
+    }
+   ],
+   "C1_pass": false
+  },
+  "step-L1n": {
+   "q2_gate_pad": [
+    {
+     "high_level_V": 4.9905459897362014,
+     "rise_10_90_s": 2.3942370362797323e-08,
+     "fall_90_10_s": 6.021639666656183e-09,
+     "peak_above_high_V": 0.0007870180762985513
+    },
+    {
+     "high_level_V": 4.992956495802401,
+     "rise_10_90_s": 2.396857086897176e-08,
+     "fall_90_10_s": 6.0209589925883905e-09,
+     "peak_above_high_V": 0.00022234864950299027
+    }
+   ],
+   "q1_gate_pad": [
+    {
+     "high_level_V": 4.415947765676165,
+     "rise_10_90_s": 3.183548171643171e-08,
+     "fall_90_10_s": 5.82487554741382e-09,
+     "peak_above_high_V": 0.010913287980301334
+    },
+    {
+     "high_level_V": 4.535253565498414,
+     "rise_10_90_s": 2.628872818933055e-08,
+     "fall_90_10_s": 5.866726170606432e-09,
+     "peak_above_high_V": 0.005926741892772647
+    }
+   ],
+   "sw_max_abs_V": 0.8560389280319214,
+   "vcc_min_V": 0.0,
+   "boot_phase": [
+    {
+     "before_V": 4.304857670368518,
+     "after_100ns_V": 4.2158395434854,
+     "drop_V": 0.0890181268831185,
+     "mirror_charge_C": 1.709610831338498e-08,
+     "c81_charge_C": 8.90181268831185e-09
+    },
+    {
+     "before_V": 4.569243409434498,
+     "after_100ns_V": 4.429457489062376,
+     "drop_V": 0.13978592037212234,
+     "mirror_charge_C": 1.8104023845128525e-08,
+     "c81_charge_C": 1.3978592037212233e-08
+    }
+   ],
+   "C1_pass": false
+  },
+  "ramp-L0-C81low": {
+   "q2_gate_pad": [
+    {
+     "high_level_V": 4.9930420797462345,
+     "rise_10_90_s": 2.158908608748747e-08,
+     "fall_90_10_s": 7.0179880802866795e-09,
+     "peak_above_high_V": 0.00017348116685145243
+    },
+    {
+     "high_level_V": 4.995087161691304,
+     "rise_10_90_s": 2.1574339753619524e-08,
+     "fall_90_10_s": 7.017799488746245e-09,
+     "peak_above_high_V": 0.0001845210479540782
+    }
+   ],
+   "q1_gate_pad": [
+    {
+     "high_level_V": 4.550015509704996,
+     "rise_10_90_s": 3.12710366816812e-08,
+     "fall_90_10_s": 6.914812474942424e-09,
+     "peak_above_high_V": 0.010162974806202207
+    },
+    {
+     "high_level_V": 4.583800200657618,
+     "rise_10_90_s": 2.642486239404423e-08,
+     "fall_90_10_s": 6.9237523925829e-09,
+     "peak_above_high_V": 0.007575895128854704
+    }
+   ],
+   "sw_max_abs_V": 0.8203366994857788,
+   "vcc_min_V": 0.0,
+   "boot_phase": [
+    {
+     "before_V": 4.520767178647329,
+     "after_100ns_V": 4.303870234172145,
+     "drop_V": 0.21689694447518448,
+     "mirror_charge_C": 1.7494787590064307e-08,
+     "c81_charge_C": 1.0844847223759224e-08
+    },
+    {
+     "before_V": 4.666154953321904,
+     "after_100ns_V": 4.400666566626444,
+     "drop_V": 0.26548838669546004,
+     "mirror_charge_C": 1.7957063958296515e-08,
+     "c81_charge_C": 1.3274419334773002e-08
+    }
+   ],
+   "C1_pass": false
+  },
+  "ramp-L0-Rboot2.2": {
+   "q2_gate_pad": [
+    {
+     "high_level_V": 4.991990945131334,
+     "rise_10_90_s": 2.1565581875057666e-08,
+     "fall_90_10_s": 7.018704580063491e-09,
+     "peak_above_high_V": 0.0005861308269183851
+    },
+    {
+     "high_level_V": 4.993117762486593,
+     "rise_10_90_s": 2.1575405018502766e-08,
+     "fall_90_10_s": 7.0178963741323455e-09,
+     "peak_above_high_V": 0.0001931658581337814
+    }
+   ],
+   "q1_gate_pad": [
+    {
+     "high_level_V": 4.302486290426405,
+     "rise_10_90_s": 2.7871596191624333e-08,
+     "fall_90_10_s": 6.853440663076208e-09,
+     "peak_above_high_V": 0.011712408327493762
+    },
+    {
+     "high_level_V": 4.457592986933885,
+     "rise_10_90_s": 2.3750337566609603e-08,
+     "fall_90_10_s": 6.893872835253784e-09,
+     "peak_above_high_V": 0.0067971398688699836
+    }
+   ],
+   "sw_max_abs_V": 0.7978073358535767,
+   "vcc_min_V": 0.0,
+   "boot_phase": [
+    {
+     "before_V": 4.200304865069481,
+     "after_100ns_V": 4.106417592946762,
+     "drop_V": 0.09388727212271863,
+     "mirror_charge_C": 1.6606330634385815e-08,
+     "c81_charge_C": 9.388727212271863e-09
+    },
+    {
+     "before_V": 4.48181296646799,
+     "after_100ns_V": 4.344863032848315,
+     "drop_V": 0.13694993361967445,
+     "mirror_charge_C": 1.772067137369354e-08,
+     "c81_charge_C": 1.3694993361967444e-08
+    }
+   ],
+   "C1_pass": false
+  }
+ },
+ "Q1_reading": {
+  "per_inductance": {
+   "L0": {
+    "q2_rise_difference_s": 3.1227817461071127e-09,
+    "q2_max_voltage_difference_V": 2.2066477790516394,
+    "q1_max_voltage_difference_V": 2.0072538739173678,
+    "distinguishable": true
+   },
+   "L1n": {
+    "q2_rise_difference_s": 3.331339281627752e-09,
+    "q2_max_voltage_difference_V": 1.8160145207017422,
+    "q1_max_voltage_difference_V": 1.6521122018231806,
+    "distinguishable": true
+   }
+  },
+  "resolution_placeholders": {
+   "rise_s": 3e-10,
+   "voltage_V": 0.5
+  },
+  "E1_can_distinguish_forms": true
+ },
+ "dead_time_excursions": {
+  "5": {
+   "before_V": 3.819106844272279,
+   "after_V": 3.9859778881073,
+   "rise_V": 0.16687104383502094,
+   "max_during_V": 3.9859778881073,
+   "margin_to_gate_max_6V": 2.0140221118927,
+   "margin_to_boot_phase_abs_max_7V": 3.0140221118927
+  },
+  "10": {
+   "before_V": 3.819106844272279,
+   "after_V": 4.011413097381592,
+   "rise_V": 0.19230625310931293,
+   "max_during_V": 4.011413097381592,
+   "margin_to_gate_max_6V": 1.9885869026184082,
+   "margin_to_boot_phase_abs_max_7V": 2.988586902618408
+  }
+ },
+ "C1": {
+  "pass": false
+ },
+ "C3": {
+  "pass": true,
+  "failed_runs": []
+ },
+ "runs": {
+  "check-ramp": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 0.9529999999940628
+  },
+  "check-step": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 0.9689999999973224
+  },
+  "startup-0uA": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 1.5619999999908032
+  },
+  "startup-20uA": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 0.9219999999913853
+  },
+  "startup-100uA": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 0.875
+  },
+  "edges-ramp-L0": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 31.139999999999418
+  },
+  "edges-step-L0": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 28.093000000008033
+  },
+  "edges-ramp-L1n": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 46.88999999999942
+  },
+  "edges-step-L1n": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 29.781000000002678
+  },
+  "edges-ramp-L0-C81low": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 26.311999999990803
+  },
+  "edges-ramp-L0-Rboot2.2": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 28.59299999999348
+  },
+  "dead-5ns": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 0.8279999999940628
+  },
+  "dead-10ns": {
+   "status": "completed",
+   "message": null,
+   "elapsed_s": 0.8429999999934807
+  }
+ },
+ "complete": true
+}

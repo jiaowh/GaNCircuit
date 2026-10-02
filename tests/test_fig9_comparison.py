@@ -73,6 +73,15 @@ class ComparisonStatusTests(unittest.TestCase):
         self.assertFalse(row["usable"])
         self.assertIsNone(row["bandwidths"]["none"]["resembles"])
 
+    def test_invalid_case_gets_no_verdict_even_if_usable(self):
+        c = case(True)
+        c["interpretation_invalid"] = "test reason"
+        row = self.cmp.evaluate_case(c, self.fig9, self.meas)
+        self.assertFalse(row["usable"])
+        for b in row["bandwidths"].values():
+            self.assertIsNone(b["resembles"])
+            self.assertIn("declared invalid", b["excluded"])
+
     def test_gaussian_rise_time_known_answer(self):
         dt = 5e-12
         t = np.arange(-5e-9, 5e-9, dt)
@@ -108,6 +117,23 @@ class SwitchingComparisonStatusTests(unittest.TestCase):
         out = self.sw.comparisons(results, exts={}, reference="ref")
         self.assertIn("excluded", out["good"])
         self.assertFalse(out["good"]["base_usable"])
+
+    def test_invalid_case_excluded_from_materiality(self):
+        results = {"ref": {"parameters": {"ext": "B"}, "metrics": self.metrics(0.8e-9), "usable": True},
+                   "inv": {"parameters": {"ext": "B", "base": "ref"}, "metrics": self.metrics(1.6e-9), "usable": True,
+                           "interpretation_invalid": "test reason"}}
+        out = self.sw.comparisons(results, exts={}, reference="ref")
+        self.assertIn("excluded", out["inv"])
+        self.assertTrue(out["inv"]["case_invalid"])
+
+    def test_nogpk_declaration_carries_invalidity(self):
+        exts = {"G-m1-mid": {}, "B-m1-mid": {}}
+        self.assertTrue(self.sw.gateloop_cases(exts)["G-m1-mid-nogpk"]["interpretation_invalid"])
+
+    def test_committed_nogpk_report_is_marked_invalid(self):
+        import json
+        rep = json.loads((ROOT / "results/gan/epc90133-switching-gateloop-coupling.json").read_text(encoding="utf-8"))
+        self.assertTrue(rep["cases"]["G-m1-mid-nogpk"]["interpretation_invalid"])
 
 
 if __name__ == "__main__":

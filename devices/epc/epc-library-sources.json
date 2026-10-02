@@ -1,0 +1,29 @@
+{
+ "schema": "vendor-target-sources/1",
+ "target": "EPC footprint and symbol libraries (Altium and KiCad) for KiCad groundwork (G5)",
+ "checked": "2026-10-01",
+ "terms": "Vendor copyright notices apply; no redistribution permission established. Kept in git-ignored vendor/epc/altium. Linked publicly from the EPC2302 datasheet (p. 13); a public download is not an EPC inquiry.",
+ "files": [
+  {
+   "name": "EPC Altium Library.zip",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/altium-files/EPC%20Altium%20Library.zip",
+   "local_path": "vendor/epc/altium/EPC Altium Library.zip",
+   "retrieved": "2026-10-01",
+   "revision": "EPC_2026_Q3b (files dated 2026-08-01): SCHLIB, PcbLib, IntLib, component CSV, report",
+   "sha256": "cfe62bd273b9ea7aef19911a25ea9e6c239ad97d93ffa9c3c96a38bfd75dfe0d",
+   "status": "downloaded; the server answered 403 without a browser referrer and served the file with the EPC2302 product page as referrer",
+   "contents_note": "the CSV maps EPC2302 to Altium footprint D0606F_100V and names KiCad entries EPC_FETs:D0606F_100V and EPC_FETs:EPC2302; the KiCad library is a separate download (second entry)"
+  },
+  {
+   "name": "EPC-KiCad-Library.zip",
+   "url": "https://epc-co.com/epc/documents/KiCad/EPC-KiCad-Library.zip",
+   "local_path": "vendor/epc/kicad/EPC-KiCad-Library.zip",
+   "retrieved": "2026-10-01",
+   "revision": "EPC_2024Q4a (footprints dated 2024-08-17, KiCad format version 20221018): KiFootprints (47), KiSymbols/EPC_FETs.kicad_sym, Ki3DModels (STEP), cross-reference xlsx",
+   "sha256": "f7252a596584fa4b7ed5a43ea66bc182a5ca9ff6369442825f6d6ae16e809ff2",
+   "source_of_url": "EPC guide 'How to Install EPC's KiCad Libraries' (https://epc-co.com/epc/Portals/0/epc/documents/guides/How-to-Install-EPC-KiCad-Library.pdf)",
+   "status": "downloaded (served with the EPC2302 product page as referrer); loads and upgrades in KiCad 10.0.6 (kicad-cli fp upgrade: 47 footprints); EPC2302 footprint D0606F_100V renders",
+   "note": "older than the Altium library (2026 Q3b); D0606F_100V: 7 pads at 0.85 mm pitch, pinout 1 G, 2/4/6 S, 3/5/7 D as in the datasheet; mask and paste are custom polygons (pad margins suppressed). Not yet compared geometrically with the EPC90133/EPC9165 land patterns."
+  }
+ ]
+}

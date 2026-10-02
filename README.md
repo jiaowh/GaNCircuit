@@ -57,6 +57,9 @@ stages are kept separate, and the vendor model is never tuned to make a board wa
 EPC supplies an LTspice model of the EPC2302. The project runs it through its own LTspice adapter
 (`src/circuit_tools/ltspice.py`). The adapter writes the test circuit, runs LTspice in batch mode, reads the waveforms
 and reports failures honestly: a simulation that needed convergence fallbacks counts as failed, not as a result.
+One scoped exception exists, for small-signal checks only: an operating point that LTspice reached through fallbacks
+is accepted if a rule declared beforehand checks the solved state itself (bias voltages within stated limits, a
+complete sweep), and such results are flagged.
 
 - **Datasheet table.** Every table value that has a limit falls inside it. Capacitances, output charge and on-resistance
   are within 0.2–7 % of their typical values; total gate charge is 4 % low
@@ -120,15 +123,15 @@ as sensitivities:
 | A | top layer and mid-layer 1, Ci capacitors | 0.49–0.50 nH |
 | I | all copper, Ci capacitors | 0.30 nH |
 | B | all copper, Ci and Cm capacitors | 0.26–0.28 nH |
-| G | B plus the gate-drive loops and split source pins, with a finer mesh on the top layer | in progress |
+| G | B plus the gate-drive loops and split source pins, with a finer mesh on the top layer | 0.26 nH (one mesh) |
 
 - **Deeper layers.** The deeper copper layers lower the loop inductance by about 40 %.
 - **Via representation.** Three via-to-plane junction models change the result by under 2 % on A and up to 7 % on B.
 - **Mesh.** Only the coarse mesh has been run on the full board, so these numbers carry no mesh-convergence evidence.
 - **Qualification.** FastHenry passes known-answer checks for bars and plane pairs ([result](results/gan/fasthenry-known-answer.json)).
-  The via/plane-pair benchmark ([result](results/gan/fasthenry-via-cavity.json)) fails its mesh criterion. Vias, plane
-  holes and the slotted return plane under the transistors are therefore not qualified, and board extractions are
-  exploratory.
+  A single via in a plane pair converges with a fourth, finer mesh ([result](results/gan/fasthenry-via-cavity-mesh4.json));
+  with three meshes it had failed its mesh criterion. That benchmark does not cover the board's via arrays, plane holes
+  or the slotted return plane under the transistors, so those are not qualified and board extractions stay exploratory.
 
 ### Simulating the switching
 
@@ -139,7 +142,8 @@ A and 0.7 % on B, so the simpler test stands in for continuous operation.
 
 Every case carries its own numerical checks:
 - no single-step voltage spikes;
-- a halved-time-step rerun;
+- a rerun at half the time step for selected cases (in the gate-path study, G itself was rerun at first; its
+  package-inductance variants and controls were not, and G + 50 pH was checked later, see below);
 - convergence without fallbacks.
 
 Cases that fail are kept for inspection but receive no verdict. Device quantities are taken at the transistor's die
@@ -157,41 +161,67 @@ that failed check is recorded ([digitized values](results/gan/epc90133-qsg-fig9.
 through a range of assumed probe bandwidths (2 GHz to 350 MHz) and applies acceptance criteria fixed before the
 comparison. The headline table is generated in [results/gan/epc90133-fig9-summary.md](results/gan/epc90133-fig9-summary.md).
 
-| | Measured (Fig. 9) | Simulated, variant B |
-|---|---|---|
-| Turn-on rise time | 1.67–1.69 ns | 0.83 ns |
-| Overshoot above the bus | 5.7 V | about 35 V |
-| Ringing frequency | 262–265 MHz | 284 MHz |
-| Ringing damping ratio | 0.072–0.077 | about 0.008 |
-| Turn-off fall time | 3.62–3.64 ns | 3.96 ns (within the fall-time criterion) |
+| | Measured (Fig. 9) | Simulated, variant B | Variant G + 50 pH package source (assumed) |
+|---|---|---|---|
+| Turn-on rise time | 1.67–1.69 ns | 0.83 ns | 1.66 ns |
+| Overshoot above the bus | 5.7 V | about 35 V | about 11 V |
+| Ringing frequency | 262–265 MHz | 284 MHz | 262 MHz |
+| Ringing damping ratio | 0.072–0.077 | about 0.008 | about 0.025 |
+| Turn-off fall time | 3.62–3.64 ns | 3.96 ns (within the fall-time criterion) | 3.93 ns |
 
-The ringing frequency and the turn-off edge are close. The turn-on edge is too fast, and its ringing is far too large
-and too slowly damped.
+For variant B, the ringing frequency and the turn-off edge are close, but the turn-on edge is too fast and its
+ringing far too large and too slowly damped. With the board's gate-drive copper (variant G) and an assumed package
+inductance, rise time and frequency match; the overshoot is still twice the measured value and the damping a third.
+The package value is an assumption, so this is consistency, not identification.
 
-![EPC's measured waveform against four simulated cases](results/gan/epc90133-fig9-overlay.png)
+![EPC's measured waveform against four simulated cases](results/gan/epc90133-fig9-overlay-g.png)
 
 *EPC's measurement (black) against the simulation with:*
-- *the board as extracted (blue);*
-- *50 pH added in the transistors' drain path (orange);*
-- *50 pH added in the source path shared with the gate driver (green);*
-- *extra loss added to damp the ringing (red).*
+- *the power loop as extracted, variant B (blue);*
+- *variant B plus an assumed 50 pH in the source path shared with the gate driver (orange);*
+- *variant G, which adds the board's gate-drive copper (green);*
+- *variant G plus an assumed 50 pH of package source inductance (red).*
 
-*The turn-off edge (right) matches. At turn-on (left) every simulated ring is larger than the measured one. The shared
-source path (green) comes closest without shifting the frequency much.*
+*The turn-off edge (right) matches. At turn-on (left) the gate-drive copper and the assumed package inductance each
+lower the first peak, and the red case matches the measured rise time and frequency. Every simulated ring still
+decays far more slowly than the measured one, which dies out within about three cycles.*
 
 ### What the diagnosis shows so far
 
 Candidate causes were added one at a time, each with its own numerical checks. The results below hold for the
 approximations stated; none of them yet reproduces the measurement on every criterion.
 
-- **Common-source inductance: the strongest lead.** This is inductance in the part of the source path that the gate
-  driver's return shares with the power current. It slows the turn-on and halves the overshoot (about 17 V at 50 pH)
-  while keeping the frequency near the measurement (250 MHz). It meets the rise-time, fall-time and frequency
-  criteria but not the overshoot or damping criteria. The same inductance placed where the driver does not share it
-  behaves like extra loop inductance and makes the overshoot worse. The board part of this path is what extraction G
-  computes.
-- **Gate-loop inductance** of 0.5–2 nH changes the overshoot by only 3–10 %.
-- **A weaker driver** lowers the overshoot without moving the frequency, but not far enough.
+- **The board's gate-drive copper matters.** Extraction G adds the driver, gate resistors and each transistor's
+  gate and source return to the extracted network. With it, the overshoot falls from about 36 V to 25 V. A matched
+  control (same network, ideal gate drive) and two split cases separate the causes:
+  - about a third of the drop comes from G's slightly different network (8 % less loop inductance);
+  - the rest comes from the high-side gate-drive path. Its gate return shares almost no source copper with the
+    power loop (0.9 pH). A calculation from the extracted network supports magnetic coupling of the forward gate
+    path (driver, gate resistor, gate) as the mechanism within this model: at 100 MHz and zero gate current it is
+    equivalent to about 10 pH of common-source inductance, which would slow the high-side turn-on. That calculation
+    does not separate the coupling from the gate path's own impedance during switching;
+  - the low-side path adds damping. It also produces a spike of about 2 V at the low-side transistor's model
+    terminals during the high-side turn-on. Inside the model, behind its internal gate resistance, the
+    channel-control voltage stays below about 1 V and the sampled traces show no appreciable positive channel
+    current, so this is not evidence of false turn-on in the model; the real device still needs a measurement. Its gate return shares 48 pH with
+    the power loop. A lower overshoot bought this way is not a better design.
+- **Common-source inductance in the package** is one candidate among several. Adding an assumed 50 pH of package source
+  inductance to G gives the measured rise time (1.66 ns) and frequency (262 MHz), with an overshoot of 11 V, twice
+  the measured value. Overshoot and damping still fail. Halving the time step changes its five reported
+  switching metrics by under 0.04 % (stability over two steps, not general convergence). The package value is assumed, not published, so this is
+  consistency, not identification. The same inductance placed where the gate driver does not share it behaves like
+  extra loop inductance and makes the overshoot worse.
+- **Gate-loop inductance** alone, without coupling, of 0.5–2 nH changes the overshoot by only 3–10 %.
+- **The driver's output stage** sets how strongly the edge excites the ring. Two driver representations that both
+  meet the selected uP1966E constraints (output resistance and edge times into 3000 pF) differ by about a third in
+  overshoot on B and G (G: 25 V against 17 V) with the same ringing frequency and damping. With the assumed 50 pH
+  package source inductance the difference nearly vanishes. Edge times into a capacitor therefore do not fix the
+  driver; its gate waveform has to be measured.
+- **The ring's damping** in the B and G simulations is two to three times what a small-signal analysis of the settled
+  circuit gives; in every simulated case it stays three to seven times below the measured value. Within the model, the upper transistor's channel carries
+  59–64 % of a declared ring-deviation metric (the integral of voltage and current deviations, not a physical heat
+  partition; the whole-window energy balance fails), and the transistor still turning on raises the local damping.
+  Neither accounts for the decay. Local damping, transient decay and energy accounting are separate quantities. This is not pursued further in simulation until a decision needs it.
 - **Extra capacitor loss** can reproduce the measured damping (about 60–70 mΩ in the loop) but barely lowers the
   first peak. Loss located elsewhere, such as in the transistor's output capacitance, is untested.
 - **Probe bandwidth** alone cannot explain the gap. Probe loading, connection point and resonances are untested.
@@ -228,16 +258,28 @@ Simulated peak voltages are sensitivity results, not a safe operating envelope.
 
 The tool chain works end to end: vendor files → model qualification → layout geometry → inductance extraction →
 switching simulation → comparison with a measurement. Its board-level predictions do not yet match EPC's waveform.
-Gate G3 (stock-board simulation) stays open until the gap is explained or bounded.
+Gate G3 (stock-board simulation) stays open until the gap is explained or bounded. Further simulation now gains little
+without measurements, so measurement readiness comes first.
 
 Next steps:
-1. **Finish the common-source and gate-loop extraction** (variant G) and rerun the switching comparison with it.
-2. **Complete the parasitic set.** Switch-node capacitance comes from capacitance extraction with FasterCap, after
-   known-answer checks. It replaces today's rough parallel-plate estimate, which changes the overshoot by only about
-   1 V. All values go into one `parasitics.inc` file, with the couplings kept.
-3. **Measure the board** following the hardware test plan once equipment and interlocks are in place (gate G4).
-4. **A first bounded agent run.** Reproduce the comparison from declared inputs, with interventions, failures, time and
-   cost recorded against the plain scripts. The current evidence is for the tools, not yet for an agent workflow.
+1. **Measurement readiness.** The simulation baseline is frozen: the original driver model and the
+   regularized-driver variants stay as separate recorded cases. The next work starts from the lab's exact equipment
+   and the purchased board's identity, and turns them into
+   a probe-and-channel plan (switch node, low-side gate voltage, driver PHASE-to-ground and current measured together,
+   with connection points, probe loading, bandwidth, grounding and uncertainty), and the hardware draft into an
+   executable first-power procedure with numerical limits, independent hardware trips, discharge verification and
+   measurement uncertainty. A small simulation of the driver alone, with its bootstrap and supply capacitors, prepares
+   the unpowered driver measurement.
+2. **Measure the board** once that procedure and its interlocks are approved (gate G4): measurement chain and
+   unpowered driver checks first, then the first energized condition, with predictions and held-out conditions
+   frozen before diagnostic switching data are taken. Efficiency (input and output power with an uncertainty) is
+   a separate G4 measurement, not replaced by waveform matching.
+3. **Complete the parasitic set** if a decision needs it: switch-node capacitance with FasterCap, within the scope
+   its known-answer checks support. All values go into one `parasitics.inc` file, with the couplings kept.
+4. **Agent runs.** A first bounded run works: an agent given only a task card checks the declared inputs of the Fig. 9
+   comparison, runs it with the same result as the plain script, and stops correctly when an input has been altered
+   ([result](results/gan/agent-milestone-1.json)). That is one narrow task run once each. Next are repeated runs and
+   tasks in which the agent has to make a decision.
 5. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
 
 ## Tools
@@ -250,8 +292,8 @@ Next steps:
 | **FastHenry 3.0.1** | inductance and resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory; internal use only (licence note below) |
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
-| **FasterCap** | capacitance extraction between conductors | planned; LGPL 2.1+ ([source](https://github.com/ediloren/FasterCap)); needs known-answer checks before board use |
-| KiCad | our own board design | not installed |
+| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound. A 3D strip-over-dielectric check failed and its 3D matrices are unphysical; not qualified for 3D or board geometry ([results](results/gan/fastercap-known-answer.json), [3D check](results/gan/fastercap-board3d-assessment.json)) |
+| KiCad 10.0.6 | our own board design | installed per-user (checksum verified); EPC's KiCad library loads (47 footprints); no board design started, route choice open |
 | DEVSIM | device simulator for the paused silicon fixture (WSL) | paused |
 
 EPC files, papers and FastHenry itself are not in git. They live in the git-ignored `vendor/` and `.tools/`, with sources,

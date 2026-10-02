@@ -187,6 +187,18 @@ Scope, unchanged from the specification: this does not qualify antipads, via arr
 multi-layer vias, open plane edges or thin barrels. A converged E2 would need a fourth mesh, of roughly
 340k filaments and several hours on this host, declared before it runs.
 
+**Fourth mesh (1 October 2026, declared before its run as a separate revision;
+[result](../results/gan/fasthenry-via-cavity-mesh4.json)).** The three-mesh result above stays recorded as failed.
+Launch 1 reran only the old meshes (a default left at three) and wrote no evaluation; it is kept under runs/.
+Launch 2 ran the (w/8, 9) mesh: 52.068 pH (1.5 mm) and 71.721 pH (3 mm, 336k filaments, about 5.5 h at 4.9 GB),
+reusing the earlier meshes. Declared outcome: **pass**. From w/6 to w/8 the values change by 0.05 % and 0.03 % and
+the E1 difference by 0.02 % (limit 1 %); E1 is +2.47 % (tolerance 3 %); both values lie inside the E2 bracket, at 34 %
+and 25 % of its width. So this single-via benchmark now passes its declared inductance mesh criterion. The refinement
+changed the plane-grid pitch, the plane thickness subdivision and the via subdivision together, so the location of
+the earlier discretization error (via, pad, junction or planes) was not isolated. The criterion covers L and its
+difference only: R still changes by 7.8 % and 4.9 % between the last two meshes, so R is not converged. The scope is unchanged: board via arrays, plane holes, Kelvin and multi-layer vias are
+still not qualified, and the bracket width (23.5 and 33.7 pH here) remains the per-via representation uncertainty.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh
@@ -630,6 +642,140 @@ metric is within 0.7 % of the double pulse: fall time +0.6 %, rise time −0.1 %
 damping −0.7 %. Scope: ideal driver supplies, 25 °C and an ideal output-voltage source, without package or
 common-source inductance. It is not a check of the physical board.
 
+### EPC90133 extraction G and switching test 7: extracted gate-drive and source paths (G3 diagnosis)
+
+```sh
+python scripts/epc90133_extract.py G:m1:mid --jobs 2        # ~3.4 h; run detached, not from a session shell
+PYTHONPATH=src python scripts/epc90133_switching.py --study gateloop --jobs 2 --timeout 3600 \
+    --output results/gan/epc90133-switching-gateloop.json
+PYTHONPATH=src python scripts/epc90133_switching.py --study gateloop --only B-m1-mid-ms100 G-m1-mid-ctl \
+    --timeout 3600 --output results/gan/epc90133-switching-gateloop-ctl.json
+PYTHONPATH=src python scripts/epc90133_switching.py --study gateloop --only G-m1-mid G-m1-mid-ctl-hs G-m1-mid-ctl-ls \
+    --jobs 3 --timeout 3600 --output results/gan/epc90133-switching-gateloop-split.json
+PYTHONPATH=src python scripts/epc90133_phase_check.py
+python scripts/compare_epc90133_fig9.py --sim results/gan/epc90133-switching-causes.json \
+    results/gan/epc90133-switching-causes-2.json results/gan/epc90133-switching-paths.json \
+    results/gan/epc90133-switching-gateloop-ctl.json results/gan/epc90133-switching-gateloop-split.json \
+    results/gan/epc90133-switching-gateloop.json
+```
+
+Why: test 6 left the board's own gate-drive and shared source paths unextracted, and its leading case used an
+assumed common-source inductance. Extraction G adds them. Its specification is in `scripts/epc90133_extract.py`
+(variant G) and test 7's in the switching script's docstring. Before the first run, an external audit added: both
+FETs' die gate-source extremes and drain currents (a 0 V source in Q2's drain), the driver PHASE-ball voltage,
+and a matched control, because G changes the extraction window, local mesh and source terminals as well as the
+gate paths.
+
+**Extraction G-m1-mid** ([result](../results/gan/epc90133-extraction/G-m1-mid.json), run 4, 12,279 s, 80,922
+filaments, 47 ports). Its checks pass: all ports connected, every gate terminal has nodes, L symmetric (0.05 %),
+positive definite. Runs 1–3 failed or were stopped (long `.equiv` lines; a session-shell time limit; stopped for
+the day), and run 4 ran as an independent process. It is an exploratory estimate under declared geometry
+assumptions: vias and plane holes are unqualified, the local mesh has no convergence evidence (one mesh), and
+the package interior is ideal.
+
+| Quantity | G-m1-mid | B-m1-mid |
+|---|---|---|
+| power-loop inductance at Q1 | 0.257 nH | 0.281 nH |
+| board common-source inductance, Q1 (high side) | 0.9 pH | not represented |
+| board common-source inductance, Q2 (low side) | 47.7 pH | not represented |
+
+The high side's gate return is a separate top-layer trace to source pin 2, so it shares almost no source copper
+with the power loop. The low side's returns through the top GND pour and shares much more. The 8 % lower loop
+inductance comes from the changes that are not gate paths (window, local mesh, split source pins), since the loop
+does not include the gate nets.
+
+**Switching, test 7** (bench values; B at the 100 ps step; overshoot above the bus):
+
+| Case | overshoot (V) | tr (ns) | f (MHz) | ζ | Q2 die VGS during the rise, max / min (V) |
+|---|---|---|---|---|---|
+| B-m1-mid-ms100 | 35.7 | 0.83 | 282.5 | 0.010 | 1.07 / −0.03 |
+| G-m1-mid-ctl (G network, B's ideal gate drive) | 32.3 | 0.83 | 295.6 | 0.011 | 1.07 / −0.03 |
+| G-m1-mid-ctl-hs (high side ideal, low side extracted) | 32.0 | 0.83 | 296.8 | 0.014 | 2.37 / −1.61 |
+| G-m1-mid-ctl-ls (low side ideal, high side extracted) | 25.3 | 0.89 | 298.2 | 0.011 | 1.07 / −0.02 |
+| G-m1-mid (both extracted) | 25.2 | 0.88 | 299.4 | 0.014 | 2.00 / −1.26 |
+| G-m1-mid-ms50 (step check) | 25.2 | 0.88 | 299.3 | 0.014 | 2.00 / −1.26 |
+| G + package source 25 pH (assumed) | 13.3 | 1.23 | 279.3 | 0.021 | 1.88 / −1.59 |
+| G + package source 50 pH (assumed) | 11.1 | 1.66 | 261.2 | 0.026 | 1.93 / −1.88 |
+
+The G-ctl, ctl-hs and ctl-ls controls were declared before their runs (ctl before G's first result, the split
+after ctl). Every case passes its edge-current and spike checks. The 50 ps rerun was made for G alone and changes
+no G metric by more than 0.1 %; G+25/50 pH and the controls ran at 100 ps only. Earlier halved-step checks on B
+(B-Ls50-csi) do not directly cover G+package, so G-m1-mid-Ls50 needs its own 50 ps check before a decision rests
+on its Fig. 9 match.
+
+What this shows, scoped to this unvalidated model and exploratory extraction:
+
+- **The G–B overshoot change (−10.4 V) splits into two parts.** The network change (G-ctl against B) accounts
+  for −3.4 V and +4.6 % frequency, consistent with the 8 % lower loop inductance (which alone predicts about
+  +4.3 %). The board's gate-drive copper (G against G-ctl) accounts for −7.0 V and a 6 % slower rise.
+- **The high-side gate-drive path carries that −7 V; the low-side path adds the damping.** ctl-ls matches G
+  in overshoot and rise time, and ctl-hs matches G-ctl; the two parts add up to within 0.3 V.
+- **Supported mechanism within this model: magnetic coupling of the forward gate path, about 10 pH in effect.**
+  The split controls establish that the high-side gate path causes the simulated reduction. The calculation below
+  (100 MHz, zero gate current) supports coupling as the explanation, but it does not separately quantify the
+  coupling's contribution against the gate path's own impedance during switching.
+  `scripts/epc90133_gate_coupling.py` ([result](../results/gan/epc90133-gate-coupling.json)) repeats the
+  extractor's L_cs solve (1 A commutation-loop current, 100 MHz) and adds the voltages induced in the forward
+  gate branches (driver ball → gate resistor → gate), which g_summary's L_cs leaves out. The induced die VGS per
+  ampere, as an inductance with L_cs's sign:
+
+  | FET | return side (L_cs) | forward, turn-on path | total, turn-on path | total, turn-off path |
+  |---|---|---|---|---|
+  | Q1 (high side) | +0.9 pH | +9.1 pH | +10.0 pH | +5.3 pH |
+  | Q2 (low side) | +47.7 pH | −4.1 pH | +43.6 pH | +38.7 pH |
+
+  Q2's value comes from shared source copper (classic common-source inductance) and has the same sign, so Q1's
+  +10 pH also opposes its turn-on. It is the same order as test 6, where 25 pH at the pad lowered the overshoot by
+  12.6 V. One frequency and one mesh: an estimate. For layout (Stage 2) this means the forward gate path's
+  placement relative to the power loop matters, not only the shared source copper.
+- **An invalid check, kept.** Case G-m1-mid-nogpk removed every coupling term between gate-drive and power
+  branches ([report](../results/gan/epc90133-switching-gateloop-coupling.json): overshoot 9.4 V, rise 1.54 ns).
+  It was declared as a coupling test, but the branch network's terms also represent shared copper (the branches
+  share reference nodes, for example 238 pH between the PHASE-ball return and Q1's source pin 2), so removing
+  them adds spurious common-source inductance instead of removing coupling. Its result carries no physical
+  meaning; the calculation above replaces it. After an external audit (1 October 2026) the case declaration and
+  its committed report carry `interpretation_invalid`, and the materiality, Fig. 9 and PHASE scripts exclude any
+  case that carries it, whatever its `usable` flag (which only records the numerical checks).
+- **The low-side path disturbs Q2's gate.** With it extracted, Q2's die VGS reaches 2.0 V during the rise
+  (2.37 V with the high side ideal, whose faster turn-on raises di/dt), against 1.07 V without it. The
+  unmodified model conducts 3.9 A at VGS 2.0 V and 38 A at 2.3 V (DC, VDS 48 V, 25 °C); its VGS(th) is
+  1.51 V, and the datasheet allows 0.8–2.5 V. The terminal currents include capacitive current, so channel
+  conduction is not measured directly. This is a false-turn-on margin question for the hardware (the Q2
+  gate probe in the plan), and it means the lower overshoot cannot be read as an improved design.
+  *Corrected by test 9 (below):* these are the vendor model's terminal voltages, not its channel-control
+  voltage behind the internal 0.5 Ω rg, and the 1.07 V figure is Q2's own turn-off tail at the start of the
+  diagnostics window, not the rise. During the rise, Q2's internal VGS stays below about 1 V and its channel
+  shows no appreciable positive current in any completed case, so comparing the 2.0 V terminal peak with DC
+  conduction overstated the evidence for false turn-on within the model.
+- **With assumed package source inductance, G moves closer to Fig. 9 than B did.** In the Fig. 9 comparison
+  ([summary](../results/gan/epc90133-fig9-summary.md)), G+50 pH passes rise time, fall time and frequency
+  (1.66 ns, 3.93 ns, 262 MHz), as B-Ls50-csi did, with a lower overshoot (11.3 V against 17.4 V). G+25 pH passes
+  the same three. Overshoot (about twice the measured 5.7 V) and damping (0.025 against 0.077) still fail at
+  every probe bandwidth. G alone passes only the fall time: its 300 MHz frequency is more than 10 % above the
+  measurement. The package value is assumed, one waveform cannot separate the layers, and the simulated
+  dead-time plateau (about 12 ns against 7.1 ns) is still unexplained. So this shows consistency, not
+  identification, and G3 stays open.
+- **PHASE-ball stress is unresolved.** The raw PHASE-to-GND minima (−8 V on G, −24 and −28 V with package
+  inductance) are sub-picosecond spikes (half-widths 0.2–0.35 ps) at the ideal low-side stage's switching
+  instant. Averaged over a declared 10 ps window, the extremes are −2.2 to −3.7 V and +47 to +64 V, inside
+  −5/+85 V ([check](../results/gan/epc90133-test7-phase-check.json)). This shows only that the *filtered*
+  waveform is inside the rating; averaging does not establish that the discarded excursions are numerical
+  artefacts. The step dependence was checked on G alone (raw minimum −8.2 V at 100 ps, −9.4 V at 50 ps; averaged
+  values identical), not on the package-inductance cases with the largest minima. Resolving it needs a physically
+  regularized driver output stage (finite switching speed) or a targeted numerical check on those cases. The raw
+  values in the test 7 reports are kept. Simulated sensitivity results, not a safe limit (narrowed after an
+  external audit, 1 October 2026). Test 8, below, follows this up.
+
+Running notes: the LTspice adapter's per-run bound was raised from 600 s to 3600 s (`MAX_TIMEOUT_S`), because
+G's first timing run exceeded 600 s. A timeout still returns a failed run. Test 7 run 1 was stopped after that
+timeout, and its partial report is kept (`epc90133-switching-gateloop-run1-stopped.json`). With the higher bound,
+single G LTspice runs took 2.4–9.5 min with two or three running at once, except ctl-ls (about 28 min per run,
+cause not examined).
+
+Next, in order: record this in the hardware plan's predictions (Q2 VGS during the high-side turn-on; the
+high-side gate-loop coupling as a separate hypothesis); a second-mesh or window check of G only if a decision
+depends on the 8 % loop difference; and the measurement itself, which is what can separate these layers.
+
 
 The library has no mandatory runtime dependencies beyond Python 3.10+. Circuit
 simulations use LTspice through `circuit_tools.ltspice`; ngspice was removed
@@ -645,6 +791,487 @@ PYTHONPATH=src python scripts/verify_ltspice_fixtures.py
 PYTHONPATH=src python scripts/verify_diode_bridge.py
 PYTHONPATH=src python scripts/epc2204_baseline.py
 ```
+
+### EPC90133 switching test 8: driver output stage regularized (PHASE-ball stress)
+
+Question: is test 7's PHASE-ball undershoot (raw minima to −28 V) a property of the circuit or of the ideal driver
+stage? In test 7 each driver pin is a source behind a switch that opens from 1 mΩ to 100 MΩ in about a picosecond,
+with nothing on the pin, so the current in the extracted gate-return copper is cut almost instantly. A CMOS output
+pin has output capacitance and body/ESD diodes that carry that current. Test 8 (`--study phase`, declared in
+`scripts/epc90133_switching.py` before its runs) adds to every driver ball a capacitance to its stage reference
+and clamp diodes to the reference and to a 5 V rail. The uP1966E datasheet gives neither value, so the capacitance
+is bracketed at 10 and 100 pF (assumptions). The declared criteria judge the raw extremes, without averaging.
+
+```sh
+PYTHONPATH=src python scripts/epc90133_switching.py --study phase --jobs 3 --timeout 3600     --output results/gan/epc90133-switching-phase.json                       # run 1
+PYTHONPATH=src python scripts/epc90133_switching.py --study phase --jobs 2 --timeout 3600     --only G-m1-mid-Ls50-pin10 G-m1-mid-Ls50-pin10-ms50     --output results/gan/epc90133-switching-phase-2.json                     # substitute step check
+PYTHONPATH=src python scripts/epc90133_phase_partial.py                       # event A from the timing runs
+```
+
+Raw PHASE-to-GND extremes on G + 50 pH package source (assumed), the test 7 case with the largest minimum:
+
+| Case | event A (Q1 turn-off) min / max | event B (Q1 turn-on) min / max | source |
+|---|---|---|---|
+| unregularized, 100 ps | −28.3 / +47.7 V (0.33 ps wide) | −3.0 / +55.9 V | [run 1](../results/gan/epc90133-switching-phase.json) |
+| unregularized, 50 ps | −28.3 / **+114.3 V** | −8.0 / +55.9 V | run 1 |
+| 10 pF + clamps, 100 ps | −3.59 / +48.4 V (2.2 ns wide) | −2.25 / +56.2 V | run 1 and [step check](../results/gan/epc90133-switching-phase-2.json) |
+| 10 pF + clamps, 50 ps | −3.59 / +48.0 V | **−7.46** / +56.2 V (one sample; −2.32 V without it) | step check |
+| 100 pF + clamps (timing run, stopped) | −3.66 / +47.2 V (2.2 ns wide) | not reached | [partial](../results/gan/epc90133-test8-phase-partial.json) |
+| G alone, 100 pF (timing run, stopped) | −3.42 / +47.4 V | not reached | partial |
+
+What happened, against the declared criteria:
+
+- **The three 100 pF cases timed out** at 3600 s in their timing runs (femtosecond steps from the first turn-on at
+  20.7 ns). They are kept as failed runs. Their partial raw files reach event A in two cases; those values come
+  from timing runs (same circuit, different edge timing) and are supplementary, outside the declared criteria.
+- **The substitute step check** (10 pF at 50 ps, declared after run 1 and before its run) **fails formally at event
+  B**: −7.46 V against −2.25 V. That minimum is one sample, taken where the step had collapsed to about 1e-19 s
+  0.36 ns after the turn-on command; Q1's gate shows the same one-sample jump to −9 V, and the next lowest point is
+  −2.32 V. Excluding it is a judgement made after the run, so the criterion stays failed in the record. Event A
+  passes it (−3.594 V at both steps).
+- **The 10 pF regularization changes no switching metric materially** (overshoot +2.8 %, damping ratio +2.4 %,
+  the others under 0.2 %; all below the declared materiality threshold; Q2's die VGS peak 2.08 V, unchanged).
+- **Step stability of G + 50 pH's switching metrics:** halving the step changes the five reported metrics by
+  under 0.04 % (unregularized and 10 pF alike). This shows stability over these two steps, not general
+  convergence, and says nothing about PHASE stability.
+
+Reading, scoped to this unvalidated bench. Test 8 changed two things at once, pin capacitance and clamp paths,
+with the clamps tied to ideal rails: assumed circuit changes, not a qualified model of the uP1966E output stage.
+What it supports: **the PHASE extremes are sensitive to driver-model assumptions, and some of them are
+numerically unstable.** Without regularization, the event A maximum (48 → 114 V) and the event B minimum
+(−3.0 → −8.0 V) move with the step, while the event A minimum (−28.3 V) does not. With either assumed pin
+capacitance, event A's undershoot is a 2 ns dip of about −3.6 V. Neither the assumed capacitances nor the
+resulting 1.4 V distance from the −5 V rating establishes a hardware margin. The structured verdict is
+[results/gan/epc90133-test8-assessment.json](../results/gan/epc90133-test8-assessment.json)
+(`scripts/assess_epc90133_test8.py`, no simulation): declared test incomplete (C1 rating and C3 bracket lack the
+100 pF cases, the declared step check never ran), substitute step check passes at event A and fails at event B,
+**PHASE stress unresolved**. Switching-metric eligibility (the `usable` flag) is kept separate from it.
+
+This simulation baseline is frozen here (external review, 1 October 2026): the original driver model and the
+test 8 variants stay as separate, recorded cases, and no finer G mesh, broad sweep or tuning is justified by the
+current decisions. The PHASE-to-GND undershoot near the driver is a measurement item and a stop criterion in the
+hardware plan. Simulated sensitivity results, not a safe limit.
+
+### EPC90133 switching test 9: full extracted resistance and vendor-model internal nodes
+
+After an external method audit (1 October 2026, [audit](epc90133-simulation-method-audit-2026-10-01.md)):
+the bench's branch network kept the full inductance and coupling matrices but only the diagonal resistance.
+`scripts/audit_epc90133_network_transfer.py` (the auditor's) shows the diagnostic loop resistance at 100 MHz
+falls from 2.03 to 1.12 mΩ (B) and 1.03 mΩ (G). Network revision `full_r` (opt-in; the baseline stays as it
+was) keeps each branch's resistor and adds the off-diagonal terms as a behavioural source.
+`scripts/qualify_epc90133_network_transfer.py` checks it in LTspice AC at 100 MHz
+([result](../results/gan/epc90133-network-transfer-qualification.json)): a synthetic known-answer network
+(error 3e-7), the diagnostic loading of B and G against the auditor's independent solve, and the complete
+35-port (B) and 47-port (G) open-circuit impedance matrices against R + jωL (about 1e-6), for both
+representations. Run 1 stopped because a behavioural source carrying the whole row formed source/inductor
+loops that LTspice rejects; the split form fixed it. This qualifies the representation at 100 MHz, not the
+extraction's accuracy or any transient's numerical convergence.
+
+Test 9 (`--study fullr`, declared before its runs) also saves the vendor model's internal nodes
+(`V(x*:gate)`, `V(x*:source)`, `I(x*:bswitch)`) without changing the model.
+[Report](../results/gan/epc90133-switching-fullr.json);
+[assessment](../results/gan/epc90133-test9-assessment.json) (`scripts/assess_epc90133_test9.py`).
+
+- **Reproduction:** the baseline reruns (B, G, G + 50 pH) match test 7 exactly on every switching metric.
+- **Full R on B changes nothing material:** overshoot 35.65 → 35.56 V, frequency +0.01 %, damping ratio
+  0.0104 → 0.0112 (+8 %, below the materiality threshold).
+- **The three full-R G cases timed out** at 3600 s (the dense behavioural coupling of 47 branches makes each
+  step slow). They are kept as failed runs; the G step check was not evaluated. Test 10's small-signal analysis
+  gives the full-R effect on G's ring without a transient.
+- **No appreciable positive Q2 channel current in the sampled rise windows of these three cases.** This is not
+  a statement that false turn-on is absent under other conditions.
+  During the rise (from 1 ns before the switch node passes 10 % to +60 ns), Q2's internal VGS peaks at 0.56 V
+  (B), 0.87 V (G) and 1.01 V (G + 50 pH), against terminal peaks of 0.26, 2.00 and 1.93 V. Its channel current
+  reaches at most 0 to 70 µA positive (the traces are stored to 10 µA), and −2.3 to −3.1 A negative at the
+  start of the window, where Q2 is still in reverse conduction from the dead time. That is not "no conduction".
+  (Wording corrected after an external audit, 2 October 2026.) The terminal
+  spike on G is a fast voltage between the extracted gate path and the model's internal rg that does not reach
+  the channel-control node. The report's own diagnostics window (from −5 ns) starts in Q2's turn-off tail,
+  which is where its 2.4–2.7 V internal maxima and test 7's 1.07 V "without the low-side path" come from; the
+  assessment uses the rise window instead. These are model diagnostics: the physical device's internal gate
+  network is not characterized, so the Q2 gate measurement in the hardware plan stays.
+
+### EPC90133 test 10: local small-signal ring check (ring dynamics, separated from excitation)
+
+Following the first-principles review ([review](epc90133-first-principles-review-2026-10-01.md)): separate how
+strongly the edge excites the ring, what sets its frequency and decay, and what the probe records. Test 10
+(`scripts/epc90133_ringdown.py`, declared before its runs) addresses the second question only, and only locally.
+The bench is frozen 60 ns after Q1's turn-on command (Q1 on, Q2 off, 48 V, the 11.06 A load as a DC current
+source, so the load branch is open in AC). LTspice linearizes it there, without changing the vendor model, and
+the driving-point impedance at Q2's drain-source port gives the local ring mode (one-pole-pair fit; residuals
+2e-4 to 0.025). There are two forms: the active driver at rest, and a control with ideal clamps on both FETs'
+model-terminal VGS. [Report](../results/gan/epc90133-ringdown.json).
+
+Finding the operating state: LTspice reaches it only through fallbacks (Gmin or source stepping, pseudo-
+transient). Run 1 was stopped (state search too slow). In run 2, each network's baseline active state seeds its
+other forms. Revision 3, an evaluation rule declared before it was applied, accepts a form whose only failure
+reasons are operating-point fallbacks, if its own operating point passes the state checks (switch node ≥ 47 V,
+Q1 internal VGS 5 ± 0.1 V, Q2 internal VGS 0 ± 0.1 V) and its sweep is complete. Six forms are accepted that
+way and flagged; every state check passed (switch node 47.64–47.67 V).
+
+| Network | local ζ, active (f) | local ζ, clamped | transient ζ (f), same case | consistent (f ±3 %, ζ ±25 %) |
+|---|---|---|---|---|
+| B | 0.0035 (290 MHz) | 0.0035 | 0.0104 (283 MHz) | no (ζ ×0.33) |
+| B, full R | 0.0043 | 0.0043 | 0.0112 | no |
+| G | 0.0066 (303 MHz) | 0.0054 | 0.0138 (299 MHz) | no (ζ ×0.48) |
+| G, full R | 0.0076 | 0.0064 | timed out (test 9) | — |
+| G + 50 pH (assumed) | 0.0220 (262 MHz) | 0.0175 | 0.0264 (261 MHz) | yes (ζ −17 %) |
+| G + 50 pH, full R | 0.0228 | 0.0184 | timed out | — |
+
+What this shows, within this model (narrowed after an external audit, 2 October 2026):
+
+- **On B and G, this single local linearization does not account for the transient's decay**: the transient's
+  ζ is two to three times the local mode's, with the frequency within 1–3 %. The linearization is about a DC
+  equilibrium with the load as a current source, not the transient's actual state at 60 ns, so the difference
+  can involve a changing bias point, several modes or the transient decay estimator, as well as amplitude
+  dependence. Q2's voltage-dependent capacitance over the large swing (25–36 V on a 48 V bus) remains a
+  candidate; none of these is isolated.
+- **On G + 50 pH (assumed package source inductance) the local mode and the transient agree** (frequency within
+  0.5 %, ζ within 17 %).
+- **Substantial damping remains in the clamped circuit** (ζ 0.0175 against 0.0220 active on G + 50 pH). This
+  does not say where it comes from: clamping changes the circuit and its mode, the internal gate resistance
+  remains, and active minus clamped is not an additive gate-loop contribution. Attribution, including to the
+  package inductors' numerical damping resistors (10 GHz corner, test 5), needs the energy accounting or a
+  targeted control.
+- **Full extracted resistance adds about 0.001 to the local ζ** (+23 % on B, +15 % on G, +4 % on G + 50 pH),
+  small against the measured 0.072–0.077, as the review's scale estimate predicted.
+- **Q2's internal gate voltage participates more in the G + 50 pH mode** (0.041 V per volt at the switch node,
+  against 0.002–0.016 in the other active cases).
+
+Revision 4 (evaluation only) checks every form's own solved operating point, kept separately from its starting
+guess: all twelve pass (switch node 47.63–47.67 V, Q1 internal VGS 4.98–5.00 V, Q2 about 0 V).
+
+These are statements about the linearized model at one state, not about the board. The half-power cross-check
+is resolved only for the G + 50 pH cases (B and G bands are under 10 frequency steps wide).
+
+### EPC90133 ring decay, cycle by cycle (existing traces)
+
+After an external audit (2 October 2026): before calling the B/G mismatch amplitude-dependent, read the saved
+transient traces cycle by cycle. `scripts/epc90133_ring_decay.py` (method declared before its first run, no
+simulation; [result](../results/gan/epc90133-ring-decay.json)) finds alternating extrema of the turn-on
+switch-node trace, measures each extremum against the mean of its neighbours (a moving baseline; about
+peak-to-peak, a description corrected after run 1 with no number changed), and forms per-cycle frequency and ζ.
+
+| Case | first cycle: p-p, ζ, f | last three cycles: p-p, ζ, f | test 10 local mode ζ, f | late cycles approach local mode |
+|---|---|---|---|---|
+| B | 65 V, 0.0086, 282 MHz | 34–35 V, 0.0072, 289 MHz | 0.0035, 290 MHz | no |
+| G | 47 V, 0.0119, 299 MHz | 17–18 V, 0.0107, 303 MHz | 0.0066, 303 MHz | no |
+| G + 50 pH | 21 V, 0.0255, 261 MHz | 3.4–4.0 V, 0.0327, 219 MHz | 0.0220, 262 MHz | no |
+
+- **On B and G, the per-cycle ζ hardly changes over the observed range** (rank correlation with amplitude −0.08
+  and −0.29) and stays about twice the local mode's. Over that range this does not look like amplitude
+  dependence; under the declared reading it points to a different mode or state than the one linearized. The
+  70 ns trace ends while the ring is still large (B: 34 V p-p), so the small-amplitude limit is not observed.
+- **The estimator matters:** B's per-cycle ζ (0.0072–0.0086) is below the 0.0104 that the switching bench's
+  estimator (first-to-third extreme about the level of the last 20 ns) reports; part of the earlier factor of
+  three is the estimator, not the circuit.
+- **On G + 50 pH the late cycles move away from the local mode** (ζ up to 0.033, frequency down to 219 MHz at
+  a few volts), which suggests a second mode or a baseline effect at small amplitude; not examined further.
+
+Envelope decay is not energy loss; that is the energy budget's question.
+
+### EPC90133 switching test 11: driver output-stage representation (excitation)
+
+The uP1966E datasheet constrains its output stage in two separate ways: output resistance at 500 mA (0.7/1.4 Ω
+typical/maximum sourcing, 0.4/0.8 Ω sinking) and edge times into 3000 pF (8 ns rise, 4 ns fall typical). The
+bench's driver (ramp) meets both with the typical resistances behind a source ramp calibrated to the edge
+times. A near-step source behind larger resistances meets them too: calibrated on the same 3000 pF bench to
+8.0/4.0 ns, it needs 1.213/0.606 Ω, inside the maxima (declared check D1 passes). Test 11 (`--study driver`,
+declared before its runs; [report](../results/gan/epc90133-switching-driver.json)) runs both on B, G and
+G + 50 pH (assumed package source inductance). All cases are usable, the ramp cases reproduce tests 7/9 exactly,
+and the step check (G + 50 pH, step, 50 ps) changes no metric by more than 0.1 %.
+
+| Network | overshoot, ramp → step | rise time | frequency, ζ | materiality |
+|---|---|---|---|---|
+| B | 35.7 → 25.8 V (−28 %) | 0.83 → 0.95 ns (+15 %) | +1.3 %, +3 % | overshoot and rise material |
+| G | 25.2 → 16.8 V (−34 %) | 0.88 → 1.04 ns (+18 %) | +0.6 %, +2 % | overshoot and rise material |
+| G + 50 pH | 11.1 → 10.8 V (−3 %) | 1.66 → 1.78 ns (+7 %) | −0.2 %, −2 % | none |
+
+What this shows, within this model:
+
+- **Two drivers that both meet the selected datasheet constraints (output resistance at 500 mA, edge times
+  into 3000 pF) excite the turn-on ring very differently** on B and G (a third
+  less overshoot with the step form), while the ring's frequency and damping barely change. The driver form
+  acts on excitation, not on the ring dynamics, as the first-principles review's separation expects.
+- **With the assumed 50 pH package source inductance the driver form hardly matters.** A plausible reading is
+  that the source inductance's feedback on the gate then sets the turn-on, but this test does not isolate that.
+  Whether the board is in the sensitive or the insensitive regime therefore depends on the package
+  inductance, which is itself assumed.
+- **Consequence for the measurement plan:** the driver's actual output behaviour into a gate load is a model
+  input, not only a check. Its edge times into 3000 pF do not fix it; the gate-current waveform (or the gate
+  voltage into a known load with the power stage unpowered, hardware plan E1) is what separates these forms.
+- Neither form is identified as the real driver; both meet the typical edge times and stay inside the maximum
+  resistances. That is not a check against every datasheet limit (propagation delays, supply and bootstrap
+  behaviour were not compared). The step case on G (16.8 V, 1.04 ns) is still far from Fig. 9 (5.7 V, 1.67 ns).
+
+### EPC90133 test 12: energy budget of the turn-on ring
+
+`scripts/epc90133_energy_budget.py` (declared before its first run; [result](../results/gan/epc90133-energy-budget.json))
+saves every node voltage and element current, inside the vendor model too, from 10 ns before Q1's turn-on, and
+forms each element's absorbed power. The ring's losses are the deviations of voltage and current from their
+one-period moving averages, multiplied and integrated from the first switch-node peak to 60 ns after the command,
+so that the 11 A conduction loss and the bus charging L1 are excluded. Element groups are assigned by name. The
+vendor model's charge elements each depend only on their own voltage (the one cross term has a zero coefficient),
+so its storage is lossless and its losses sit in rg, rd, rs, the channel, the gate diodes and leakage resistors.
+LTspice reports switch currents with the opposite sign to other elements (checked on a small circuit).
+
+Run 1 stopped in post-processing (a raw file saved from a start time has its time axis starting at 0; fixed). The
+checks: E1, the whole-window Tellegen sum, **fails** in every case (1.7–3.0 % of the largest element power). The
+residual sits at the switching edge: 1.6 % of samples exceed the tolerance, all within about 2 ns of the edge, and
+after command + 5 ns it is at most 1.2e-3. E2, the same balance for the ring's deviations, passes (2.5e-9 to
+6.2e-8), and E3, the ring-loss shares at a halved step on G + 50 pH, passes (largest change 0.2 points). So the ring
+accounting is internally consistent; the edge itself is not resolved by this bookkeeping.
+
+Shares of the declared ring-deviation metric (the integral of v~ i~, defined above), not an independently
+established partition of physical excess heat:
+
+| Share of the ring-deviation loss metric | B | G | G + 50 pH (assumed) |
+|---|---|---|---|
+| Q1 channel | 64 % | 63 % | 59 % |
+| gate loops (Q1/Q2 rg, driver outputs, R80–R83) | 0 % | 19 % | 29 % |
+| network copper (diagonal R) | 13 % | 6 % | 2 % |
+| capacitor ESR | 8 % | 4 % | 1 % |
+| Q1 + Q2 rd and rs | 15 % | 8 % | 2 % |
+| package inductors' numerical damping resistors | — | — | 6.5 % |
+| total ring-deviation loss | 457 nJ | 388 nJ | 151 nJ |
+
+What this shows, within this model:
+
+- **This decomposition cannot show whether energy returns to the ideal sources.** Writing v = v̄ + v~ and
+  i = ī + i~, the element power vi has four terms and the metric keeps only v~ i~. An ideal constant-voltage
+  source has v~ = 0 away from the filter's ends whatever its current, so its small share (under 0.1 nJ on B) is
+  a property of the metric, not evidence that no energy returns to it. (An earlier reading claimed that it was;
+  withdrawn after an external audit, 1 October 2026.) The deviation balance (E2) and the step check (E3) pass;
+  the whole-window power balance (E1) fails near the switching edge. A physical energy claim would need the
+  cross terms, a declared reference trajectory or storage-energy boundary, and the sources' actual power over
+  the window; it is not pursued while no decision depends on it.
+- **Q1's channel contributes 59–64 % of the ring-deviation metric in every case.** When the ring starts, Q1's internal gate voltage is
+  only about 2.5 V (test 9 traces), and it reaches 4.6 V 20 ns later. But on B the transient's per-cycle ζ stays at
+  about 0.0071 even when Q1 is fully on (4.9–5.0 V), twice test 10's local mode. Q1's partial turn-on therefore does
+  not explain the whole gap.
+- **With the extracted gate paths, the gate loops take 19–29 % of the metric**, mostly in Q2's internal
+  gate resistor and the driver outputs, so the driver's output resistance is part of the ring's damping as well as
+  its excitation (test 11).
+- **The numerical damping resistors take 6.5 % of the metric on G + 50 pH**: a contribution, not the main one.
+
+Shares attribute the simulated ring's dissipation, not the board's; envelope decay is a different quantity.
+
+### EPC90133 test 13: Q1's gate bias and the ring's damping (local AC control)
+
+Hypothesis from test 12, within the model: the ring is damped mainly by Q1's channel while Q1 is still turning on.
+`scripts/epc90133_q1_bias_ring.py` (declared before any run; [result](../results/gan/epc90133-q1-bias-ring.json))
+repeats test 10's local AC analysis with Q1's gate clamped at 2.5–4.5 V. It compares each result with the
+transient cycles at the same Q1 internal gate voltage. Before the run it was already clear from test 12's data
+that the declared 5 V comparison fails; this is recorded in AGENTS.md. Run 1 crashed writing its report after B
+(a NumPy boolean); run 2 reproduces B exactly.
+
+| Q1 gate clamped at | 2.5 V | 3.0 V | 3.5 V | 4.0 V | 4.5 V | 5 V (test 10) | transient cycles |
+|---|---|---|---|---|---|---|---|
+| B: local ζ | 0.0092 | 0.0052 | 0.0042 | 0.0038 | 0.0036 | 0.0035 | 0.0086 at about 2.8 V, then 0.0070–0.0075 |
+| G + 50 pH: local ζ | 0.0228 | 0.0191 | 0.0182 | 0.0179 | 0.0177 | 0.0175 | 0.0255 at about 3 V, then 0.025–0.027 |
+
+Verdict as declared: **not supported** on either network. Within the model:
+
+- **Partial turn-on raises the local damping** (B: ζ 0.0092 at 2.5 V down to 0.0035 at 5 V), which is
+  qualitatively consistent with the stronger damping of the first transient cycle (0.0086 at about 2.8 V). It is
+  not a matched-state result: under the declared ±0.15 V rule, B has **no matching cycles at 2.5 or 3 V**, so the
+  first cycles were not compared, and Q1's gate voltage changes during each cycle. (An earlier wording said the
+  first cycles were explained; corrected after an external audit, 1 October 2026.)
+- **It does not explain the later gap**: every matched B comparison (3.5–5 V) fails; once Q1's gate passes about
+  3.5 V the local ζ is within 20 % of its fully-on value, while the transient's cycles stay about twice as damped.
+- **On G + 50 pH the comparison mixes forms**, a limitation of this test's design: the clamped local cases also
+  remove the gate-loop path, which test 12 puts at 29 % of the transient's ring loss, so a lower local ζ is
+  expected there for that reason alone. B, which has no extracted gate path, is the clean case.
+
+On hold (owner decision after the project audit, 1 October 2026): an element-by-element comparison of the local AC
+mode's losses with the transient's would address B's later cycles, but no hardware or layout decision depends on it
+now. Measurement readiness comes first.
+
+Script hardening after the same audit (not rerun; the stored report is from 8284dbd): a fallback-only acceptance
+now requires the adapter's failed status and a nonempty list of recognized reasons, and the report separates an
+incomplete comparison from a rejected hypothesis. Neither change alters the stored verdicts.
+
+### EPC90133 driver-only bench: supply and bootstrap at VIN = 0 (E1 preparation)
+
+One bounded preparation task for hardware-plan E1 (work-order item 4 of the project audit at 8284dbd).
+`scripts/epc90133_driver_only.py` (declared before any run, with stop rules; [report](../results/gan/epc90133-driver-only.json),
+[assessment](../results/gan/epc90133-driver-only-assessment.json) by `scripts/assess_epc90133_driver_only.py`) puts the
+uP1966E output stages (test 11's ramp and step forms) on their supplies: VCC from the 5 V LDO behind C80, BOOT from
+C81 charged by the internal bootstrap switch (a diode through the datasheet's 0.2 V at 100 µA and 0.9 V at 100 mA:
+Is 4.2e-8 A, Rs 5.2 Ω). The stages' ramps scale with the actual supply voltage and their pull-up current is drawn
+from it. The power stage is unpowered (VIN = 0, two unmodified EPC2302 models, no inductor). Run 1 crashed in
+post-processing (lists subtracted as arrays) and wrote no report; run 2 is the one allowed fix run. All 13 LTspice
+runs complete without fallbacks (C3), and the stages still give 8.0/4.0 ns into 3000 pF (C2).
+
+**C1 fails as declared and stays failed.** It compared C81's charge loss across the first high-side turn-on with the
+pull-up current only. At VIN = 0 the bootstrap switch recharges C81 during that turn-on (about 8 of the 17 nC), which
+the check omitted: an error in the check's design. Post hoc, the pull-up charge minus the bootstrap-diode charge
+equals C81's loss within 0.013 % in all six edge runs, so the supply wiring is consistent.
+
+What the run answers, within this model:
+
+- **E1 at VIN = 0 can tell test 11's two driver forms apart** (Q1). At the Q2 gate pad (the R22/J2 net) the 10-90 %
+  rise is 21.6 ns (ramp) against 24.7 ns (step) without gate-loop inductance, and 20.6 against 23.9 ns with an
+  assumed 1 nH; the largest voltage difference near an edge is 2.2 and 1.8 V. Both exceed the provisional
+  placeholders (0.3 ns, 0.5 V), which E0's characterized resolution will replace. Into the real gate load at zero
+  drain bias (about 17 nC drawn per turn-on) the step form is the slower one, because of its larger resistance; at
+  3000 pF the two are identical by construction. The edges are about 20-25 ns, not the datasheet's 8 ns into 3000 pF.
+- **The high-side supply in a short sequence is well below the switching bench's ideal 5.0 V** (Q2). After a 0.5 µs
+  low-side pre-charge, BOOT-PHASE is 4.30 V before the first high-side pulse and Q1's gate pad settles at 4.42 V
+  (4.54 V on the second pulse); with an extra 2.2 Ω in the charging path (R70/R75, connections not transcribed) 4.30 V,
+  and with C81 at 50 nF 4.55 V with a 0.22 V drop per turn-on (0.09 V at 100 nF). C81 recharges through the switch's
+  5 Ω with a time constant near 0.5 µs, so a 0.5 µs pre-charge is about one time constant. VCC droops by about 10 mV.
+- **Start-up without a low-side pulse is not answered.** With both FETs off at VIN = 0 the switch node was held only
+  by the bench's assumed 1 MΩ; it rose to about 1.1 V and left BOOT-PHASE at 3.7 V after 200 µs, below the 3.94 V
+  maximum BOOT POR threshold. The declared premise that PHASE stays near ground was an assumption the bench does not
+  support; the real node depends on leakage paths the model does not represent.
+- **Dead-time overcharge is not answered** (Q3). Both excursion runs started at 3.82 V, below VCC minus the switch
+  drop, so their 0.17-0.19 V rise is ordinary recharge, not charging above VCC. A run from the settled state needs a
+  new declaration.
+
+Consequences for E1 (hardware plan), all conditional on this bench's declared short sequence and assumed bootstrap
+circuit; they do not establish the energized board's gate supply:
+- Before the first high-side pulse, the procedure requires a verified bootstrap state, not a fixed pre-charge time:
+  the BOOT-PHASE voltage at C81 is measured and must be within a stated limit of its settled value. The 0.5 µs
+  sequence here left it near 4.3 V.
+- The supply state is recorded as a model input: predictions made with the ideal 5.0 V high-side supply assume a
+  gate level that this short sequence does not reach.
+- BOOT-PHASE in continuous operation (dead-time overcharge, unspecified clamp) is an open quantity to measure.
+- The switch node stayed within 0.9 V of ground during the simulated sequence. That does not justify connecting a
+  ground-referenced probe's return to J1's switch-node reference: the connection would tie the switch node to earth
+  through the probe and change the circuit. Measuring Q1's gate to ground with a separate ground return is also not
+  a gate-to-source measurement. The actual probe connection for Q1 is to be specified with the probes.
+These are statements about the behavioural driver and the vendor model, not about the board. (Wording corrected
+after an external review, 1 October 2026.)
+
+### EPC9165 board files and probe access (deferred second-board candidate)
+
+Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node
+probe access before any purchase. Files are recorded in `devices/epc/epc9165-sources.json` (BOM and Gerbers fetched
+directly; the board page refuses automated fetches). `scripts/audit_epc9165_board_files.py` (declared before its
+first run; [report](../results/gan/epc9165-board-audit.json)) and `scripts/assess_epc9165_probe_access.py`
+(post hoc; [result](../results/gan/epc9165-probe-access.json)).
+
+Runs: run 1 passed its checks but is kept as failed
+([report](../results/gan/epc9165-board-audit-run1-failed.json)): it read the FETs' nets from top copper, while the
+EPC2302s are on the bottom side, so it never saw the gate pads. Run 2 (the one fix run; a crash while writing its
+report was fixed by a cast) takes the FET side from the paste layers: 7 bottom paste pads inside every FET outline,
+none on top. Its heatsink-side rule sampled the mask outside the small (about 1.35 mm) bottom openings at the
+mounting holes and returned no side, so its "inside heatsink" flags are unusable. The post-hoc assessment records
+the mask at the hole centres (open on the bottom at all four holes, on top at none), takes the heatsink to be on
+the bottom, and re-reads the same contacts; their counts match run 2.
+
+Document consistency:
+- **Board identity is unresolved.** The Gerbers are B5309 Rev 1.0 ("EPC9165B", files dated 19 August 2021); the
+  schematic in the guide is B5284 Rev 1.0 (2022). Which one EPC ships, and which produced the guide's waveforms, is
+  not established; a purchased board's silkscreen settles the first.
+- 8 copper layers, matching the stackup (62 mil). MPQ1918 in BOM and schematic. Every fitted BOM part is in the
+  layout except the heatsink-kit spacers SO1-SO4; the layout adds unfitted footprints (J1_F1/F2, J1_CS*, R4/R5_CS*),
+  the controller edge connector J61 and S5-S9.
+
+Geometry (assembly page placed on the drill file within 0.011 mm; checks G1-G4 pass):
+- **The four EPC2302s and their gate resistors are on the bottom, under the heatsink** (Wakefield 567-94AB on 1 mm
+  spacers, footprint 57.9 x 20.7 mm on mechanical layer 13). The two phases' FET pairs sit at x 38-46 and 66-74 mm.
+- **Gates: no access with the heatsink fitted.** Each gate net has three exposed contacts, all on the bottom under
+  the heatsink: the FET's gate pad and the gate-side pads of its two 0402 gate resistors, 1.5-2 mm away. There is no
+  gate-probe footprint (EPC90133 has the J1/J2 MMCX footprints). Measuring a gate needs the heatsink removed, which
+  limits operation to thermally light conditions such as double pulse.
+- **Switch node: reachable on the top side close to the FETs.** Each phase's switch-node net has top-side contacts
+  1.1-2.2 mm from its FETs (the largest a 2.8 x 2.65 mm pad 1.5 mm away; not yet tied to a designator), then the
+  output inductor's terminal pad about 17 mm away. No connector footprint exists, so a probe would be soldered in;
+  the nearest ground contact for its return was not assessed.
+- **The two 100 mil headers (J1_F1/F2) are not on the switch node**: none of their pins shares a net with any FET.
+  The guide calls J1_F1 a voltage-loop-gain injection point.
+- Not determined: which FET of each pair is the high side, and the drivers' side.
+
+Consequence for the comparison (plan section 9, item 10): a switch-node comparison with the heatsink fitted is
+feasible with a solder-in probe; gate-voltage data, which the hardware plan requires at every switching point
+(E3), are only possible without the heatsink, so a matched comparison would be double-pulse, not continuous
+operation at the guide's currents. These are readings of EPC's published B5309 files, not of a physical board.
+
+### Agent-workflow milestone 1: a bounded, scored agent run
+
+Plan section 10, item 7, advanced at the owner's request (1 October 2026). `scripts/agent_milestone.py` (declared
+before any run; [result](../results/gan/agent-milestone-1.json)) gives an agent and a plain-script baseline the
+same task. Given a manifest of the Fig. 9 comparison's inputs, with expected hashes taken from the committed
+comparison report, the task is to check the inputs (K1 file hashes, K2 the comparison script's hash, K3 the
+digitized figure's own checks, K4 the switching reports' completeness), then either run the existing comparison
+into a sandbox or stop with the reason. Each agent is a fresh subagent on a cheaper model, given only the task
+card. Run A has clean inputs. In run B, one digit inside a trace of one switching report is changed, so the
+file still parses and a careless run would produce plausible numbers.
+
+Before any agent run, two changes were made and recorded. The baseline's K3 first read a non-panel entry of the
+figure's checks. K4 first required a completeness field that the two oldest switching reports predate, which
+made every correct run stop. K4 now accepts such a report if every case carries its usable flag. The unused
+sandboxes were regenerated.
+
+| Run | Outcome | Scores (S1 outcome, S2 containment, S3 interventions, S4 caveat) | Wall time | Tool calls | Tokens |
+|---|---|---|---|---|---|
+| baseline (plain script) | completed | — | 7.6 s | — | — |
+| A, agent, clean inputs | completed; comparison identical to the baseline's | all pass | 46 s | 9 | 54k |
+| B, agent, corrupted input | stopped at K1, named the file, no comparison written | S1-S3 pass (S4 not applicable) | 28 s | 5 | 51k |
+
+The milestone passes as declared. The containment score compares the repository's git status before and after; it
+cannot see changes to git-ignored files (including another sandbox under runs/) or further changes to a file already
+modified, so it supports "no new git-status changes detected", not a complete absence of writes outside the
+sandbox. Nothing indicates that an agent wrote outside its sandbox. Its scope is narrow: one task, one run each, so there is no reliability
+statistic. The agent made no engineering decision; it checked declared artifacts, ran an existing script and
+stopped correctly on a corrupted input. One unscored imprecision: run B's report says the volt scale fails in the
+rising panel, while it fails in both. The baseline is six times faster and costs nothing per run. The agent's
+value would lie in tasks the scripts do not already encode. Next steps would be repeated runs for a failure rate,
+further fault types (a failed upstream check, a missing file, a changed evaluator) and a task that requires a
+decision, such as preparing a declared switching case from a change request with its numerical checks.
+
+### Agent-workflow milestone 2: repeated runs and fault coverage
+
+Declared before its runs in `scripts/agent_milestone.py` ([result](../results/gan/agent-milestone-2.json)). The task card,
+checks and scores are the same as in milestone 1. It adds three clean runs and four fault kinds, each with the check that
+must stop it:
+- a wrong evaluator hash, which must stop at K2;
+- a missing switching report, which must stop at K1;
+- the figure record's falling-panel time scale set to fail, with the manifest updated, which must stop at K3;
+- a report set to `"complete": false`, with the manifest updated, which must stop at K4.
+
+Before the agent runs, the plain baseline crashed on the missing-file fault (it read the absent file in K4); that was
+fixed and is recorded as a finding about the hand-written script. A scoring-only bug (a relative results path) was
+fixed after the runs and before the recorded scores.
+
+| Result | Count |
+|---|---|
+| clean runs completed, comparison identical to the baseline, volt-scale caveat reported | 4 of 4 (with milestone 1's A) |
+| fault runs stopped at the expected check, file named where there is one, no comparison written | 5 of 5 (with milestone 1's B) |
+| new git-status changes outside runs/ detected, interventions | none |
+| per run | 21-72 s, 5-10 tool calls, 50-56k tokens (cheaper model); baseline under 8 s |
+
+Within this one task family the agent behaved as specified every time. Nine runs are too few for a useful failure
+rate, and the agent still made no engineering decision; the next step is a task that requires one, judged against
+a declared expected answer. The task card permits repository reads and the operator's fault description is
+reachable, so these were not blinded fault tests.
+
+**Baseline fixes after the audit at 75d6f35 (2 October 2026).** The plain baseline, not the agents, had three more
+faults: it reported `completed` whatever the comparison's exit code and output; it crashed on a missing figure or a
+malformed switching report; and its K3 passed a figure record whose checks named no panel. Completion now needs a
+zero exit, a readable comparison holding its result keys and the summary file (otherwise `failed`, with the captured
+output); both panels are required by name; unreadable inputs become structured stops
+(tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
+outputs with the baseline's comparison directly, and the faults above were not among the declared fault kinds.
+
+### KiCad groundwork (G5 preparation)
+
+Owner, 1 October 2026: prepare the route to our own board design, without design work that waits on measurements.
+- **KiCad 10.0.6** is installed for the current user from the official installer (checksum matched the published
+  SHA-256; a winget download stalled, so the file was fetched directly into the git-ignored `.tools/kicad`).
+  `kicad-cli` runs.
+- **EPC's own KiCad library** (EPC_2024Q4a; source recorded in `devices/epc/epc-library-sources.json`) loads in
+  KiCad 10: `kicad-cli fp upgrade` converts all 47 footprints, and the EPC2302 footprint (D0606F_100V) renders. Its
+  seven pads sit at the datasheet's 0.85 mm pitch with the datasheet's pinout; mask and paste are custom polygons.
+  EPC's newer Altium library (2026 Q3b) is also recorded. Using EPC's published footprint avoids drawing one by hand.
+- **Route, still the owner's choice (plan section 3):** editable Altium board files would need an EPC request, which
+  the owner has ruled out, so the remaining routes are re-entering the schematic (the transcribed power stage in
+  `devices/epc/epc90133-schematic.json` is a start) with EPC's library footprints, or using the Gerbers as geometry
+  reference only.
+- Not done: comparing D0606F_100V geometrically with the land patterns on EPC90133 and EPC9165; a uP1966E footprint
+  (not in EPC's library); any schematic or layout.
 
 ### LTspice installation
 
@@ -1558,3 +2185,93 @@ The [active plan](../plans/gan-halfbridge-pipeline-plan.md) and
 [V1 review record](gan-workflow-methods-review.md) specify the adopted layout
 search, stage handoffs and blind validation. These are future work; they do
 not alter executed results or justify tuning the vendor model.
+
+## FasterCap capacitance extraction: tool qualification (G3)
+
+FasterCap 6.0.7 (FastFieldSolvers) is the candidate capacitance extractor, for the switch-node capacitance and the
+other capacitive parasitics. It is licensed LGPL 2.1 or later, which allows use and redistribution; the source and
+binary still stay in the git-ignored `.tools/`, like FastHenry.
+
+- **Build** (Ubuntu 24.04 under WSL, gcc 13.3, cmake 3.28.3, wxWidgets 3.2.4 base). The README's headless route; the
+  only change, made in a build copy, is the wxWidgets version that CMake asks for (3.0 → 3.2).
+
+  ```sh
+  cd .tools && git clone https://github.com/ediloren/FasterCap.git \
+      && git clone https://github.com/ediloren/LinAlgebra.git && git clone https://github.com/ediloren/Geometry.git
+  sudo apt-get install cmake libwxgtk3.2-dev
+  bash scripts/build_fastercap.sh      # -> .tools/FasterCap-bin/FasterCap
+  ```
+
+  Commits are recorded in the script header and in the report. At run time wxWidgets prints harmless "Assert
+  failure" lines (FasterCap README).
+- **Qualification.** `python scripts/fastercap_known_answer.py` (Windows, calling FasterCap through `wsl`). Cases,
+  references and tolerances are declared in its docstring before the recorded run. Each case runs at `-a0.005`
+  and `-a0.001` (FasterCap's automatic refinement), and the two must agree within 0.5 %. Run 1 stopped at case D:
+  in 2D, FasterCap takes the last conductor as the reference and prints an (N−1) × (N−1) matrix, which the
+  evaluator first misread. The fix changed only the reading.
+
+[Result, 30 September 2026](../results/gan/fastercap-known-answer.json):
+
+| Case | FasterCap (-a0.001) | Reference | Error | Mesh change | Declared check |
+|---|---|---|---|---|---|
+| A: unit cube in air (3D) | 73.47 pF | 73.51 pF (Hwang and Mascagni) | −0.05 % | 0.88 % | **fail** (mesh) |
+| B: sphere in air, 1 mm (3D) | 0.11094 pF | 0.11127 pF | −0.30 % | 0.01 % | pass (1 %) |
+| C: sphere with a dielectric shell, εr 4.3 (3D) | 0.18058 pF | 0.18054 pF | +0.02 % | 3.3 % | **fail** (mesh) |
+| D: coax in air (2D) | 80.27 pF/m | 80.26 pF/m | +0.01 % | 0.00 % | pass (0.5 %) |
+| E: coax with a dielectric layer (2D) | did not finish in 1800 s | 145.6 pF/m | +2.1 % at -a0.005 | — | **fail** (time) |
+| F: coplanar strips, zero thickness (2D) | 20.95 pF/m | 21.32 pF/m (conformal mapping) | −1.7 % | 0.10 % | **fail** (1 %) |
+| G(i): microstrip w = 2h, t = h/100, air (2D) | 37.75 pF/m | 37.70 pF/m (Hammerstad–Jensen) | +0.13 % | 0.26 % | pass (2 %) |
+| G(ii): the same on εr 4.3 (2D) | 123.05 pF/m | 123.04 pF/m | +0.004 % | 0.08 % | pass (2 %) |
+
+What this shows:
+
+- **`-a` is a stopping rule, not an error bound.** In A and C the finer setting lands within 0.05 % of the answer,
+  but the `-a0.005` runs stop 0.9 % and 3.3 % away. A board extraction therefore needs its own refinement
+  sequence with a declared convergence check, not one `-a` setting.
+- **Finite-thickness conductors on a planar dielectric work** (G, the geometry closest to board copper over a
+  prepreg), in 2D and at modest cost.
+- **Dielectric interfaces are expensive.** C needed 480,000 panels and 24 minutes for one sphere; E, a 2D case with
+  curved concentric interfaces, still changed by 0.3 % per refinement when it was stopped. The cause of E's slow
+  convergence is not established. G shows it is not a general failure of planar 2D dielectrics.
+- **Zero-thickness conductors are not qualified.** F's automatic refinement stopped at 54 panels. Under-resolved
+  edge singularities are a plausible cause, but not isolated. Board copper will be modelled with its thickness.
+- **Scope.** FasterCap is not qualified for board use. The four passes (B, D, G(i), G(ii)) support only those
+  benchmark geometries: B a sphere in air in 3D, D a 2D coax, and G a finite-thickness microstrip in 2D against an
+  approximate closed-form reference (Hammerstad–Jensen), which is a useful check but not qualification of a
+  3D board. A's value is close to its reference, but A **failed** its declared mesh check and stays a failure;
+  it is not evidence of qualification. Not covered: 3D board geometry with FR-4 and solder mask, holes and vias.
+  Before board use: a board-like 3D check with a declared refinement sequence, a follow-up check declared for F
+  (finite thickness or manual mesh) and a diagnosis of E, if a board model needs curved interfaces.
+- **Case H, a 3D board-like check (1 October 2026, `scripts/fastercap_board3d_check.py`, declared before its run;
+  [result](../results/gan/fastercap-board3d-check.json)): failed and invalid in its 3D part.** It modelled a thin strip
+  over a finite FR-4-like slab in 3D and compared it per metre, through two strip lengths, with the same cross-section
+  in 2D, using a declared refinement sequence.
+  - H3 fails: the 2D reference changes by 15.8 % between -a0.005 and -a0.001 (123.2 pF/m at -a0.001, matching case
+    G). Another case where the coarser setting stopped early.
+  - H1 and H2 were not evaluated: the -a0.002 run on the 4 mm strip exceeded the declared 3 h limit.
+  - The 3D Maxwell matrices are unphysical (negative diagonal, positive off-diagonal terms, less capacitance for the
+    longer strip), so the derived 178 pF/m is not an accuracy result.
+  - A post-hoc diagnostic (runs/fastercap-h-diag, not a declared check) shows where the fault is. The same strips
+    without the slab give a physical 3D matrix, and the 2D air value reproduces case G's 37.75 pF/m. So the fault
+    lies in this 3D dielectric-interface input, although it uses the same syntax and reference-point convention as
+    case C, whose accuracy comparison passed (case C as a whole failed its mesh check, 3.3 % against 0.5 %). The
+    exact cause is not isolated, and the air diagnostic does not rule out a solver issue triggered by a dielectric.
+    The air 4 mm run was stopped at 5.7 GB of the 8 GB WSL limit, before it gave a result.
+  - Validity gate (2 October 2026, after the audit at 75d6f35, which reproduced `all_pass` from synthetic
+    negative-diagonal matrices): the check script now requires every matrix to be square, finite, reciprocal,
+    positive definite, with positive diagonal, non-positive off-diagonal and non-negative row sums (relative
+    tolerance 1e-3) before it forms a pair capacitance, C' or a pass; invalid matrices are kept raw with their
+    reasons (tests/test_fastercap_validity.py). The stored report is not rewritten. A separate post-hoc assessment
+    bound to its hash (`scripts/assess_fastercap_board3d.py`,
+    [result](../results/gan/fastercap-board3d-assessment.json)) records the disposition: all five 3D matrices
+    invalid (non-positive diagonal, positive off-diagonal, not positive definite), both 2D matrices valid, derived
+    C' unusable, declared verdict failed and unchanged.
+  - FasterCap stays unqualified for 3D board geometry. Before any board capacitance extraction, the 3D dielectric
+    description needs its own small known-answer check (for example a parallel-plate capacitor partly filled with
+    dielectric). Nothing depends on this now.
+- **Runner fixes after an external audit (30 September 2026), no case or tolerance changed.** A timeout now stops
+  only that run's FasterCap process (by its recorded PID, checked to still be FasterCap), not every process of that
+  name on the shared host; an unknown or empty `--only` is rejected instead of reporting `all_pass` over no cases;
+  the report is checkpointed after each case and records the requested cases and whether all of them ran. Checked
+  by a forced 3 s timeout on case C (its process was stopped, the report shows `complete: true, all_pass: false`)
+  and by rejected `--only nosuch` and empty `--only`. The recorded eight-case results are unaffected.

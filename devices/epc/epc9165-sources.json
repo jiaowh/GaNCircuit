@@ -1,0 +1,53 @@
+{
+ "schema": "vendor-target-sources/1",
+ "target": "EPC9165 (EPC2302 x4, MPQ1918 x2), deferred second-board candidate",
+ "selected_by": "owner, 2026-10-01: record and audit only; purchase deferred (plan section 9, item 10)",
+ "checked": "2026-10-01",
+ "board_page": "https://epc-co.com/epc/products/evaluation-boards/epc9165",
+ "terms": "Vendor copyright notices apply; no redistribution permission established. Original downloads remain git-ignored. The board page returned HTTP 403 to an automated fetch on 2026-10-01; file URLs follow the pattern used for EPC90133 and were fetched directly.",
+ "files": [
+  {
+   "name": "EPC9165BOM.xlsx",
+   "url": "https://epc-co.com/epc/documents/bill-of-materials/EPC9165BOM.xlsx",
+   "local_path": "vendor/epc/epc9165/EPC9165BOM.xlsx",
+   "retrieved": "2026-10-01",
+   "revision": "titled 'EPC9165 BOM'; no revision, PCB number or date in the file",
+   "sha256": "a24631af39611113b1cc50c23e4c01f561decebec46987b9d8488fa0fddd7957",
+   "status": "downloaded"
+  },
+  {
+   "name": "EPC9165 Development Board Gerbers.zip",
+   "url": "https://epc-co.com/epc/documents/gerber-files/EPC9165%20Development%20Board%20Gerbers.zip",
+   "local_path": "vendor/epc/epc9165/EPC9165 Development Board Gerbers.zip",
+   "retrieved": "2026-10-01",
+   "revision": "files named EPC9165B_B5309_Rev1_0, dated 2021-08-19",
+   "sha256": "2ad2d0bc65282320535a2cb33063cfefacba33e4e36cc35c4c3a0239c5a5a3d1",
+   "contents": "8 copper Gerbers (GTL, G1-G6, GBL), NC drill, stackup .xls, fab notes PDF, layout PDF (Altium print with component and pad tokens)",
+   "status": "downloaded; extracted to vendor/epc/epc9165/gerbers"
+  },
+  {
+   "name": "EPC9165_Schematic.pdf",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/schematics/EPC9165_Schematic.pdf",
+   "local_path": "vendor/epc/second-board-screening/EPC9165_Schematic.pdf",
+   "retrieved": "2026-10-01",
+   "revision": "B5284 Rev1.0 main schematic, EPC copyright 2022",
+   "sha256": "eb834493bf7f020c8d141892b608a8934b8a149e53927523d35a406eea2f87b3",
+   "status": "downloaded during screening (devices/epc/second-board-screening-sources-2026-10-01.json)"
+  },
+  {
+   "name": "EPC9165_qsg.pdf",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/guides/EPC9165_qsg.pdf",
+   "local_path": "vendor/epc/second-board-screening/EPC9165_qsg.pdf",
+   "retrieved": "2026-10-01",
+   "revision": "Version 1.0, January 31, 2022",
+   "sha256": "d2dbba3b6693b6f39b90076fc3998a9ee2fadd385e441ecd99b1383714bfa468",
+   "status": "downloaded during screening"
+  }
+ ],
+ "pending_resources": [
+  "Board identity: the schematic is B5284 Rev1.0, the Gerbers are B5309 Rev1.0 ('EPC9165B'); which one EPC ships, and which one produced the QSG waveforms, is not established",
+  "Editable Altium files: on request; not requested",
+  "MPQ1918 driver model: none published (MPS forum, 2026-09-08)",
+  "EPC9528 controller board files: not retrieved"
+ ]
+}

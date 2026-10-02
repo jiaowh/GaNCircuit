@@ -60,6 +60,17 @@ the uncertainty from the mid-plane via-junction representation. It does NOT qual
 antipads or plane holes, via arrays and their coupling, Kelvin vias, vias through
 several layers, open plane edges, plated barrels thinner than a few skin depths,
 or frequencies where delta is not much smaller than t (below about 10 MHz).
+
+Fourth mesh (revision declared 1 October 2026, before its run; the owner deferred it on 29 September and asked
+on 1 October to advance tool qualification). The three-mesh result stays recorded as failed in
+results/gan/fasthenry-via-cavity.json. With --fourth-mesh the meshes are those three plus (w/8, 9), the evaluation
+is unchanged except that the finest mesh is (w/8, 9) and it is compared with (w/6, 7) under the same 1 % criterion,
+E1 and E2 use (w/8, 9), and the report goes to results/gan/fasthenry-via-cavity-mesh4.json. The earlier meshes are
+reused from the original run directory. Expected: about 340k filaments for D = 3 mm, run one case at a time
+(-p diag). A pass would converge this single-via benchmark only; the scope above is unchanged, and it would
+not qualify board via arrays or plane holes.
+Launch 1 of the fourth mesh ran only the three old meshes (--meshes still defaulted to 3) and wrote no evaluation;
+its log and report are kept under runs/ as via-mesh4-run1-failed.*. Fixed: --meshes defaults to all meshes.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
@@ -82,6 +93,7 @@ W = 0.25  # mm, via section
 FREQ = 1e8
 SIZES = (1.5, 3.0)
 MESHES = ((2, 3), (4, 5), (6, 7))  # (w / s, filaments through t and across the via)
+MESH4 = (8, 9)  # fourth mesh, --fourth-mesh only
 TOL_E1 = 0.03
 MESH_TOL = 0.01
 
@@ -199,14 +211,20 @@ def case_impedance(run_root, D, div, n, precond):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/fasthenry-via-cavity.json")
-    ap.add_argument("--meshes", type=int, default=len(MESHES), help="run only the first N meshes (for timing)")
+    ap.add_argument("--meshes", type=int, default=None, help="run only the first N meshes (for timing)")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel (FastHenry is single-threaded)")
     ap.add_argument("--run-dir", type=Path, default=None, help="reuse finished or running cases in this directory")
     ap.add_argument("--precond", default=None, help="FastHenry -p option for new runs, e.g. diag (solver path only)")
+    ap.add_argument("--fourth-mesh", action="store_true", help="add the declared (w/8, 9) mesh (see the docstring)")
     args = ap.parse_args()
+    meshes = MESHES + ((MESH4,) if args.fourth_mesh else ())
+    if args.meshes is None:
+        args.meshes = len(meshes)
+    if args.fourth_mesh and args.output == ap.get_default("output"):
+        args.output = ROOT / "results/gan/fasthenry-via-cavity-mesh4.json"
     delta = skin_depth(FREQ) * 1e3  # mm
     run_root = args.run_dir.resolve() if args.run_dir else ROOT / "runs" / ("fasthenry-via-" + uuid.uuid4().hex)
-    cases = [(div, n, D) for div, n in MESHES[:args.meshes] for D in SIZES]
+    cases = [(div, n, D) for div, n in meshes[:args.meshes] for D in SIZES]
     values = {}
 
     def one(case):
@@ -223,13 +241,13 @@ def main():
               "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest() if FH_BIN.is_file() else None,
               "geometry_mm": {"t": T, "h": H, "via_w": W, "sizes_D": SIZES}, "frequency_Hz": FREQ,
-              "skin_depth_mm": delta, "meshes": MESHES[:args.meshes], "values": values,
+              "skin_depth_mm": delta, "meshes": meshes[:args.meshes], "values": values,
               "solver_note": ("-p diag was adopted after it reproduced the finished fine D = 1.5 mm case exactly "
                               "(Z = 0.00107254 + 0.0327315j ohm, 187 s against 759 s for the default); "
                               "each case records its preconditioner"),
               "references": {str(k): v for k, v in ref.items()}, "evidence_directory": str(run_root.relative_to(ROOT))}
-    if args.meshes == len(MESHES):
-        fine, mid = MESHES[-1][0], MESHES[-2][0]
+    if args.meshes >= len(meshes):
+        fine, mid = meshes[-1][0], meshes[-2][0]
         L = {D: values[f"{fine},{D}"]["L_H"] for D in SIZES}
         Lm = {D: values[f"{mid},{D}"]["L_H"] for D in SIZES}
         dl, dlm = L[SIZES[1]] - L[SIZES[0]], Lm[SIZES[1]] - Lm[SIZES[0]]

@@ -1,0 +1,163 @@
+{
+ "schema": "epc90133-network-transfer-qualification/1",
+ "scope": "AC port impedance of the SPICE network against its extracted matrices at 100 MHz; not frequency dependence, geometry accuracy or switching",
+ "evaluator_sha256": "6e4579e0843f91cb6d2f4a3d504382d6d285aea2b29e0411c425b529509eeec1",
+ "network_generator_sha256": "0383b1dd023e7b311b187054fc20437fa87d7d45a5df448657da99f450fa132f",
+ "audit_solver_sha256": "14533625bda63e7ff10f0b22292251e9705ee146ae487d4648c1d3bbeb3de047",
+ "run_directory": "runs/network-transfer-7cff18e2139b",
+ "Q1_known_answer": {
+  "full_r": {
+   "max_rel_error": 2.581498858643281e-07,
+   "pass": true,
+   "Z_real_mohm": [
+    [
+     2.0,
+     0.6,
+     -0.3
+    ],
+    [
+     0.6,
+     1.5,
+     0.4
+    ],
+    [
+     -0.3,
+     0.4,
+     1.2
+    ]
+   ]
+  },
+  "baseline": {
+   "max_rel_error": 2.5814988588273303e-07,
+   "pass": true,
+   "Z_real_mohm": [
+    [
+     2.0,
+     -0.0,
+     0.0
+    ],
+    [
+     -0.0,
+     1.5,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.2
+    ]
+   ]
+  }
+ },
+ "Q2_saved_matrices": {
+  "B-m1-mid": {
+   "extraction_sha256": "01460bb853f4826535d1ae1100d91592cf7293ed20231dbea344b31d8ec57797",
+   "full_r": {
+    "ltspice": {
+     "R_loop_mohm": 2.0344468558481053,
+     "L_loop_nH": 0.28087274598421696
+    },
+    "reference": {
+     "R_loop_mohm": 2.0344462844652362,
+     "L_loop_nH": 0.2808726921224787
+    },
+    "checks": {
+     "R_loop": true,
+     "L_loop": true
+    },
+    "pass": true
+   },
+   "baseline": {
+    "ltspice": {
+     "R_loop_mohm": 1.1244652142004,
+     "L_loop_nH": 0.2808756944965797
+    },
+    "reference": {
+     "R_loop_mohm": 1.1244649559104438,
+     "L_loop_nH": 0.2808756406437635
+    },
+    "checks": {
+     "R_loop": true,
+     "L_loop": true
+    },
+    "pass": true
+   }
+  },
+  "G-m1-mid": {
+   "extraction_sha256": "d1b5a9adc1e6ea24a0835de25cce0663acb3bd097ff4cd75a4e5f02d31cb2693",
+   "full_r": {
+    "ltspice": {
+     "R_loop_mohm": 2.0342298247508186,
+     "L_loop_nH": 0.25744815016474937,
+     "R_cs_Q1_mohm": 0.015700253410630968,
+     "R_cs_Q2_mohm": 0.40407395604528507
+    },
+    "reference": {
+     "R_loop_mohm": 2.0342266224763286,
+     "L_loop_nH": 0.25744810890700315,
+     "R_cs_Q1_mohm": 0.015698706958194374,
+     "R_cs_Q2_mohm": 0.40407352638752175
+    },
+    "checks": {
+     "R_loop": true,
+     "L_loop": true,
+     "R_cs_Q1_mohm": true,
+     "R_cs_Q2_mohm": true
+    },
+    "pass": true
+   },
+   "baseline": {
+    "ltspice": {
+     "R_loop_mohm": 1.034446461254986,
+     "L_loop_nH": 0.25745251586150414,
+     "R_cs_Q1_mohm": 0.580071548364892,
+     "R_cs_Q2_mohm": 0.1788399787155126
+    },
+    "reference": {
+     "R_loop_mohm": 1.0344433830694542,
+     "L_loop_nH": 0.25745247449190267,
+     "R_cs_Q1_mohm": 0.580068674157939,
+     "R_cs_Q2_mohm": 0.17883914794080516
+    },
+    "checks": {
+     "R_loop": true,
+     "L_loop": true,
+     "R_cs_Q1_mohm": true,
+     "R_cs_Q2_mohm": true
+    },
+    "pass": true
+   }
+  }
+ },
+ "Q3_terminal_impedance": {
+  "B-m1-mid": {
+   "full_r": {
+    "ports": 35,
+    "max_rel_error_real": 1.3059546448017204e-06,
+    "max_rel_error_imag": 6.962433925450605e-07,
+    "pass": true
+   },
+   "baseline": {
+    "ports": 35,
+    "max_rel_error_real": 1.3059708610458261e-06,
+    "max_rel_error_imag": 6.962823840744768e-07,
+    "pass": true
+   }
+  },
+  "G-m1-mid": {
+   "full_r": {
+    "ports": 47,
+    "max_rel_error_real": 1.1215609218946428e-06,
+    "max_rel_error_imag": 6.34192442263247e-07,
+    "pass": true
+   },
+   "baseline": {
+    "ports": 47,
+    "max_rel_error_real": 1.1215761529609393e-06,
+    "max_rel_error_imag": 6.342287703821606e-07,
+    "pass": true
+   }
+  }
+ },
+ "outcome": "pass"
+}

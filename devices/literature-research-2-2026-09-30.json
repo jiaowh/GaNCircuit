@@ -1,0 +1,158 @@
+{
+  "schema": "literature-supplement/1",
+  "retrieved": "2026-09-30",
+  "scope": "Second research round: lab-instrument capability for EPC2302, output-capacitance loss (H3), passive loop-inductance measurement, and revision check of pinned EPC files",
+  "notes": "docs/gan-research-round-2-2026-09-30.md",
+  "files": [
+    {
+      "title": "Keysight PD1550A Series Advanced Dynamic Power Device Analyzer / Double-Pulse Tester, data sheet",
+      "url": "https://www.testunlimited.com/pdf/Keysight_PD1550A.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/Keysight_PD1550A_datasheet.pdf",
+      "sha256": "8f698b7491cddc06c900d8f9c3e94609373346bb47beb92825fa4be75a594e07",
+      "bytes": 842706,
+      "pages": 20,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "Keysight copyright data sheet, retrieved from a distributor mirror (testunlimited.com), not keysight.com; compare with Keysight's current revision before relying on specifications. No open licence; keep outside git.",
+      "review_scope": "Pages 3-5, 13-14, 17-19: fixture scope (62 mm / FM3 module interface boards, custom boards on request), 200 MHz voltage and current probe bandwidth, pulse timing limits."
+    },
+    {
+      "title": "Keysight B1506A Power Device Analyzer for Circuit Design, data sheet 5991-4441EN (May 2020)",
+      "url": "https://www.axiomtest.com/documents/models/Keysight%20B1506A%20Datasheet.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/Keysight_B1506A_datasheet.pdf",
+      "sha256": "161aaba25bda9266bc86a4108808c39eab456bf73c3f4da0289df69e08472811",
+      "bytes": 1903631,
+      "pages": 33,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "Keysight copyright 2019-2020, retrieved from a distributor mirror (axiomtest.com) because keysight.com returned HTTP 403. No open licence; keep outside git.",
+      "review_scope": "Pages 2, 4, 8-9, 30-32: capacitance (MFCMU, 1 kHz-1 MHz, bias up to 3 kV), gate charge (1 nC-100 uC, 10 pC resolution, gate charge socket adapter, options H21/H51/H71 only), socket modules; no QFN socket listed."
+    },
+    {
+      "title": "EPC: GaN First Time Right - Controllers, Gate Drivers & PCB Layout Tips for DC-DC Converters (B. Miller, slides rev. 3/2024)",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/products/Controllers_Gate_Drive_PCB_Layout.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/EPC_Controllers_Gate_Drive_PCB_Layout.pdf",
+      "sha256": "49ae96b4bf8cc1888d7e1bd8263fd5c43306ba5b2018d8bfc79b29dab9aa5506",
+      "bytes": 2874894,
+      "pages": 43,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "EPC copyright presentation. No open licence; keep outside git, cite rather than redistribute.",
+      "review_scope": "Slides 23-33: driver list (uP1966E footprint-compatible alternatives), parasitic definitions (L_loop, L_gate, L_CS high/low), loss-versus-inductance plots for a 12 V/1 MHz buck. No EPC2302 package inductance."
+    },
+    {
+      "title": "EPC How2AppNote 031: How to Design a 2 kW 48 V/12 V Bi-Directional Power Module (EPC9165, four EPC2302)",
+      "url": "https://epc-co.com/epc/portals/0/epc/documents/application-notes/How2AppNote031%20How%20to%20Design%20a%202%20kW%2048%20V%2012%20V%20Bi-Directional%20Power%20Module.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/EPC_How2AppNote031_2kW_48V12V_EPC2302.pdf",
+      "sha256": "3e41595ec190659659fcadef3db533e526f917b83885538b5187869f266e0968",
+      "bytes": 823295,
+      "pages": 4,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "EPC copyright 2022. No open licence; keep outside git.",
+      "review_scope": "Pages 1-2: EPC2302 with the internal vertical layout and MPQ1918 driver. No switching waveforms or parasitic values relevant to EPC90133."
+    },
+    {
+      "title": "Wolfspeed PRD-08710 Rev. 1: Measuring Stray Inductance in Power Electronics Systems (July 2024)",
+      "url": "https://assets.wolfspeed.com/uploads/2024/07/Wolfspeed_PRD-08710_Measuring_Stray_Inductance_in_Power_Electronics_Systems_Application_Note.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/Wolfspeed_PRD-08710_Measuring_Stray_Inductance.pdf",
+      "sha256": "5b77880d9f59362c8f9fc7dd24c9e0da16351994eea9bc4a621ed9ebaef88609",
+      "bytes": 10396558,
+      "pages": 36,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "Wolfspeed copyright 2024, informational. No open licence; keep outside git.",
+      "review_scope": "Sections 1.1, 2.1-2.3 and 4.1: impedance-analyzer method with devices gated on, choice of measurement frequency, open/short compensation and residual removal. Written for SiC modules of several nH; sub-nH applicability not shown."
+    },
+    {
+      "title": "Matioli et al. (EPFL): Switching losses in power devices: from dynamic on resistance to output capacitance hysteresis (IEA 4E PECTA contribution, EPE 2023)",
+      "url": "https://www.iea-4e.org/wp-content/uploads/publications/2023/10/594_full_paper_pdf.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/IEA4E_dynamic_Ron_to_Coss_hysteresis.pdf",
+      "sha256": "5a4f948fa9bdf4c9e96e00eae27328e27f2ae1f49c5c3b56fad864aed6bcd659",
+      "bytes": 876909,
+      "pages": 7,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "Published by IEA 4E TCP; licence not stated in the file. Keep outside git; cite.",
+      "review_scope": "Whole paper (7 pages): review of Coss hysteresis (Sawyer-Tower) and steady-state dynamic RON methods; examples are 650 V GaN (GS66502B)."
+    },
+    {
+      "title": "Samperi et al.: COSS Losses in Resonant Converters, Energies 18 (2025) 3312, doi:10.3390/en18133312",
+      "url": "https://mdpi-res.com/d_attachment/energies/energies-18-03312/article_deploy/energies-18-03312.pdf",
+      "local_path": "vendor/literature/2026-09-30-research-2/Energies_18_3312_Coss_losses_resonant.pdf",
+      "sha256": "086a0a9679e91b0ad28fcc0b8ff893343927eb6071eb71da2e307dbd8df58f14",
+      "bytes": 7743379,
+      "pages": 29,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "CC BY 4.0 (stated on page 1).",
+      "review_scope": "Review of Coss hysteresis measurement methods and device comparisons (Si-SJ, SiC, GaN); GaN mechanisms (traps, substrate bias)."
+    },
+    {
+      "title": "Tian, Lu, Udrea, Goetz: Hybrid Single-Pulse and Sawyer-Tower Method for Accurate Transistor Loss Separation (arXiv:2506.18635)",
+      "url": "https://arxiv.org/pdf/2506.18635",
+      "local_path": "vendor/literature/2026-09-30-research-2/arXiv_2506.18635_single_pulse_Sawyer_Tower.pdf",
+      "sha256": "0e6c8136c8b1454bbc1307bb236ee74d8a3346d52f3f810ba8b9af658f118cbd",
+      "bytes": 1037159,
+      "pages": 5,
+      "retrieved": "2026-09-30",
+      "reuse_terms": "arXiv preprint; licence not verified (arXiv's default non-exclusive licence does not grant reuse). Keep outside git; cite.",
+      "review_scope": "Method outline only; validated on a 350 W LLC converter, not a 100 V GaN half-bridge."
+    },
+    {
+      "title": "Tranchero, Giraudi, Santero: DC-Loop Stray Inductance Characterization in Printed Circuit Board Using a Vector Network Analyzer (Zenodo 20617321, 9 June 2026)",
+      "url": "https://zenodo.org/records/20617321",
+      "local_path": "vendor/literature/2026-09-30-research-2/Tranchero_2026_Zenodo_StrayInductanceWithVNA.pdf",
+      "sha256": "341e88821d71f1b369a2ce45d649ebdfa291f3cf5e80b194e0f7eb3ac5167101",
+      "bytes": 3217128,
+      "pages": 6,
+      "retrieved": "2026-09-30",
+      "retrieved_by": "project owner via browser (automated download was blocked)",
+      "reuse_terms": "CC BY 4.0 (Zenodo record page).",
+      "review_scope": "Whole paper (6 pages): shunt-thru VNA measurement with one FET position shorted and the ports across the other; incremental capacitor population; 4.5 nH PCB+DC-link against 5.9 nH from DPT (650 V cascode GaN inverter). Fixture (about 8 mm) not de-embedded."
+    },
+    {
+      "title": "Zhu, Zong, AlNuaimee, Codjia, Matioli: Soft-Switching CO Hysteresis Losses in GaN HEMTs: A Resonant-Sawyer-Tower Measurement Method (IEEE Trans. Power Electron., early-access author version, 2024)",
+      "url": "https://infoscience.epfl.ch/bitstreams/6f1729a7-3d9f-4d1d-96d5-ffe040f92b2b/download",
+      "local_path": "vendor/literature/2026-09-30-research-2/Zhu_Matioli_2024_Resonant_Sawyer_Tower_GaN_Coss.pdf",
+      "sha256": "bfd540b8fc987759940c63d20d1ee378680a78ac3704939b1e3d267f5958661f",
+      "bytes": 4127553,
+      "pages": 11,
+      "retrieved": "2026-09-30",
+      "retrieved_by": "project owner via browser (automated download was blocked)",
+      "reuse_terms": "IEEE copyright 2024; personal use permitted, other uses need IEEE permission. Keep outside git; cite.",
+      "review_scope": "Method (resonant pulse generator plus Sawyer-Tower branch) and results for six 600-650 V commercial GaN HEMTs; Ediss depends on peak voltage, transient frequency and, for some devices, switching frequency. No 100 V devices."
+    },
+    {
+      "title": "Spitaleri, Iannuzzo, Gurpinar, Scelba: Systematic investigation on the effects of tracks' mutual coupling on a GaN-based three-level bridge leg, Power Electronic Devices and Components 12 (2025) 100120",
+      "url": "https://doi.org/10.1016/j.pedc.2025.100120",
+      "local_path": "vendor/literature/2026-09-30-research-2/Spitaleri_2025_PEDC_mutual_coupling_GaN_3L.pdf",
+      "sha256": "bf5bacfbef2c72b655327d42fffb9abf022ab97cb6a4f412edfab8b5004e6ce0",
+      "bytes": 5133308,
+      "pages": 10,
+      "retrieved": "2026-09-30",
+      "retrieved_by": "project owner via browser (automated download was blocked)",
+      "reuse_terms": "CC BY-NC-ND 4.0 (stated on page 1): no derivatives; noncommercial.",
+      "review_scope": "Sections on Q3D RL-matrix modelling and reduced models (Fig. 14-15): keeping the power-source/gate-return mutual terms cuts the switching-energy deviation from the complete model from 13% to 3%. Simulation only, 400 V three-level topology."
+    }
+  ],
+  "revision_checks": [
+    {
+      "file": "vendor/epc/epc90133/EPC2302_datasheet.pdf",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/EPC2302_datasheet.pdf",
+      "checked": "2026-09-30",
+      "result": "current download byte-identical (sha256 c77d265a098910385c9a4d334223316eea85d4b9d6ad93da5858a3b790495f0b); duplicate not kept"
+    },
+    {
+      "file": "vendor/epc/uP1966E_datasheet.pdf",
+      "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/uP1966E_datasheet.pdf",
+      "checked": "2026-09-30",
+      "result": "current EPC-hosted download byte-identical (sha256 82d82a017f2e2b002289d94a8dadd7c1b4eebc7773221b4371543a42e68850ce); uPI's product page links no datasheet to compare against its timing figures"
+    }
+  ],
+  "not_obtained": [
+    {
+      "title": "PCB Layout Parasitics Extraction of a GaN Half-Bridge: Simulation and Experimental Validation (EPE 2023)",
+      "url": "https://ieeexplore.ieee.org/document/10264516/",
+      "reason": "paywalled; not obtained by the owner either; abstract only: sub-nH commutation inductance via resonance of a modified DC-link capacitor"
+    },
+    {
+      "title": "Li, Buttay, Pena Quintal, Evans: Investigation of Mutual Inductance on GaN-HEMT Switching in a Half-Bridge Circuit (IEEE DMC 2024)",
+      "url": "https://doi.org/10.1109/DMC62632.2024.10812133",
+      "reason": "paywalled; not obtained by the owner either"
+    }
+  ]
+}
