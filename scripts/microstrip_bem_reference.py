@@ -17,7 +17,9 @@ Checks, fixed here:
        Hammerstad-Jensen (case G(ii) put FasterCap 2D within 0.004 % of it at that span);
     B2 convergence: at S = 10h (case H's span) the Richardson values of (n = 128, 256) and (256, 512) agree within 0.1 %.
 The S = 10h Richardson value of (256, 512) is the reference. Reported, not judged: its difference from case H's
-FasterCap 2D value at -a0.001 and -a0.005. Declared use: once run 4 finishes, its dielectric C' at M3 is also reported
+FasterCap 2D value at -a0.001 and -a0.005.
+Run 1 crashed while writing its report (numpy booleans are not JSON-serialisable) after printing its values; fixed by
+converting to float/bool, nothing else changed; its log is runs/microstrip-bem-run1-failed.log. Declared use: once run 4 finishes, its dielectric C' at M3 is also reported
 against this reference beside the declared D4 (which stays as declared).
 
     python scripts/microstrip_bem_reference.py   # results/gan/microstrip-bem-reference.json
@@ -62,7 +64,7 @@ def c_ms(S, n):
         faces.append((p, np.full(len(p), nx), np.zeros(len(p))))
     interfaces = [(p, nx, ny, 1.0, ER) for p, nx, ny in faces]
     q = solve_dielectric(strips, interfaces, [0.5, -0.5])
-    return 2 * q[0]  # C_pair = q_top / 1 V; C_ms = 2 C_pair
+    return float(2 * q[0])  # C_pair = q_top / 1 V; C_ms = 2 C_pair
 
 
 def richardson(a, b):
@@ -86,9 +88,9 @@ def main():
     hj = hammerstad_jensen(W / H, T / H, ER)
     r10a, r10b = richardson(v10["128"], v10["256"]), richardson(v10["256"], v10["512"])
     out["checks"] = {"B1": {"richardson_S40h": r40, "hammerstad_jensen": hj, "relative_error": r40 / hj - 1,
-                            "pass": abs(r40 / hj - 1) <= 0.003},
+                            "pass": bool(abs(r40 / hj - 1) <= 0.003)},
                      "B2": {"richardson_128_256": r10a, "richardson_256_512": r10b, "change": abs(r10b / r10a - 1),
-                            "pass": abs(r10b / r10a - 1) <= 0.001}}
+                            "pass": bool(abs(r10b / r10a - 1) <= 0.001)}}
     out["reference_S10h_F_per_m"] = r10b
     out["fastercap_2d_case_h"] = {a: {"value": v["value_F_per_m"], "vs_bem": v["value_F_per_m"] / r10b - 1}
                                   for a, v in h_rep["two_d"].items() if v.get("value_F_per_m")}
