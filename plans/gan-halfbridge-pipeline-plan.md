@@ -545,6 +545,17 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    the plain baseline crashed on a missing file until fixed. Next: a task that requires an engineering decision,
    designed so the expected answer is not reachable by the agent (hidden scorer, held-out material, structural
    scoring); a first draft did not meet this and was not run (external review, 1 October 2026).
+   *E2E-0 pilot, declared 2 October 2026* (scripts/e2e_pilot.py docstring; owner: frontier-model agents;
+   reduced after an external review of the end-to-end plan). Non-blind: the established EPC90133 workflow
+   (Stage 1 EPC2302 model checks, Stage 2 extraction A:m1:mid and switching, then a simulation assessment
+   against QSG Fig. 9, which is not Stage 3 closure) runs through frozen I-1/I-2/assessment records
+   (src/circuit_tools/handoff.py) with an independent checker (scripts/e2e_check.py). Order: one
+   deterministic reference, then one clean agent run and one fault run (class: upstream model revision
+   changed after the I-1 handoff, records consistently updated; Stage 2 must reject). Consistency with the
+   reference checks execution, not engineering truth. Review value, interventions and cost before any other
+   target; a held-out target needs an isolated environment, a frozen reference method and an independent
+   review of geometry, ports, pinout, driver and benchmark applicability. Yields priority to the probe/channel
+   plan and first-power procedure once the equipment inventory arrives.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:
