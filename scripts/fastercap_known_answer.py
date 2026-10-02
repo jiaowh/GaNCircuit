@@ -62,13 +62,14 @@ def wsl_path(p):
     return "/mnt/" + p.drive[0].lower() + p.as_posix()[2:]
 
 
-def run_fastercap(files, workdir, auto, timeout):
-    """Write the input files (first is the root), run FasterCap, return (Maxwell matrix, names, stdout)."""
+def run_fastercap(files, workdir, auto, timeout, extra=""):
+    """Write the input files (first is the root), run FasterCap, return (Maxwell matrix, names, stdout).
+    `extra` adds FasterCap options (e.g. -f0, stay in core); the default leaves every earlier call unchanged."""
     workdir.mkdir(parents=True, exist_ok=True)
     for name, text in files.items():
         (workdir / name).write_text(text, encoding="ascii")
     root = next(iter(files))
-    args = f"-b {root} -a{auto}"
+    args = f"-b {root} -a{auto}" + (f" {extra}" if extra else "")
     pidfile = workdir / f"fastercap-a{auto}.pid"
     if platform.system() == "Windows":
         # exec keeps bash's PID, so the PID file names this run's FasterCap process and no other.

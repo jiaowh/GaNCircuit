@@ -64,6 +64,15 @@ run_problem). Revision 3: references come only from the fixed runner; a referenc
 retried up to three times, 120 s apart, each attempt in its own directory and recorded; FastHenry cases are read from
 the run-1 or run-2 directory when their case.inp is byte-identical. Nothing else changed.
 
+Run 3 (revision 3, 3 October 2026) is kept as results/gan/via-array-benchmark-run3-failed.json: some reference calls
+still failed for lack of memory. They exited with status 97 and the memory message sat in FasterCap's own log, not in
+the error text the retry tested, so no retry ran. FasterCap goes out of core when its links exceed a fifth of
+wxGetFreeMemory(), which counts only unused pages (about 80 MB on this host while about 5 GB of page cache was
+reclaimable). Revision 4: reference calls pass -f0 (Solver/Autorefine.cpp: the out-of-core test becomes links x 0 <
+free memory, so they stay in core; these 2D references need tens of MB), and a failed attempt is retried when its own
+FasterCap log reports the memory termination. Nothing else changed; FastHenry outputs are read from runs 1-3 for
+byte-identical decks.
+
     python scripts/via_array_benchmark.py            # results/gan/via-array-benchmark.json
 """
 import argparse
@@ -206,7 +215,7 @@ def reference(arr, a, auto, workdir):
     pts = [(-b, -b), (b, -b), (b, b), (-b, b), (-b, -b)]
     files["wall.txt"] = "* wall inner face\n" + "".join(seg("wall", p[0] * m, p[1] * m, q[0] * m, q[1] * m) for p, q in zip(pts, pts[1:]))
     files["va.lst"] += "C wall.txt 1.0 0 0\n"
-    mat, names, _ = run_fastercap(files, workdir, auto, 3600)
+    mat, names, _ = run_fastercap(files, workdir, auto, 3600, extra="-f0")
     return mat
 
 
@@ -232,14 +241,14 @@ def main():
         if rep["evaluator_sha256"] != ev:
             raise SystemExit("report was written by a different evaluator")
     else:
-        rep = {"schema": "via-array-benchmark/3", "declared": "2026-10-02, before the first run (docstring)",
+        rep = {"schema": "via-array-benchmark/4", "declared": "2026-10-02, before the first run (docstring)",
                "evaluator_sha256": ev,
                "dependencies_sha256": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES},
                "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
                "fastercap_binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
                "run_directory": f"runs/via-array-{uuid.uuid4().hex[:12]}", "references": {}, "runs": {}, "errors": []}
     root = ROOT / rep["run_directory"]
-    earlier = [ROOT / f"results/gan/via-array-benchmark-run{k}-failed.json" for k in (1, 2)]
+    earlier = [ROOT / f"results/gan/via-array-benchmark-run{k}-failed.json" for k in (1, 2, 3)]
     PREV = [ROOT / json.loads(f.read_text(encoding="utf-8"))["run_directory"] for f in earlier if f.is_file()]
     rep["earlier_directories_reused"] = [str(d.relative_to(ROOT)) for d in PREV]
     delta = skin_depth(FREQ) * 1e3
@@ -272,7 +281,10 @@ def main():
                     break
                 except RuntimeError as exc:
                     attempts.append(str(exc)[-300:])
-                    if "lack of memory" not in str(exc) and "Cannot go" not in str(exc) or attempt == 3:
+                    wd = root / "ref" / key.replace("|", "_") / auto / f"attempt{attempt}"
+                    log = "".join(f.read_text(errors="replace") for f in wd.glob("stdout-*.log"))
+                    memory = "lack of memory" in str(exc) or "Cannot go" in log or "not enough to allocate" in log
+                    if not memory or attempt == 3:
                         row[auto] = {"error": str(exc), "attempts": attempts}
                         rep["errors"].append(f"reference {key} -a{auto}: {exc}")
                         break
