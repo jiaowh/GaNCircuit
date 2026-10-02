@@ -51,6 +51,12 @@ the same cavity (to show why a single-via value must not be divided by the count
 Run order: references, then production (cheap), then resolved. One FastHenry job at a time, 3 h limit per job, report
 checkpointed after each job; --resume continues a report written by the same evaluator.
 
+Run 1 (2 October 2026) failed in post-processing, kept as results/gan/via-array-benchmark-run1-failed.json: with every
+port requested FastHenry writes the full impedance matrix, and the reused extractor runner accepts only admittance
+columns, so every FastHenry case was solved but not read (12 cases). Fixed: this script runs FastHenry itself (-p diag,
+all ports) and reads the impedance matrix by port name. A case whose run-1 directory holds a byte-identical case.inp and
+a complete Zc.mat is read from there instead of being solved again (recorded per case as "reused"). Nothing else changed.
+
     python scripts/via_array_benchmark.py            # results/gan/via-array-benchmark.json
 """
 import argparse
@@ -67,10 +73,38 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
-from epc90133_extract import run_case  # noqa: E402
+from epc90133_extract import parse_matrix_file  # noqa: E402
 from fastercap_board3d_check import matrix_validity  # noqa: E402
 from fastercap_known_answer import FC_BIN, run_fastercap, seg  # noqa: E402
-from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth  # noqa: E402
+from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth, wsl_path  # noqa: E402
+import platform  # noqa: E402
+import subprocess  # noqa: E402
+import time  # noqa: E402
+
+def solve(text, workdir, reuse_dir=None):
+    """FastHenry with every port: (port names, complex Z, seconds, reused)."""
+    if reuse_dir is not None and (reuse_dir / "case.inp").is_file() and (reuse_dir / "case.inp").read_text(encoding="ascii") == text:
+        for f in (reuse_dir / "Zc_j0.mat", reuse_dir / "Zc.mat"):
+            if f.is_file() and "matrix for frequency" in f.read_text(errors="replace"):
+                rows, _, kind, mat = parse_matrix_file(f.read_text(errors="replace"))
+                if kind == "Impedance":
+                    return rows, mat, None, str(reuse_dir.relative_to(ROOT))
+    workdir.mkdir(parents=True, exist_ok=False)
+    (workdir / "case.inp").write_text(text, encoding="ascii")
+    if platform.system() == "Windows":
+        cmd = ["wsl", "-e", "bash", "-lc", f"cd '{wsl_path(workdir)}' && '{wsl_path(FH_BIN)}' case.inp -p diag"]
+    else:
+        cmd = [str(FH_BIN), "case.inp", "-p", "diag"]
+    t0 = time.time()
+    p = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=3 * 3600, check=False)
+    (workdir / "stdout.log").write_text(p.stdout or "", encoding="utf-8")
+    f = workdir / "Zc.mat"
+    if p.returncode != 0 or not f.is_file() or "matrix for frequency" not in f.read_text(errors="replace"):
+        raise RuntimeError(f"FastHenry failed (status {p.returncode}): {(p.stderr or p.stdout)[-400:]}")
+    rows, _, kind, mat = parse_matrix_file(f.read_text(errors="replace"))
+    if kind != "Impedance":
+        raise RuntimeError(f"expected an impedance matrix, got {kind}")
+    return rows, mat, time.time() - t0, None
 
 OUTPUT = ROOT / "results/gan/via-array-benchmark.json"
 T, H = 0.0711, 0.127
@@ -188,13 +222,16 @@ def main():
         if rep["evaluator_sha256"] != ev:
             raise SystemExit("report was written by a different evaluator")
     else:
-        rep = {"schema": "via-array-benchmark/1", "declared": "2026-10-02, before the first run (docstring)",
+        rep = {"schema": "via-array-benchmark/2", "declared": "2026-10-02, before the first run (docstring)",
                "evaluator_sha256": ev,
                "dependencies_sha256": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES},
                "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
                "fastercap_binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
                "run_directory": f"runs/via-array-{uuid.uuid4().hex[:12]}", "references": {}, "runs": {}, "errors": []}
     root = ROOT / rep["run_directory"]
+    run1 = ROOT / "results/gan/via-array-benchmark-run1-failed.json"
+    RUN1 = ROOT / json.loads(run1.read_text(encoding="utf-8"))["run_directory"] if run1.is_file() else None
+    rep["run1_directory_reused"] = str(RUN1.relative_to(ROOT)) if RUN1 else None
     delta = skin_depth(FREQ) * 1e3
 
     def save():
@@ -231,14 +268,14 @@ def main():
         if rid in rep["runs"]:
             continue
         text, ports, a = deck(arr, c, r)
+        sub_ = rid.replace("|", "_").replace("=", "")
         try:
-            order, Y, times, fil = run_case(text, ports, root / rid.replace("|", "_").replace("=", ""), 1)
-            Z = np.linalg.inv(Y)
+            order, Z, secs, reused = solve(text, root / sub_, RUN1 / sub_ if RUN1 else None)
             idx = [order.index(f"v{v}") for v in range(len(ports))]
             Z = Z[np.ix_(idx, idx)]
             L = (Z.imag + Z.imag.T) / 2 / (2 * math.pi * FREQ)
             rep["runs"][rid] = {"a_mm": a, "L_H": L.tolist(), "R_ohm": ((Z.real + Z.real.T) / 2).tolist(),
-                                "seconds": sum(times), "filaments": fil}
+                                "seconds": secs, "reused_from": reused}
         except Exception as exc:  # recorded per run
             rep["runs"][rid] = {"a_mm": a, "error": f"{type(exc).__name__}: {exc}"}
             rep["errors"].append(f"{rid}: {exc}")
