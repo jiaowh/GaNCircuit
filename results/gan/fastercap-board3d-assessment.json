@@ -8,7 +8,7 @@
  "evaluator_sha256": "dfd70fef4626b2b737fc1554c5a4bfbd5f7c743dc9fefb87b433f719c28493f7",
  "dependencies_sha256": {
   "scripts/fastercap_board3d_check.py": "6f92e81227208bd45ad2c0a9a64680166b32c3227e61a6ff2b766ea314c6485b",
-  "scripts/fastercap_known_answer.py": "fc14536f183dc3ba35f5e003ba188698f9744bfc1a6030ebfef407ff512aa76e"
+  "scripts/fastercap_known_answer.py": "b25eabda02a1edfdf63ecf9560f5259406f4510ff5931bcf4d179b78ea99c481"
  },
  "gate_rel_tol": 0.001,
  "matrix_validity": {

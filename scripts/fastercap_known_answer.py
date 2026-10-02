@@ -90,8 +90,29 @@ def run_fastercap(files, workdir, auto, timeout):
     (workdir / f"stdout-a{auto}.log").write_text(p.stdout or "", encoding="utf-8")
     if p.returncode != 0:
         raise RuntimeError(f"FasterCap failed in {workdir} (status {p.returncode}): {(p.stderr or p.stdout)[-500:]}")
+    problem = run_problem(p.stdout, float(auto))
+    if problem:
+        raise RuntimeError(f"FasterCap result rejected in {workdir}: {problem}")
     names, matrix = parse_last_matrix(p.stdout)
     return matrix, names, p.stdout
+
+
+def run_problem(text, auto=None):
+    """Why a FasterCap log must not be read as a result, or None.
+
+    Added 3 October 2026: under memory pressure FasterCap printed "Cannot go out-of-core, terminating process" during
+    an automatic iteration and still exited 0, so the last matrix printed (an earlier, unconverged iteration) was read
+    as the result (via-array references, run 2). A log is rejected if it reports that termination, or, in automatic
+    mode, if its last relative change exceeds the requested -a value (FasterCap stops either on convergence or on its
+    iteration limit).
+    """
+    if "Cannot go out-of-core" in text or "Cannot go Out-of-Core" in text or "not enough to allocate" in text:
+        return "FasterCap terminated for lack of memory"
+    if auto is not None:
+        diffs = re.findall(r"Weighted Frobenius norm of the difference between capacitance \(auto option\): (\S+)", text)
+        if diffs and float(diffs[-1]) > auto:
+            return f"automatic refinement ended without converging (last change {diffs[-1]} > {auto:g})"
+    return None
 
 
 def parse_last_matrix(text):
