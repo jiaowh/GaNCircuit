@@ -299,7 +299,7 @@ Next steps:
 | **FastHenry 3.0.1** | inductance and resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory; internal use only (licence note below) |
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
-| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound. A 3D strip-over-dielectric check failed and its 3D matrices are unphysical; not qualified for 3D or board geometry ([results](results/gan/fastercap-known-answer.json), [3D check](results/gan/fastercap-board3d-assessment.json)) |
+| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound. A 3D strip-over-dielectric check failed with unphysical matrices; the cause found so far is the solver's automatic settings, not the geometry. With meshes written by our script, the same strip in air comes out within 0.5 % of the textbook value, and the dielectric case is still being checked. Not qualified for 3D or board geometry ([results](results/gan/fastercap-known-answer.json), [3D check](results/gan/fastercap-board3d-assessment.json)) |
 | KiCad 10.0.6 | our own board design | installed per-user (checksum verified); EPC's KiCad library loads (47 footprints); no board design started, route choice open |
 | DEVSIM | device simulator for the paused silicon fixture (WSL) | paused |
 

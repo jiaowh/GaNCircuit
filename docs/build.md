@@ -288,6 +288,29 @@ declares the criteria, committed before its first run, after one profiled case.
   board features it resembles and how. Turning it into board uncertainty needs a transfer argument or a
   representative board-subgeometry check, declared separately.
 
+**FasterCap with user-controlled meshes** (`python scripts/fastercap_manual_mesh_check.py`, declared at 4cf9434,
+revision 2 at de2aebf; criteria in the docstring). The script writes its own graded panel meshes for case H's geometry
+(three meshes), switches FasterCap's refinement off, and adds a partly filled plate capacitor (K1). K1 runs only if the
+case-H part passes.
+
+- *Run 1 failed and was stopped, kept* ([report](../results/gan/fastercap-manual-mesh-check-run1-failed.json)). With
+  `-m1e9` alone every 4 mm matrix was unphysical, air included, and the 2 mm values did not converge. FasterCap sets the
+  threshold that decides at which hierarchy level two panels interact to `-d` × `-m` (`SolveCapacitance.cpp`;
+  `Autorefine.cpp`, `RefineCriteria`). `-m1e9` therefore made panels interact through coarse super-panels. The same
+  coupling makes every automatic iteration 0 (`-m` 1e32) unphysical, which is what case H and the air diagnostics show.
+  On a 1 m probe cube the threshold moves the result from 69.0 pF (1e9) to 72.66 pF (0.01) and 72.67 pF (all links).
+- *Revision 2* uses threshold 0.01 (`-d1e-11`) and adds D5, a rerun of M2 at threshold 0.001.
+  - Air form: complete and passing. C′ = 37.53, 37.52 and 37.50 pF/m on M1–M3: a 0.05 % change from M2 to M3 (D2,
+    limit 1 %) and −0.53 % against Hammerstad–Jensen (D3, limit 1 %). Every matrix is physical and no run refined (D0).
+    So FasterCap's 3D solver gives a physical, mesh-stable, accurate result for this thin strip when the mesh is
+    resolved and the interaction threshold is tight.
+  - Dielectric form: see the run state below.
+- *Reading so far.* Case H's unphysical matrices are explained, at least in part, by settings rather than by the
+  dielectric input: the automatic mode never left a coarse interaction threshold. Whether the dielectric description is
+  also sound is what the dielectric form of revision 2 decides.
+
+- *Run state, 2 October 2026.* Revision 2 was stopped at the end of the working day during the dielectric M2 call ([report](../results/gan/fastercap-manual-mesh-check-run2-incomplete.json), outcome 'incomplete, stopped'; no check evaluated). Completed: air M1–M3 and dielectric M1. Dielectric M1 took 10 and 27 minutes for its two lengths and gave physical matrices, unlike case H, with C′ = 116.8 pF/m, 5.2 % below the 2D reference (123.2 pF/m). The air form was within 0.5 % on the same mesh, so the dielectric value is either not converged at M1 or still carries an error; the finer meshes decide. Not run: dielectric M2/M3, D5, the automatic run from M1, and K1. The rerun takes an estimated 3–5 hours and should be launched detached, so it is not a child of a session shell.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh

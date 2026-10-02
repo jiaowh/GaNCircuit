@@ -585,9 +585,12 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    subgeometry check links them to the board. V2 and D3 are dropped, and K1 must remove side-edge fringing. One case is
    profiled before compute is committed. Done: the mesh topology audit. The return-plane slots under the transistors are
    seen by every grid, but at m1 the segment widths cover 27 % of the hole area on mid-layer 1 (9 % at m2). No two vias
-   share an attachment node. Next: FasterCap with user-controlled meshes, because the stored case H logs show automatic
-   refinement stopping on an unrefined mesh; then the slot and via-array benchmark declarations. Yields to item 8 when the
-   equipment inventory arrives.
+   share an attachment node. FasterCap with user-controlled meshes (scripts/fastercap_manual_mesh_check.py): run 1
+   failed (-m1e9 also coarsened the interaction threshold, kept). Revision 2: the air form passes (C' within 0.53 % of
+   Hammerstad-Jensen, 0.05 % mesh change), and the dielectric form gives physical matrices, 5.2 % low on the coarsest
+   mesh. Revision 2 was stopped for time before its finer dielectric meshes, D5 and K1. Benchmark designs for via arrays and
+   slots are drafted in docs/build.md, not declared. Next: rerun revision 2's dielectric part (about 3-5 h, unattended,
+   detached), then declare the slot benchmark. Yields to item 8 when the equipment inventory arrives.
 
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a
