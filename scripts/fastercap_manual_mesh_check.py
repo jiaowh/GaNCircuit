@@ -48,6 +48,18 @@ Time limit 1 h per FasterCap call; a timeout fails the check that needs the valu
 for the board: it diagnoses case H. A pass of K1 supports user-meshed 3D planar dielectric layers touching a conductor,
 at these sizes; not holes, vias, solder mask or the board.
 
+Revision 2 (2 October 2026, declared after run 1 and before run 2). Run 1 used -m1e9 alone and failed: every L2 matrix,
+air included, was unphysical, and the L1 values did not converge (air 62.0, 65.7, 54.4 fF). FasterCap sets its
+interaction threshold to -d x -m (Solver/SolveCapacitance.cpp; Autorefine.cpp, RefineCriteria), so -m1e9 with the
+default -d1 let panels interact through coarse super-panels. That is also why every automatic iteration 0 (-m 1e32) is
+unphysical. On the probe cube (1 m, 96 panels) the capacitance was 69.0 pF at threshold 1e9, 72.66 pF at 0.01 and
+72.67 pF with all links (reference 73.51 pF; the rest is the 4 x 4 face mesh). Run 1's report is kept as
+results/gan/fastercap-manual-mesh-check-run1-failed.json. Changes, nothing else altered: every FasterCap call uses
+-m1e9 -d1e-11 (threshold 0.01), and a check is added:
+    D5 interaction threshold: at M2, both lengths and both forms, rerun with -d1e-12 (threshold 0.001); C' changes by
+       <= 0.2 % for each form.
+The part-D readings and the K1 gate add D5 to D0-D2.
+
     python scripts/fastercap_manual_mesh_check.py   # results/gan/fastercap-manual-mesh-check.json
 """
 import hashlib
@@ -173,6 +185,10 @@ def case_k(a, p, form):
     return files
 
 
+ARGS = "-m1e9 -d1e-11"
+ARGS_FINE = "-m1e9 -d1e-12"
+
+
 def run(files, workdir, args, timeout=TIMEOUT):
     """Write the inputs, run FasterCap with args, return (matrix, input panels, panels after refinement, seconds)."""
     workdir.mkdir(parents=True, exist_ok=True)
@@ -212,7 +228,7 @@ def main():
     run_root = ROOT / "runs" / f"fastercap-manual-mesh-{uuid.uuid4().hex[:12]}"
     h_rep = json.loads((ROOT / "results/gan/fastercap-board3d-check.json").read_text(encoding="utf-8"))
     ref_2d = h_rep["two_d"]["0.001"]["value_F_per_m"]
-    rep = {"schema": "fastercap-manual-mesh-check/1", "declared": "2026-10-02, before the first run (docstring)",
+    rep = {"schema": "fastercap-manual-mesh-check/2", "declared": "2026-10-02, before the first run (docstring)",
            "evaluator_sha256": sha("scripts/fastercap_manual_mesh_check.py"),
            "dependencies_sha256": {p: sha(p) for p in DEPENDENCIES},
            "binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
@@ -226,7 +242,7 @@ def main():
         tmp.write_text(json.dumps(rep, indent=1) + "\n")
         os.replace(tmp, OUTPUT)
 
-    def solve(key, files, wd, args="-m1e9"):
+    def solve(key, files, wd, args=ARGS):
         try:
             m, n_in, n_ref, secs = run(files, wd, args)
             val = matrix_validity(m)
@@ -248,6 +264,15 @@ def main():
             row["C_per_m"] = 2 * (b - a) / (L2 - L1) if a and b and b > a > 0 else None
             rep["part_d"].setdefault(form, {})[mesh] = row
             save()
+    for form in ("air", "diel"):
+        row = {}
+        for L in (L1, L2):
+            row[f"{L:g}"] = solve(f"D5 {form} M2 L={L:g} threshold 0.001", case_d(L, D_MESHES["M2"], form),
+                                  run_root / f"d5-{form}-M2-L{L * 1e3:g}mm", ARGS_FINE)
+        a, b = row[f"{L1:g}"].get("C_pair_F"), row[f"{L2:g}"].get("C_pair_F")
+        row["C_per_m"] = 2 * (b - a) / (L2 - L1) if a and b and b > a > 0 else None
+        rep.setdefault("part_d5", {})[form] = row
+        save()
     rep["part_d"]["auto_from_M1_diel_L1"] = solve("D diel M1 L1 -a0.01", case_d(L1, D_MESHES["M1"], "diel"),
                                                   run_root / "d-diel-M1-L2mm-auto", "-a0.01")
     runs = [r for form in ("air", "diel") for row in rep["part_d"][form].values() for k, r in row.items() if k != "C_per_m"]
@@ -259,19 +284,26 @@ def main():
     rep["checks"]["D1_valid"] = {f: all("matrix" in r and not r["validity"] for row in rep["part_d"][f].values()
                                         for k, r in row.items() if k != "C_per_m") for f in ("air", "diel")}
     rep["checks"]["D2_mesh_change"] = {f: {"change": chg[f], "pass": chg[f] is not None and chg[f] <= 0.01} for f in chg}
+    d5 = {}
+    for f in ("air", "diel"):
+        a5, a2 = rep["part_d5"][f]["C_per_m"], rep["part_d"][f]["M2"]["C_per_m"]
+        ch = abs(a5 / a2 - 1) if a5 and a2 else None
+        d5[f] = {"change": ch, "pass": ch is not None and ch <= 0.002}
+    rep["checks"]["D5_interaction_threshold"] = d5
     rep["checks"]["D3_air_vs_hj"] = {"relative_error": d3, "pass": d3 is not None and abs(d3) <= 0.01}
     rep["checks"]["D4_diel_vs_2d"] = {"relative_error": d4, "pass": d4 is not None and abs(d4) <= 0.02,
                                       "vs_hj_infinite_slab": cp["diel"][2] / rep["references"]["hj_diel_F_per_m"] - 1 if cp["diel"][2] else None}
     c = rep["checks"]
     rep["part_d_all_pass"] = bool(c["D0_no_refinement"] and all(c["D1_valid"].values())
+                                  and all(v["pass"] for v in c["D5_interaction_threshold"].values())
                                   and all(v["pass"] for v in c["D2_mesh_change"].values()) and c["D3_air_vs_hj"]["pass"]
                                   and c["D4_diel_vs_2d"]["pass"])
     save()
 
     # ---- part K1, gated
-    gate = c["D0_no_refinement"] and all(c["D1_valid"].values()) and all(v["pass"] for v in c["D2_mesh_change"].values())
+    gate = c["D0_no_refinement"] and all(c["D1_valid"].values()) and all(v["pass"] for v in c["D2_mesh_change"].values())         and all(v["pass"] for v in c["D5_interaction_threshold"].values())
     if not gate:
-        rep["part_k1"] = {"run": False, "reason": "part D did not pass D0, D1 and D2 for both forms"}
+        rep["part_k1"] = {"run": False, "reason": "part D did not pass D0, D1, D2 and D5 for both forms"}
         rep["outcome"] = "part D failed its gate; K1 not run"
         save()
         print(json.dumps(rep["checks"], indent=1))
