@@ -212,10 +212,50 @@ def read_json(p):
         return None, f"unreadable: {type(exc).__name__}: {exc}"
 
 
+KINDS = ("digitized_figure", "switching_report")
+
+
+def manifest_problems(m):
+    """Structural problems of a manifest (empty if well formed); checked before any entry is indexed."""
+    if not isinstance(m, dict):
+        return ["manifest is not a JSON object"]
+    problems = []
+    ev = m.get("evaluator_sha256")
+    if not (isinstance(ev, str) and len(ev) == 64 and all(c in "0123456789abcdef" for c in ev)):
+        problems.append("evaluator_sha256 is not a 64-digit lowercase hex string")
+    files = m.get("files")
+    if not isinstance(files, list) or not files:
+        return problems + ["files is not a nonempty list"]
+    for i, f in enumerate(files):
+        if not isinstance(f, dict):
+            problems.append(f"files[{i}] is not an object")
+            continue
+        p, h, k = f.get("path"), f.get("sha256"), f.get("kind")
+        # a bare file name under inputs/: no directories, no absolute or parent paths
+        if not (isinstance(p, str) and p and p not in (".", "..") and Path(p).name == p and "\\" not in p):
+            problems.append(f"files[{i}].path is not a bare file name: {p!r}")
+        if not (isinstance(h, str) and len(h) == 64 and all(c in "0123456789abcdef" for c in h)):
+            problems.append(f"files[{i}].sha256 is not a 64-digit lowercase hex string")
+        if k not in KINDS:
+            problems.append(f"files[{i}].kind {k!r} is not one of {list(KINDS)}")
+    paths = [f.get("path") for f in files if isinstance(f, dict)]
+    if len(set(map(str, paths))) != len(paths):
+        problems.append("duplicate file paths")
+    if sum(isinstance(f, dict) and f.get("kind") == "digitized_figure" for f in files) != 1:
+        problems.append("manifest must list exactly one digitized_figure")
+    if not any(isinstance(f, dict) and f.get("kind") == "switching_report" for f in files):
+        problems.append("manifest lists no switching_report")
+    return problems
+
+
 def baseline_checks(sb, m):
     """K1-K4 on sandbox sb with manifest m; returns (checks, caveats). Every failure is structured, none raises."""
+    problems = manifest_problems(m)
+    if problems:
+        # nothing in a malformed manifest is indexed; K1 carries the reasons and the run stops
+        return {"K1": {"pass": False, "detail": {"manifest": problems}}}, []
     checks = {}
-    files = m.get("files") or []
+    files = m["files"]
     present = {f["path"] for f in files if (sb / "inputs" / f["path"]).is_file()}
     bad = [f["path"] for f in files if f["path"] not in present or sha(sb / "inputs" / f["path"]) != f["sha256"]]
     checks["K1"] = {"pass": bool(files) and not bad, "detail": bad if files else "manifest lists no files"}

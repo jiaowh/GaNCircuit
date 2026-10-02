@@ -1252,8 +1252,8 @@ reachable, so these were not blinded fault tests.
 faults: it reported `completed` whatever the comparison's exit code and output; it crashed on a missing figure or a
 malformed switching report; and its K3 passed a figure record whose checks named no panel. Completion now needs a
 zero exit, a readable comparison holding its result keys and the summary file (otherwise `failed`, with the captured
-output); both panels are required by name; unreadable inputs become structured stops
-(tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
+output); both panels are required by name; unreadable inputs become structured stops; the manifest's structure (entries, bare file names, hashes, kinds,
+one figure) is validated before any entry is used (tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
 outputs with the baseline's comparison directly, and the faults above were not among the declared fault kinds.
 
 ### KiCad groundwork (G5 preparation)
@@ -2265,7 +2265,8 @@ What this shows:
     bound to its hash (`scripts/assess_fastercap_board3d.py`,
     [result](../results/gan/fastercap-board3d-assessment.json)) records the disposition: all five 3D matrices
     invalid (non-positive diagonal, positive off-diagonal, not positive definite), both 2D matrices valid, derived
-    C' unusable, declared verdict failed and unchanged.
+    C' unusable, declared verdict failed and unchanged. The assessment binds by hash the gate module it imports and
+    that module's helpers (`scripts/fastercap_known_answer.py`); the check's future reports bind those helpers too.
   - FasterCap stays unqualified for 3D board geometry. Before any board capacitance extraction, the 3D dielectric
     description needs its own small known-answer check (for example a parallel-plate capacitor partly filled with
     dielectric). Nothing depends on this now.

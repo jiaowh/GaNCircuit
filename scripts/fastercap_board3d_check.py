@@ -32,7 +32,9 @@ diagonal (Maxwell matrices have non-positive off-diagonals), each row sum >= -RE
 |C_ij - C_ji| <= REL_TOL x the largest diagonal, and the symmetric part positive definite. REL_TOL = 1e-3 (FasterCap's
 stored matrices are reciprocal to about 1e-4). An invalid matrix is kept raw with its reasons; it gives no pair
 capacitance, no C' and no check pass. The post-hoc invalidity of the stored run is recorded separately by
-scripts/assess_fastercap_board3d.py, bound to the report's hash.
+scripts/assess_fastercap_board3d.py, bound to the report's hash. Reports from now on also bind the imported helpers
+(scripts/fastercap_known_answer.py: geometry builders, solver runner, pair capacitance) by sha256 under
+"dependencies_sha256".
 
     python scripts/fastercap_board3d_check.py   # results/gan/fastercap-board3d-check.json
 """
@@ -45,6 +47,7 @@ import sys
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
+DEPENDENCIES = ("scripts/fastercap_known_answer.py",)  # imported code that shapes the result, bound by hash
 sys.path.insert(0, str(ROOT / "scripts"))
 from fastercap_known_answer import (ER, FC_BIN, case_g, hammerstad_jensen, pair, quad_box,  # noqa: E402
                                     run_fastercap)
@@ -66,6 +69,10 @@ def q(name, *pts):
 
 def rect_z(name, x0, x1, y0, y1, z):
     return q(name, (x0, y0, z), (x1, y0, z), (x1, y1, z), (x0, y1, z))
+
+
+def dependency_hashes(paths=DEPENDENCIES):
+    return {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in paths}
 
 
 def matrix_validity(m, rel_tol=REL_TOL):
@@ -163,6 +170,7 @@ def main():
     run_root = ROOT / "runs" / f"fastercap-board3d-{uuid.uuid4().hex[:12]}"
     rep = {"schema": "fastercap-board3d-check/2", "declared": "2026-10-01, before the first run (docstring)",
            "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+           "dependencies_sha256": dependency_hashes(),
            "binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
            "geometry_m": {"h": H, "w": W, "t": T, "half_span": S, "end_extension": E, "L1": L1, "L2": L2, "eps_r": ER},
            "hammerstad_jensen_F_per_m": hammerstad_jensen(W / H, T / H, ER),

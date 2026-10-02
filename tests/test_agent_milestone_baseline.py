@@ -123,6 +123,34 @@ class BaselineTests(unittest.TestCase):
         Sandbox(self.base, fig={"checks": {"rising": {"time_scale": "pass", "volt_scale": "pass"}}})
         self.assertEqual(AM.baseline("run", run=fake_run(0, True))["stop_reason"], ["K3"])
 
+    def test_malformed_manifests_are_structured_k1_stops(self):
+        Sandbox(self.base)
+        good = json.loads((self.base / "run/manifest.json").read_text(encoding="utf-8"))
+        bad_entries = [{}, {"path": "fig.json"}, {"path": "../fig.json", "sha256": "0" * 64, "kind": "digitized_figure"},
+                       {"path": "sub/fig.json", "sha256": "0" * 64, "kind": "digitized_figure"},
+                       {"path": "fig.json", "sha256": "xyz", "kind": "digitized_figure"},
+                       {"path": "fig.json", "sha256": "0" * 64, "kind": "other"}, "fig.json", None]
+        manifests = [[], {}, {"evaluator_sha256": good["evaluator_sha256"]},
+                     {**good, "files": "fig.json"}, {**good, "files": []},
+                     {**good, "evaluator_sha256": 5},
+                     {**good, "files": good["files"] + good["files"][:1]},           # duplicate path
+                     {**good, "files": good["files"][1:]}]                            # no figure
+        manifests += [{**good, "files": [e] + good["files"][1:]} for e in bad_entries]
+        calls = []
+        for m in manifests:
+            with self.subTest(manifest=m):
+                (self.base / "run/manifest.json").write_text(json.dumps(m), encoding="utf-8")
+                out = AM.baseline("run", run=lambda *a, **k: calls.append(a))
+                self.assertEqual(out["status"], "stopped")
+                self.assertEqual(out["stop_reason"], ["K1"])
+                self.assertTrue(self.report()["checks"]["K1"]["detail"])
+        self.assertEqual(calls, [])
+
+    def test_well_formed_manifest_has_no_problems(self):
+        Sandbox(self.base)
+        m = json.loads((self.base / "run/manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(AM.manifest_problems(m), [])
+
     def test_no_comparison_runs_after_a_failed_check(self):
         Sandbox(self.base, sim={"complete": False, "cases": {}})
         calls = []

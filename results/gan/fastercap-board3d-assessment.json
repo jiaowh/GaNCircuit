@@ -5,7 +5,11 @@
  "report": "results/gan/fastercap-board3d-check.json",
  "report_sha256": "65d5a063dd57edfd4d4886432d1fe46af6aa507edbb9930982e03946eb0f5974",
  "report_schema": "fastercap-board3d-check/1",
- "evaluator_sha256": "ca66236309fb4f228c3cfc41bbd368b20985b9e7068b181eb640be45303aa1e7",
+ "evaluator_sha256": "dfd70fef4626b2b737fc1554c5a4bfbd5f7c743dc9fefb87b433f719c28493f7",
+ "dependencies_sha256": {
+  "scripts/fastercap_board3d_check.py": "6f92e81227208bd45ad2c0a9a64680166b32c3227e61a6ff2b766ea314c6485b",
+  "scripts/fastercap_known_answer.py": "fc14536f183dc3ba35f5e003ba188698f9744bfc1a6030ebfef407ff512aa76e"
+ },
  "gate_rel_tol": 0.001,
  "matrix_validity": {
   "2D -a0.005": [],

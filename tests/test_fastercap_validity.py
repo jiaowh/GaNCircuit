@@ -88,5 +88,17 @@ class ValidityTests(unittest.TestCase):
         self.assertFalse(out["disposition"]["derived_C_per_m_usable"])
 
 
+    def test_stored_assessment_binds_current_dependencies(self):
+        out = ROOT / "results/gan/fastercap-board3d-assessment.json"
+        if not out.is_file():
+            self.skipTest("stored assessment absent")
+        import hashlib
+        import json
+        deps = json.loads(out.read_text(encoding="utf-8"))["dependencies_sha256"]
+        self.assertEqual(set(deps), {"scripts/fastercap_board3d_check.py", *self.fc.DEPENDENCIES})
+        for p, h in deps.items():
+            self.assertEqual(hashlib.sha256((ROOT / p).read_bytes()).hexdigest(), h, p)
+
+
 if __name__ == "__main__":
     unittest.main()
