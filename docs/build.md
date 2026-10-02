@@ -310,6 +310,53 @@ case-H part passes.
   also sound is what the dielectric form of revision 2 decides.
 
 - *Run state, 2 October 2026.* Revision 2 was stopped at the end of the working day during the dielectric M2 call ([report](../results/gan/fastercap-manual-mesh-check-run2-incomplete.json), outcome 'incomplete, stopped'; no check evaluated). Completed: air M1–M3 and dielectric M1. Dielectric M1 took 10 and 27 minutes for its two lengths and gave physical matrices, unlike case H, with C′ = 116.8 pF/m, 5.2 % below the 2D reference (123.2 pF/m). The air form was within 0.5 % on the same mesh, so the dielectric value is either not converged at M1 or still carries an error; the finer meshes decide. Not run: dielectric M2/M3, D5, the automatic run from M1, and K1. The rerun takes an estimated 3–5 hours and should be launched detached, so it is not a child of a session shell.
+- *Run 3, 2–3 October 2026, failed, kept* ([report](../results/gan/fastercap-manual-mesh-check-run3-failed.json)). It was
+  launched detached at 23:33 but shared the host with the two FastHenry benchmarks below and the via-array references.
+  Dielectric M1 at 4 mm exceeded its 1 h limit (27 minutes in run 2), so D2 could not pass. It was stopped during
+  dielectric M2. The air results reproduce run 2 exactly. Run 4 is queued to start alone after the FastHenry jobs.
+
+**FasterCap runner: a false-success path closed (3 October 2026).** With three jobs running, WSL's *free* memory fell to
+tens of MB, while most of the 8 GB sat in page cache. FasterCap sizes its out-of-core storage from free memory, and in some
+via-array reference runs it printed "Cannot go out-of-core, terminating process" during an automatic iteration and still
+exited 0. The shared runner then read the last matrix printed, from an earlier, unconverged iteration, as the result.
+`run_problem` in [fastercap_known_answer.py](../scripts/fastercap_known_answer.py) now rejects a log that reports that
+termination, or that ends an automatic run with its last change above the requested `-a` value. It is unit-tested on
+synthetic logs (tests/test_fastercap_run_problem.py). Every earlier FasterCap result log passes the gate except
+known-answer case E at `-a0.001`, which was already recorded as failed (time). No earlier result was a hidden false
+success. The case H assessment was regenerated to bind the changed helper's hash; only the hash changed.
+
+**Plane-pair slot benchmark** (`python scripts/plane_hole_benchmark.py`, declared at b5c1775;
+[report](../results/gan/plane-hole-benchmark.json)). A plane-pair strip (6.8 × 5.1 mm, board stack) with a slot of
+the measured size (0.65 × 3.65 mm) across or along the current, or a smaller one. The slot is cut through both plates
+(P1) or only through the return plate (P2), as on the board. Meshes use the production rule at the board pitches m1 and
+m2 (grid aligned to the slot centre, as the production grid is to the pin rows, and shifted by half a pitch) and at
+finer pitches. The P1 reference is a new 2D sheet-current solver ([circuit_tools/sheet.py](../src/circuit_tools/sheet.py);
+exact for a plain strip, and within about 1 % of the dilute-hole formula after extrapolation). It gives dL = μ0 (h + δ) dN
+for the slot's added squares dN, with slot edges on cell faces so that no staircase error enters.
+
+- *Reference (R1 converged: 0.06 % and 0.04 % between the two finest cells).* A slot across the current adds 0.89
+  squares, 150 pH in this plane pair. The same slot along the current adds 0.12 squares, 21 pH, seven times less. On the
+  board the slots run along y, as does most of the return current under the transistors (a geometric reading, not an
+  extracted current), which resembles the cheaper orientation.
+- *Board pitches.* FastHenry's slot inductance there is well below the reference, and it depends on grid alignment:
+
+  | Slot (P1) | m1 aligned | m1 shifted | m2 aligned | m2 shifted | 2D reference |
+  |---|---|---|---|---|---|
+  | across, 0.65 × 3.65 | 97.6 pH | 90.1 | 94.2 | 123.0 | 149.7 |
+  | along, 3.65 × 0.65 | 7.4 | 17.7 | 12.1 | 19.3 | 20.7 |
+  | small, across | 26.9 | – | 17.0 | – | 27.4 |
+
+  The slot in the return plate only (P2, the board's case) behaves similarly: 83/77 pH (m1) and 79/103 pH (m2) across the
+  current, 6/14 and 9/15 pH along it. The unslotted strip comes out at 204–205 pH against 224 pH from L/W. That matches
+  every copper edge being widened by half a pitch (L/(W + s) gives 207 pH at m1), the same width overreach the topology
+  audit measured on the board.
+- *Network diagnostic, not supported* ([assessment](../results/gan/plane-hole-network-assessment.json),
+  [script](../scripts/assess_plane_hole_network.py), declared before it was run). In the plane-pair limit, the production
+  mesh should act as a resistor network of its kept segments. That network reproduces the unslotted strip (FastHenry
+  within 1–5 %) and the direction of every alignment effect, but FastHenry's slot inductance is only 0.62–0.77 of the
+  network's. So mesh topology alone does not explain the board-pitch values, and a slot-specific factor remains. One
+  candidate is 3D field fringing at the slot edges, which both the network and the sheet reference omit. The fine meshes
+  and the half-gap case (check P1c) test it.
 
 ### EPC90133 geometry reader and nets (G3 preparation)
 
