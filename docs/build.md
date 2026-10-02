@@ -365,6 +365,28 @@ for the slot's added squares dN, with slot edges on cell faces so that no stairc
   network's. So mesh topology alone does not explain the board-pitch values, and a slot-specific factor remains. One
   candidate is 3D field fringing at the slot edges, which both the network and the sheet reference omit. The fine meshes
   and the half-gap case (check P1c) test it.
+- *Run 1 complete; declared outcome: fail* ([report](../results/gan/plane-hole-benchmark.json)). The f4 profile (the
+  unslotted strip) exceeded both the 75-minute rule and its 3 h limit, so as declared every f4 run was dropped. The checks
+  then use f3 as the finest mesh with m2 for comparison. Each f3 run took 22–89 minutes on the shared host.
+  - R1 passes (reference converged to 0.1 % or better).
+  - **P1a fails:** across-slot dL changes 14.7 % from m2 to f3. **P2a fails:** 13.6 % (10.7 pH).
+  - **P1b fails:** at f3 FastHenry's across-slot dL through both plates is 108.0 pH against the sheet reference's 149.7 pH
+    (−27.9 %). The along-slot and small slots show similar ratios (0.73 and 0.58).
+  - **P1c passes:** with the gap halved the shortfall falls to −16.0 %. An error that scales roughly with h is what
+    field fringing over a distance of order h at the slot edges would give. A straight-line extrapolation to zero gap
+    leaves about −4 %, comparable to the unconverged f3 mesh error. So the sheet picture is not an accurate known
+    answer at the board's ratio of gap to slot size; it overestimates the slot's effect. The extrapolation is a
+    reading, not a declared check, and f3 is not converged.
+  - *Production-mesh error against f3* (reported; f3 is itself not converged): across-slot cases −17 % to +15 %. The
+    along-current slot in the return plate only, the board-like case, gives 5.6–15.3 pH against 11.6 pH (−52 % to
+    +32 %). The production alignment (grid lines through the slot centre) gives the low end: −52 % at m1 and −21 % at m2.
+    The small slot at m1 is +68 %. Grid alignment alone moves these values by factors of up to 2.4.
+  - *What this means for the board extraction.* The board's pin-row slots lie along the return current, the cheaper
+    orientation (about 12 pH per slot in this benchmark strip). The production m1 grid gives about half of that, a few pH
+    per slot, against a loop inductance of 260–280 pH in variants B and G. That suggests the slot representation is a
+    percent-level effect on the loop at the board pitches, not a dominant one. This is a reading from one benchmark
+    geometry. The board's current paths, layer stack and slot count are not reproduced here, so a board-subgeometry
+    check would be needed before quoting it as a board bound.
 
 **Via-array benchmark** (`python scripts/via_array_benchmark.py`, declared at d220f0e; revision 5 at the commit before
 567de11; [report](../results/gan/via-array-benchmark.json)). Closed plane-pair cavities at the board stack hold one via,
