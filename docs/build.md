@@ -255,6 +255,39 @@ Consequences for the benchmarks: the slot benchmark uses the measured slot (0.66
 0.6 mm) at m1 and m2, with the production alignment (slot-centred) and a shifted grid. The via-array benchmark does not
 need a merged-attachment case for these grids.
 
+**Benchmark designs (draft for review; no script, criterion or run yet).** Each becomes a script whose docstring
+declares the criteria, committed before its first run, after one profiled case.
+
+- *Via arrays.* Closed plane-pair cavities at the top-layer/mid-layer-1 stack, as in the single-via check. The wall
+  clearance from the array's bounding box is declared, and two clearances are used so that differences can be formed.
+  Board via section (square, side 0.847 × 0.198 mm), arrangements: one via, a row of six at 0.6 mm, a row of six at
+  1.2 mm, 3 × 3 at 0.6 mm, and later the 35-via source cluster from the board's drill coordinates. Each via is its own
+  port, so FastHenry returns the full N × N matrix; the parallel-array inductance is derived from it, not measured
+  separately. Two representations: the production rule (via end tied to the nearest plate node, plates at the board's
+  m1/m2 pitches, production alignment and a shifted grid) and a resolved one (fine plates, ideal pads).
+  Reference: between perfectly conducting plates the field is two-dimensional, so L = μ0 ε0 (h + δ) C2D⁻¹. Here C2D is
+  the 2D capacitance matrix of the via cross-sections inside the wall, with the wall as reference and every conductor
+  equipotential (the perfect-conductor limit). FasterCap 2D gives C2D: it passed its 2D coax known answer to 0.01 %
+  and is independent of FastHenry. A small Python solver could cross-check it, but is not needed for this step. The
+  2D reference cannot fix the via's length inside the copper (the E2 bracket), so it is compared through quantities in
+  which that cancels: ratios of mutual inductances (Mij/M12; the factor h + δ cancels), and cavity-size differences of
+  self, mutual and parallel-array values (the E1 construction). Absolute values are reported against the E2 bracket
+  only. Tolerances: reference accuracy plus the 2D mesh change, declared with the script.
+- *Plane holes and slots.* P1, holes through both plates: for hole sizes much larger than the plate gap, current in the
+  plane pair is a 2D sheet current with an inductance per square of μ0 (h + δ), and the hole is an insulating
+  boundary. The reference is therefore a 2D sheet-current (Laplace, Neumann at the hole edge) count of squares. A
+  Python finite-difference solver gives it for any hole shape, including the measured slot, and is itself checked
+  against exact strip results (L/W squares without a hole) and the small-circular-hole limit. The sheet picture
+  has an O(h/size) error at hole edges, so its applicability is stated as a ratio and tested with two plate gaps.
+  The strip is long enough that the terminals sit several widths from the hole. P2, a slot in the return plate only
+  (the board case): no reference exists. Checks are mesh stability of the added inductance (with an absolute floor, so
+  a near-zero addition does not make the relative change unstable), the trend as the slot shrinks, and agreement
+  between the production-rule mesh at m1/m2 (slot-centred and shifted) and a resolved mesh. That last comparison is
+  the number the audit's 27 % cover calls for.
+- *Applicability.* Each result is reported as the error of the benchmark geometry, with a separate statement of which
+  board features it resembles and how. Turning it into board uncertainty needs a transfer argument or a
+  representative board-subgeometry check, declared separately.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh
