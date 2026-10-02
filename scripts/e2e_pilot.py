@@ -76,6 +76,18 @@ vendor file may be edited. Stop conditions for an agent: an integrity check fail
 its cited hashes), an upstream record is failed/incomplete/rejected_input, or a step fails twice; it then writes
 its record with the stopped status and a stop_reason and ends.
 
+Reference run 1 (REF, 2 October 2026) stopped in Stage 1 and is kept as failed: the driver treated exit status 2 of
+compare_epc2302_gate_charge.py as a failed step, but 2 is that script's documented status for "report written,
+a declared check failed" (the known Fig. 7 failure); epc2302_baseline.py, epc2302_curve_benches.py,
+compare_epc2302_curves.py and digitize_epc90133_qsg_fig9.py use the same convention. Its I-1 also cited an
+artifact the stopped run never wrote (a builder bug, caught by the validator). Fix before any agent run: a step
+fails on any other nonzero status or when its declared output was not written during the step; status 2 with a
+fresh output continues and the record's checks carry the outcome. The builders cite only existing files. The
+agent cards state the same exit-status rule. No stage, check or score changed; the reference is rerun as REF2.
+Change after the declaration, before any agent run (2 October 2026): papers/ (476 MB of tracked literature PDFs,
+used by no step) is excluded from agent workspaces; the reference workspace was prepared with it. Workspace
+content only; no stage, check or score changed.
+
     python scripts/e2e_pilot.py prepare REF            # workspace under runs/e2e-pilot/REF/workspace
     python scripts/e2e_pilot.py reference REF          # deterministic chain + records + checker
     python scripts/e2e_pilot.py prepare C1 ; python scripts/e2e_pilot.py card C1 stage1   (agent per stage)
@@ -104,7 +116,7 @@ from e2e_check import BASE_CASE, LIB, METRICS, SOURCES, STAGE1, STAGE2, STAGE3, 
 
 BASE = ROOT / "runs/e2e-pilot"
 RESULTS = ROOT / "results/gan/e2e-pilot.json"
-EXCLUDE = ("results/*", "docs/*", "plans/*", "runs/*", "tests/*", "README.md", "AGENTS.md", "CLAUDE.md", ".claude/*",
+EXCLUDE = ("results/*", "docs/*", "plans/*", "papers/*", "runs/*", "tests/*", "README.md", "AGENTS.md", "CLAUDE.md", ".claude/*",
            "scripts/e2e_pilot.py", "scripts/e2e_check.py", "scripts/agent_milestone.py")
 IGNORED_DEPS = ("vendor/epc/epc90133", "vendor/epc/ltspice/EPCGaNLibrary.lib", "vendor/epc/EPCGaNLibrary.zip",
                 ".tools/FastHenry2/bin/fasthenry")
@@ -121,6 +133,13 @@ STAGES = {
     "stage3": [["scripts/digitize_epc90133_qsg_fig9.py"],
                ["scripts/compare_epc90133_fig9.py", "--sim", STAGE2["switching"], "--output", STAGE3["comparison"],
                 "--summary", STAGE3["summary"]]]}
+# The file each step must write during the step (exit status 2 = report written, a declared check failed).
+STEP_OUTPUT = {"scripts/digitize_datasheet_figures.py": STAGE1["figures"], "scripts/epc2302_baseline.py": STAGE1["baseline"],
+               "scripts/epc2302_curve_benches.py": STAGE1["extra"], "scripts/compare_epc2302_gate_charge.py": STAGE1["fig7"],
+               "scripts/compare_epc2302_curves.py": STAGE1["comparison"], "scripts/read_epc90133_geometry.py": STAGE2["geometry"],
+               "scripts/epc90133_power_loop.py": STAGE2["power_loop"], "scripts/epc90133_extract.py": STAGE2["extraction"],
+               "scripts/epc90133_switching.py": STAGE2["switching"], "scripts/digitize_epc90133_qsg_fig9.py": STAGE3["fig9"],
+               "scripts/compare_epc90133_fig9.py": STAGE3["comparison"]}
 RECORD = {"stage1": "handoffs/I-1.json", "stage2": "handoffs/I-2.json", "stage3": "handoffs/assessment.json"}
 ALLOWED = {"stage1": ("results/gan/epc2302-*", "runs/*", "handoffs/I-1.json", "work/stage1/*"),
            "stage2": ("results/gan/epc90133-geometry*", "results/gan/epc90133-power-loop*",
@@ -247,12 +266,15 @@ def outside_allowed(stage, changed):
 def run_stage(ws, stage, log):
     env = dict(os.environ, PYTHONPATH=str(ws / "src"))
     for cmd in STAGES[stage]:
-        t0 = time.monotonic()
+        t0, start = time.monotonic(), time.time()
         p = subprocess.run([PY, *cmd], cwd=ws, env=env, capture_output=True, text=True)
-        log.append({"stage": stage, "cmd": cmd, "returncode": p.returncode, "wall_s": time.monotonic() - t0,
-                    "stdout_tail": p.stdout[-1500:], "stderr_tail": p.stderr[-1500:]})
-        print(stage, cmd[0], p.returncode, f"{log[-1]['wall_s']:.0f} s", flush=True)
-        if p.returncode != 0:
+        out = ws / STEP_OUTPUT[cmd[0]]
+        written = out.is_file() and out.stat().st_mtime >= start - 1
+        ok = written and p.returncode in (0, 2)
+        log.append({"stage": stage, "cmd": cmd, "returncode": p.returncode, "output_written": written, "step_ok": ok,
+                    "wall_s": time.monotonic() - t0, "stdout_tail": p.stdout[-1500:], "stderr_tail": p.stderr[-1500:]})
+        print(stage, cmd[0], p.returncode, "ok" if ok else "FAILED", f"{log[-1]['wall_s']:.0f} s", flush=True)
+        if not ok:
             return False
     return True
 
@@ -302,6 +324,7 @@ def build_i1(ws, ran):
         {"statement": "The model reproduces the datasheet gate-charge curve (Fig. 7)", "scope": "Fig. 7 at its stated conditions",
          "status": "supported" if t["S1-FIG7"] else "not_supported", "evidence": [STAGE1["fig7"]]}]
     rec["assumptions"] = []
+    rec["claims"] = [c for c in rec["claims"] if all((ws / e).is_file() for e in c["evidence"])]
     return rec
 
 
@@ -416,6 +439,7 @@ def reference(name):
         snapshot(name, f"before-{stage}")
         ran = run_stage(ws, stage, log)
         rec = build(ws, ran)
+        rec["claims"] = [c for c in rec.get("claims", []) if all((ws / e).is_file() for e in c["evidence"])]
         (ws / RECORD[stage]).write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
         snapshot(name, f"after-{stage}")
         out[stage] = {"status": rec["status"], "checker": check(ws, RECORD[stage]),
@@ -436,7 +460,9 @@ tool an absolute path inside it, and do not read or search anything outside it (
 holds other runs and reports; using them invalidates this run). Do not edit anything under scripts/, src/,
 devices/ or vendor/, do not install anything, do not commit, do not ask questions: finish on your own.
 Python: {py} (Windows; set PYTHONPATH to the workspace's src directory). FastHenry runs through WSL, called by the
-scripts. A step that fails for an environmental reason (timeout, crash, locked file) may be rerun ONCE unchanged;
+scripts. Exit status: 0 = success; 2 (some scripts) = the script wrote its report and a declared check or bench failed,
+which is a check outcome to record, not a failed step; any other status, or a step that did not write its report,
+is a failed step. A step that fails for an environmental reason (timeout, crash, locked file) may be rerun ONCE unchanged;
 record the retry. Never change a script's arguments from those given, never edit a model, record or vendor file.
 Wall-clock budget: 90 minutes for this stage.
 
