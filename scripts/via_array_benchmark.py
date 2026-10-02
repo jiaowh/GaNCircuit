@@ -1,0 +1,305 @@
+#!/usr/bin/env python3
+"""Via arrays in a closed plane-pair cavity: FastHenry under the production via rule against a 2D reference (V1-V3).
+
+Declared 2 October 2026, before its first run (plan section 10 item 9; docs/build.md "Via-array, plane-hole and
+FasterCap qualification", draft design). The single-via cavity (scripts/fasthenry_via_cavity.py) passes its mesh
+criterion but says nothing about arrays: board vias come in rows of six at 0.6 mm under each transistor pin and one
+35-via cluster under Q2's source, and a single-via value must not be divided by the via count. This benchmark
+measures how FastHenry with the production via rule represents arrays, through quantities in which the via's length
+inside the plate copper (the single-via E2 bracket) cancels. It reports errors of these benchmark geometries; it does
+not give board error bars.
+
+Geometry (mm), as the single-via cavity: plates of thickness T = 0.0711 at mid-planes z = 0 (bottom) and h + T (top),
+gap h = 0.127, square cavity of half-side a closed by a wall of vertical segments at every perimeter node (width s,
+thickness T). Vias: square section, side w = 0.847 x 0.198 (the extractor's rule for the board's 0.198 mm drills),
+one vertical segment each between the plate mid-planes (nwinc = nhinc = 3, rw = rh = 2). Arrangements, centred:
+    single     one via;
+    row6-0.6   six vias at x = 0, y = -1.5 ... 1.5 (pitch 0.6, as under each pin);
+    row6-1.2   six vias at x = 0, pitch 1.2;
+    grid3-0.6  3 x 3 at pitch 0.6.
+Clearances c = 1.0 and 2.0 mm from the outermost via centres to the wall: a = k s with k = round((half-span + c) / s),
+so a depends slightly on the mesh; each reference uses the same a. The 35-via cluster is deferred to a later case.
+Representations:
+    production  plates at the board pitches m1 (s = 0.425, plate nhinc 3) and m2 (0.2125, 5), grid lines through x = 0
+                and y = 0 (the production grid runs through the via rows); each via's top end tied to the nearest top
+                node, its bottom end is the port's + node and the nearest bottom node the port's - node;
+    resolved    s = 0.085 (about w/2), plate nhinc 3; top end tied to every top node within the via footprint grown to
+                s/2 (Chebyshev), port - node tied to the same bottom nodes. Single mesh: a consistency check of
+                FastHenry against the reference, not a converged value (the single-via cavity at w/2 was 5 % high in
+                absolute L but within 0.6 % in its cavity difference).
+Each via is its own port; FastHenry gives the full N x N impedance matrix at 100 MHz (-p diag, admittance columns,
+inverted); L = Im(Z) / omega, symmetrised.
+
+Reference. Between perfectly conducting plates the field of vertical currents is two-dimensional, so
+L_ref = mu0 eps0 (h + delta) C2D^-1, with C2D the 2D Maxwell matrix of the via cross-sections inside the wall's inner
+face (a square of side 2a - T, the wall conductor as reference), every conductor equipotential. C2D from FasterCap 2D
+(qualified on its 2D coax to 0.01 %), at -a0.001 and -a0.0005, every matrix through the physical-validity gate.
+The reference cannot fix the via length inside the copper, so comparisons use:
+    mutual ratios       r_j = M_1j / M_12 for rows (via 1 at one end), and M_centre,corner / M_centre,edge for the grid;
+                        the factor h + delta cancels;
+    cavity differences  dX = X(c = 2) - X(c = 1) for X = the parallel-array inductance
+                        L_par = 1 / (1^T L^-1 1) and the self inductance of via 1 (the E1 construction);
+    absolute L_par      reported against the reference at h + delta and h + T + delta (the bracket), not judged.
+Checks, fixed here:
+V0  reference: every C2D valid; -a0.001 to -a0.0005 changes every entry of L_ref by <= 0.2 %.
+V1  resolved, mutual ratios: every r_j of row6-0.6 within 3 % of the reference (a single via has no ratio).
+V2  resolved, cavity differences: dL_par and dL_self within 3 % of the reference, for single and row6-0.6.
+V3  resolved, absolute: L_par inside the reference bracket for single and row6-0.6.
+Reported, not judged: the same ratios, differences and absolute values for the production representation at m1 and
+m2, as relative errors against the reference; the reference's L_par of each array against L_single / N for one via in
+the same cavity (to show why a single-via value must not be divided by the count).
+Run order: references, then production (cheap), then resolved. One FastHenry job at a time, 3 h limit per job, report
+checkpointed after each job; --resume continues a report written by the same evaluator.
+
+    python scripts/via_array_benchmark.py            # results/gan/via-array-benchmark.json
+"""
+import argparse
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import sys
+import uuid
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
+from epc90133_extract import run_case  # noqa: E402
+from fastercap_board3d_check import matrix_validity  # noqa: E402
+from fastercap_known_answer import FC_BIN, run_fastercap, seg  # noqa: E402
+from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth  # noqa: E402
+
+OUTPUT = ROOT / "results/gan/via-array-benchmark.json"
+T, H = 0.0711, 0.127
+W = 0.847 * 0.198
+FREQ = 1e8
+MU0, EPS0 = 4e-7 * math.pi, 8.8541878128e-12
+CLEAR = (1.0, 2.0)
+ARRANGEMENTS = {
+    "single": [(0.0, 0.0)],
+    "row6-0.6": [(0.0, -1.5 + 0.6 * k) for k in range(6)],
+    "row6-1.2": [(0.0, -3.0 + 1.2 * k) for k in range(6)],
+    "grid3-0.6": [(x, y) for y in (-0.6, 0.0, 0.6) for x in (-0.6, 0.0, 0.6)],
+}
+REPS = {"m1": (0.425, 3, "production"), "m2": (0.2125, 5, "production"), "r1": (0.085, 3, "resolved")}
+RESOLVED_CASES = ("single", "row6-0.6")
+AUTO_2D = ("0.001", "0.0005")
+DEPENDENCIES = ("scripts/epc90133_extract.py", "scripts/fastercap_board3d_check.py", "scripts/fastercap_known_answer.py",
+                "scripts/fasthenry_known_answer.py")
+
+
+def half_side(arr, c, s):
+    span = max(max(abs(x), abs(y)) for x, y in ARRANGEMENTS[arr])
+    return round((span + c) / s) * s
+
+
+def deck(arr, c, rep):
+    s, n, kind = REPS[rep]
+    a = half_side(arr, c, s)
+    k = round(a / s)
+    zt = H + T
+    name = lambda p, i, j: f"n{p}_{i + k}_{j + k}"  # noqa: E731
+    lines = [f"* via array {arr}, clearance {c}, {rep}; generated by scripts/via_array_benchmark.py", ".units mm",
+             f".default sigma={SIGMA_CU_PER_MM:g}"]
+    for p, z in (("b", 0.0), ("t", zt)):
+        for i in range(-k, k + 1):
+            for j in range(-k, k + 1):
+                lines.append(f"{name(p, i, j)} x={i * s:.9g} y={j * s:.9g} z={z:.9g}")
+    e = 0
+    for p in ("b", "t"):
+        for i in range(-k, k + 1):
+            for j in range(-k, k + 1):
+                if i < k:
+                    e += 1
+                    lines.append(f"E{e} {name(p, i, j)} {name(p, i + 1, j)} w={s:.9g} h={T} nwinc=1 nhinc={n} rh=2")
+                if j < k:
+                    e += 1
+                    lines.append(f"E{e} {name(p, i, j)} {name(p, i, j + 1)} w={s:.9g} h={T} nwinc=1 nhinc={n} rh=2")
+    for i in range(-k, k + 1):
+        for j in range(-k, k + 1):
+            if max(abs(i), abs(j)) == k:
+                along_x = abs(j) == k
+                e += 1
+                lines.append(f"E{e} {name('b', i, j)} {name('t', i, j)} w={s:.9g} h={T} "
+                             f"wx={1 if along_x else 0} wy={0 if along_x else 1} wz=0 nwinc=1 nhinc=1")
+    ports = []
+    used = {}
+    for v, (x, y) in enumerate(ARRANGEMENTS[arr]):
+        if kind == "production":
+            pads = [(round(x / s), round(y / s))]
+        else:
+            g = max(W / 2, s / 2) + 1e-9
+            pads = [(i, j) for i in range(-k, k + 1) for j in range(-k, k + 1) if abs(i * s - x) <= g and abs(j * s - y) <= g]
+        for ij in pads:
+            if ij in used:
+                raise RuntimeError(f"vias {used[ij]} and {v} share an attachment node")
+            used[ij] = v
+        lines += [f"nv{v}b x={x:.9g} y={y:.9g} z=0", f"nv{v}t x={x:.9g} y={y:.9g} z={zt:.9g}",
+                  f"Ev{v} nv{v}b nv{v}t w={W:.9g} h={W:.9g} wx=1 wy=0 wz=0 nwinc=3 nhinc=3 rw=2 rh=2",
+                  ".equiv " + " ".join([f"nv{v}t"] + [name("t", i, j) for i, j in pads])]
+        if len(pads) > 1:
+            lines.append(".equiv " + " ".join(name("b", i, j) for i, j in pads))
+        i0, j0 = pads[0]
+        lines.append(f".external nv{v}b {name('b', i0, j0)} v{v}")
+        ports.append((f"v{v}", None, None))
+    lines += [f".freq fmin={FREQ:g} fmax={FREQ:g} ndec=1", ".end", ""]
+    return "\n".join(lines), ports, a
+
+
+def reference(arr, a, auto, workdir):
+    """L_ref per unit (h + delta) [H/m]: mu0 eps0 C2D^-1 for the via squares inside the wall's inner face."""
+    m = 1e-3
+    files = {"va.lst": f"2D via array {arr}, half-side {a}\n"}
+    for v, (x, y) in enumerate(ARRANGEMENTS[arr]):
+        h = W / 2
+        pts = [(x - h, y - h), (x + h, y - h), (x + h, y + h), (x - h, y + h), (x - h, y - h)]
+        files[f"v{v}.txt"] = f"* via {v}\n" + "".join(seg(f"v{v}", p[0] * m, p[1] * m, q[0] * m, q[1] * m) for p, q in zip(pts, pts[1:]))
+        files["va.lst"] += f"C v{v}.txt 1.0 0 0\n"
+    b = a - T / 2
+    pts = [(-b, -b), (b, -b), (b, b), (-b, b), (-b, -b)]
+    files["wall.txt"] = "* wall inner face\n" + "".join(seg("wall", p[0] * m, p[1] * m, q[0] * m, q[1] * m) for p, q in zip(pts, pts[1:]))
+    files["va.lst"] += "C wall.txt 1.0 0 0\n"
+    mat, names, _ = run_fastercap(files, workdir, auto, 3600)
+    return mat
+
+
+def metrics(L):
+    """Parallel-array inductance, self of via 0, and mutual ratios, from a symmetric N x N matrix (henry)."""
+    L = np.asarray(L)
+    n = len(L)
+    out = {"L_par": float(1 / np.sum(np.linalg.inv(L))), "L_self0": float(L[0, 0])}
+    if n == 6:
+        out["ratios"] = [float(L[0, j] / L[0, 1]) for j in range(2, 6)]
+    elif n == 9:  # centre is via 4; edge neighbour via 1, corner via 0
+        out["ratios"] = [float(L[4, 0] / L[4, 1])]
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--resume", action="store_true")
+    args = ap.parse_args()
+    ev = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    if args.resume and OUTPUT.is_file():
+        rep = json.loads(OUTPUT.read_text(encoding="utf-8"))
+        if rep["evaluator_sha256"] != ev:
+            raise SystemExit("report was written by a different evaluator")
+    else:
+        rep = {"schema": "via-array-benchmark/1", "declared": "2026-10-02, before the first run (docstring)",
+               "evaluator_sha256": ev,
+               "dependencies_sha256": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES},
+               "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
+               "fastercap_binary_sha256": hashlib.sha256(FC_BIN.read_bytes()).hexdigest(),
+               "run_directory": f"runs/via-array-{uuid.uuid4().hex[:12]}", "references": {}, "runs": {}, "errors": []}
+    root = ROOT / rep["run_directory"]
+    delta = skin_depth(FREQ) * 1e3
+
+    def save():
+        tmp = OUTPUT.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(rep, indent=1) + "\n")
+        os.replace(tmp, OUTPUT)
+
+    plan = [(arr, c, r) for r in ("m1", "m2") for arr in ARRANGEMENTS for c in CLEAR] + \
+           [(arr, c, "r1") for arr in RESOLVED_CASES for c in CLEAR]
+    # references for every cavity size used
+    wanted = []
+    for arr, c, r in plan:
+        a = half_side(arr, c, REPS[r][0])
+        wanted += [(arr, a), ("single", a)]  # one via in the same cavity, for the division-by-count comparison
+    for arr, a in wanted:
+        key = f"{arr}|a={a:.6g}"
+        if key in rep["references"]:
+            continue
+        row = {}
+        for auto in AUTO_2D:
+            try:
+                C = reference(arr, a, auto, root / "ref" / key.replace("|", "_") / auto)
+                val = matrix_validity(C)
+                row[auto] = {"C2D": C, "validity": val,
+                             "L_per_heff_H_per_m": (MU0 * EPS0 * np.linalg.inv(np.array(C))).tolist() if not val else None}
+            except RuntimeError as exc:
+                row[auto] = {"error": str(exc)}
+                rep["errors"].append(f"reference {key} -a{auto}: {exc}")
+        rep["references"][key] = row
+        print("reference", key, {k: v.get("validity", v.get("error")) for k, v in row.items()}, flush=True)
+        save()
+    for arr, c, r in plan:
+        rid = f"{arr}|c={c:g}|{r}"
+        if rid in rep["runs"]:
+            continue
+        text, ports, a = deck(arr, c, r)
+        try:
+            order, Y, times, fil = run_case(text, ports, root / rid.replace("|", "_").replace("=", ""), 1)
+            Z = np.linalg.inv(Y)
+            idx = [order.index(f"v{v}") for v in range(len(ports))]
+            Z = Z[np.ix_(idx, idx)]
+            L = (Z.imag + Z.imag.T) / 2 / (2 * math.pi * FREQ)
+            rep["runs"][rid] = {"a_mm": a, "L_H": L.tolist(), "R_ohm": ((Z.real + Z.real.T) / 2).tolist(),
+                                "seconds": sum(times), "filaments": fil}
+        except Exception as exc:  # recorded per run
+            rep["runs"][rid] = {"a_mm": a, "error": f"{type(exc).__name__}: {exc}"}
+            rep["errors"].append(f"{rid}: {exc}")
+        print(rid, {k: v for k, v in rep["runs"][rid].items() if k not in ("L_H", "R_ohm")}, flush=True)
+        save()
+
+    # evaluation
+    def ref_L(arr, a, gap):
+        row = rep["references"].get(f"{arr}|a={a:.6g}", {}).get(AUTO_2D[-1], {})
+        Lp = row.get("L_per_heff_H_per_m")
+        return np.array(Lp) * gap * 1e-3 if Lp is not None else None
+
+    res = {}
+    v0_changes = []
+    for key, row in rep["references"].items():
+        x, y = row.get(AUTO_2D[0], {}).get("L_per_heff_H_per_m"), row.get(AUTO_2D[1], {}).get("L_per_heff_H_per_m")
+        v0_changes.append(float(np.max(np.abs(np.array(y) / np.array(x) - 1))) if x and y else None)
+    checks = {"V0": {"max_change": max((v for v in v0_changes if v is not None), default=None),
+                     "pass": all(v is not None and v <= 0.002 for v in v0_changes)}}
+    for arr, c, r in plan:
+        run = rep["runs"].get(f"{arr}|c={c:g}|{r}", {})
+        if "L_H" not in run:
+            continue
+        Lr = ref_L(arr, run["a_mm"], H + delta)
+        Lr_hi = ref_L(arr, run["a_mm"], H + T + delta)
+        if Lr is None:
+            continue
+        mf, mr, mh = metrics(run["L_H"]), metrics(Lr), metrics(Lr_hi)
+        res[f"{arr}|c={c:g}|{r}"] = {"fasthenry": mf, "reference": mr, "reference_upper": mh,
+                                     "ratio_errors": [a / b - 1 for a, b in zip(mf.get("ratios", []), mr.get("ratios", []))],
+                                     "L_par_bracket_position": (mf["L_par"] - mr["L_par"]) / (mh["L_par"] - mr["L_par"])}
+    for arr in ARRANGEMENTS:
+        for r in REPS:
+            a1, a2 = res.get(f"{arr}|c=1|{r}"), res.get(f"{arr}|c=2|{r}")
+            if a1 and a2:
+                res[f"{arr}|diff|{r}"] = {
+                    q: {"fasthenry": a2["fasthenry"][q] - a1["fasthenry"][q], "reference": a2["reference"][q] - a1["reference"][q],
+                        "relative_error": (a2["fasthenry"][q] - a1["fasthenry"][q]) / (a2["reference"][q] - a1["reference"][q]) - 1}
+                    for q in ("L_par", "L_self0")}
+    v1 = [e for arr in RESOLVED_CASES for c in CLEAR for e in res.get(f"{arr}|c={c:g}|r1", {}).get("ratio_errors", [])]
+    checks["V1"] = {"max_abs_error": max((abs(e) for e in v1), default=None), "pass": bool(v1) and all(abs(e) <= 0.03 for e in v1)}
+    v2 = [res.get(f"{arr}|diff|r1", {}).get(q, {}).get("relative_error") for arr in RESOLVED_CASES for q in ("L_par", "L_self0")]
+    checks["V2"] = {"errors": v2, "pass": all(e is not None and abs(e) <= 0.03 for e in v2)}
+    v3 = [res.get(f"{arr}|c={c:g}|r1", {}).get("L_par_bracket_position") for arr in RESOLVED_CASES for c in CLEAR]
+    checks["V3"] = {"bracket_positions": v3, "pass": all(p is not None and 0 <= p <= 1 for p in v3)}
+    div = {}
+    for arr in ARRANGEMENTS:
+        a = half_side(arr, 1.0, REPS["m2"][0])
+        La, L1 = ref_L(arr, a, H + delta), ref_L("single", a, H + delta)
+        if La is not None and L1 is not None:
+            lp, l1 = metrics(La)["L_par"], float(L1[0, 0])
+            div[arr] = {"half_side_mm": a, "reference_L_par_H": lp, "single_over_N_H": l1 / len(ARRANGEMENTS[arr]),
+                        "ratio": lp / (l1 / len(ARRANGEMENTS[arr]))}
+    rep["division_by_count"] = div
+    rep["results"] = res
+    rep["checks"] = checks
+    rep["all_pass"] = all(v["pass"] for v in checks.values())
+    rep["outcome"] = "complete"
+    save()
+    print(json.dumps(checks, indent=1, default=str))
+
+
+if __name__ == "__main__":
+    main()
