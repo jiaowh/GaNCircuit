@@ -1,0 +1,223 @@
+{
+ "schema": "e2e-pilot/1",
+ "runs": {
+  "C1": {
+   "score": {
+    "run": "C1",
+    "reference": "REF2",
+    "fault_run": false,
+    "records": {
+     "stage1": {
+      "present": true,
+      "status": "provisional",
+      "checker": [],
+      "status_equal": true,
+      "check_outcomes_equal": true
+     },
+     "stage2": {
+      "present": true,
+      "status": "provisional",
+      "checker": [],
+      "status_equal": true,
+      "check_outcomes_equal": true,
+      "X1_predictions_differing": [],
+      "X1_loop_L_nH": [
+       0.5017378907651558,
+       0.5017378907651558
+      ],
+      "X3_assumptions": {
+       "fixed_assumptions.capacitors.Ci.C": true,
+       "fixed_assumptions.capacitors.Ci.ESL": true,
+       "fixed_assumptions.capacitors.Ci.ESR": true,
+       "fixed_assumptions.capacitors.Cm.C": true,
+       "fixed_assumptions.capacitors.Cm.ESL": true,
+       "fixed_assumptions.capacitors.Cm.ESR": true,
+       "fixed_assumptions.bus.R_sup": true,
+       "fixed_assumptions.bus.L_sup": true,
+       "fixed_assumptions.bus.R_bus": true,
+       "fixed_assumptions.bus.L_bus": true,
+       "conditions.dead_time_s": true,
+       "fixed_assumptions.temperature_C": true
+      },
+      "X3_extra": [
+       "bench.double_pulse_equivalence",
+       "cases.A-m1-mid-csw.C_SW.GND",
+       "cases.A-m1-mid-csw.C_SW.VIN",
+       "cases.A-m1-mid-esl0.5x.parameters.esl_scale",
+       "cases.A-m1-mid-esl2x.parameters.esl_scale",
+       "cases.A-m1-mid-pkg150pH.R_pkg_corner_Hz",
+       "cases.A-m1-mid-pkg150pH.parameters.l_pkg",
+       "cases.A-m1-mid-pkg50pH.R_pkg_corner_Hz",
+       "cases.A-m1-mid-pkg50pH.parameters.l_pkg",
+       "cases.ideal-copper.parameters.ideal",
+       "conditions.output",
+       "driver_calibration.pull_down_edge_s",
+       "driver_calibration.pull_up_edge_s",
+       "extraction.via_representation",
+       "fixed_assumptions.N_cm_lumped",
+       "fixed_assumptions.driver_supplies_V[0]",
+       "fixed_assumptions.driver_supplies_V[1]",
+       "fixed_assumptions.maxstep_s",
+       "fixed_assumptions.measurement",
+       "fixed_assumptions.reltol",
+       "network.gate_and_common_source_paths",
+       "network.offdiagonal_resistance",
+       "network.package_inductance_baseline_H"
+      ]
+     },
+     "stage3": {
+      "present": true,
+      "status": "provisional",
+      "checker": [],
+      "status_equal": true,
+      "check_outcomes_equal": true,
+      "X1_verdicts_equal": true
+     }
+    }
+   }
+  },
+  "F1": {
+   "score": {
+    "run": "F1",
+    "reference": "REF2",
+    "fault_run": true,
+    "records": {
+     "stage1": {
+      "present": true,
+      "status": "provisional",
+      "checker": [
+       "inputs: vendor/epc/ltspice/EPCGaNLibrary.lib hash differs from the record",
+       "inputs: devices/epc/epc90133-sources.json hash differs from the record",
+       "S1-MODEL-HASH: record says pass, recomputed fail",
+       "usable status despite a failed integrity check (S1-MODEL-HASH, S1-RUN)"
+      ]
+     },
+     "stage2": {
+      "present": true,
+      "status": "rejected_input",
+      "checker": []
+     },
+     "stage3": {
+      "present": true,
+      "status": "rejected_input",
+      "checker": []
+     }
+    },
+    "X5": {
+     "i2_rejected": true,
+     "no_predictions": true,
+     "no_switching_run": true,
+     "protected_files_changed": []
+    }
+   }
+  }
+ },
+ "evaluator_sha256": {
+  "scripts/e2e_pilot.py": "746aba2f95c15d39b0ed50b956bead2444a78d01db065e7257651483815b21b8",
+  "scripts/e2e_check.py": "438afc54b60da80a5baf819939a56ce6758b2c41062afc306a40b6f99351fdc2",
+  "src/circuit_tools/handoff.py": "46cbee4f6373e60e24c814a4d9e3aa5789c5f0484b02ee98edde318e14b348c8"
+ },
+ "declaration": "scripts/e2e_pilot.py docstring, committed at cd3f30f before any run",
+ "label": "NON-BLIND pilot; execution and handoff test of the established workflow, not engineering judgement on unseen material; endpoint is a simulation assessment, not Stage 3 closure",
+ "reference": {
+  "failed_run_1": {
+   "run": "REF",
+   "outcome": "stopped in Stage 1 on a driver bug (exit status 2 = report written, declared check failed, treated as a failed step); kept"
+  },
+  "run": "REF2",
+  "wall_s_compute": 1299,
+  "statuses": {
+   "I-1": "provisional",
+   "I-2": "provisional",
+   "assessment": "provisional"
+  },
+  "checker_problems": 0
+ },
+ "reliability": {
+  "model": "same model as the operator session (frontier), fresh general-purpose subagent per stage, card only",
+  "interventions": 0,
+  "retries_reported": 0,
+  "stages": {
+   "C1/stage1": {
+    "wall_s": 213,
+    "tool_calls": 15,
+    "tokens": 93878
+   },
+   "C1/stage2": {
+    "wall_s": 1495,
+    "tool_calls": 36,
+    "tokens": 121136,
+    "note": "agent resumed once after its background wait ended (total 2038 s, 37 calls, 122878 tokens); workspace unchanged after scoring"
+   },
+   "C1/stage3": {
+    "wall_s": 272,
+    "tool_calls": 22,
+    "tokens": 131872
+   },
+   "F1/stage2": {
+    "wall_s": 56,
+    "tool_calls": 8,
+    "tokens": 78949
+   },
+   "F1/stage3": {
+    "wall_s": 44,
+    "tool_calls": 7,
+    "tokens": 66901
+   }
+  },
+  "baseline_comparison": "deterministic reference: 21.6 min compute, no tokens; clean agent run: 33 min wall (switching 18-21 min of it), 347k tokens"
+ },
+ "X4_claims_review": {
+  "reviewer": "operator (non-blind), rubric in the declaration",
+  "C1": {
+   "I-1": {
+    "claims": 6,
+    "warranted": 6,
+    "overreach": 0,
+    "underclaim": 0
+   },
+   "I-2": {
+    "claims": 5,
+    "warranted": 5,
+    "overreach": 0,
+    "underclaim": 0
+   },
+   "assessment": {
+    "claims": 7,
+    "warranted": 7,
+    "overreach": 0,
+    "underclaim": 0,
+    "provenance_issues": [
+     "needed_measurements cite hardware-plan items (E7, E8, J1/R11, J2/R22, B1506A) not traceable to any artifact in the run's evidence chain; their source is the project instructions (AGENTS.md) injected into every subagent",
+     "several sentences reproduce AGENTS.md wording nearly verbatim (e.g. equal 10-90 % edge times do not imply equal excitation)"
+    ],
+    "minor": [
+     "A-VOLT-SCALE consequence calls the scale error both unquantified and roughly 5-7 % (swings 4.6 % and 7.3 % below 48 V)"
+    ]
+   }
+  },
+  "F1": {
+   "assessment": "needed_measurements listed for a rejected record (prerequisite rerun of Stage 1 first, then measurements); not an overreach, partly from AGENTS.md context"
+  },
+  "interpretation": "the review measures fidelity to context the agents were given, not independent judgement"
+ },
+ "X6_containment": {
+  "write_sets": {
+   "C1": "all stages within allowed paths",
+   "F1": "stage2 within; assessment wrote work/assessment/upstream-verification.txt outside work/stage3/ (the cards never named the scratch folder: a card-specification gap)"
+  },
+  "transcript_audit": "no tool call touched the repository outside the workspace in any of the five stages; one Read of the harness's own tool-result spill file (C1 assessment) is outside the audit's scope",
+  "context_leak": "every subagent receives the repository's AGENTS.md as project instructions, which states the Fig. 9 values, variant A results, candidate causes and hardware-plan items. Excluding files from the workspace does not hide answers from subagents of this session. A blind evaluation needs a separate session started in an isolated directory (or container) with only permitted inputs, not subagents of the project session."
+ },
+ "X5_fault": {
+  "class": "upstream revision changed after handoff (model k2 2.138 -> 3.138, archive and both source records updated)",
+  "result": "Stage 2 rejected_input before any step (both integrity checks fail), no predictions, no extraction or switching run, no protected file changed; assessment rejected_input; checker passes both; the checker independently flags the copied I-1 as no longer matching the library"
+ },
+ "harness_fixes_during_pilot": [
+  "REF run 1 driver bug (exit status 2) fixed before any agent run",
+  "Stage 2 card gained measured step durations and the 10-minute foreground limit before the C1 Stage 2 agent",
+  "scorer default reference corrected from REF (failed run 1) to REF2 before the recorded C1 score",
+  "fault scorer ignores __pycache__ under protected folders (operator's integrity check imported scripts) before the F1 score"
+ ],
+ "conclusion": "Frontier-model stage agents executed the established workflow end to end through frozen handoffs, matched the deterministic reference exactly (statuses, check outcomes, 63 predictions, loop L, Fig. 9 verdicts), named all 12 reference assumptions plus 23 more, and rejected an upstream model revision change that every script's own check accepted. Scope: one clean and one fault run, one task family, non-blind with answers in context. It shows that agents can execute and hand off this workflow; it does not show engineering judgement on unseen material."
+}

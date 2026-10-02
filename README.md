@@ -278,8 +278,12 @@ Next steps:
    its known-answer checks support. All values go into one `parasitics.inc` file, with the couplings kept.
 4. **Agent runs.** A first bounded run works: an agent given only a task card checks the declared inputs of the Fig. 9
    comparison, runs it with the same result as the plain script, and stops correctly when an input has been altered
-   ([result](results/gan/agent-milestone-1.json)). That is one narrow task run once each. Next are repeated runs and
-   tasks in which the agent has to make a decision.
+   ([result](results/gan/agent-milestone-1.json)). In a first end-to-end pilot, one agent per stage ran the whole
+   simulation workflow (model checks, extraction and switching, comparison with the published waveform) and passed
+   its results on through versioned handoff records. It matched a plain-script reference exactly and refused to
+   continue when the device model had been changed after the model stage qualified it
+   ([result](results/gan/e2e-pilot.json)). The agents could see the project's own notes, so this tests execution
+   and handoffs, not engineering judgement on unseen material.
 5. **Later:** our own board layout in KiCad, with predictions frozen before fabrication and scored against measurements.
 
 ## Tools

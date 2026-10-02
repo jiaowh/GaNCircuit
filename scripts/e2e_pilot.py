@@ -86,6 +86,9 @@ fresh output continues and the record's checks carry the outcome. The builders c
 agent cards state the same exit-status rule. No stage, check or score changed; the reference is rerun as REF2.
 Card change before the Stage 2 agent of C1 (2 October 2026): the Stage 2 card states the step durations measured in
 REF2 and that a foreground shell command is cut off at 10 min (an environment fact; the switching step takes ~18 min).
+Scorer fixes after the runs, before the recorded scores (2 October 2026): the score's default reference was REF (the
+failed run 1) and is now REF2; the fault score ignores __pycache__ files under protected folders (the operator's
+check of the injected model imported scripts). Results: results/gan/e2e-pilot.json; docs/build.md "E2E-0 pilot".
 Change after the declaration, before any agent run (2 October 2026): papers/ (476 MB of tracked literature PDFs,
 used by no step) is excluded from agent workspaces; the reference workspace was prepared with it. Workspace
 content only; no stage, check or score changed.
@@ -561,7 +564,7 @@ def audit_transcript(transcript, ws):
     return {"tool_calls": calls, "flagged": flagged}
 
 
-def score(name, ref="REF", fault=False):
+def score(name, ref="REF2", fault=False):
     ws, rws = ws_of(name), ws_of(ref)
     out = {"run": name, "reference": ref, "fault_run": fault, "records": {}}
     for stage, rel in RECORD.items():
@@ -605,7 +608,7 @@ def score(name, ref="REF", fault=False):
         i2 = ws / RECORD["stage2"]
         rec = json.loads(i2.read_text(encoding="utf-8")) if i2.is_file() else {}
         protected = [p for p in changes(name, "prepared", "final")
-                     if p.startswith(("scripts/", "src/", "devices/", "vendor/"))]
+                     if p.startswith(("scripts/", "src/", "devices/", "vendor/")) and "__pycache__" not in p]
         out["X5"] = {"i2_rejected": rec.get("status") == "rejected_input", "no_predictions": not rec.get("predictions"),
                      "no_switching_run": not (ws / STAGE2["switching"]).is_file()
                      and not (ws / STAGE2["extraction"]).is_file(),
@@ -625,6 +628,7 @@ def main():
     ap.add_argument("arg", nargs="*")
     ap.add_argument("--fault-from")
     ap.add_argument("--fault", action="store_true")
+    ap.add_argument("--ref", default="REF2", help="reference run (REF2; REF is the failed reference run 1)")
     a = ap.parse_args()
     if a.action == "prepare":
         prepare(a.name, a.fault_from)
@@ -641,7 +645,7 @@ def main():
     elif a.action == "audit":
         print(json.dumps(audit_transcript(a.arg[0], ws_of(a.name)), indent=1))
     else:
-        score(a.name, fault=a.fault)
+        score(a.name, ref=a.ref, fault=a.fault)
 
 
 if __name__ == "__main__":

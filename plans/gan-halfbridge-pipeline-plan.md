@@ -556,6 +556,10 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    target; a held-out target needs an isolated environment, a frozen reference method and an independent
    review of geometry, ports, pinout, driver and benchmark applicability. Yields priority to the probe/channel
    plan and first-power procedure once the equipment inventory arrives.
+   *Run, 2 October 2026* (docs/build.md "E2E-0 pilot"): reference run 1 stopped on a driver bug (kept), run 2
+   provisional throughout; clean run identical to the reference; fault run rejected at Stage 2 and the assessment;
+   no interventions. Found: every subagent of this session receives AGENTS.md, so excluding files does not hide
+   answers; blind runs need a separate isolated session. Next: owner review of value and cost.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:

@@ -1256,6 +1256,45 @@ output); both panels are required by name; unreadable inputs become structured s
 one figure) is validated before any entry is used (tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
 outputs with the baseline's comparison directly, and the faults above were not among the declared fault kinds.
 
+### E2E-0 pilot: the simulation workflow end to end through stage handoffs
+
+Declared before its runs in `scripts/e2e_pilot.py` (2 October 2026; [result](../results/gan/e2e-pilot.json)) after an
+external review of the end-to-end plan, which reduced it to this pilot. **Non-blind.** Its endpoint is a simulation
+assessment against QSG Fig. 9; it is not Stage 3 closure. The stages hand off through frozen records
+(`src/circuit_tools/handoff.py`: I-1, I-2 and the assessment, with complete/provisional/incomplete/failed/rejected_input
+states and exception inheritance). An independent checker (`scripts/e2e_check.py`) rehashes cited files, recomputes
+every required check, compares predictions with the report and requires stops to be warranted. Configuration:
+EPC2302 Stage 1 benches, extraction A:m1:mid, the switching sensitivity study on A (nine cases), then the Fig. 9
+comparison. Each stage ran in a copied workspace without results, docs or plans, one fresh subagent per stage on the
+operator's frontier model, given only its stage card.
+
+- **Reference.** Run 1 stopped on a driver bug: it treated exit status 2 (report written, declared check failed) as
+  a failed step. It is kept. Run 2 completed in 21.6 min of compute; all three records are provisional and the
+  checker found no problems.
+- **Clean run C1.** It matched the reference exactly: statuses, every check outcome, all 63 predictions, loop L
+  0.502 nH and the per-case Fig. 9 verdicts. All 12 reference assumptions were named with equal values, plus 23
+  more. The checker passes all three records. Stages took 3.6, 25 and 4.5 min, with 15/36/22 tool calls and
+  94k/121k/132k tokens. No interventions or retries.
+- **Fault run F1** (C1's Stage 1, then the EPC2302 model's k2 changed, the archive rebuilt and both source records
+  updated, so every script's own check passes). Stage 2 rejected its input before any step: both integrity checks
+  failed, nothing was predicted and no protected file was touched. The assessment rejected in turn. The checker
+  passes both stopped records.
+- **Claims review** (operator, non-blind). All 18 C1 claims were warranted, with no overreach or underclaim. The
+  assessment's needed measurements cite hardware-plan items (E7, E8, J1/J2, B1506A) that no artifact in the run
+  supports, and some sentences echo AGENTS.md almost verbatim.
+- **Containment.** Every subagent receives the repository's AGENTS.md as project instructions, so the answers were in
+  the agents' context whatever the workspace held. The transcript audit found no tool call touching the repository
+  outside the workspaces. One stage wrote a scratch note outside its allowed folder; the cards never named that
+  folder.
+
+Reading: agents on a frontier model can execute this workflow and hand it off through declared records, and they
+stopped on an upstream change that the scripts accepted. Consistency with the reference checks execution, not
+engineering truth (same models, assumptions and helpers). The pilot does not show judgement on unseen material. A
+blind test needs a separate session in an isolated directory with only permitted inputs, a frozen reference method,
+and an independent review of geometry, ports, pinout, driver and benchmark applicability. Per the review, a second
+target waits for the owner's assessment of value, interventions and cost. The agents took about 33 min of wall time
+and 347k tokens; the scripts alone took 22 min and no tokens.
+
 ### KiCad groundwork (G5 preparation)
 
 Owner, 1 October 2026: prepare the route to our own board design, without design work that waits on measurements.
