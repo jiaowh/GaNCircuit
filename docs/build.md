@@ -193,8 +193,10 @@ Launch 1 reran only the old meshes (a default left at three) and wrote no evalua
 Launch 2 ran the (w/8, 9) mesh: 52.068 pH (1.5 mm) and 71.721 pH (3 mm, 336k filaments, about 5.5 h at 4.9 GB),
 reusing the earlier meshes. Declared outcome: **pass**. From w/6 to w/8 the values change by 0.05 % and 0.03 % and
 the E1 difference by 0.02 % (limit 1 %); E1 is +2.47 % (tolerance 3 %); both values lie inside the E2 bracket, at 34 %
-and 25 % of its width. So this single-via benchmark has converged, and the earlier failure was mesh resolution in the
-via, junction and pad region. The scope is unchanged: board via arrays, plane holes, Kelvin and multi-layer vias are
+and 25 % of its width. So this single-via benchmark now passes its declared inductance mesh criterion. The refinement
+changed the plane-grid pitch, the plane thickness subdivision and the via subdivision together, so the location of
+the earlier discretization error (via, pad, junction or planes) was not isolated. The criterion covers L and its
+difference only: R still changes by 7.8 % and 4.9 % between the last two meshes, so R is not converged. The scope is unchanged: board via arrays, plane holes, Kelvin and multi-layer vias are
 still not qualified, and the bracket width (23.5 and 33.7 pH here) remains the per-via representation uncertainty.
 
 ### EPC90133 geometry reader and nets (G3 preparation)
@@ -1243,7 +1245,16 @@ fixed after the runs and before the recorded scores.
 
 Within this one task family the agent behaved as specified every time. Nine runs are too few for a useful failure
 rate, and the agent still made no engineering decision; the next step is a task that requires one, judged against
-a declared expected answer.
+a declared expected answer. The task card permits repository reads and the operator's fault description is
+reachable, so these were not blinded fault tests.
+
+**Baseline fixes after the audit at 75d6f35 (2 October 2026).** The plain baseline, not the agents, had three more
+faults: it reported `completed` whatever the comparison's exit code and output; it crashed on a missing figure or a
+malformed switching report; and its K3 passed a figure record whose checks named no panel. Completion now needs a
+zero exit, a readable comparison holding its result keys and the summary file (otherwise `failed`, with the captured
+output); both panels are required by name; unreadable inputs become structured stops
+(tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
+outputs with the baseline's comparison directly, and the faults above were not among the declared fault kinds.
 
 ### KiCad groundwork (G5 preparation)
 
@@ -2243,8 +2254,18 @@ What this shows:
   - A post-hoc diagnostic (runs/fastercap-h-diag, not a declared check) shows where the fault is. The same strips
     without the slab give a physical 3D matrix, and the 2D air value reproduces case G's 37.75 pF/m. So the fault
     lies in this 3D dielectric-interface input, although it uses the same syntax and reference-point convention as
-    case C, which passed. The exact cause is not isolated. The air 4 mm run was stopped at 5.7 GB of the 8 GB WSL
-    limit, before it gave a result.
+    case C, whose accuracy comparison passed (case C as a whole failed its mesh check, 3.3 % against 0.5 %). The
+    exact cause is not isolated, and the air diagnostic does not rule out a solver issue triggered by a dielectric.
+    The air 4 mm run was stopped at 5.7 GB of the 8 GB WSL limit, before it gave a result.
+  - Validity gate (2 October 2026, after the audit at 75d6f35, which reproduced `all_pass` from synthetic
+    negative-diagonal matrices): the check script now requires every matrix to be square, finite, reciprocal,
+    positive definite, with positive diagonal, non-positive off-diagonal and non-negative row sums (relative
+    tolerance 1e-3) before it forms a pair capacitance, C' or a pass; invalid matrices are kept raw with their
+    reasons (tests/test_fastercap_validity.py). The stored report is not rewritten. A separate post-hoc assessment
+    bound to its hash (`scripts/assess_fastercap_board3d.py`,
+    [result](../results/gan/fastercap-board3d-assessment.json)) records the disposition: all five 3D matrices
+    invalid (non-positive diagonal, positive off-diagonal, not positive definite), both 2D matrices valid, derived
+    C' unusable, declared verdict failed and unchanged.
   - FasterCap stays unqualified for 3D board geometry. Before any board capacitance extraction, the 3D dielectric
     description needs its own small known-answer check (for example a parallel-plate capacitor partly filled with
     dielectric). Nothing depends on this now.

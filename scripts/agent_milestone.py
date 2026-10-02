@@ -64,6 +64,12 @@ stopped correctly out of five (with milestone 1's B). No threshold is set for a 
 Baseline fix before any milestone-2 agent run: on the missing-file fault the plain baseline crashed in K4 (it read
 the absent file) instead of reporting the K1 stop; K4 now skips files K1 already reports missing. Recorded as a
 finding about the hand-written baseline.
+Baseline fixes after the audit at 75d6f35 (2 October 2026; milestones 1 and 2 stand as recorded): the baseline
+reported "completed" whatever the comparison's exit code and output; crashed on a missing figure or a malformed
+switching report; and passed K3 on a figure whose checks named no panel. Completion now needs a zero exit and both
+outputs, with the comparison readable and holding "measured" and "cases" (otherwise status "failed" with the
+captured output tails); both panels are required by name; unreadable or malformed inputs become structured K1/K3/K4
+failures. Regression tests: tests/test_agent_milestone_baseline.py. The agent task card is unchanged.
 """
 import argparse
 import hashlib
@@ -193,39 +199,100 @@ def git(*a):
     return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True).stdout.strip()
 
 
-def baseline(name):
-    sb = BASE / name
-    m = json.loads((sb / "manifest.json").read_text(encoding="utf-8"))
-    t0 = time.monotonic()
-    checks, stop = {}, None
-    bad = [f["path"] for f in m["files"] if not (sb / "inputs" / f["path"]).is_file() or sha(sb / "inputs" / f["path"]) != f["sha256"]]
-    checks["K1"] = {"pass": not bad, "detail": bad}
-    checks["K2"] = {"pass": sha(COMPARE) == m["evaluator_sha256"], "detail": sha(COMPARE)}
-    fig = next(f for f in m["files"] if f["kind"] == "digitized_figure")
-    fc = {k: v for k, v in json.loads((sb / "inputs" / fig["path"]).read_text(encoding="utf-8"))["checks"].items()
-          if k in ("rising", "falling")}  # the two panels; "pitch_agreement" is not a panel
-    checks["K3"] = {"pass": all(v["time_scale"] == "pass" for v in fc.values()),
-                    "detail": {k: {"time_scale": v["time_scale"], "volt_scale": v["volt_scale"]} for k, v in fc.items()}}
-    sims = [f for f in m["files"] if f["kind"] == "switching_report"]
-    def k4_ok(rep):
-        if "complete" in rep:
-            return rep["complete"] is True
-        return all("usable" in c for c in rep["cases"].values())
-    incomplete = [f["path"] for f in sims if (sb / "inputs" / f["path"]).is_file()
-                  and not k4_ok(json.loads((sb / "inputs" / f["path"]).read_text(encoding="utf-8")))]
+PANELS = ("rising", "falling")
+
+
+def read_json(p):
+    """(data, None) or (None, reason); never raises for a missing, unreadable or malformed file."""
+    try:
+        return json.loads(Path(p).read_text(encoding="utf-8")), None
+    except FileNotFoundError:
+        return None, "missing"
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return None, f"unreadable: {type(exc).__name__}: {exc}"
+
+
+def baseline_checks(sb, m):
+    """K1-K4 on sandbox sb with manifest m; returns (checks, caveats). Every failure is structured, none raises."""
+    checks = {}
+    files = m.get("files") or []
+    present = {f["path"] for f in files if (sb / "inputs" / f["path"]).is_file()}
+    bad = [f["path"] for f in files if f["path"] not in present or sha(sb / "inputs" / f["path"]) != f["sha256"]]
+    checks["K1"] = {"pass": bool(files) and not bad, "detail": bad if files else "manifest lists no files"}
+    checks["K2"] = {"pass": sha(COMPARE) == m.get("evaluator_sha256"), "detail": sha(COMPARE)}
+    caveats = []
+    figs = [f for f in files if f.get("kind") == "digitized_figure"]
+    if len(figs) != 1:
+        checks["K3"] = {"pass": False, "detail": f"manifest lists {len(figs)} digitized figures, expected 1"}
+    else:
+        d, err = read_json(sb / "inputs" / figs[0]["path"])
+        fc = d.get("checks") if isinstance(d, dict) else None
+        if err or not isinstance(fc, dict):
+            checks["K3"] = {"pass": False, "detail": f"{figs[0]['path']}: {err or 'no checks object'}"}
+        else:
+            # both named panels are required; an absent panel is a failure, not a vacuous pass
+            # ("pitch_agreement" is not a panel)
+            missing = [k for k in PANELS if not isinstance(fc.get(k), dict)]
+            ok = not missing and all(fc[k].get("time_scale") == "pass" for k in PANELS)
+            checks["K3"] = {"pass": ok, "detail": {"missing_panels": missing,
+                            **{k: {"time_scale": fc[k].get("time_scale"), "volt_scale": fc[k].get("volt_scale")}
+                               for k in PANELS if k not in missing}}}
+            caveats = [f"{k} volt scale fail" for k in PANELS if k not in missing and fc[k].get("volt_scale") != "pass"]
+    incomplete = {}
+    for f in files:
+        if f.get("kind") != "switching_report" or f["path"] not in present:
+            continue  # a missing file is K1's failure
+        rep, err = read_json(sb / "inputs" / f["path"])
+        if err:
+            incomplete[f["path"]] = err
+        elif not isinstance(rep, dict):
+            incomplete[f["path"]] = "not a JSON object"
+        elif "complete" in rep:
+            if rep["complete"] is not True:
+                incomplete[f["path"]] = f"complete = {rep['complete']!r}"
+        elif not (isinstance(rep.get("cases"), dict) and rep["cases"]
+                  and all(isinstance(c, dict) and "usable" in c for c in rep["cases"].values())):
+            incomplete[f["path"]] = "no complete field and not every case carries usable"
     checks["K4"] = {"pass": not incomplete, "detail": incomplete}
+    return checks, caveats
+
+
+def baseline(name, run=subprocess.run):
+    sb = BASE / name
+    t0 = time.monotonic()
+    m, err = read_json(sb / "manifest.json")
+    if err or not isinstance(m, dict):
+        checks, caveats = {"K1": {"pass": False, "detail": f"manifest.json: {err or 'not a JSON object'}"}}, []
+    else:
+        checks, caveats = baseline_checks(sb, m)
     failed = [k for k, v in checks.items() if not v["pass"]]
-    out = {"status": "stopped" if failed else "completed", "checks": checks, "stop_reason": failed or None,
-           "caveats": [f"{k} volt scale fail" for k, v in fc.items() if v["volt_scale"] != "pass"]}
+    out = {"status": "stopped" if failed else None, "checks": checks, "stop_reason": failed or None, "caveats": caveats}
     if not failed:
+        fig = next(f for f in m["files"] if f["kind"] == "digitized_figure")
+        sims = [f for f in m["files"] if f["kind"] == "switching_report"]
+        comp, summ = sb / "outputs/fig9-comparison.json", sb / "outputs/fig9-summary.md"
         cmd = [sys.executable, str(COMPARE), "--fig9", str(sb / "inputs" / fig["path"]),
-               "--sim", *[str(sb / "inputs" / f["path"]) for f in sims],
-               "--output", str(sb / "outputs/fig9-comparison.json"), "--summary", str(sb / "outputs/fig9-summary.md")]
-        p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+               "--sim", *[str(sb / "inputs" / f["path"]) for f in sims], "--output", str(comp), "--summary", str(summ)]
+        p = run(cmd, cwd=ROOT, capture_output=True, text=True)
         out["returncode"] = p.returncode
+        # completion needs a zero exit and both outputs present, with a readable comparison holding its result keys
+        rep, rerr = read_json(comp)
+        problems = [f"returncode {p.returncode}"] if p.returncode != 0 else []
+        if rerr:
+            problems.append(f"fig9-comparison.json {rerr}")
+        elif not (isinstance(rep, dict) and all(k in rep for k in ("measured", "cases"))):
+            problems.append("fig9-comparison.json lacks measured/cases")
+        if not summ.is_file():
+            problems.append("fig9-summary.md missing")
+        out["status"] = "failed" if problems else "completed"
+        if problems:
+            out["failure"] = {"problems": problems, "stdout_tail": (p.stdout or "")[-2000:],
+                              "stderr_tail": (p.stderr or "")[-2000:]}
     out["wall_s"] = time.monotonic() - t0
+    (sb / "outputs").mkdir(parents=True, exist_ok=True)
     (sb / "outputs/agent-report.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({k: out[k] for k in ("status", "stop_reason", "wall_s")}))
+    return out
 
 
 def score(name, ref_name="baseline", results=None):

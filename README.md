@@ -142,8 +142,8 @@ A and 0.7 % on B, so the simpler test stands in for continuous operation.
 
 Every case carries its own numerical checks:
 - no single-step voltage spikes;
-- a rerun at half the time step for selected cases (in the gate-path study, G itself was rerun; its
-  package-inductance variants and controls were not);
+- a rerun at half the time step for selected cases (in the gate-path study, G itself was rerun at first; its
+  package-inductance variants and controls were not, and G + 50 pH was checked later, see below);
 - convergence without fallbacks.
 
 Cases that fail are kept for inspection but receive no verdict. Device quantities are taken at the transistor's die
@@ -218,9 +218,10 @@ approximations stated; none of them yet reproduces the measurement on every crit
   package source inductance the difference nearly vanishes. Edge times into a capacitor therefore do not fix the
   driver; its gate waveform has to be measured.
 - **The ring's damping** in the B and G simulations is two to three times what a small-signal analysis of the settled
-  circuit gives; in every simulated case it stays three to seven times below the measured value. Within the model, most of the ring's loss sits in
-  the upper transistor's channel, and the transistor still turning on raises the damping, but neither fully accounts
-  for the decay. This is not pursued further in simulation until a decision needs it.
+  circuit gives; in every simulated case it stays three to seven times below the measured value. Within the model, the upper transistor's channel carries
+  59–64 % of a declared ring-deviation metric (the integral of voltage and current deviations, not a physical heat
+  partition; the whole-window energy balance fails), and the transistor still turning on raises the local damping.
+  Neither accounts for the decay. Local damping, transient decay and energy accounting are separate quantities. This is not pursued further in simulation until a decision needs it.
 - **Extra capacitor loss** can reproduce the measured damping (about 60–70 mΩ in the loop) but barely lowers the
   first peak. Loss located elsewhere, such as in the transistor's output capacitance, is untested.
 - **Probe bandwidth** alone cannot explain the gap. Probe loading, connection point and resonances are untested.
@@ -291,8 +292,8 @@ Next steps:
 | **FastHenry 3.0.1** | inductance and resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory; internal use only (licence note below) |
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
-| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound; not qualified for board geometry ([results](results/gan/fastercap-known-answer.json)) |
-| KiCad | our own board design | not installed |
+| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound. A 3D strip-over-dielectric check failed and its 3D matrices are unphysical; not qualified for 3D or board geometry ([results](results/gan/fastercap-known-answer.json), [3D check](results/gan/fastercap-board3d-assessment.json)) |
+| KiCad 10.0.6 | our own board design | installed per-user (checksum verified); EPC's KiCad library loads (47 footprints); no board design started, route choice open |
 | DEVSIM | device simulator for the paused silicon fixture (WSL) | paused |
 
 EPC files, papers and FastHenry itself are not in git. They live in the git-ignored `vendor/` and `.tools/`, with sources,
