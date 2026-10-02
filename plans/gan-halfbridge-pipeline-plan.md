@@ -588,9 +588,15 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    share an attachment node. FasterCap with user-controlled meshes (scripts/fastercap_manual_mesh_check.py): run 1
    failed (-m1e9 also coarsened the interaction threshold, kept). Revision 2: the air form passes (C' within 0.53 % of
    Hammerstad-Jensen, 0.05 % mesh change), and the dielectric form gives physical matrices, 5.2 % low on the coarsest
-   mesh. Revision 2 was stopped for time before its finer dielectric meshes, D5 and K1. Benchmark designs for via arrays and
-   slots are drafted in docs/build.md, not declared. Next: rerun revision 2's dielectric part (about 3-5 h, unattended,
-   detached), then declare the slot benchmark. Yields to item 8 when the equipment inventory arrives.
+   mesh, 3.9 % low on the next (run 4, 3 October; finer mesh, D5 and K1 pending at the time of writing). FasterCap's
+   runner now rejects memory-terminated or unconverged automatic runs (a false-success path found on 3 October).
+   Slot benchmark (scripts/plane_hole_benchmark.py, run 1): fails P1a/P1b/P2a, passes R1 and P1c; the 2D sheet
+   reference overestimates slots by an error of order h (edge fringing); production-mesh slot errors -52 % to +68 %,
+   a few pH per board-like slot. Via-array benchmark (scripts/via_array_benchmark.py, revision 5 with a new 2D
+   boundary-element reference, circuit_tools.bem2d): V0/V3 pass, V1/V2 fail on the single resolved mesh; board pitches
+   give mutual-ratio errors up to 20 %; dividing a single via by the count is off by 1.6-2.6x. Neither benchmark is a
+   board error bar. Next, only if a decision needs it: a board-subgeometry slot check, a second resolved via mesh, a
+   finer slot mesh. Yields to item 8 when the equipment inventory arrives.
 
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a

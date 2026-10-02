@@ -135,6 +135,17 @@ as sensitivities:
   An audit of the mesh itself, without the solver ([result](results/gan/epc90133-mesh-topology-audit.json)), shows that
   the coarse grid sees every slot in that return plane, but its strips of copper reach into the slots and fill about a
   quarter of their area (under a tenth on the finer mesh).
+- **Benchmarks of the board's own mesh rule.** Two benchmarks measure what that mesh does to vias and slots, against
+  independent 2D references written for the purpose ([build notes](docs/build.md#via-array-plane-hole-and-fastercap-qualification-plan-review-and-first-bounded-step-2-october-2026)):
+  - *Via rows and grids.* The physics is clear: six vias at 0.6 mm have about twice the inductance of one via divided
+    by six, so via counts cannot be used to scale a single via. At the board's pitches, individual couplings between
+    vias come out up to 20 % wrong.
+  - *Slots in the return plane.* At the board's pitches the slots' added inductance is off by −52 % to +68 % depending on
+    slot shape and grid alignment. For the board's own slots, which run along the return current, that is a few
+    picohenries each, against a loop of about 270 pH: small but not negligible.
+
+  These are errors of simple benchmark shapes. They show where the board numbers are soft, not how far off the board
+  extraction is.
 
 ### Simulating the switching
 
@@ -299,7 +310,7 @@ Next steps:
 | **FastHenry 3.0.1** | inductance and resistance extraction from copper geometry (under WSL) | qualified for bars and plane pairs; board use exploratory; internal use only (licence note below) |
 | PyMuPDF | reads datasheets and digitizes their graphs | in use |
 | openpyxl, xlrd | read EPC's BOM and stackup files | in use |
-| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound. A 3D strip-over-dielectric check failed with unphysical matrices; the cause found so far is the solver's automatic settings, not the geometry. With meshes written by our script, the same strip in air comes out within 0.5 % of the textbook value, and the dielectric case is still being checked. Not qualified for 3D or board geometry ([results](results/gan/fastercap-known-answer.json), [3D check](results/gan/fastercap-board3d-assessment.json)) |
+| **FasterCap 6.0.7** | capacitance extraction between conductors (under WSL) | built; LGPL 2.1+. Known-answer checks: 4 of 8 pass (specific benchmark geometries, including a 2D microstrip on a dielectric); its accuracy setting is not an error bound. A 3D strip-over-dielectric check failed with unphysical matrices, caused by the solver's automatic settings. With meshes written by our script the same strip comes out physical, within 0.5 % in air; with the dielectric it converges slowly (5 % low on the coarsest mesh, 4 % on the next, finer mesh still running). Its automatic mode can also stop early or run out of memory without saying so; the runner now rejects such results. Not qualified for 3D or board geometry ([results](results/gan/fastercap-known-answer.json), [3D check](results/gan/fastercap-board3d-assessment.json)) |
 | KiCad 10.0.6 | our own board design | installed per-user (checksum verified); EPC's KiCad library loads (47 footprints); no board design started, route choice open |
 | DEVSIM | device simulator for the paused silicon fixture (WSL) | paused |
 
