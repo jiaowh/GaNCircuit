@@ -1,0 +1,213 @@
+{
+ "schema": "fastercap-manual-mesh-check/2",
+ "declared": "2026-10-02, before the first run (docstring)",
+ "evaluator_sha256": "542566fed53be6bc50300341421704d48bc20f37642d35c30c1bf38f87d91e71",
+ "dependencies_sha256": {
+  "scripts/fastercap_known_answer.py": "b25eabda02a1edfdf63ecf9560f5259406f4510ff5931bcf4d179b78ea99c481",
+  "scripts/fastercap_board3d_check.py": "6f92e81227208bd45ad2c0a9a64680166b32c3227e61a6ff2b766ea314c6485b",
+  "results/gan/fastercap-board3d-check.json": "65d5a063dd57edfd4d4886432d1fe46af6aa507edbb9930982e03946eb0f5974"
+ },
+ "binary_sha256": "9f7be612ead06f1f56f34f921f9cdf12be250c38903b47eae11b3b7df87e073d",
+ "run_directory": "runs/fastercap-manual-mesh-c2a6afff5e8f",
+ "references": {
+  "hj_air_F_per_m": 3.770247832493649e-11,
+  "hj_diel_F_per_m": 1.2304490474198107e-10,
+  "case_h_2d_a0.001_F_per_m": 1.232296e-10
+ },
+ "part_d": {
+  "air": {
+   "M1": {
+    "0.002": {
+     "matrix": [
+      [
+       5.05826e-14,
+       -2.92893e-14
+      ],
+      [
+       -2.92893e-14,
+       5.05826e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 5296,
+     "panels_after_refinement": 5296,
+     "seconds": 18.378265,
+     "C_pair_F": 3.993595000000001e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       9.44886e-14,
+       -6.04401e-14
+      ],
+      [
+       -6.04401e-14,
+       9.44886e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 9552,
+     "panels_after_refinement": 9552,
+     "seconds": 46.762054,
+     "C_pair_F": 7.746435e-14
+    },
+    "C_per_m": 3.752839999999999e-11
+   },
+   "M2": {
+    "0.002": {
+     "matrix": [
+      [
+       5.07043e-14,
+       -2.93738e-14
+      ],
+      [
+       -2.93738e-14,
+       5.07043e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 7296,
+     "panels_after_refinement": 7296,
+     "seconds": 32.436207,
+     "C_pair_F": 4.0039050000000006e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       9.46077e-14,
+       -6.05103e-14
+      ],
+      [
+       -6.05103e-14,
+       9.46077e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 13088,
+     "panels_after_refinement": 13088,
+     "seconds": 127.074905,
+     "C_pair_F": 7.755899999999998e-14
+    },
+    "C_per_m": 3.751994999999997e-11
+   },
+   "M3": {
+    "0.002": {
+     "matrix": [
+      [
+       5.07018e-14,
+       -2.93697e-14
+      ],
+      [
+       -2.93697e-14,
+       5.07018e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 12112,
+     "panels_after_refinement": 12112,
+     "seconds": 113.632668,
+     "C_pair_F": 4.003575e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       9.45933e-14,
+       -6.04838e-14
+      ],
+      [
+       -6.04838e-14,
+       9.45933e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 21776,
+     "panels_after_refinement": 21776,
+     "seconds": 1834.5802,
+     "C_pair_F": 7.753855000000001e-14
+    },
+    "C_per_m": 3.7502800000000013e-11
+   }
+  },
+  "diel": {
+   "M1": {
+    "0.002": {
+     "matrix": [
+      [
+       1.38607e-13,
+       -1.0531e-13
+      ],
+      [
+       -1.05307e-13,
+       1.38606e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 19712,
+     "panels_after_refinement": 19712,
+     "seconds": 525.457397,
+     "C_pair_F": 1.2195750003003183e-13
+    },
+    "0.004": {
+     "matrix": [
+      [
+       2.63892e-13,
+       -2.13693e-13
+      ],
+      [
+       -2.13691e-13,
+       2.63891e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 26128,
+     "panels_after_refinement": 26128,
+     "seconds": 2674.45166,
+     "C_pair_F": 2.3879175000747016e-13
+    },
+    "C_per_m": 1.1683424997743832e-10
+   },
+   "M2": {
+    "0.002": {
+     "matrix": [
+      [
+       1.40587e-13,
+       -1.06616e-13
+      ],
+      [
+       -1.06617e-13,
+       1.40588e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 35952,
+     "panels_after_refinement": 35952,
+     "seconds": 2033.056885,
+     "C_pair_F": 1.2360200000000007e-13
+    },
+    "0.004": {
+     "matrix": [
+      [
+       2.67652e-13,
+       -2.16181e-13
+      ],
+      [
+       -2.16176e-13,
+       2.67649e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 46976,
+     "panels_after_refinement": 46976,
+     "seconds": 2377.585938,
+     "C_pair_F": 2.4191450003885603e-13
+    },
+    "C_per_m": 1.1831250003885595e-10
+   }
+  }
+ },
+ "part_k1": {},
+ "errors": [],
+ "checks": {},
+ "outcome": "failed, stopped",
+ "stop_note": "Run 4 (revision 2, alone on the host from 3 October 04:24) reproduced air M1-M3 and diel M1 exactly, gave diel M2 C' = 118.3 pF/m, and diel M3 L=2 mm exceeded its 1 h limit, so D2 and D4 cannot pass and K1's gate fails. Stopped by the operator during diel M3 L=4 mm (the remaining D5 calls were expected to time out as well). A post-hoc 2D boundary-element emulation with the same panel layout reproduces the 3D values (air -0.48 %, diel -5.5/-4.0 % on M1/M2), so the dielectric shortfall is the meshes' discretisation error at the strip edges."
+}
