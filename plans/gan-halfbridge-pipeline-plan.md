@@ -589,7 +589,7 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    failed (-m1e9 also coarsened the interaction threshold, kept). Revision 2: the air form passes (C' within 0.53 % of
    Hammerstad-Jensen, 0.05 % mesh change), and the dielectric form gives physical matrices, 5.2 % low on the coarsest
    mesh, 3.9 % low on the next (run 4, 3 October, failed: M3 over its time limit); a 2D emulation of the same panels
-   reproduces this, so the shortfall is edge discretisation; an edge-refined 3D check is running (D1/D4/D6). FasterCap's
+   reproduces this, so the shortfall is edge discretisation; an edge-refined 3D check was stopped unfinished (run 1 failed, kept). FasterCap's
    runner now rejects memory-terminated or unconverged automatic runs (a false-success path found on 3 October).
    Slot benchmark (scripts/plane_hole_benchmark.py, run 1): fails P1a/P1b/P2a, passes R1 and P1c; the 2D sheet
    reference overestimates slots by an error of order h (edge fringing); production-mesh slot errors -52 % to +68 %,

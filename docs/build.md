@@ -333,10 +333,13 @@ case-H part passes.
   0.6 µm gives −0.13 %. This answers what the FasterCap diagnosis set out to find. Case H's unphysical matrices came from
   the automatic settings (a coarse interaction threshold that the automatic mode never tightened). With a tight
   threshold and resolved meshes, FasterCap's 3D dielectric solution matches an independent calculation.
-- *Pending: an edge-refined 3D confirmation* (`python scripts/fastercap_edge_mesh_check.py`, declared at bcd1c3e,
-  launched 3 October). One mesh, E1: 1.25 µm panels at the strip edges, prediction −0.76 %. Checks: D1 validity, D4
-  within 2 % of the 2D reference, D6 within 0.5 % of the 2D emulation of its own layout. Convergence evidence then
-  rests on the 2D emulation series. FasterCap stays unqualified for board geometry; K1 (partly filled plates) is unrun.
+- *Edge-refined 3D confirmation, run 1 failed and stopped* (`python scripts/fastercap_edge_mesh_check.py`, declared at
+  bcd1c3e; [report](../results/gan/fastercap-edge-mesh-check-run1-failed.json)). Mesh E1 has 1.25 µm panels at the strip
+  edges, with a predicted error of −0.76 %. The 2 mm case took 2.6 h and gave a physical matrix. The 4 mm case was
+  stopped at the owner's decision after about 2 h 10 min, so no C′ and no D4 or D6 verdict exists. Its 3 h limit had
+  been set without profiling and would very likely have been exceeded. In future, time limits come from a profiled or
+  scaled estimate with margin. The diagnosis above does not depend on this run. FasterCap stays unqualified for board
+  geometry, and K1 (partly filled plates) has not been run.
   Dielectric M1 at 4 mm exceeded its 1 h limit (27 minutes in run 2), so D2 could not pass. It was stopped during
   dielectric M2. The air results reproduce run 2 exactly. Run 4 is queued to start alone after the FastHenry jobs.
 
