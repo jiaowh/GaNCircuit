@@ -60,6 +60,10 @@ results/gan/fastercap-manual-mesh-check-run1-failed.json. Changes, nothing else 
        <= 0.2 % for each form.
 The part-D readings and the K1 gate add D5 to D0-D2.
 
+Audit at 9ca735d (3 October 2026): run() now applies run_problem (memory termination; unconverged automatic stop), as
+the shared runner does since 3 October. No case or criterion changed; stored reports are not re-evaluated (none of
+their logs reports a memory termination).
+
     python scripts/fastercap_manual_mesh_check.py   # results/gan/fastercap-manual-mesh-check.json
 """
 import hashlib
@@ -80,7 +84,7 @@ DEPENDENCIES = ("scripts/fastercap_known_answer.py", "scripts/fastercap_board3d_
                 "results/gan/fastercap-board3d-check.json")
 sys.path.insert(0, str(ROOT / "scripts"))
 from fastercap_board3d_check import matrix_validity  # noqa: E402
-from fastercap_known_answer import ER, FC_BIN, hammerstad_jensen, pair, parse_last_matrix, wsl_path  # noqa: E402
+from fastercap_known_answer import ER, FC_BIN, hammerstad_jensen, pair, parse_last_matrix, run_problem, wsl_path  # noqa: E402
 
 EPS0 = 8.8541878128e-12
 OUTPUT = ROOT / "results/gan/fastercap-manual-mesh-check.json"
@@ -213,6 +217,10 @@ def run(files, workdir, args, timeout=TIMEOUT):
     (workdir / "stdout.log").write_text(p.stdout or "", encoding="utf-8")
     if p.returncode != 0:
         raise RuntimeError(f"FasterCap failed in {workdir} (status {p.returncode}): {(p.stderr or p.stdout)[-500:]}")
+    auto = re.search(r"-a(\S+)", args)
+    problem = run_problem(p.stdout, float(auto.group(1)) if auto else None)
+    if problem:  # audit at 9ca735d: the false-success gate of the shared runner applies here too
+        raise RuntimeError(f"FasterCap result rejected in {workdir}: {problem}")
     _, m = parse_last_matrix(p.stdout)
     n_in = [int(x) for x in re.findall(r"Number of input panels to solver engine: (\d+)", p.stdout)]
     n_ref = [int(x) for x in re.findall(r"Number of panels after refinement: (\d+)", p.stdout)]

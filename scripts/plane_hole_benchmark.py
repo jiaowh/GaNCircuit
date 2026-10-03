@@ -59,6 +59,10 @@ a separate argument or a board-subgeometry check.
 Runs one FastHenry job at a time (-p diag), 3 h limit per job, report checkpointed after each job; --resume continues a
 report written by the same evaluator.
 
+Audit at 9ca735d (3 October 2026): FastHenry now runs through circuit_tools.wslrun, which stops the Linux solver itself
+on timeout (before, only wsl.exe was stopped, so a timed-out case could keep running beside the next one); --resume also
+refuses a report whose dependencies changed. No case, mesh or criterion changed; the stored run-1 report stays as written.
+
     python scripts/plane_hole_benchmark.py            # results/gan/plane-hole-benchmark.json
 """
 import argparse
@@ -67,8 +71,6 @@ import json
 import math
 import os
 from pathlib import Path
-import platform
-import subprocess
 import sys
 import time
 import uuid
@@ -77,7 +79,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from circuit_tools.sheet import disk_mask, squares  # noqa: E402
-from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, parse_zc, skin_depth, wsl_path  # noqa: E402
+from circuit_tools.wslrun import run_solver  # noqa: E402
+from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, parse_zc, skin_depth  # noqa: E402
 
 OUTPUT = ROOT / "results/gan/plane-hole-benchmark.json"
 T, H = 0.0711, 0.127
@@ -90,7 +93,7 @@ MESHES = {"m1": (0.425, 3), "m2": (0.2125, 5), "f3": (0.10625, 5), "f4": (0.425 
 REF_CELLS = (0.025, 0.0125, 0.00625)
 TIMEOUT = 3 * 3600
 PROFILE_LIMIT = 75 * 60
-DEPENDENCIES = ("src/circuit_tools/sheet.py", "scripts/fasthenry_known_answer.py")
+DEPENDENCIES = ("src/circuit_tools/sheet.py", "scripts/fasthenry_known_answer.py", "src/circuit_tools/wslrun.py")
 
 
 def runs_matrix():
@@ -177,14 +180,10 @@ def deck(form, slot, mesh, al, gap):
 def solve(text, workdir):
     workdir.mkdir(parents=True, exist_ok=False)
     (workdir / "case.inp").write_text(text, encoding="ascii")
-    if platform.system() == "Windows":
-        cmd = ["wsl", "-e", "bash", "-lc", f"cd '{wsl_path(workdir)}' && '{wsl_path(FH_BIN)}' case.inp -p diag"]
-    else:
-        cmd = [str(FH_BIN), "case.inp", "-p", "diag"]
     t0 = time.time()
-    try:
-        p = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT, check=False)
-    except subprocess.TimeoutExpired:
+    try:  # audit at 9ca735d: on timeout the Linux FastHenry process itself is stopped (circuit_tools.wslrun)
+        p = run_solver(FH_BIN, "case.inp -p diag", workdir, TIMEOUT, "fasthenry")
+    except TimeoutError:
         raise RuntimeError(f"FastHenry did not finish within {TIMEOUT} s")
     (workdir / "stdout.log").write_text(p.stdout or "", encoding="utf-8")
     zc = workdir / "Zc.mat"
@@ -281,6 +280,9 @@ def main():
         rep = json.loads(OUTPUT.read_text(encoding="utf-8"))
         if rep["evaluator_sha256"] != ev:
             raise SystemExit("report was written by a different evaluator")
+        now = {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES}
+        if rep.get("dependencies_sha256") != now:
+            raise SystemExit("a dependency changed since the report was written; start a new report")
     else:
         rep = {"schema": "plane-hole-benchmark/1", "declared": "2026-10-02, before the first run (docstring)",
                "evaluator_sha256": ev,

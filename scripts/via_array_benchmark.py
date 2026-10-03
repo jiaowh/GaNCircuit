@@ -85,6 +85,12 @@ corner-graded panels (tests/test_bem2d.py: coax to 4e-7, the square via to 0.004
 V1-V3, the representations and the FastHenry cases are unchanged (FastHenry read from runs 1-3). Run 4's FasterCap
 references at -a0.0005 are reported beside the new ones as a cross-check.
 
+Audit at 9ca735d (3 October 2026), no rerun: FastHenry runs through circuit_tools.wslrun (stops the Linux solver
+itself on timeout; before, a 3 h timeout was not even caught); the reference implementation src/circuit_tools/bem2d.py
+(and wslrun.py) is now bound in DEPENDENCIES and --resume refuses a report whose dependencies changed; V1 now fails if
+any expected ratio is missing. The stored revision-5 report predates these changes (its V1 failure and V0/V2/V3
+verdicts stand; it binds bem2d.py only indirectly, through the git commit that declared revision 5).
+
     python scripts/via_array_benchmark.py            # results/gan/via-array-benchmark.json
 """
 import argparse
@@ -105,9 +111,8 @@ from epc90133_extract import parse_matrix_file  # noqa: E402
 from fastercap_board3d_check import matrix_validity  # noqa: E402
 from fastercap_known_answer import FC_BIN, run_fastercap, seg  # noqa: E402
 from circuit_tools.bem2d import maxwell_matrix, panels, square  # noqa: E402
-from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth, wsl_path  # noqa: E402
-import platform  # noqa: E402
-import subprocess  # noqa: E402
+from circuit_tools.wslrun import run_solver  # noqa: E402
+from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth  # noqa: E402
 import time  # noqa: E402
 
 def solve(text, workdir, reuse_dirs=()):
@@ -123,12 +128,11 @@ def solve(text, workdir, reuse_dirs=()):
                     return rows, mat, None, str(reuse_dir.relative_to(ROOT))
     workdir.mkdir(parents=True, exist_ok=False)
     (workdir / "case.inp").write_text(text, encoding="ascii")
-    if platform.system() == "Windows":
-        cmd = ["wsl", "-e", "bash", "-lc", f"cd '{wsl_path(workdir)}' && '{wsl_path(FH_BIN)}' case.inp -p diag"]
-    else:
-        cmd = [str(FH_BIN), "case.inp", "-p", "diag"]
     t0 = time.time()
-    p = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=3 * 3600, check=False)
+    try:  # audit at 9ca735d: on timeout the Linux FastHenry process itself is stopped (circuit_tools.wslrun)
+        p = run_solver(FH_BIN, "case.inp -p diag", workdir, 3 * 3600, "fasthenry")
+    except TimeoutError as exc:
+        raise RuntimeError(str(exc))
     (workdir / "stdout.log").write_text(p.stdout or "", encoding="utf-8")
     f = workdir / "Zc.mat"
     if p.returncode != 0 or not f.is_file() or "matrix for frequency" not in f.read_text(errors="replace"):
@@ -153,7 +157,8 @@ ARRANGEMENTS = {
 REPS = {"m1": (0.425, 3, "production"), "m2": (0.2125, 5, "production"), "r1": (0.085, 3, "resolved")}
 RESOLVED_CASES = ("single", "row6-0.6")
 AUTO_2D = ("bem16", "bem32")  # revision 5: boundary-element refinements (panels per via side)
-DEPENDENCIES = ("scripts/epc90133_extract.py", "scripts/fastercap_board3d_check.py", "scripts/fastercap_known_answer.py",
+DEPENDENCIES = ("src/circuit_tools/bem2d.py", "src/circuit_tools/wslrun.py",
+                "scripts/epc90133_extract.py", "scripts/fastercap_board3d_check.py", "scripts/fastercap_known_answer.py",
                 "scripts/fasthenry_known_answer.py")
 
 
@@ -242,6 +247,17 @@ def bem_reference(arr, a, n):
     return M[:k, :k]
 
 
+def v1_check(res, tol=0.03):
+    """V1 over the resolved row cases; every expected ratio must be present (audit at 9ca735d: a missing cavity used to
+    drop out of the list silently)."""
+    expected = {arr: len(ARRANGEMENTS[arr]) - 2 for arr in RESOLVED_CASES if len(ARRANGEMENTS[arr]) == 6}
+    sets = {f"{arr}|c={c:g}": res.get(f"{arr}|c={c:g}|r1", {}).get("ratio_errors") for arr in expected for c in CLEAR}
+    complete = all(v is not None and len(v) == expected[k.split("|")[0]] for k, v in sets.items())
+    errs = [e for v in sets.values() if v for e in v]
+    return {"max_abs_error": max((abs(e) for e in errs), default=None), "complete": complete,
+            "pass": complete and all(abs(e) <= tol for e in errs)}
+
+
 def metrics(L):
     """Parallel-array inductance, self of via 0, and mutual ratios, from a symmetric N x N matrix (henry)."""
     L = np.asarray(L)
@@ -263,6 +279,9 @@ def main():
         rep = json.loads(OUTPUT.read_text(encoding="utf-8"))
         if rep["evaluator_sha256"] != ev:
             raise SystemExit("report was written by a different evaluator")
+        now = {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in DEPENDENCIES}
+        if rep.get("dependencies_sha256") != now:
+            raise SystemExit("a dependency changed since the report was written; start a new report")
     else:
         rep = {"schema": "via-array-benchmark/5", "declared": "2026-10-02, before the first run (docstring)",
                "evaluator_sha256": ev,
@@ -372,8 +391,7 @@ def main():
                     q: {"fasthenry": a2["fasthenry"][q] - a1["fasthenry"][q], "reference": a2["reference"][q] - a1["reference"][q],
                         "relative_error": (a2["fasthenry"][q] - a1["fasthenry"][q]) / (a2["reference"][q] - a1["reference"][q]) - 1}
                     for q in ("L_par", "L_self0")}
-    v1 = [e for arr in RESOLVED_CASES for c in CLEAR for e in res.get(f"{arr}|c={c:g}|r1", {}).get("ratio_errors", [])]
-    checks["V1"] = {"max_abs_error": max((abs(e) for e in v1), default=None), "pass": bool(v1) and all(abs(e) <= 0.03 for e in v1)}
+    checks["V1"] = v1_check(res)
     v2 = [res.get(f"{arr}|diff|r1", {}).get(q, {}).get("relative_error") for arr in RESOLVED_CASES for q in ("L_par", "L_self0")]
     checks["V2"] = {"errors": v2, "pass": all(e is not None and abs(e) <= 0.03 for e in v2)}
     v3 = [res.get(f"{arr}|c={c:g}|r1", {}).get("L_par_bracket_position") for arr in RESOLVED_CASES for c in CLEAR]
