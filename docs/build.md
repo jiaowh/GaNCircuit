@@ -330,9 +330,11 @@ case-H part passes.
   −4.0 % on M1 and M2. FasterCap's 3D values are −0.46 %, −5.1 % and −3.9 %. So FasterCap's 3D dielectric solution is
   what these meshes should give, and the shortfall comes from panels too coarse where strip and dielectric meet; at M3
   it would still be −2.8 %. In 2D, refining only the panels at the strip's side edges removes it: 1.25 µm gives −0.76 %,
-  0.6 µm gives −0.13 %. This answers what the FasterCap diagnosis set out to find. Case H's unphysical matrices came from
-  the automatic settings (a coarse interaction threshold that the automatic mode never tightened). With a tight
-  threshold and resolved meshes, FasterCap's 3D dielectric solution matches an independent calculation.
+  0.6 µm gives −0.13 %. The diagnosis is therefore substantially resolved, and the 3D qualification unfinished. Case H's
+  unphysical matrices came from the automatic settings (a coarse interaction threshold that the automatic mode never
+  tightened). With a tight threshold and the declared meshes, FasterCap's 3D dielectric values match an independent 2D
+  emulation of the same panels. No edge-refined 3D value exists yet (see the next item), so FasterCap's 3D dielectric
+  accuracy has not been shown directly.
 - *Edge-refined 3D confirmation, run 1 failed and stopped* (`python scripts/fastercap_edge_mesh_check.py`, declared at
   bcd1c3e; [report](../results/gan/fastercap-edge-mesh-check-run1-failed.json)). Mesh E1 has 1.25 µm panels at the strip
   edges, with a predicted error of −0.76 %. The 2 mm case took 2.6 h and gave a physical matrix. The 4 mm case was
@@ -362,8 +364,8 @@ finer pitches. The P1 reference is a new 2D sheet-current solver ([circuit_tools
 exact for a plain strip, and within about 1 % of the dilute-hole formula after extrapolation). It gives dL = μ0 (h + δ) dN
 for the slot's added squares dN, with slot edges on cell faces so that no staircase error enters.
 
-- *Reference (R1 converged: 0.06 % and 0.04 % between the two finest cells).* A slot across the current adds 0.89
-  squares, 150 pH in this plane pair. The same slot along the current adds 0.12 squares, 21 pH, seven times less. On the
+- *Reference (R1 converged: 0.06 % and 0.04 % between the two finest cells; a 2D sheet picture with the slot through
+  both plates).* A slot across the current adds 0.89 squares, 150 pH in this plane pair. The same slot along the current adds 0.12 squares, 21 pH, seven times less. On the
   board the slots run along y, as does most of the return current under the transistors (a geometric reading, not an
   extracted current), which resembles the cheaper orientation.
 - *Board pitches.* FastHenry's slot inductance there is well below the reference, and it depends on grid alignment:
@@ -397,16 +399,18 @@ for the slot's added squares dN, with slot edges on cell faces so that no stairc
     leaves about −4 %, comparable to the unconverged f3 mesh error. So the sheet picture is not an accurate known
     answer at the board's ratio of gap to slot size; it overestimates the slot's effect. The extrapolation is a
     reading, not a declared check, and f3 is not converged.
-  - *Production-mesh error against f3* (reported; f3 is itself not converged): across-slot cases −17 % to +15 %. The
+  - *Production-mesh differences from f3* (reported; f3 is itself not converged, so these are differences, not
+    established accuracy errors): across-slot cases −17 % to +15 %. The
     along-current slot in the return plate only, the board-like case, gives 5.6–15.3 pH against 11.6 pH (−52 % to
     +32 %). The production alignment (grid lines through the slot centre) gives the low end: −52 % at m1 and −21 % at m2.
     The small slot at m1 is +68 %. Grid alignment alone moves these values by factors of up to 2.4.
-  - *What this means for the board extraction.* The board's pin-row slots lie along the return current, the cheaper
-    orientation (about 12 pH per slot in this benchmark strip). The production m1 grid gives about half of that, a few pH
-    per slot, against a loop inductance of 260–280 pH in variants B and G. That suggests the slot representation is a
-    percent-level effect on the loop at the board pitches, not a dominant one. This is a reading from one benchmark
-    geometry. The board's current paths, layer stack and slot count are not reproduced here, so a board-subgeometry
-    check would be needed before quoting it as a board bound.
+  - *What this might mean for the board extraction (a hypothesis).* The board's pin-row slots lie along the return
+    current. For that case, slot in the return plate only, the finest mesh gives 11.6 pH in this benchmark strip
+    (unconverged), and the production m1 grid about half of it. Against a loop inductance of 260–280 pH in variants B
+    and G, that would make slot representation a percent-level effect rather than a dominant one. The hypothesis needs
+    a transfer argument or a board-subgeometry check: the board's current paths, layer stack and slot count are not
+    reproduced here. The 150 and 21 pH figures above belong to the 2D reference with both plates slotted, not to the
+    board-like case.
 
 **Via-array benchmark** (`python scripts/via_array_benchmark.py`, declared at d220f0e; revision 5 at the commit before
 567de11; [report](../results/gan/via-array-benchmark.json)). Closed plane-pair cavities at the board stack hold one via,

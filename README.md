@@ -138,11 +138,13 @@ as sensitivities:
 - **Benchmarks of the board's own mesh rule.** Two benchmarks measure what that mesh does to vias and slots, against
   independent 2D references written for the purpose ([build notes](docs/build.md#via-array-plane-hole-and-fastercap-qualification-plan-review-and-first-bounded-step-2-october-2026)):
   - *Via rows and grids.* The physics is clear: six vias at 0.6 mm have about twice the inductance of one via divided
-    by six, so via counts cannot be used to scale a single via. At the board's pitches, individual couplings between
-    vias come out up to 20 % wrong.
-  - *Slots in the return plane.* At the board's pitches the slots' added inductance is off by −52 % to +68 % depending on
-    slot shape and grid alignment. For the board's own slots, which run along the return current, that is a few
-    picohenries each, against a loop of about 270 pH: small but not negligible.
+    by six, so via counts cannot be used to scale a single via. At the board's pitches, the ratios between the vias'
+    mutual inductances differ from the reference by up to about 20 %.
+  - *Slots in the return plane.* At the board's pitches a slot's added inductance differs from the finest mesh run by
+    −52 % to +68 %, depending on slot shape and grid alignment. That finest mesh is itself not converged, so these are
+    differences, not established errors. For a slot like the board's (return plane only, along the current) the finest
+    mesh gives 11.6 pH in the benchmark strip. Whether that makes slot representation a small effect on the board's
+    loop of about 270 pH is a hypothesis; it needs a check on the board's own geometry.
 
   These are errors of simple benchmark shapes. They show where the board numbers are soft, not how far off the board
   extraction is.

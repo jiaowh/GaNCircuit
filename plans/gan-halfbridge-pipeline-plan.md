@@ -589,13 +589,15 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    failed (-m1e9 also coarsened the interaction threshold, kept). Revision 2: the air form passes (C' within 0.53 % of
    Hammerstad-Jensen, 0.05 % mesh change), and the dielectric form gives physical matrices, 5.2 % low on the coarsest
    mesh, 3.9 % low on the next (run 4, 3 October, failed: M3 over its time limit); a 2D emulation of the same panels
-   reproduces this, so the shortfall is edge discretisation; an edge-refined 3D check was stopped unfinished (run 1 failed, kept). FasterCap's
+   reproduces this, so the shortfall is most likely edge discretisation (diagnosis substantially resolved; 3D qualification
+   unfinished: the edge-refined 3D check was stopped with no C' or verdict, run 1 failed, kept). FasterCap's
    runner now rejects memory-terminated or unconverged automatic runs (a false-success path found on 3 October).
    Slot benchmark (scripts/plane_hole_benchmark.py, run 1): fails P1a/P1b/P2a, passes R1 and P1c; the 2D sheet
-   reference overestimates slots by an error of order h (edge fringing); production-mesh slot errors -52 % to +68 %,
-   a few pH per board-like slot. Via-array benchmark (scripts/via_array_benchmark.py, revision 5 with a new 2D
+   reference (both plates slotted) overestimates slots by an error of order h (edge fringing); board-pitch slot values
+   differ from the unconverged f3 mesh by -52 % to +68 %; the board-like slot gives 11.6 pH at f3 in the benchmark strip;
+   a minor effect on the board loop is a hypothesis needing a transfer argument. Via-array benchmark (scripts/via_array_benchmark.py, revision 5 with a new 2D
    boundary-element reference, circuit_tools.bem2d): V0/V3 pass, V1/V2 fail on the single resolved mesh; board pitches
-   give mutual-ratio errors up to 20 %; dividing a single via by the count is off by 1.6-2.6x. Neither benchmark is a
+   give mutual-inductance-ratio differences up to about 20 % (ratios, not absolute couplings); dividing a single via by the count is off by 1.6-2.6x. Neither benchmark is a
    board error bar. Next, only if a decision needs it: a board-subgeometry slot check, a second resolved via mesh, a
    finer slot mesh. Yields to item 8 when the equipment inventory arrives.
 
