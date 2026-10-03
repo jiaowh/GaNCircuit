@@ -320,6 +320,23 @@ case-H part passes.
 - *Run state, 2 October 2026.* Revision 2 was stopped at the end of the working day during the dielectric M2 call ([report](../results/gan/fastercap-manual-mesh-check-run2-incomplete.json), outcome 'incomplete, stopped'; no check evaluated). Completed: air M1–M3 and dielectric M1. Dielectric M1 took 10 and 27 minutes for its two lengths and gave physical matrices, unlike case H, with C′ = 116.8 pF/m, 5.2 % below the 2D reference (123.2 pF/m). The air form was within 0.5 % on the same mesh, so the dielectric value is either not converged at M1 or still carries an error; the finer meshes decide. Not run: dielectric M2/M3, D5, the automatic run from M1, and K1. The rerun takes an estimated 3–5 hours and should be launched detached, so it is not a child of a session shell.
 - *Run 3, 2–3 October 2026, failed, kept* ([report](../results/gan/fastercap-manual-mesh-check-run3-failed.json)). It was
   launched detached at 23:33 but shared the host with the two FastHenry benchmarks below and the via-array references.
+- *Run 4, 3 October 2026, failed, kept* ([report](../results/gan/fastercap-manual-mesh-check-run4-failed.json)). It ran
+  mostly alone. It reproduced air M1–M3 and dielectric M1 exactly and gave dielectric M2 C′ = 118.3 pF/m (−3.9 % against
+  the 2D reference). Dielectric M3 at 2 mm exceeded its 1 h limit, so D2 and D4 cannot pass and K1 was not run. It was
+  stopped during M3 at 4 mm.
+- *Diagnosis: discretisation at the strip edges, not the dielectric description.* A 2D boundary-element emulation with
+  the same panel layout as each 3D mesh (`emulate_2d` in
+  [fastercap_edge_mesh_check.py](../scripts/fastercap_edge_mesh_check.py)) gives air −0.48 % and dielectric −5.5 % and
+  −4.0 % on M1 and M2. FasterCap's 3D values are −0.46 %, −5.1 % and −3.9 %. So FasterCap's 3D dielectric solution is
+  what these meshes should give, and the shortfall comes from panels too coarse where strip and dielectric meet; at M3
+  it would still be −2.8 %. In 2D, refining only the panels at the strip's side edges removes it: 1.25 µm gives −0.76 %,
+  0.6 µm gives −0.13 %. This answers what the FasterCap diagnosis set out to find. Case H's unphysical matrices came from
+  the automatic settings (a coarse interaction threshold that the automatic mode never tightened). With a tight
+  threshold and resolved meshes, FasterCap's 3D dielectric solution matches an independent calculation.
+- *Pending: an edge-refined 3D confirmation* (`python scripts/fastercap_edge_mesh_check.py`, declared at bcd1c3e,
+  launched 3 October). One mesh, E1: 1.25 µm panels at the strip edges, prediction −0.76 %. Checks: D1 validity, D4
+  within 2 % of the 2D reference, D6 within 0.5 % of the 2D emulation of its own layout. Convergence evidence then
+  rests on the 2D emulation series. FasterCap stays unqualified for board geometry; K1 (partly filled plates) is unrun.
   Dielectric M1 at 4 mm exceeded its 1 h limit (27 minutes in run 2), so D2 could not pass. It was stopped during
   dielectric M2. The air results reproduce run 2 exactly. Run 4 is queued to start alone after the FastHenry jobs.
 
