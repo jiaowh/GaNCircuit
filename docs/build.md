@@ -448,6 +448,21 @@ copper cancels: mutual-inductance ratios, and cavity-size differences.
   through slotted planes and meet several layers. The numbers show the size of representation effects at the board
   pitches; they are not error bars for the extracted board network.
 
+**Audit at 9ca735d (3 October 2026), applied without reruns.**
+- The user-mesh FasterCap runner (also used by the edge-mesh check) now applies the same `run_problem` gate as the
+  shared runner. None of the 37 stored user-mesh and edge-mesh logs reports a memory termination.
+- Both FastHenry benchmarks now run through [circuit_tools/wslrun.py](../src/circuit_tools/wslrun.py), which records
+  the Linux solver's PID and on timeout stops that process after checking its name (tests/test_wslrun.py). Before,
+  only wsl.exe was stopped, so a timed-out case could keep running beside the next one, and the via script did not
+  catch a timeout at all.
+- The via benchmark binds `bem2d.py` and `wslrun.py` in its manifest. On `--resume`, both benchmarks refuse a report whose
+  dependencies changed.
+- V1 now fails if any expected ratio is missing (tests/test_via_array_checks.py). The stored V1 used complete ratio
+  sets, so its failure stands.
+- The stored reports predate these changes, and their verdicts are unchanged.
+- Wording narrowed: slot figures are differences from an unconverged mesh, via figures are mutual-inductance ratios,
+  and the FasterCap diagnosis is substantially resolved with its 3D qualification unfinished.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh
