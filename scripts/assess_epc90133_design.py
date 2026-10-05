@@ -27,6 +27,11 @@ worst-case overshoot over the four; 'not met' if any alternative fails, 'undeter
 50 ps pair rule above applies unchanged. (C3, admissible changes, holds by construction for part swaps.)
 Gear fallback (declared 5 October 2026 before any Gear run; scripts/epc90133_switching.py): where neither the
 100 ps pair nor a 50 ps pair is usable, the Gear pair <d>@<a>-gear is used, only if the declared Gear check passes.
+Cross-method fallback (declared 5 October 2026, 20:05, before any result it affects; after stock@ramp-Ls50-gear
+stalled at 4.98 us while R80-1.2@ramp-Ls50 and R80-2.2-dt7.5@ramp-Ls50 stalled with the trapezoidal method): if no
+same-method pair is usable, the usable trapezoidal case of one side is compared with the Gear case of the other,
+only if the Gear check passes with every per-case difference within 0.1 % (4 pairs: at most 0.05 % found). Such a
+comparison decides a constraint only if its margin exceeds 0.1 % of the stock value; otherwise 'undetermined'.
 """
 import argparse
 import hashlib
@@ -75,7 +80,7 @@ def main():
     table, verdicts = {}, {}
     for d in designs:
         table[d] = {a: metrics(cases.get(f"{d}@{a}")) for a in alts}
-    pair_step, pair_gear = {}, set()
+    pair_step, pair_gear, pair_mixed = {}, set(), set()
     # Gear check (declared in scripts/epc90133_switching.py, rev-2 Gear fallback): Gear vs trapezoidal, same step.
     gear_check = []
     for base in ("stock@step-Ls0", "R80-2.2@step-Ls0", "R80-2.2@step-Ls50"):
@@ -91,6 +96,11 @@ def main():
             dt_, dg_ = ct[k] - st[k], cg_[k] - sg_[k]
             gear_diff.append({"metric": k, "trap_difference": dt_, "gear_difference": dg_, "rel": dg_ / dt_ - 1})
     gear_ok = bool(gear_check) and bool(gear_diff) and all(abs(v) <= 0.02 for r in gear_check for k, v in r.items() if k != "case")         and all(abs(r["rel"]) <= 0.10 for r in gear_diff)
+    extra_check = [metrics(cases.get(b)) and metrics(cases.get(b + "-gear")) and
+                   {k: metrics(cases[b + "-gear"])[k] / metrics(cases[b])[k] - 1 for k in ("overshoot_V", "fet_loss_W", "q2_gate_peak_V")}
+                   for b in ("stock@ramp-Ls0",)]
+    gear_check += [{"case": "stock@ramp-Ls0", **x} for x in extra_check if x]
+    gear_tight = gear_ok and all(abs(v) <= 0.001 for r in gear_check for k, v in r.items() if k != "case")
     for a in alts:
         for d in designs:
             if d == "stock":
@@ -103,6 +113,11 @@ def main():
                 elif sg and cg and gear_ok:
                     pair_step[(d, a)] = (sg, cg)
                     pair_gear.add((d, a))
+                elif gear_tight:
+                    st_, ct_ = table["stock"][a] or sg, table[d][a] or cg
+                    if st_ and ct_:
+                        pair_step[(d, a)] = (st_, ct_)
+                        pair_mixed.add((d, a))
     for d in designs:
         if d == "stock":
             continue
@@ -116,9 +131,13 @@ def main():
                         per[k].append(None)
                     over.append(None)
                     continue
-                per["C1_fet_loss_within_5pct"].append(None if c["fet_loss_W"] is None or s["fet_loss_W"] is None
-                                                      else c["fet_loss_W"] <= s["fet_loss_W"] * 1.05)
-                per["C2_q2_gate_peak_not_above"].append(c["q2_gate_peak_V"] <= s["q2_gate_peak_V"])
+                tol = 0.001 if (d, a) in pair_mixed else 0.0  # cross-method: decide only outside the method error
+                def cmp(cv, lim):
+                    if cv is None or lim is None:
+                        return None
+                    return None if abs(cv - lim) <= tol * abs(lim) and tol else cv <= lim
+                per["C1_fet_loss_within_5pct"].append(cmp(c["fet_loss_W"], None if s["fet_loss_W"] is None else s["fet_loss_W"] * 1.05))
+                per["C2_q2_gate_peak_not_above"].append(cmp(c["q2_gate_peak_V"], s["q2_gate_peak_V"]))
                 over.append(c["overshoot_V"])
             v = {k: ("not met" if False in x else "undetermined" if None in x else "met") for k, x in per.items()}
             v["constraints"] = ("not met" if "not met" in v.values() else
@@ -126,7 +145,8 @@ def main():
             verdicts[d] = {"per_alternative": per, "verdict": v, "overshoot_V": dict(zip(alts, over)),
                            "worst_case_overshoot_V": None if None in over else max(over),
                            "compared_at_50ps": sorted(a for (dd, a) in pair_step if dd == d and (dd, a) not in pair_gear),
-                           "compared_with_gear": sorted(a for (dd, a) in pair_gear if dd == d)}
+                           "compared_with_gear": sorted(a for (dd, a) in pair_gear if dd == d),
+                           "compared_cross_method": sorted(a for (dd, a) in pair_mixed if dd == d)}
             continue
         per = {"T1_overshoot_lower": [], "T2_switching_energy_not_higher": [], "T3_efficiency_not_lower": []}
         for a in alts:
@@ -159,7 +179,8 @@ def main():
                        if args.rule == "round3" else None),
            "scope": "ranking within the unvalidated model (EPC2302 Fig. 7 exception, behavioural driver, exploratory G extraction); frozen predictions for the board, not validated values",
            "gear_check": {"per_case": gear_check, "stock_to_candidate_difference": gear_diff, "passes": gear_ok,
-                          "rule": "overshoot, FET loss, Q2 gate peak within 2 %; difference R80-2.2 minus stock within 10 %"},
+                          "rule": "overshoot, FET loss, Q2 gate peak within 2 %; difference R80-2.2 minus stock within 10 %",
+                          "tight_within_0.1pct": gear_tight},
            "metrics": table, "relative_to_stock": rel, "verdicts": verdicts}
     args.output.write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     for d in designs:
