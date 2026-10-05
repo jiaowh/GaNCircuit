@@ -1525,6 +1525,9 @@ Result (change against stock under each alternative that ran):
 | R80 2.2 ohm, dead time 7.5 ns | -16 to -61 % | +7.4 to +13 % | -0.8 to +15 % | -9 to -41 % |
 | R80 3.3 ohm | -44 to -75 % | +14 to +17 % | +9 to +20 % | -23 to -47 % |
 
+*T3 and the efficiency figures in this section are invalid (loss-estimator revision 2, see "layout round 2a"); the
+rerun is results/gan/epc90133-design-round1-rev2.json.*
+
 Verdicts: **no candidate meets all three targets.** T1 holds under every alternative that ran but stays undetermined
 (the stock step-driver, 50 pH case is missing). T2 and T3 are not met. A larger R80 slows Q1's turn-on: Eon rises
 while the overshoot falls. The shorter dead time recovers only about 0.05 W of the roughly 0.3 W extra loss. The
@@ -1537,6 +1540,49 @@ energy; none lowers both. Meeting all three targets would need a change that low
 inductance rather than slowing the edge, which means a layout change and a new board. The trade-off and its size are
 frozen predictions for E4 (R80 2.2 ohm) on the purchased board; they are not validated values (EPC2302 Fig. 7
 exception, behavioural driver, exploratory extraction).
+
+### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
+
+Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
+dielectric (the power loop's return gap; stock 0.127 mm) meet design round 1's three targets with the stock gate
+resistors? `scripts/epc90133_extract.py` gained an opt-in gap override (`A:m1:mid:d<mm>`). The default and
+stock-height decks are byte-identical to the previous version. Variant A extractions
+(results/gan/epc90133-extraction-layout/): loop L 0.502 nH (0.127 mm, stock), 0.469 (0.100), 0.436 (0.075), 0.401 nH
+(0.050). Halving the gap lowers this variant's loop inductance by 20 %: the rest of the loop is lateral. Run 1 of the
+extractions wrote the 0.100 mm report, then crashed printing a relative path (log kept in runs/). Switching:
+`--study layout`, the same operating point, alternatives, robust rule and assessment as round 1, variant A (ranking
+only: no gate loops, not a board prediction).
+
+**Loss-estimator revision 2.** The first run ([report](../results/gan/epc90133-layout-round2a.json), kept) gave FET
+losses that jumped from +59 % to -15 % between neighbouring cases. The loss window ended 40 ns after the valley turn-on,
+while the switch node was still ringing. FET terminal energy equals loss only if the energy stored in the device
+capacitances is the same at both ends of the window, and here it was not: Q2's turn-on segment read 0.77, 3.60 and
+0.66 µJ in three neighbouring cases. **Every T3 verdict and efficiency figure from round 1 and from round 2a's first
+run is invalid.** T1 and T2 use threshold-defined edge windows and are unaffected, so round 1's "no candidate meets all
+three" stands through T2. Revision 2, declared at 6031d30 before any rerun: Q1's second pulse lasts 600 ns, the window
+runs to 450 ns after the turn-on, and a settling check requires the window energy at 400 and 450 ns to agree within
+2 %. Round 2a rerun ([report](../results/gan/epc90133-layout-round2a-rev2.json),
+[assessment](../results/gan/epc90133-layout-round2a-rev2-assessment.json)): all 16 cases usable and settled (0.3-1.4 %).
+Round 1 reruns on G with revision 2 (launched 5 October, about 3 h; results/gan/epc90133-design-round1-rev2.json).
+
+Result (change against stock under the four alternatives):
+
+| Gap | Loop L | Overshoot | Eon + Eoff | FET loss |
+|---|---|---|---|---|
+| 0.100 mm | -6.6 % | -3 to -7 % | +1.3 to +2.9 % | +1.2 to +1.8 % |
+| 0.075 mm | -13 % | -6 to -15 % | +2.4 to +6.3 % | +1.2 to +2.5 % |
+| 0.050 mm | -20 % | -11 to -23 % | +3.7 to +11 % | +3.1 to +3.8 % |
+
+Verdicts: no gap meets all three. T1 is met only at 0.050 mm, T2 at none, and T3 only at 0.100 mm (within the 2 %
+tolerance), where T1 fails. **In this model, lowering the loop inductance raises Q1's turn-on energy.** The loop
+inductance takes up voltage while the current rises, and the earlier extraction variants show the same direction (loop
+L 0.50 / 0.30 / 0.28 nH / ideal copper: Eon 1.78 / 2.69 / 2.89 / 3.92 µJ, Eoff 1.6-1.8 µJ). The total FET loss rises
+too, by about 3 % at 0.050 mm. So, with these target definitions, overshoot and loss pull against each other for
+loop-inductance changes as they do for gate resistors. In absolute terms the loss changes are small (0.05 W, about
+0.02 efficiency points at 240 W), but the targets are strict "not higher". Plan update: the owner decides whether T2
+should become total loss and whether the tolerance should allow small increases. Variant A ranks only. Its gate loops
+and inner layers are missing, and its loop L (0.50 nH) is about twice G's, so the size of these changes on the board
+would differ.
 
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
