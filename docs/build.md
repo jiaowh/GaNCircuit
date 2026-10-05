@@ -1459,6 +1459,25 @@ voltage. Open item 5 is answered for the schematic. The actual board's jumpers a
 open. Scope: static logic of the published schematic; no timing simulation, no PWM-source behaviour, no noise, not a
 measurement of our board.
 
+### EPC90133 first-power content and channel requirements (5 October 2026)
+
+Equipment-independent parts of the first-power procedure are drafted in the hardware plan (v0.4) for the lab's
+review. **The QSG's procedure text does not match this board's connectors.** It names VDD "J1, Pin-1" and ground
+"J1, Pin-2", but the 12 V input is J90, whose pin 1 is GND in both the schematic and the layout. The silkscreen marks
+GND at the square pad and VDD at the round pad. Following the QSG's pin numbers would reverse the gate-drive supply,
+so connections are made by silkscreen label. J80's silkscreen (PWM1, GND, PWM2, GND) matches the schematic. The
+board has no bleed resistor on VIN, so a discharge path and its verification are part of the procedure. Shutdown
+keeps VDD and PWM on until the bus is verified discharged, because the driver's output state below POR is not stated
+in the datasheet text read. The double-pulse width limit is given as t1 = L I / V for the user-fitted inductor.
+
+`scripts/epc90133_probe_requirements.py` ([result](../results/gan/epc90133-probe-requirements.json); a derivation
+with declared allowances, no pass/fail) turns recorded waveform features into channel requirements. At Fig. 9's
+features, the system bandwidth is 0.89 GHz (set by the 264 MHz ring at 3 % amplitude error), with 6.0 GS/s and
+168 ps deskew. At the fastest usable simulated case (0.80 ns, 300 MHz): 1.36 GHz, 12.5 GS/s, 80 ps. A floating Q1
+gate measurement needs at least 54 dB CMRR. Probe tip capacitance does not limit the choice (20 pF shifts the ring
+by 1 %). The first version computed the edge dv/dt from the largest step and the fastest edge of different cases.
+It was corrected to a per-case value before the result was recorded.
+
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
 Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node

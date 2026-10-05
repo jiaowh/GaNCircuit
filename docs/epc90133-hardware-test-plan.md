@@ -128,6 +128,32 @@ not, beyond that uncertainty.
 | Network or impedance analyzer (E8, optional) | loop inductance of the unpowered board, separating layout from device and driver | VNA to at least 100 MHz with fixture de-embedding, or an impedance analyzer to 120 MHz | — |
 | Second EPC90133 (E8, optional) | shunt-thru measurement needs the FETs removed | one board, not used for switching tests | — |
 
+### Derived channel requirements (5 October 2026)
+
+`scripts/epc90133_probe_requirements.py` ([result](../results/gan/epc90133-probe-requirements.json)) derives these from
+the measured Fig. 9 features and the usable simulated cases. Its allowances are proposals: 5 % rise-time error, 3 %
+ring-amplitude error with a Gaussian response, 10 samples per edge, deskew within 10 % of the edge, and at most 1 %
+ring-frequency shift from probe capacitance. The board's waveform is unknown. If Fig. 9 was itself
+bandwidth-limited (H4), the board's edges are faster, so both ends are given. The bandwidth applies to the whole
+probe-plus-scope system; for Gaussian-like parts the system bandwidth is about 1/sqrt(1/B1² + 1/B2²).
+
+| Quantity | At Fig. 9 features (1.68 ns, 264 MHz) | At the fastest usable simulated case (0.80 ns, 300 MHz) |
+|---|---|---|
+| System bandwidth | 0.89 GHz (set by the ring) | 1.36 GHz (set by the edge) |
+| Sample rate | 6.0 GS/s | 12.5 GS/s |
+| Channel deskew | 168 ps | 80 ps |
+| Floating Q1 gate: CMRR for 0.1 V error | 54 dB (51.5 V step, 22 V/ns) | 60 dB (step up to 103 V in the unvalidated cases, up to 49 V/ns) |
+
+- Switch-node probe tip capacitance up to 20 pF shifts the ring by at most 1 % (EPC2302 COSS 1000 pF at 50 V), so
+  tip capacitance does not limit the choice. The ground path and the probe's own resonance do, and E0
+  characterizes them.
+- The Q2 gate spike occurs during the switch-node edge, so its channel needs the switch-node bandwidth. The
+  checklist's 500 MHz minimum for the low-side gate probe is below that and must be raised or justified.
+- The checklist's minimum oscilloscope (1 GHz, 5 GS/s) meets the bandwidth at Fig. 9 features but not the sample
+  rate (6.0 GS/s for 10 samples per 1.68 ns edge), and neither value at the fastest simulated case.
+- A floating Q1 gate measurement needs at least 54 dB CMRR across the edge's spectrum. That points to an optically
+  isolated probe class; without one, Q1's VGS is not measured.
+
 ## Probe connection points (published layout)
 
 `scripts/epc90133_probe_points.py` locates them in EPC's published B5253 Rev 2.0 files, with declared checks
