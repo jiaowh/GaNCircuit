@@ -1408,6 +1408,57 @@ circuit; they do not establish the energized board's gate supply:
 These are statements about the behavioural driver and the vendor model, not about the board. (Wording corrected
 after an external review, 1 October 2026.)
 
+### EPC90133 input logic: can any input state command both gates on? (hardware plan open item 5)
+
+The uP1966E has no HI/LI lockout, so shoot-through protection rests on the board's input logic, its jumpers and the
+PWM source. `devices/epc/epc90133-input-logic.json` transcribes QSG Fig. 16 (dead-time and bypass) with the
+main-sheet and driver-sheet connections: four 74LVC1G99 configurable gates, two SN74LVC1G66 switches, the R620/C620/D620
+and R625/C625/D625 delay networks, the pull-downs and the J630/J640 headers. Both logic datasheets are recorded in
+`devices/epc/epc90133-sources.json`. `scripts/epc90133_input_logic.py` (checks declared at fab26fd before the first
+run; [report](../results/gan/epc90133-input-logic.json); tests/test_epc90133_input_logic.py) evaluates the
+transcription as recorded: L1 BOM, L2 the gate function against all 16 rows of the 74LVC1G99 function table parsed
+from the PDF, L3 the QSG's documented settings, L5 power-up. All pass. Run 1's class label for two-input settings
+was wrong where a polarity jumper inverts one channel (its recorded states were right); it is kept as
+`results/gan/epc90133-input-logic-run1-label-defect.json`, and run 2 changed only the label.
+
+Each input channel is Y = (C ? B : A) XOR D: U610 gives InBufQup = PWM1 XOR PolQup; U611 gives InBufQlow = (Dual ?
+PWM2 : PWM1) XOR PolQlow. U612/U614 select the RC-delayed copy when UseDT is high and are disabled (3-state) when
+SWbyp is high, when U615/U616 connect PWM1/PWM2 straight to HIN/LIN. J630 sets PolQlow (1-2), PolQup (3-4) and Dual
+(5-6); J640 sets SWbyp (1-2) and UseDT (5-6); pin 3 of J640 is unconnected, so its 3-4 position equals no jumper.
+
+Across all 64 horizontal jumper combinations:
+
+- **Safe as designed, 4 combinations**: J630 1-2 or 3-4 with J640 5-6 (and the same with an ineffective 3-4 on
+  J640). Gate commands are complementary from PWM1, with an RC delay on each turn-on. With open inputs only the
+  synchronous-rectifier FET is commanded on.
+- **Both gates on at idle, 8**: J630 1-2 and 3-4 together (both polarity bits set) without full bypass. Both
+  commands are high with PWM1 low or unplugged.
+- **Both follow PWM1, 8**: no J630 jumper, or J630 1-2 with 5-6, without full bypass. Both gates are on whenever
+  PWM1 is high (PWM2 open).
+- **Complementary but no added dead time, 4**: a single-input polarity jumper with no J640 jumper (the pull-downs
+  select dead-time bypass).
+- **Two-input, 40**: dual mode or full bypass. Both gates are on for one PWM1/PWM2 combination (usually both high;
+  PWM1 low with PWM2 high for J630 3-4 with 5-6), which the PWM source must avoid.
+
+Power-up: the logic and U80 share the 5 V VCC from U100. U80 enables its outputs only above its POR (3.8 V minimum),
+where the 74LVC parts (1.65 V minimum) already give their static outputs, so the commands at enable are the idle
+state of the jumper setting.
+
+Dead time from datasheet limits (L4, arithmetic, informational): the RC delay R C ln((VOH - V0)/(VOH - VT+)) is 9.6 ns
+typical (EPC's Fig. 4 rule gives 9.9 ns for 120 Ω) and 6.3-12.9 ns over R ±1 %, C ±10 %, VT+ limits (interpolated to
+5.0 V) and an assumed 0-0.3 V residual voltage, or 5.3-14.8 ns with X7R temperature drift. The two channels'
+gate delays may differ by up to 7.3 ns and the uP1966E's delay matching by up to 6 ns, so stacked limits give
+about -7 ns at the gate commands (typical about 8 ns). The capacitor's discharge delay, which shortens the dead time,
+is not bounded by any datasheet used here. Stacked worst cases are pessimistic, but they mean the datasheets do not
+guarantee a positive dead time. The uP1966E datasheet recommends at least 30 ns; EPC recommends 5-15 ns for this
+board.
+
+Consequences (hardware plan): the first-power procedure gains a jumper-configuration entry, with the shoot-through
+and zero-dead-time settings named as stop conditions, and a measured dead time at the driver outputs before any bus
+voltage. Open item 5 is answered for the schematic. The actual board's jumpers and its measured dead time remain
+open. Scope: static logic of the published schematic; no timing simulation, no PWM-source behaviour, no noise, not a
+measurement of our board.
+
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
 Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node

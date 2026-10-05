@@ -46,6 +46,11 @@ vertical placement shorts two pulled-down signals or two VCC pins and reduces to
 listed case), which input states command both gates on, and whether the
 complementary settings have an RC delay on each turn-on.
 
+Run 1 (5 October 2026) labelled the two-input class "both on only if PWM1 and PWM2 are
+high together", which is wrong where a polarity jumper inverts one channel (J630 3-4 +
+5-6: both on at PWM1 = 0, PWM2 = 1); its both_on_states were correct. Kept as
+results/gan/epc90133-input-logic-run1-label-defect.json; run 2 changes only the label.
+
 Static logic only: no timing simulation, no PWM-source behaviour, no noise.
 """
 import argparse
@@ -163,7 +168,7 @@ def classify(logic, j630, j640):
         kind = ("complementary from PWM1, RC delay on each turn-on" if delayed
                 else "complementary from PWM1, no added dead time")
     elif both_on:
-        kind = "independent inputs: both on only if the PWM source sets PWM1 and PWM2 high together"
+        kind = "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid"
     else:
         kind = "no input state commands both on"
     return {"J630": list(j630), "J640": list(j640), "kind": kind, "both_on_states": both_on,

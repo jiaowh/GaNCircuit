@@ -285,7 +285,11 @@ Next steps:
    with connection points, probe loading, bandwidth, grounding and uncertainty), and the hardware draft into an
    executable first-power procedure with numerical limits, independent hardware trips, discharge verification and
    measurement uncertainty. A small simulation of the driver alone, with its bootstrap and supply capacitors, prepares
-   the unpowered driver measurement.
+   the unpowered driver measurement. The board's input logic has been evaluated from the schematic
+   ([result](results/gan/epc90133-input-logic.json)). Because the driver has no lockout, only the documented
+   single-input settings (J630 1-2 or 3-4 with J640 5-6) keep both gates from being commanded on together.
+   Several jumper errors command shoot-through, and datasheet limits do not guarantee the nominal 10 ns dead time.
+   The procedure therefore checks the jumpers and measures the dead time before any bus voltage is applied.
 2. **Measure the board** once that procedure and its interlocks are approved (gate G4): measurement chain and
    unpowered driver checks first, then the first energized condition, with predictions and held-out conditions
    frozen before diagnostic switching data are taken. Efficiency (input and output power with an uncertainty) is

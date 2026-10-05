@@ -1,0 +1,3665 @@
+{
+ "schema": "epc90133-input-logic/1",
+ "scope": "Static logic of the transcribed input path and datasheet-limit dead-time arithmetic; no timing simulation, no PWM-source behaviour, not a measurement.",
+ "evaluator_sha256": "d1b5fe5d21a294991334a80806402499a88ea7d99434561183b1a7c6ccaef6d7",
+ "transcription_sha256": "cd6a0588c6ba575d5431d90edfbab5af253c9b63358ee85f075917ea5d88ea60",
+ "checks": {
+  "L1_bom": true,
+  "L2_function_table": true,
+  "L3_qsg_settings": true,
+  "L5_logic_valid_at_driver_enable": true
+ },
+ "outcome": "pass",
+ "L1_bom": [
+  {
+   "ref": "U610",
+   "transcribed": "74LVC1G99GN,115",
+   "bom": "74LVC1G99GN,115",
+   "match": true
+  },
+  {
+   "ref": "U611",
+   "transcribed": "74LVC1G99GN,115",
+   "bom": "74LVC1G99GN,115",
+   "match": true
+  },
+  {
+   "ref": "U612",
+   "transcribed": "74LVC1G99GN,115",
+   "bom": "74LVC1G99GN,115",
+   "match": true
+  },
+  {
+   "ref": "U614",
+   "transcribed": "74LVC1G99GN,115",
+   "bom": "74LVC1G99GN,115",
+   "match": true
+  },
+  {
+   "ref": "U615",
+   "transcribed": "SN74LVC1G66DBV",
+   "bom": "SN74LVC1G66DBV",
+   "match": true
+  },
+  {
+   "ref": "U616",
+   "transcribed": "SN74LVC1G66DBV",
+   "bom": "SN74LVC1G66DBV",
+   "match": true
+  },
+  {
+   "ref": "U100",
+   "transcribed": "MCP1703T-5002E/MC",
+   "bom": "MCP1703T-5002E/MC",
+   "match": true
+  },
+  {
+   "ref": "R620",
+   "transcribed": "RC0603FR-07120RL",
+   "bom": "RC0603FR-07120RL",
+   "match": true
+  },
+  {
+   "ref": "R625",
+   "transcribed": "RC0603FR-07120RL",
+   "bom": "RC0603FR-07120RL",
+   "match": true
+  },
+  {
+   "ref": "C620",
+   "transcribed": "CC0402KRX7R9BB101",
+   "bom": "CC0402KRX7R9BB101",
+   "match": true
+  },
+  {
+   "ref": "C625",
+   "transcribed": "CC0402KRX7R9BB101",
+   "bom": "CC0402KRX7R9BB101",
+   "match": true
+  },
+  {
+   "ref": "D620",
+   "transcribed": "SDM03U40-7",
+   "bom": "SDM03U40-7",
+   "match": true
+  },
+  {
+   "ref": "D625",
+   "transcribed": "SDM03U40-7",
+   "bom": "SDM03U40-7",
+   "match": true
+  },
+  {
+   "ref": "J630",
+   "transcribed": "GRPB032VWVN-RC",
+   "bom": "GRPB032VWVN-RC",
+   "match": true
+  },
+  {
+   "ref": "J640",
+   "transcribed": "GRPB032VWVN-RC",
+   "bom": "GRPB032VWVN-RC",
+   "match": true
+  },
+  {
+   "ref": "JP630",
+   "transcribed": "M50-2030005",
+   "bom": "M50-2030005",
+   "match": true
+  },
+  {
+   "ref": "JP640",
+   "transcribed": "M50-2020005",
+   "bom": "M50-2020005",
+   "match": true
+  },
+  {
+   "ref": "R601",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R602",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R603",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R604",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R605",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R621",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R626",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R641",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R643",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R71",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  },
+  {
+   "ref": "R76",
+   "transcribed": "RC0402FR-0710KL",
+   "bom": "RC0402FR-0710KL",
+   "match": true
+  }
+ ],
+ "L2_function_table": {
+  "rows_parsed": 17,
+  "oe_low_rows": 16,
+  "mismatches": [],
+  "pass": true
+ },
+ "L3_qsg_settings": {
+  "single_buck_no_bypass": true,
+  "single_boost_no_bypass": true,
+  "dual_any_bypass": true,
+  "full_bypass_any_mode": true
+ },
+ "L4_dead_time": {
+  "vt_plus_5V_interpolated_V": [
+   2.385,
+   2.755,
+   3.035
+  ],
+  "t_rc_typ_ns": 9.61,
+  "t_rc_room_range_ns": [
+   6.27,
+   12.88
+  ],
+  "t_rc_with_x7r_temperature_ns": [
+   5.33,
+   14.81
+  ],
+  "qsg_rule_ns": 9.93,
+  "logic_channel_skew_max_ns": 7.3,
+  "driver_match_max_ns": 6.0,
+  "worst_case_gate_command_dead_time_ns": -7.03,
+  "typical_gate_command_dead_time_ns": 8.11,
+  "unbounded_reduction": "turn-off delay of the diode discharge (InBuf output resistance, SDM03U40 forward behaviour); not bounded here",
+  "datasheet_limits_guarantee_positive_dead_time": false
+ },
+ "L5_power_up": {
+  "driver_por_min_V": 3.8,
+  "logic_vcc_min_V": 1.65,
+  "logic_valid_at_driver_enable": true,
+  "both_on_at_enable": [
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   }
+  ]
+ },
+ "configurations_by_kind": {
+  "both follow PWM1: both on whenever PWM1 is high (PWM2 open)": [
+   {
+    "J630": [],
+    "J640": []
+   },
+   {
+    "J630": [],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   }
+  ],
+  "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid": [
+   {
+    "J630": [],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ]
+   }
+  ],
+  "complementary from PWM1, no added dead time": [
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   }
+  ],
+  "complementary from PWM1, RC delay on each turn-on": [
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "3-4"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   }
+  ],
+  "both on at idle (PWM inputs open or low)": [
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": []
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "3-4"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "5-6"
+    ]
+   },
+   {
+    "J630": [
+     "1-2",
+     "3-4",
+     "5-6"
+    ],
+    "J640": [
+     "3-4",
+     "5-6"
+    ]
+   }
+  ]
+ },
+ "configurations": [
+  {
+   "J630": [],
+   "J640": [],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0",
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0",
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0",
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0",
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [],
+   "kind": "complementary from PWM1, no added dead time",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "complementary from PWM1, no added dead time",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "complementary from PWM1, RC delay on each turn-on",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "complementary from PWM1, RC delay on each turn-on",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [],
+   "kind": "complementary from PWM1, no added dead time",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "complementary from PWM1, no added dead time",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "complementary from PWM1, RC delay on each turn-on",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "complementary from PWM1, RC delay on each turn-on",
+   "both_on_states": [],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0",
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0",
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0",
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0",
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "both follow PWM1: both on whenever PWM1 is high (PWM2 open)",
+   "both_on_states": [
+    "PWM1=1,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=0,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "3-4"
+   ],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "direct"
+    ],
+    "Qlow": [
+     "direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "5-6"
+   ],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "3-4",
+    "5-6"
+   ],
+   "kind": "both on at idle (PWM inputs open or low)",
+   "both_on_states": [
+    "PWM1=0,PWM2=0"
+   ],
+   "idle_gate_commands": {
+    "HIN": 1,
+    "LIN": 1
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "rc_delayed"
+    ],
+    "Qlow": [
+     "rc_delayed"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 1,
+     "LIN": 1
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 0,
+     "LIN": 0
+    }
+   }
+  },
+  {
+   "J630": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "J640": [
+    "1-2",
+    "3-4",
+    "5-6"
+   ],
+   "kind": "two-input: both on for the PWM1/PWM2 combinations in both_on_states, which the PWM source must avoid",
+   "both_on_states": [
+    "PWM1=1,PWM2=1"
+   ],
+   "idle_gate_commands": {
+    "HIN": 0,
+    "LIN": 0
+   },
+   "paths_pwm1_high": {
+    "Qup": [
+     "pwm_input_direct"
+    ],
+    "Qlow": [
+     "pwm_input_direct"
+    ]
+   },
+   "contention": false,
+   "truth": {
+    "PWM1=0,PWM2=0": {
+     "HIN": 0,
+     "LIN": 0
+    },
+    "PWM1=0,PWM2=1": {
+     "HIN": 0,
+     "LIN": 1
+    },
+    "PWM1=1,PWM2=0": {
+     "HIN": 1,
+     "LIN": 0
+    },
+    "PWM1=1,PWM2=1": {
+     "HIN": 1,
+     "LIN": 1
+    }
+   }
+  }
+ ]
+}
