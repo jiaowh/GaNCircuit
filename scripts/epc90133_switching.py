@@ -293,6 +293,21 @@ overshoot, FET loss and Q2 gate peak each agree within 2 % and the stock-to-cand
 loss agrees within 10 % between methods. If it fails, step-Ls50 stays undetermined and the Gear runs are kept as
 failed. Report: results/gan/epc90133-design-round1-rev2-gear.json.
 
+Round 3 (declared 5 October 2026 after the rev-2 results, before any round-3 run; owner decision of 5 October,
+plans/layout-round-2-plan.md). Objective: the lowest worst-case overshoot over the four alternatives. Constraints
+under every alternative: C1 FET loss (estimator revision 2, settled) at most 5 % above stock's; C2 Q2 die gate peak
+during the rise not above stock's. Rev 2 (with the continuation and the Gear fallback, whose check passed: Gear
+within 0.05 % of trapezoidal) gives FET loss +5.5 to +9.0 % at R80 2.2 ohm and +10 to +12 % at 3.3 ohm, so both
+fail C1; a straight-line reading puts the C1 limit at about 1.6-1.8 ohm under ramp-Ls0. Candidates: R80 1.2, 1.5
+and 1.8 ohm (E12 values, a part swap on the stock board: C3), stock dead time, the same bench and alternatives.
+step-Ls50 runs directly with Gear (<d>@step-Ls50-gear), paired with rev 2's stock@step-Ls50-gear (the trapezoidal
+stock case stalls). Stock is not rerun; a reproduction control stock@ramp-Ls0-repro must match rev 2's stock@ramp-Ls0
+(netlist hashes identical, metrics within 1e-6 relative), otherwise round 3 is not compared with rev 2. A
+trapezoidal case that times out is rerun with Gear together with the matching stock case (declared now, applied only
+if needed). Assessment: scripts/assess_epc90133_design.py --rule round3 over rev 2, its continuation, the Gear report
+and results/gan/epc90133-design-round3.json. The result ranks R80 values within this model and is a frozen prediction
+for E4 on the purchased board, not a validated value.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -1010,6 +1025,9 @@ def driver_cases(exts):
 DESIGN_POINT = {"VOUT": 12.0, "IOUT": 20.0}
 DESIGNS = {"stock": {}, "R80-2.2": {"gate_r": {"R80": 2.2}}, "R80-3.3": {"gate_r": {"R80": 3.3}},
            "R80-2.2-dt7.5": {"gate_r": {"R80": 2.2}, "dead": 7.5e-9}}
+# Round 3 (declared in the docstring): on request only, so the default design run is unchanged.
+ROUND3_DESIGNS = {"R80-1.2": {"gate_r": {"R80": 1.2}}, "R80-1.5": {"gate_r": {"R80": 1.5}},
+                  "R80-1.8": {"gate_r": {"R80": 1.8}}}
 ALTERNATIVES = {"ramp-Ls0": {}, "step-Ls0": {"driver": "step"}, "ramp-Ls50": {"l_s": 50e-12},
                 "step-Ls50": {"driver": "step", "l_s": 50e-12}}
 
@@ -1021,14 +1039,18 @@ def design_cases(exts):
     common = {"ext": "G-m1-mid", "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True,
               "period_loss": True, "long_pulse": True}  # estimator revision 2
     cases = {}
-    for d, dp in DESIGNS.items():
+    for d, dp in {**DESIGNS, **ROUND3_DESIGNS}.items():
         for a, ap_ in ALTERNATIVES.items():
             cases[f"{d}@{a}"] = {**common, **ap_, **dp, "design": d, "alternative": a}
+            if d in ROUND3_DESIGNS:
+                cases[f"{d}@{a}"]["on_request"] = True
             # numerical check (declared): run on request with --only, at half the step
             cases[f"{d}@{a}-ms50"] = {**cases[f"{d}@{a}"], "maxstep": MAXSTEP_PKG / 2, "base": f"{d}@{a}",
                                       "on_request": True}
             # rev-2 Gear fallback (declared in the docstring): same step, Gear integration, on request
             cases[f"{d}@{a}-gear"] = {**cases[f"{d}@{a}"], "method": "gear", "base": f"{d}@{a}", "on_request": True}
+    # Round 3 reproduction control: identical to stock@ramp-Ls0 (rev 2); must reproduce it exactly.
+    cases["stock@ramp-Ls0-repro"] = {**cases["stock@ramp-Ls0"], "base": "stock@ramp-Ls0", "on_request": True}
     return cases
 
 
