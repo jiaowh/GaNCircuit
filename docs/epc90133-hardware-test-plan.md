@@ -328,7 +328,7 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   part of E3, including the 48 V point at the converter's edge currents (turn-off 28 A, turn-on 12 A) if the
   approved envelope includes it. Simulated change at that point: overshoot -31 to -33 % without package source
   inductance and only -4 to -11 % with an assumed 50 pH. The stock-board E3 data therefore indicate, before the swap,
-  which regime applies. Q2's gate spike falls 5-23 %, and FET loss rises +2.4 to +4.3 %. The model predicts how rise
+  which regime applies. Q2's gate spike falls 3-23 %, and FET loss rises +2.4 to +4.3 %. The model predicts how rise
   time and overshoot scale with the gate resistance under H1 and under H2, and the predictions differ; a second
   step to 2.2 Ω (simulated: overshoot -16 to -60 %, loss +5.5 to +9 %) widens the contrast if the diagnosis needs
   it. These simulated changes enter the frozen prediction record (below) at the approved conditions; they are not
