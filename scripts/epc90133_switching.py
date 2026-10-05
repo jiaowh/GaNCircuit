@@ -276,6 +276,23 @@ on-time conduction uses Rds averaged 300-450 ns after the turn-on and the on-tim
 value. Reports: results/gan/epc90133-layout-round2a-rev2.json and results/gan/epc90133-design-round1-rev2.json;
 revision-1 reports are kept.
 
+Design round 1 rev-2 continuation and Gear fallback (declared 5 October 2026, 17:15, before any Gear case ran).
+The rev-2 run (PID 29988) ended at 16:52 with no error output after 7 of 16 cases, apparently when its launching
+session closed; the 9 cases that never started run unchanged into results/gan/epc90133-design-round1-rev2-cont.json
+(launched through WMI, outside any session's process tree). stock@step-Ls50 stalled again (2400 s at 100 ps; at
+50 ps in the round-1 fix, 3600 s). Diagnosis from the partial raw file: the 100 ps run advanced normally to 1.753 us
+and then stepped at about 1e-19 s, 0.76 ns after Q2's turn-on command (step driver, 50 pH source L); not a start-up
+stall. Profiling on a copy cut at 1.8 us (not a result): trapezoidal at 75 ps stalls already at 20 ns; Gear at
+100 ps reaches 1.8 us in 28 s. Fallback: the step-Ls50 alternative is evaluated with Gear integration at 100 ps
+(cases <design>@step-Ls50-gear, method=gear, nothing else changed) for the stock and every candidate, compared with
+each other only (never with trapezoidal cases), used only where the 100 ps trapezoidal pair is unusable and no
+50 ps pair exists. Gear damps ringing numerically, so a declared check decides whether the Gear pairs count:
+stock@step-Ls0-gear and R80-2.2@step-Ls0-gear against their trapezoidal runs in rev 2, and
+R80-2.2@step-Ls50-gear against R80-2.2@step-Ls50 if the continuation's trapezoidal run is usable; check passes if
+overshoot, FET loss and Q2 gate peak each agree within 2 % and the stock-to-candidate DIFFERENCE in overshoot and
+loss agrees within 10 % between methods. If it fails, step-Ls50 stays undetermined and the Gear runs are kept as
+failed. Report: results/gan/epc90133-design-round1-rev2-gear.json.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -462,7 +479,7 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
-          pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False):
+          pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
@@ -600,7 +617,7 @@ Rbret bn {node(at + '.GND')} 1u"""
         # Test 9 (opt-in): vendor-model internal nodes, behind rg/rs; the vendor model itself is unchanged.
         + (" V(x1:gate) V(x1:source) V(x2:gate) V(x2:source) I(x1:bswitch) I(x2:bswitch)" if internal else ""),
         ".temp 25",
-        f".options plotwinsize=0 reltol={reltol:g}",
+        f".options plotwinsize=0 reltol={reltol:g}" + (f" method={method}" if method else ""),
         f".tran 0 {t_end:.9g} 0 {maxstep:g}",
         ".end", ""]
     head = (f"* EPC90133 switching sensitivity, extraction {ext['case']}{' (ideal copper)' if ideal else ''}; "
@@ -1010,6 +1027,8 @@ def design_cases(exts):
             # numerical check (declared): run on request with --only, at half the step
             cases[f"{d}@{a}-ms50"] = {**cases[f"{d}@{a}"], "maxstep": MAXSTEP_PKG / 2, "base": f"{d}@{a}",
                                       "on_request": True}
+            # rev-2 Gear fallback (declared in the docstring): same step, Gear integration, on request
+            cases[f"{d}@{a}-gear"] = {**cases[f"{d}@{a}"], "method": "gear", "base": f"{d}@{a}", "on_request": True}
     return cases
 
 
@@ -1186,7 +1205,8 @@ def main():
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
                   no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
                   full_r=c.get("full_r", False), internal=c.get("internal", False),
-                  gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False))
+                  gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
+                  method=c.get("method"))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
