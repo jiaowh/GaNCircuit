@@ -49,6 +49,28 @@
             "sha256": "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1",
             "contents": "8 copper Gerbers (GTL, G1-G6, GBL), NC drill, stackup .xls, fab notes PDF, layout PDF (Altium print with component tokens)",
             "status": "downloaded; extracted to vendor/epc/epc90133/gerbers"
+        },
+        {
+            "name": "74LVC1G99.pdf",
+            "url": "https://assets.nexperia.com/documents/data-sheet/74LVC1G99.pdf",
+            "local_path": "vendor/epc/epc90133/parts/74LVC1G99.pdf",
+            "retrieved": "2026-10-05",
+            "revision": "Nexperia Rev. 13, 12 August 2024",
+            "sha256": "03c6845b7a7feeab4ee4a324df8d327cfa2e3451a70d42b2eea3ce93b6bd90af",
+            "role": "U610-U612, U614 (BOM 74LVC1G99GN,115): function table (Table 4), GN pinning (Table 3), Schmitt thresholds",
+            "terms": "Manufacturer datasheet, publicly downloadable; copyright notice applies, no redistribution permission established; kept git-ignored.",
+            "status": "downloaded; PDF readable, 24 pages"
+        },
+        {
+            "name": "sn74lvc1g66.pdf",
+            "url": "https://www.ti.com/lit/ds/symlink/sn74lvc1g66.pdf",
+            "local_path": "vendor/epc/epc90133/parts/sn74lvc1g66.pdf",
+            "retrieved": "2026-10-05",
+            "revision": "TI SCES323R, revised September 2025",
+            "sha256": "423c8b724b9443f7dbe26906056c0f1ea08ed0e67d1a0c30315624737fc58f01",
+            "role": "U615, U616 (BOM SN74LVC1G66DBV): control high = switch on",
+            "terms": "Manufacturer datasheet, publicly downloadable; copyright notice applies, no redistribution permission established; kept git-ignored.",
+            "status": "downloaded; PDF readable, 44 pages"
         }
     ],
     "model": {
