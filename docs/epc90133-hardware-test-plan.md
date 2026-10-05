@@ -1,4 +1,4 @@
-# EPC90133 hardware test plan (draft v0.3, 1 October 2026)
+# EPC90133 hardware test plan (draft v0.4, 5 October 2026)
 
 Status: **draft for owner review; not approved, and not yet an executable lab procedure** (the envelope values
 below are still open). v0.2 applies an external audit: the driver has no input lockout, the driver's PHASE/BOOT
@@ -7,7 +7,7 @@ approved (plan section 8). v0.3 applies the project audit at 8284dbd (docs/proje
 setup is declared, the hypothesis signatures are treated as non-exclusive, prediction freezing has two stages, the
 held-out set is chosen from feasible conditions (60 V is optional), efficiency is a named deliverable, and the
 first-power procedure has a required structure (its values are still open). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
-reviews of 30 September 2026. It measures the stock board first, as the plan requires.
+reviews of 30 September 2026. It measures the stock board first, as the plan requires. v0.4 (5 October 2026) adds the input-logic evaluation (open item 5) and equipment-independent first-power content: connections by silkscreen label (the QSG's pin text would reverse VDD), pre-power checks, sequence and shutdown order, discharge and pulse-width formulas.
 
 ## Purpose
 
@@ -184,6 +184,60 @@ Entries marked *hardware* are implemented and acceptance-tested independently of
 | Temperature limit | operator | case-temperature limit, sensor and location | open |
 | Measurement uncertainty per channel | record | probe and connection-point allowances (probe-points section), bandwidth, deskew, from E0 | open (needs the probes) |
 | Checkpoint record | record | who decides at each step, what is recorded, the decision | open |
+
+### Equipment-independent content (draft, 5 October 2026)
+
+Proposals from the published files for the lab's responsible person to review. Values that depend on equipment
+stay open. The approved procedure replaces this draft.
+
+**Connections by silkscreen label, not by the QSG's text.** The QSG's procedure (p. 4) connects VDD to "J1, Pin-1"
+and ground to "J1, Pin-2", with PWM ground on "J2". On this board J1 and J2 are the unfitted gate MMCX footprints.
+The 12 V input is J90, whose pin 1 is GND and pin 2 VDD in both the schematic and the layout: the top silkscreen
+reads "7.5 V - 12V", GND at the square pad and VDD at the round pad. PWM is J80 (pin 1 PWM1, 2 GND, 3 PWM2, 4 GND,
+the same order as its silkscreen). Bus and switch node are the bottom-side header J3: J3A VIN, J3B SW, J3C GND.
+Every connection is made to the silkscreen label and checked on the actual board before power, because the
+QSG's pin numbers would reverse the VDD supply.
+
+**Pre-power checks (unpowered, board discharged):**
+1. Board identity and population against the published BOM (first-power table, row 1).
+2. J630 and J640 in the approved setting (single-input buck: J630 1-2, J640 5-6), photographed. The shoot-through
+   settings named in "What the board's input logic does" are stop conditions.
+3. Resistance checks with a meter, in both polarities and settled readings (the bus and gate capacitors charge
+   from the meter): VIN-GND, VIN-SW and SW-GND not low-resistance; J90 GND and J80 GND continuous with J3C GND;
+   J90 VDD not shorted to GND. Thresholds are set with the meter chosen.
+
+**Sequence (QSG order with additions):**
+1. VDD on (7.5-12 V, current limit set). Check VCC near 5 V at C80. With PWM1 low or open and the buck setting,
+   expect the low-side gate command high and the high-side command low; confirm at the accessible gate points.
+2. PWM source connected with its output low, then enabled. E1 runs here at VIN = 0, including both measured dead
+   times and the verified bootstrap state (BOOT-PHASE at C81) before the first high-side pulse.
+3. Bus from 0 V in the approved steps. Hardware trips are armed and acceptance-tested before the first step.
+4. Shutdown in reverse: switching stopped, bus off, **bus discharge verified at J3 below the stated threshold**,
+   then PWM off, then VDD off. VDD and PWM stay on while the bus is charged: the uP1966E datasheet text read so far
+   says the outputs "only function" above POR, but does not state that they hold the gates low below it. The gate
+   state of an unpowered driver is therefore not credited.
+
+**Discharge.** The board has no bleed resistor on VIN (BOM: the only VIN-GND parts are Ci1-Ci7 and Cm1-Cm10). On
+the board alone, the bus therefore decays only through leakage. Board capacitance is at most 11.5 µF (nominal values;
+DC-bias derating lowers it). That stores at most 0.8, 3.3, 7.5, 13.3 and 36.9 mJ at 12, 24, 36, 48 and 80 V. The bus
+supply's output capacitance and any external bulk capacitance add to this and are taken from the equipment. An
+external discharge path of resistance R discharges the total capacitance C from V0 to Vsafe in R C ln(V0/Vsafe). For
+example, 10 kOhm on the board's 11.5 µF takes 0.37 s from 48 V to 2 V and dissipates 0.64 W at 80 V. The path, its
+rating, Vsafe and the verifying measurement are entries in the first-power table.
+
+**Pulse-width limit.** The inductor is user-fitted (L1 and Cout are empty), so the limit is stated as a formula: the
+first pulse that builds current I at bus voltage V is t1 = L I / V. For Fig. 9's edge currents (11.1 A turn-on,
+28.9 A turn-off):
+
+| L | 12 V | 24 V | 36 V | 48 V |
+|---|---|---|---|---|
+| 2.2 µH | 2.0 / 5.3 µs | 1.0 / 2.6 µs | 0.68 / 1.8 µs | 0.51 / 1.3 µs |
+| 4.7 µH | 4.4 / 11.3 µs | 2.2 / 5.7 µs | 1.5 / 3.8 µs | 1.1 / 2.8 µs |
+| 10 µH | 9.3 / 24.1 µs | 4.6 / 12.0 µs | 3.1 / 8.0 µs | 2.3 / 6.0 µs |
+
+The hardware limit caps the pulse width independently of the PWM source, so a stuck-high PWM cannot drive the
+current past the inductor's saturation current or the chosen stop current. Its value follows from the selected
+inductor and step. The QSG's minimum PWM widths (50 ns high, 200 ns low for bootstrap refresh) also apply.
 
 ## Experiments
 
