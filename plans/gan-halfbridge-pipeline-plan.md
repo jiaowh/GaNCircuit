@@ -577,6 +577,8 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    docs/build.md "EPC90133 input logic"): safe only with J630 1-2 or 3-4 and J640 5-6; several jumper
    errors command both gates on; datasheet limits do not guarantee a positive dead time, so the jumpers are
    checked and the dead time is measured at VIN = 0 before any bus voltage;
+   (c, partial, 5 October 2026) equipment-independent first-power content and derived channel
+   requirements in hardware plan v0.4; values that depend on equipment wait for the inventory;
    (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
    conditions, then the approved energized measurements.
    Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to
