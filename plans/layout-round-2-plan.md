@@ -33,6 +33,21 @@ That keeps the two rounds comparable and stops the rule from moving after result
 Variant A (top layer and mid-layer 1, input capacitors only) has no gate loops and no inner layers. It can rank
 changes to the power loop, but not to the common-source or gate routing, and its absolute numbers are not G's.
 
+## Found on 5 October, after this plan was drafted
+
+1. **In the model, lower loop inductance raises Q1's turn-on energy.** Earlier runs: loop L 0.50 / 0.30 / 0.28 nH /
+   ideal copper gives Eon 1.78 / 2.69 / 2.89 / 3.92 µJ, with Eoff nearly unchanged (1.6-1.8 µJ). The loop
+   inductance takes up voltage during the current rise (a turn-on snubber); the stored energy then rings out and is
+   dissipated elsewhere, largely outside the standard Eon window. Round 2a (stackup on A, rev 1) confirms it: a
+   thinner gap cuts the overshoot (T1 met only at 0.050 mm, -11 to -23 %) but raises Eon by 3-21 %, so T2 fails.
+   **With Eon + Eoff in the standard windows, T1 and T2 pull against each other for loop-L changes as well as for
+   gate resistors.** Proposed for the owner: replace T2 with total FET loss per period (the T3 quantity), which
+   counts the ring energy wherever the FETs dissipate it, or keep T2 and accept that no change in either family
+   meets it.
+2. **The loss estimate (T3) of round 1 and round 2a rev 1 was invalid.** Its window ended during the ringing, so
+   terminal energy included a stored-energy swing of several µJ. Estimator revision 2 (window to 450 ns after the
+   turn-on, settling check) is declared. Round 2a reruns with it on 5 October; round 1 reruns overnight on G.
+
 ## Candidate changes, balancing effort and effect
 
 | # | Change | Expected effect on loop L | Effort | Tooling needed | Manufacturability question |
