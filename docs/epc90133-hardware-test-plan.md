@@ -347,12 +347,46 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   fixture effects included; otherwise the difference is not a bound. Both measurements' errors carry into it.
   Sources and limits: docs/gan-research-round-2-2026-09-30.md.
 
-- **E9, efficiency (named deliverable; procedure not yet written).** Efficiency is core scope (plan section 2)
-  and is not replaced by waveform matching. Before G4 approval of this experiment, a procedure states: input power
-  from bus voltage and current measured at the board terminals (four-wire voltage sense, DC meters, ranges), output
-  power at the load, gate-drive supply power counted separately, the thermal steady-state criterion and case
-  temperature, the operating points (within the approved envelope), and the propagated uncertainty of the loss
-  (the difference of two large powers). The simulated loss stays gate-charge dependent and is not labelled validated.
+- **E9, efficiency (named deliverable; draft procedure below, 5 October 2026).** Efficiency is core scope (plan
+  section 2) and is not replaced by waveform matching. The simulated loss stays gate-charge dependent and is not
+  labelled validated.
+
+### E9 draft procedure: efficiency (equipment values open)
+
+**Boundary.** Power stage plus the user-fitted inductor and output capacitor, between the board's voltage-sense
+points. The QSG names them "voltage measurement" points: TP2 (VIN) and TP4 (VOUT), with TP1/TP3 on GND. Gate-drive
+power (VDD x IDD at J90, logic included) is measured and reported separately, both excluded from and included in
+the efficiency. The inductor's loss sits inside the boundary. Its DC resistance is measured four-wire before
+mounting. The simulation then needs an inductor model, which is an explicit, separate model input. EPC publishes no
+efficiency curve for this board in the QSG, so there is no vendor value to compare with.
+
+**Readings.** Vin four-wire at TP2-TP1 and Vout at TP4-TP3. Iin and Iout through DC current measurement in the
+supply and load leads. Each power is a product of averages, so both meters must see DC: input current is measured
+upstream of an added bulk capacitor (or LC filter) and output current after Cout. The error from correlated ripple
+is at most sigma_v x sigma_i as a fraction of the power (1 % ripple on both gives 0.01 %); the ripple at the meters
+is measured and this bound reported.
+
+**Required accuracy** (`scripts/epc90133_efficiency_uncertainty.py`,
+[result](../results/gan/epc90133-efficiency-uncertainty.json)). For a loss uncertainty of 10 % of the loss, each of
+the four readings needs a standard uncertainty of about 0.05 x the loss fraction, whatever the operating point: 0.05 %
+at 1 % loss, 0.15 % at 3 %, 0.26 % at 5 %. Efficiency itself is then known to about 0.1-0.5 percentage points. The
+loss fraction is swept because no validated loss model exists. Clamp-on current probes (typically 1-3 %) are far
+too coarse. Calibrated shunts with DMMs, or a power analyzer with stated DC accuracy, are needed, and the
+equipment's specification sets the achievable loss uncertainty, which is stated as such. Correlated errors (the
+same meter type on both sides) partly cancel and are credited only if shown.
+
+**Thermal steady state.** Case temperature by thermocouple on Q1 and Q2 (heatsink per QSG Fig. 10), with ambient
+recorded. Readings are taken when the case temperature changes by less than 0.5 °C over 5 minutes (proposal). The
+case temperature is reported with each point, because RDS(on) and therefore the loss depend on it.
+
+**Operating points** (inside the approved envelope; proposals). Continuous buck at 250 kHz with the QSG's 2.2 µH:
+48 V -> 13.8 V at 5, 10 and 20 A (the 20 A point is Fig. 9's condition), and 24 V -> 6.9 V at 10 A. Each point is
+repeated, with the setup unchanged, to give the repeatability term. The bus is raised in the approved steps with
+the same stop criteria as E6.
+
+**Report.** Pin, Pout, Ploss, efficiency, gate-drive power, case and ambient temperatures, ripple bound, and the
+propagated uncertainty with each term listed (meter specifications, repeatability, ripple bound). The simulated
+loss at the same points is compared only after its gate-charge caveat and the inductor model are stated.
 
 ## Held-out conditions and frozen predictions
 
@@ -375,6 +409,35 @@ selected from feasible conditions and recorded before any of its data are observ
 - the second temperature, if a controlled temperature is available.
 
 Report the first held-out score as it is; later corrections create new revisions and do not overwrite it.
+
+### Frozen prediction record: specification (draft, 5 October 2026)
+
+A frozen prediction is a committed and pushed JSON record, written before the data it predicts exist. These
+records double as the project's judgement test for agents: their outcome is unknown to everyone and is not written
+down anywhere, so reading AGENTS.md or the docs cannot supply the answer.
+
+- **Identity.** Hashes of the vendor model library, the extraction network, the bench script and its imported
+  helpers, plus the driver representation (test-11 form, or an E1-calibrated revision), the probe response applied
+  (none, or the E0-measured response) and the solver settings. Stage 1 (prior baseline) or stage 2 (revised after
+  E0/E1), as defined above. Each stage-2 record names the stage-1 record it revises.
+- **Conditions.** Only conditions in the approved envelope: bus voltage, turn-on and turn-off currents, R80, case
+  temperature, dead time (from E1 when available). The held-out subset is marked in the record and listed before
+  any of its data are observed.
+- **Metrics per condition.** Switch-node 10-90 % rise and 90-10 % fall time, overshoot above the settled level,
+  ring frequency and damping ratio (the same estimators as `scripts/compare_epc90133_fig9.py`), Q2 VGS peak during
+  Q1's turn-on, and the PHASE-to-GND minimum. Efficiency is predicted only after its inductor model is stated (E9).
+- **Ranges, not single values.** Each metric carries a point value from the declared baseline case and a range
+  over declared alternatives that the evidence has not resolved: the two test-11 driver forms, assumed package
+  source inductance 0/25/50 pH, extraction variants B and G, and the probe response. The range shows which
+  unresolved choices matter. It is not a confidence interval, and it does not widen after the data arrive.
+- **Scoring, fixed in the record.** A metric is consistent if the measurement interval (measured value +/- its
+  stated measurement uncertainty) overlaps the predicted range, and inconsistent otherwise. The record also stores
+  which alternatives each measurement excludes. Scores are reported as they fall, including on the held-out
+  subset; later model changes create new revisions and are scored separately.
+- **Cost before commitment.** The E3 grid (3 bus voltages x 3 turn-on and 3 turn-off currents) times the
+  alternatives is a large set of switching runs. B and G runs have taken from tens of minutes to hours each.
+  The case list is profiled on one case per network before it is frozen, and alternatives that do not change a
+  metric beyond its measurement uncertainty are dropped from the range, with that recorded.
 
 ## Open items for the owner
 

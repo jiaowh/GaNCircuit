@@ -1,0 +1,190 @@
+{
+ "schema": "epc90133-efficiency-uncertainty/1",
+ "scope": "Requirement arithmetic with swept loss fractions; no prediction of the board's loss; proposals, not lab-approved.",
+ "evaluator_sha256": "b5de4a9b1c8edfed56db4f33a17a1a52ef367095349a2436c7e237cb08098c39",
+ "target_u_ploss_rel": 0.1,
+ "rows": [
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 20.0,
+   "pout_W": 276.0,
+   "loss_fraction_assumed": 0.01,
+   "ploss_W": 2.788,
+   "per_reading_rel_uncertainty_for_target": 0.000502506218238862,
+   "u_eta_abs_at_that_accuracy": 0.0009949623121129467
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 20.0,
+   "pout_W": 276.0,
+   "loss_fraction_assumed": 0.02,
+   "ploss_W": 5.633,
+   "per_reading_rel_uncertainty_for_target": 0.0010100494835363321,
+   "u_eta_abs_at_that_accuracy": 0.001979696987731211
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 20.0,
+   "pout_W": 276.0,
+   "loss_fraction_assumed": 0.03,
+   "ploss_W": 8.536,
+   "per_reading_rel_uncertainty_for_target": 0.0015226660929111547,
+   "u_eta_abs_at_that_accuracy": 0.00295397222024764
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 20.0,
+   "pout_W": 276.0,
+   "loss_fraction_assumed": 0.05,
+   "ploss_W": 14.526,
+   "per_reading_rel_uncertainty_for_target": 0.002563260079255083,
+   "u_eta_abs_at_that_accuracy": 0.004870194150584657
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 10.0,
+   "pout_W": 138.0,
+   "loss_fraction_assumed": 0.01,
+   "ploss_W": 1.394,
+   "per_reading_rel_uncertainty_for_target": 0.000502506218238862,
+   "u_eta_abs_at_that_accuracy": 0.0009949623121129467
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 10.0,
+   "pout_W": 138.0,
+   "loss_fraction_assumed": 0.02,
+   "ploss_W": 2.816,
+   "per_reading_rel_uncertainty_for_target": 0.0010100494835363321,
+   "u_eta_abs_at_that_accuracy": 0.001979696987731211
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 10.0,
+   "pout_W": 138.0,
+   "loss_fraction_assumed": 0.03,
+   "ploss_W": 4.268,
+   "per_reading_rel_uncertainty_for_target": 0.0015226660929111547,
+   "u_eta_abs_at_that_accuracy": 0.00295397222024764
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 10.0,
+   "pout_W": 138.0,
+   "loss_fraction_assumed": 0.05,
+   "ploss_W": 7.263,
+   "per_reading_rel_uncertainty_for_target": 0.002563260079255083,
+   "u_eta_abs_at_that_accuracy": 0.004870194150584657
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 5.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.01,
+   "ploss_W": 0.697,
+   "per_reading_rel_uncertainty_for_target": 0.000502506218238862,
+   "u_eta_abs_at_that_accuracy": 0.0009949623121129467
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 5.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.02,
+   "ploss_W": 1.408,
+   "per_reading_rel_uncertainty_for_target": 0.0010100494835363321,
+   "u_eta_abs_at_that_accuracy": 0.001979696987731211
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 5.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.03,
+   "ploss_W": 2.134,
+   "per_reading_rel_uncertainty_for_target": 0.0015226660929111547,
+   "u_eta_abs_at_that_accuracy": 0.00295397222024764
+  },
+  {
+   "vin_V": 48.0,
+   "vout_V": 13.8,
+   "iout_A": 5.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.05,
+   "ploss_W": 3.632,
+   "per_reading_rel_uncertainty_for_target": 0.002563260079255083,
+   "u_eta_abs_at_that_accuracy": 0.004870194150584657
+  },
+  {
+   "vin_V": 24.0,
+   "vout_V": 6.9,
+   "iout_A": 10.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.01,
+   "ploss_W": 0.697,
+   "per_reading_rel_uncertainty_for_target": 0.000502506218238862,
+   "u_eta_abs_at_that_accuracy": 0.0009949623121129467
+  },
+  {
+   "vin_V": 24.0,
+   "vout_V": 6.9,
+   "iout_A": 10.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.02,
+   "ploss_W": 1.408,
+   "per_reading_rel_uncertainty_for_target": 0.0010100494835363321,
+   "u_eta_abs_at_that_accuracy": 0.001979696987731211
+  },
+  {
+   "vin_V": 24.0,
+   "vout_V": 6.9,
+   "iout_A": 10.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.03,
+   "ploss_W": 2.134,
+   "per_reading_rel_uncertainty_for_target": 0.0015226660929111547,
+   "u_eta_abs_at_that_accuracy": 0.00295397222024764
+  },
+  {
+   "vin_V": 24.0,
+   "vout_V": 6.9,
+   "iout_A": 10.0,
+   "pout_W": 69.0,
+   "loss_fraction_assumed": 0.05,
+   "ploss_W": 3.632,
+   "per_reading_rel_uncertainty_for_target": 0.002563260079255083,
+   "u_eta_abs_at_that_accuracy": 0.004870194150584657
+  }
+ ],
+ "ripple_product_bound": [
+  {
+   "sigma_rel_v": 0.001,
+   "sigma_rel_i": 0.001,
+   "max_rel_power_error": 1e-06
+  },
+  {
+   "sigma_rel_v": 0.001,
+   "sigma_rel_i": 0.01,
+   "max_rel_power_error": 1e-05
+  },
+  {
+   "sigma_rel_v": 0.01,
+   "sigma_rel_i": 0.001,
+   "max_rel_power_error": 1e-05
+  },
+  {
+   "sigma_rel_v": 0.01,
+   "sigma_rel_i": 0.01,
+   "max_rel_power_error": 0.0001
+  }
+ ]
+}

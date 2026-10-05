@@ -559,7 +559,9 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    *Run, 2 October 2026* (docs/build.md "E2E-0 pilot"): reference run 1 stopped on a driver bug (kept), run 2
    provisional throughout; clean run identical to the reference; fault run rejected at Stage 2 and the assessment;
    no interventions. Found: every subagent of this session receives AGENTS.md, so excluding files does not hide
-   answers; blind runs need a separate isolated session. Next: owner review of value and cost.
+   answers. Owner decision (5 October 2026): agents may read AGENTS.md, as they will in real use; judgement
+   is tested by frozen predictions scored against new measurements, not by isolating the session.
+   Next: owner review of value and cost.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:

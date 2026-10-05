@@ -1638,7 +1638,7 @@ Reading: agents on a frontier model can execute this workflow and hand it off th
 stopped on an upstream change that the scripts accepted. Consistency with the reference checks execution, not
 engineering truth (same models, assumptions and helpers). The pilot does not show judgement on unseen material. A
 blind test needs a separate session in an isolated directory with only permitted inputs, a frozen reference method,
-and an independent review of geometry, ports, pinout, driver and benchmark applicability. Per the review, a second
+and an independent review of geometry, ports, pinout, driver and benchmark applicability. Owner decision, 5 October 2026: agents may read AGENTS.md and the docs. In real use the agent runs with this context and all tools, so workflow runs are tested that way and no isolated session is required. Judgement is tested on material whose answer is not written down anywhere: frozen predictions scored against new measurements (hardware plan, 'Frozen prediction record'). Per the review, a second
 target waits for the owner's assessment of value, interventions and cost. The agents took about 33 min of wall time
 and 347k tokens; the scripts alone took 22 min and no tokens.
 
