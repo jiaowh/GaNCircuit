@@ -100,7 +100,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
-from epc90133_power_loop import T_CU, via_layers, z_mid
+from epc90133_power_loop import DIELECTRICS, T_CU, via_layers, z_mid
 from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth, wsl_path
 from read_epc90133_geometry import LAYERS, PITCH, load_board
 
@@ -138,15 +138,21 @@ class UF:
         self.p[self.find(a)] = self.find(b)
 
 
-def build(b, loop, variant, mesh, junction, per_layer, gate=None):
+def build(b, loop, variant, mesh, junction, per_layer, gate=None, gap1_mm=None):
     """FastHenry deck for one case. Grid nodes are keyed by fine indices (I, J) = FINE_DIV x coarse index;
-    without a fine box only coarse points exist, which reproduces the uniform grid of tests 1-4."""
+    without a fine box only coarse points exist, which reproduces the uniform grid of tests 1-4.
+
+    gap1_mm (layout round 2a, opt-in): the top-to-mid-layer-1 dielectric in mm instead of the stackup's; every
+    layer below the top moves up by the difference (copper thickness and the other dielectrics unchanged)."""
     s, n = MESHES[mesh]
     spec = VARIANTS[variant]
     layers = spec["layers"]
     is_g = bool(spec.get("gate"))
     window = G_WINDOW if is_g else WINDOW
     z = z_mid()
+    if gap1_mm is not None:
+        shift = DIELECTRICS[0] * 0.0254 - gap1_mm
+        z = {e: (h if e == LAYERS[0] else h + shift) for e, h in z.items()}
     f = s / FINE_DIV
     xc = loop["fets"]["Q1"]["centre_mm"][0]
     yc = loop["fets"]["Q2"]["centre_mm"][1]
@@ -526,7 +532,8 @@ def g_summary(order, Z, ports):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cases", nargs="+", help="variant:mesh:junction, e.g. A:m1:mid")
+    ap.add_argument("cases", nargs="+",
+                    help="variant:mesh:junction[:d<mm>], e.g. A:m1:mid or A:m1:mid:d0.075 (top-to-G1 dielectric)")
     ap.add_argument("--jobs", type=int, default=3)
     ap.add_argument("--build-only", action="store_true", help="write decks and report mesh statistics only")
     ap.add_argument("--outdir", type=Path, default=ROOT / "results/gan/epc90133-extraction")
@@ -538,14 +545,18 @@ def main():
     run_root = ROOT / "runs" / ("epc90133-extract-" + uuid.uuid4().hex[:12])
     args.outdir.mkdir(parents=True, exist_ok=True)
     for case in args.cases:
-        variant, mesh, junction = case.split(":")
+        variant, mesh, junction, *opt = case.split(":")
+        gap1 = float(opt[0][1:]) if opt else None
+        if opt and not opt[0].startswith("d"):
+            raise SystemExit(f"{case}: the optional fourth field is d<mm>")
         is_g = bool(VARIANTS[variant].get("gate"))
         if is_g and (gate is None or gate.get("outcome") != "pass"):
             raise SystemExit("variant G needs a passing results/gan/epc90133-gate-loop.json")
-        deck, ports, connected, stats = build(b, loop, variant, mesh, junction, per_layer, gate)
+        deck, ports, connected, stats = build(b, loop, variant, mesh, junction, per_layer, gate, gap1)
         print(case, json.dumps({k: stats[k] for k in ("grid", "nodes", "segments", "filaments_before_refine", "via",
                                                        "nodes_dropped_unconnected", "terminal_contacts_without_nodes")}))
-        report = {"schema": "epc90133-extraction/1", "case": {"variant": variant, "mesh": mesh, "junction": junction},
+        report = {"schema": "epc90133-extraction/1", "case": {"variant": variant, "mesh": mesh, "junction": junction,
+                                                             **({"gap1_mm": gap1} if gap1 is not None else {})},
                   "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   "power_loop_sha256": hashlib.sha256(LOOP.read_bytes()).hexdigest(),
                   **({"gate_loop_sha256": hashlib.sha256(GATE_LOOP.read_bytes()).hexdigest()} if is_g else {}),
@@ -588,7 +599,7 @@ def main():
             "summary": (g_summary if is_g else loop_summary)(order, (Z + Z.T) / 2, ports),
         })
         report["outcome"] = "complete" if all(report["checks"].values()) else "check failed"
-        out = args.outdir / f"{variant}-{mesh}-{junction}.json"
+        out = args.outdir / (f"{variant}-{mesh}-{junction}" + (f"-d{gap1:.3f}" if gap1 is not None else "") + ".json")
         out.write_text(json.dumps(report, indent=1) + "\n")
         print(f"  {report['outcome']}; {report['wall_time_s']:.0f} s; filaments {filaments}; "
               f"L_loop {report['summary']['L_loop_nH']:.4f} nH; asym {asym:.2e}; -> {out.relative_to(ROOT)}")

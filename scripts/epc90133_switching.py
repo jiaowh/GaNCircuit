@@ -246,6 +246,16 @@ within 2 %). Written to results/gan/epc90133-design-round1-fix.json. The R80-3.3
 corrected assessment its T2 and T3 already fail under the alternatives that ran, so no rerun could change its
 all-three verdict.
 
+Layout round 2a (--study layout; declared 5 October 2026 before any run; plan: plans/layout-round-2-plan.md).
+Question: does a thinner top-to-mid-layer-1 dielectric (the power loop's return gap; stock 0.127 mm) meet round 1's
+three targets with the stock gate resistors? Candidates: 0.100, 0.075 and 0.050 mm, extracted on variant A
+(scripts/epc90133_extract.py A:m1:mid:d<mm>; results/gan/epc90133-extraction-layout/), against A-m1-mid (stock
+heights). Same operating point (48 V -> 12 V, 20 A), the same four alternatives, robust rule, efficiency estimate and
+assessment as design round 1; 100 ps step, Q2 sense source, the bench ends 80 ns after the valley turn-on. Variant A
+(top layer and mid-layer 1, Ci only, no gate loops) ranks power-loop changes; it is not a board prediction, and a
+candidate that passes on A is confirmed on G before any claim. Budget: 3 extractions (about 90 s each) and 16 switching
+cases; 50 ps checks on request.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -289,6 +299,7 @@ MATERIAL = {"sw_fall_time_90_10_s": ("rel", 0.10), "sw_rise_time_10_90_s": ("rel
             "sw_overshoot_above_bus_V": ("rel_or_abs", 0.10, 1.0), "ringing_frequency_Hz": ("rel", 0.05),
             "ringing_damping_ratio": ("rel", 0.20)}
 EXTRACTIONS = ROOT / "results/gan/epc90133-extraction"
+LAYOUT_EXTRACTIONS = ROOT / "results/gan/epc90133-extraction-layout"  # layout round 2 only
 # Added 29 September 2026 after the literature review (docs/gan-layout-literature-notes.md), before
 # their first run. Package inductance: the vendor model has none (EPC AN005 structure) and the QFN
 # value is not published, so an assumed bracket in series with each FET drain and source terminal;
@@ -975,6 +986,25 @@ def design_cases(exts):
     return cases
 
 
+LAYOUTS = {"stock": "A-m1-mid", "gap0.100": "A-m1-mid-d0.100", "gap0.075": "A-m1-mid-d0.075",
+           "gap0.050": "A-m1-mid-d0.050"}
+
+
+def layout_cases(exts):
+    """Layout round 2a (see the module docstring): every layout under every alternative, stock gate resistors."""
+    missing = [e for e in LAYOUTS.values() if e not in exts]
+    if missing:
+        raise SystemExit(f"layout study: extractions missing: {missing}")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "period_loss": True}
+    cases = {}
+    for d, e in LAYOUTS.items():
+        for a, ap_ in ALTERNATIVES.items():
+            cases[f"{d}@{a}"] = {"ext": e, **common, **ap_, "design": d, "alternative": a}
+            cases[f"{d}@{a}-ms50"] = {**cases[f"{d}@{a}"], "maxstep": MAXSTEP_PKG / 2, "base": f"{d}@{a}",
+                                      "on_request": True}
+    return cases
+
+
 def set_operating_point(vout, iout):
     """Design study: move the module's operating point (the double pulse reads these at call time)."""
     global VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
@@ -994,7 +1024,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -1002,7 +1032,7 @@ def main():
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
-    if args.study == "design":
+    if args.study in ("design", "layout"):
         set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
@@ -1024,7 +1054,7 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
-    if args.study in ("driver", "design"):
+    if args.study in ("driver", "design", "layout"):
         rs, fs = [], []
         for name, text in driver_step_bench().items():
             raw = run(name, text)
@@ -1041,6 +1071,8 @@ def main():
             raise SystemExit("test 11 D1: the step representation needs resistances above the datasheet maximum")
 
     files = sorted(glob.glob(str(EXTRACTIONS / "*.json")))
+    if args.study == "layout":
+        files += sorted(glob.glob(str(LAYOUT_EXTRACTIONS / "*.json")))
     ext_files = {Path(f).stem: Path(f) for f in files}
     exts = {Path(f).stem: json.loads(Path(f).read_text(encoding="utf-8")) for f in files}
     exts = {k: v for k, v in exts.items() if v.get("outcome") == "complete" and (args.cases is None or k in args.cases)}
@@ -1058,6 +1090,12 @@ def main():
         cases = driver_cases(exts)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "layout":
+        cases = layout_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+        else:
+            cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "design":
         cases = design_cases(exts)
         if args.only:
@@ -1221,7 +1259,7 @@ def main():
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
                                "dead_time_note": "per-case 'dead' overrides it (design study)",
-                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study == "design"
+                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout")
                                           else "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)")},
                 "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
