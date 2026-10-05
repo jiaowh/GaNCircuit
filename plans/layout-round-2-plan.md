@@ -80,7 +80,12 @@ Profile the first case of each kind before committing the rest, and set time lim
 
 1. **Fabrication route.** A redesigned board needs editable design files. We have Gerbers only; KiCad 10 and EPC's
    KiCad library are installed, but the route is undecided (no Altium request, under the no-inquiry decision).
-   Tomorrow's work does not depend on it; a fabricated test does.
+   Tomorrow's work does not depend on it; a fabricated test does. Gerbers are editable text, but they hold
+   only flattened shapes per layer (no components, nets or design rules). Small changes (stackup, added vias)
+   could be made as checked Gerber edits: every affected layer, mask and drill file, with our own clearance and
+   net checks. Moving capacitors or rerouting changes copper, mask, paste, silkscreen and placement together, and
+   pours do not reflow, so those changes belong in a real design tool (KiCad import as graphics, then a manual
+   rebuild). The simulation edits the rasterized layers in memory and never touches the Gerber files.
 2. **Manufacturing constraints.** The fab's available prepreg thicknesses, minimum drill and annular ring, and
    whether the stackup may change. Without answers, each round records its assumption.
 3. **A-ranking.** Whether ranking on A and confirming only the best on G is acceptable (recommended: yes, on cost).
