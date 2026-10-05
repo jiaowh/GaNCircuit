@@ -10,6 +10,9 @@ A target is met only if it holds under all four alternatives, and only usable ca
 missing or unusable case makes the target 'undetermined' for that design, never met. Also reported (not targets):
 Q2 die gate peak during the rise and the falling-edge minimum, each against stock.
 
+Revision 3 (5 October 2026, loss-estimator revision 2): a case whose loss window did not settle has no T3
+value (undetermined for that alternative); T1 and T2 are unaffected.
+
 Revision 2 (5 October 2026, after round 1's results): verdict precedence corrected. Revision 1 reported
 'undetermined' whenever an alternative was missing, even when another alternative already failed; since a target is
 met only if it holds under every alternative, one failure means 'not met' (kept:
@@ -84,13 +87,15 @@ def main():
                 continue
             per["T1_overshoot_lower"].append(c["overshoot_V"] <= s["overshoot_V"] - max(1.0, 0.10 * s["overshoot_V"]))
             per["T2_switching_energy_not_higher"].append(c["eon_eoff_J"] <= s["eon_eoff_J"] * 1.02)
-            per["T3_efficiency_not_lower"].append(c["fet_loss_W"] <= s["fet_loss_W"] * 1.02)
+            per["T3_efficiency_not_lower"].append(None if c["fet_loss_W"] is None or s["fet_loss_W"] is None
+                                                  else c["fet_loss_W"] <= s["fet_loss_W"] * 1.02)
         v = {k: ("not met" if False in x else "undetermined" if None in x else "met") for k, x in per.items()}
         v["all_three"] = ("not met" if "not met" in v.values() else
                           "undetermined" if "undetermined" in v.values() else "met")
         verdicts[d] = {"per_alternative": per, "verdict": v,
                        "compared_at_50ps": sorted(a for (dd, a) in pair_step if dd == d)}
-    rel = {d: {a: ({k: (table[d][a][k] / table["stock"][a][k] - 1) for k in table[d][a]}
+    rel = {d: {a: ({k: (table[d][a][k] / table["stock"][a][k] - 1) for k in table[d][a]
+                    if table[d][a][k] is not None and table["stock"][a][k]}
                    if table[d][a] and table["stock"][a] else None) for a in alts} for d in designs if d != "stock"}
     out = {"schema": "epc90133-design-assessment/1",
            "report": {"path": args.report.relative_to(ROOT).as_posix(),
@@ -105,9 +110,10 @@ def main():
         for a in alts:
             m = table[d][a]
             if m:
+                loss = f"{m['fet_loss_W']:6.3f} W eta {m['efficiency'] * 100:6.3f} %" if m["fet_loss_W"] is not None                     else "loss not settled"
                 print(f"{d:15s} {a:10s} over {m['overshoot_V']:6.2f} V  Eon+Eoff {m['eon_eoff_J'] * 1e6:6.2f} uJ "
-                      f"(on {m['eon_J'] * 1e6:5.2f}, off {m['eoff_J'] * 1e6:5.2f})  loss {m['fet_loss_W']:6.3f} W "
-                      f"eta {m['efficiency'] * 100:6.3f} %  Q2g {m['q2_gate_peak_V']:5.2f} V  tr {m['rise_s'] * 1e9:5.2f} ns")
+                      f"(on {m['eon_J'] * 1e6:5.2f}, off {m['eoff_J'] * 1e6:5.2f})  loss {loss}  "
+                      f"Q2g {m['q2_gate_peak_V']:5.2f} V  tr {m['rise_s'] * 1e9:5.2f} ns")
             else:
                 print(f"{d:15s} {a:10s} missing or unusable")
     for d, v in verdicts.items():

@@ -256,6 +256,19 @@ assessment as design round 1; 100 ps step, Q2 sense source, the bench ends 80 ns
 candidate that passes on A is confirmed on G before any claim. Budget: 3 extractions (about 90 s each) and 16 switching
 cases; 50 ps checks on request.
 
+Loss-estimator revision 2 (declared 5 October 2026 after round 2a's results, before any rerun). The revision-1
+window ended 40 ns after the valley turn-on, while the switch node was still ringing (damping ratio about 0.006 on A,
+0.01-0.03 on G). FET terminal energy over a window equals loss only if the energy stored in the device capacitances
+is the same at both ends; at a ringing end it is not, and the stored-energy swing reached several uJ (Q2's turn-on
+segment 0.77 / 3.60 / 0.66 uJ in three neighbouring A cases). Every T3 verdict and efficiency figure from revision 1
+is therefore invalid (T1 and T2 use threshold-defined edge windows and are unaffected). Revision 2, for the design and
+layout studies only: Q1's second pulse lasts 600 ns (T_ON2_DESIGN) and the bench ends 520 ns after the valley turn-on;
+the loss window runs from 2 ns before the peak turn-off command to 450 ns after the valley turn-on; Q1's remaining
+on-time conduction uses Rds averaged 300-450 ns after the turn-on and the on-time less 450 ns. Settling check
+(declared): the window energy ending at 400 ns and at 450 ns differ by at most 2 %; a case failing it gives no T3
+value. Reports: results/gan/epc90133-layout-round2a-rev2.json and results/gan/epc90133-design-round1-rev2.json;
+revision-1 reports are kept.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -289,6 +302,7 @@ DEAD = 10e-9
 VCC = VBOOT = 5.0
 R_GON, R_GOFF = 1.0, 0.0
 T_ON2 = 150e-9
+T_ON2_DESIGN, T_AFTER_B_DESIGN, LOSS_END, RDS_WINDOW = 600e-9, 520e-9, 450e-9, (300e-9, 450e-9)  # estimator revision 2
 MAXSTEP, RELTOL = 20e-12, 1e-6
 CAP_MODEL = {"Ci": {"C": 110e-9, "ESL": 0.25e-9, "ESR": 10e-3}, "Cm": {"C": 0.5e-6, "ESL": 0.35e-9, "ESR": 10e-3}}
 N_CM = 10
@@ -441,7 +455,7 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
-          pin_c=None, full_r=False, internal=False, gate_r=None, dead=None):
+          pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
@@ -478,9 +492,10 @@ Rbret bn {node(at + '.GND')} 1u"""
         # and main() corrects them once from each case's own first run.
         t_off1 = t_on1 + timing.get("t1", I_PEAK / ((VIN - VOUT) / L_OUT))
         t_on2 = t_off1 + timing.get("t_off", T_OFF)
-        hi = [(t_on1, 1), (t_off1, 0), (t_on2, 1), (t_on2 + T_ON2, 0)]
-        lo = [(t_off1 + dead, 1), (t_on2 - dead, 0), (t_on2 + T_ON2 + dead, 1)]
-        t_end = t_on2 + T_ON2 + 100e-9
+        t_on2_len = T_ON2_DESIGN if long_pulse else T_ON2
+        hi = [(t_on1, 1), (t_off1, 0), (t_on2, 1), (t_on2 + t_on2_len, 0)]
+        lo = [(t_off1 + dead, 1), (t_on2 - dead, 0), (t_on2 + t_on2_len + dead, 1)]
+        t_end = t_on2 + t_on2_len + 100e-9
         if t_after_b is not None:  # test 6: stop after the measured window; drop later edges
             t_end = t_on2 + t_after_b
             hi = [e for e in hi if e[0] <= t_end - 20e-9]
@@ -648,16 +663,20 @@ def period_loss(s, times):
     vds2 = [a - b for a, b in zip(d2, v(die["s2"]))]
     p = [a * b + c * d for a, b, c, d in zip(vds1, s["i(vq1d)"], vds2, s["i(vq2d)"])]
     ta, tb = times["t_off1"], times["t_on2"]
-    e_win = integral(t, p, ta - 2e-9, tb + 40e-9)
-    on = [(a, b) for tt, a, b in zip(t, vds1, s["i(vq1d)"]) if tb + 40e-9 <= tt <= tb + 70e-9]
+    e_win = integral(t, p, ta - 2e-9, tb + LOSS_END)
+    e_400 = integral(t, p, ta - 2e-9, tb + LOSS_END - 50e-9)
+    settled = abs(e_win - e_400) <= 0.02 * abs(e_win)
+    on = [(a, b) for tt, a, b in zip(t, vds1, s["i(vq1d)"]) if tb + RDS_WINDOW[0] <= tt <= tb + RDS_WINDOW[1]]
     rds = sum(a for a, _ in on) / sum(b for _, b in on)
     duty = VOUT / VIN
     i_rms2 = (I_VALLEY ** 2 + I_VALLEY * I_PEAK + I_PEAK ** 2) / 3
-    p_on = rds * duty * i_rms2 * (1 - 40e-9 * F_SW / duty)
+    p_on = rds * duty * i_rms2 * (1 - LOSS_END * F_SW / duty)
     loss = F_SW * e_win + p_on
     pout = VOUT * IOUT
-    return {"window_energy_J": e_win, "q1_rds_on_ohm": rds, "on_time_conduction_W": p_on, "fet_loss_W": loss,
-            "pout_W": pout, "estimated_efficiency": pout / (pout + loss),
+    return {"estimator_revision": 2, "window_energy_J": e_win, "window_energy_to_400ns_J": e_400,
+            "settled_within_2pct": settled, "q1_rds_on_ohm": rds, "on_time_conduction_W": p_on,
+            "fet_loss_W": loss if settled else None, "pout_W": pout,
+            "estimated_efficiency": pout / (pout + loss) if settled else None,
             "scope": "FET losses only (inductor, copper, capacitor and gate-drive losses excluded); for ranking"}
 
 
@@ -975,7 +994,8 @@ def design_cases(exts):
     """Design round 1 (see the module docstring): every design under every alternative."""
     if "G-m1-mid" not in exts:
         raise SystemExit("the design study needs extraction G-m1-mid")
-    common = {"ext": "G-m1-mid", "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "period_loss": True}
+    common = {"ext": "G-m1-mid", "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True,
+              "period_loss": True, "long_pulse": True}  # estimator revision 2
     cases = {}
     for d, dp in DESIGNS.items():
         for a, ap_ in ALTERNATIVES.items():
@@ -995,7 +1015,8 @@ def layout_cases(exts):
     missing = [e for e in LAYOUTS.values() if e not in exts]
     if missing:
         raise SystemExit(f"layout study: extractions missing: {missing}")
-    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "period_loss": True}
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
+              "long_pulse": True}  # estimator revision 2
     cases = {}
     for d, e in LAYOUTS.items():
         for a, ap_ in ALTERNATIVES.items():
@@ -1158,7 +1179,7 @@ def main():
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
                   no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
                   full_r=c.get("full_r", False), internal=c.get("internal", False),
-                  gate_r=c.get("gate_r"), dead=c.get("dead"))
+                  gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
