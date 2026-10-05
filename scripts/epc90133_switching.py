@@ -316,6 +316,9 @@ trapezoidal case that times out is rerun with Gear together with the matching st
 if needed). Assessment: scripts/assess_epc90133_design.py --rule round3 over rev 2, its continuation, the Gear report
 and results/gan/epc90133-design-round3.json. The result ranks R80 values within this model and is a frozen prediction
 for E4 on the purchased board, not a validated value.
+Round 3 numerical check (declared 5 October 2026, 21:30, after the interim verdict and before running): the
+leading candidate R80-1.5 at half the step, R80-1.5@step-Ls0-ms50 against R80-1.5@step-Ls0 (both trapezoidal):
+overshoot, FET loss and Q2 gate peak each within 2 %. Report results/gan/epc90133-design-round3-check.json.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
