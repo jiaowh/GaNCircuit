@@ -81,6 +81,15 @@ maximum; the board is rated 80 V in). Efficiency becomes a constraint, and the s
   combined with the chosen R80 (A ranks, G confirms).
 - The result is a frozen prediction for the purchased board: R80 swap at experiment E4.
 
+**Round 3 done (5 October 2026, evening; docs/build.md "design round 3").** Round 1 rev 2: every candidate fails C1
+(R80 2.2 ohm +5.5 to +9.0 %, 3.3 ohm +10 to +14 %, 2.2 ohm with 7.5 ns +3.0 to +6.3 %). Round 3 (R80 1.2/1.5/1.8 ohm):
+**R80 1.5 ohm is selected**, the only candidate that meets C1 and C2 under all four alternatives. Worst-case overshoot
+25.1 -> 16.8 V (-33 %), FET loss +2.4 to +4.3 %, Q2 gate peak lower in all four. 1.8 ohm misses C1 by 0.1 point;
+1.2 ohm cannot outrank 1.5. Step (3) was not run: by round 2a's figures a gap change would not beat 1.5 ohm within C1,
+and it needs a new board. The improvement shrinks to 4-11 % if the package source inductance is near 50 pH, so the
+stock-board measurement before the swap (E3/E4) decides how much it is worth. Solver note: trapezoidal stalls are
+frequent on this bench, and Gear (checked equal within 0.05 %) is the declared fallback.
+
 ## Candidate changes, balancing effort and effect
 
 | # | Change | Expected effect on loop L | Effort | Tooling needed | Manufacturability question |

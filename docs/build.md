@@ -1576,6 +1576,46 @@ about 2.5 points of loss and fails only there (+6.3 %), but it stays inadmissibl
 margin. A straight-line reading puts the largest admissible R80 at about 1.6-1.8 ohm, so round 3 tests 1.2, 1.5
 and 1.8 ohm.
 
+### EPC90133 design round 3: the largest admissible Q1 turn-on resistor (5 October 2026)
+
+Owner's rule (decision of 5 October; plans/layout-round-2-plan.md): overshoot is the single objective. Constraints
+under all four alternatives: C1 FET loss at most 5 % above stock's, C2 Q2 die gate peak during Q1's turn-on not
+above stock's. Candidates are ranked by their worst-case overshoot. Declared at 8b6cc4b before any run: R80 1.2, 1.5
+and 1.8 ohm (E12 parts; a resistor swap on the stock board), chosen from rev 2's straight-line reading. Same bench as
+rev 2. step-Ls50 runs directly with Gear, and stock is not rerun. A reproduction control, stock@ramp-Ls0-repro,
+**reproduces rev 2 exactly** (identical netlist hashes for the timing and main runs, zero metric difference), so
+round 3 is compared with rev 2's stock cases. Reports: [main](../results/gan/epc90133-design-round3.json), Gear
+fallbacks [a](../results/gan/epc90133-design-round3-gear-a.json) and
+[b](../results/gan/epc90133-design-round3-gear-b.json), [numerical check](../results/gan/epc90133-design-round3-check.json),
+[assessment](../results/gan/epc90133-design-round3-assessment.json). Trapezoidal stalls were frequent (6 of 13 cases;
+Gear stalled in 2 of 8). Each was handled by a fallback declared beforehand. The R80 1.2 ohm 50 ps ramp-Ls50 pair
+(results/gan/epc90133-design-round3-ms50-a.json) was started but no decision depends on it.
+
+| R80 | Overshoot ramp-Ls0 / step-Ls0 / ramp-Ls50 / step-Ls50 (stock 25.1 / 16.6 / 11.2 / 10.9 V) | FET loss | Q2 gate peak | Verdict |
+|---|---|---|---|---|
+| 1.2 ohm | 21.3 / 14.2 / - / - V (-15, -14 %) | +1.9, +1.4 % | lower | undetermined (Ls50 cases stalled with both methods) |
+| **1.5 ohm** | **16.8 / 11.4 / 10.8 / 9.7 V (-33, -31, -4, -11 %)** | **+4.3, +3.3, +2.4, +2.6 %** | **lower in all four** | **meets C1 and C2; worst case 16.8 V** |
+| 1.8 ohm | - / 9.2 / 10.2 / 9.0 V (-44, -9, -17 %) | +5.1 % (step-Ls0), +3.7, +3.9 % | lower | not met (C1, step-Ls0) |
+| 2.2 ohm (rev 2) | 10.0 / 6.9 / 9.4 / 8.0 V | +5.5 to +9.0 % | lower | not met |
+
+**Result: R80 1.5 ohm is the selected design.** It is the only candidate that meets both constraints under every
+alternative, and it lowers the worst-case overshoot from 25.1 V to 16.8 V (-33 %). In absolute terms the loss cost
+is at most 0.09 W at 240 W, about 0.035 efficiency points under this FET-only estimate. R80 1.2 ohm cannot outrank
+it whatever its missing cases show, because its ramp-Ls0 overshoot alone (21.3 V) exceeds 16.8 V. R80 1.8 ohm misses
+C1 by 0.1 points under step-Ls0, a same-method comparison. Numerical check (declared at 8dfc08a): R80 1.5 ohm at
+50 ps matches 100 ps within 0.002 % on overshoot, FET loss and Q2 gate peak.
+
+Reading: the benefit depends on the unresolved package source inductance. Without it, R80 1.5 ohm cuts the overshoot
+by about a third. With an assumed 50 pH the edge is already slow, and the cut is only 4-11 %. The decision is robust
+to that unknown (C1 and C2 hold in all four alternatives), but the size of the improvement is not. Measuring the stock
+board's overshoot and Q2 gate waveform before the swap (E3/E4) tells which regime the real board is in. The shorter
+dead time would allow a larger R80 (rev 2: 2.2 ohm with 7.5 ns fails C1 only under ramp-Ls0, at +6.3 %), but it stays
+inadmissible until E1. A layout lever was not run (plan order step 3). Round 2a on A gives at most -11 to -23 %
+overshoot for +3.1-3.8 % loss at the 0.050 mm gap, so combined with R80 1.5 ohm it would exceed C1. Combined with
+1.2 ohm, the estimate (about -25 % at about +4-6 % loss, from adding A's figures to G's, not a simulation) does not
+clearly beat 1.5 ohm alone, and it needs a new board. These are frozen predictions for experiment E4 (R80 swap) on the
+purchased board, not validated values (EPC2302 Fig. 7 exception, behavioural driver, exploratory extraction G).
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
