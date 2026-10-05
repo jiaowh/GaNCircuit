@@ -538,6 +538,7 @@ def main():
     ap.add_argument("--build-only", action="store_true", help="write decks and report mesh statistics only")
     ap.add_argument("--outdir", type=Path, default=ROOT / "results/gan/epc90133-extraction")
     args = ap.parse_args()
+    args.outdir = args.outdir.resolve()  # reports print their path relative to the repository
     loop = json.loads(LOOP.read_text(encoding="utf-8"))
     gate = json.loads(GATE_LOOP.read_text(encoding="utf-8")) if GATE_LOOP.is_file() else None
     b = load_board()
