@@ -40,6 +40,11 @@ class AddViaTest(unittest.TestCase):
         with self.assertRaisesRegex(self.be.EditRefused, "R1"):
             self.be.add_via(self.b, 17.0, 23.0, "GND", drill=0.1, paste=self.paste)
 
+    def test_no_antipad_in_the_power_path(self):
+        # first round-2b candidate: a GND via here perforated the SW copper between the FETs
+        with self.assertRaisesRegex(self.be.EditRefused, "R6"):
+            self.be.add_via(self.b, 22.25, 28.75, "GND", paste=self.paste)
+
     def test_no_via_under_a_component_pad(self):
         refused = 0
         for x, y in ((20.5, 31.0), (20.5, 26.0)):  # the FET centres

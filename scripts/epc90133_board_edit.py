@@ -19,6 +19,8 @@ Rules, refused otherwise (values follow the existing layout where it shows them,
   R4 bonds to `net` on at least two layers (else it carries no current);
   R5 after derivation: the probe nets VIN/SW/GND stay distinct, every layer the new via bonds belongs to `net`, and
      no other net's island count changes except where an antipad was cut without splitting it (checked).
+  R6 (added 5 October 2026 after the first candidate cut Q1's source path in the extraction mesh): no antipad in
+     VIN or SW copper; holes are not cut into the power current path.
 Assumptions (no fab rule given; open question in the plan): RING = 0.125 mm annular ring, CLEARANCE = 0.2 mm.
 """
 import copy
@@ -86,6 +88,9 @@ def add_via(b, x, y, net, drill=MIN_DRILL, paste=None):
             g[disk(g.shape, i, j, pad_r / PITCH)] = True
             bonded.append(e)
         elif ids:
+            power = sorted({n_ for n_ in nets if n_ in ("VIN", "SW")})
+            if power:
+                raise EditRefused(f"R6: an antipad on {e} would cut {power} copper")
             for k in ids:
                 region = (lab == k)
                 before = ndimage.label(region)[1]
