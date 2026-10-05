@@ -293,6 +293,15 @@ overshoot, FET loss and Q2 gate peak each agree within 2 % and the stock-to-cand
 loss agrees within 10 % between methods. If it fails, step-Ls50 stays undetermined and the Gear runs are kept as
 failed. Report: results/gan/epc90133-design-round1-rev2-gear.json.
 
+Rev-2 Gear extension (declared 5 October 2026, 19:20, before these runs). In the continuation the trapezoidal
+runs of R80-3.3@ramp-Ls0 and of R80-2.2-dt7.5 under ramp-Ls0, step-Ls0 and ramp-Ls50 timed out; the partial raw
+files show the step collapsing to about 1e-19 s at different edges (20 ns, near Q2's turn-on at 1.82-1.94 us, at the
+valley turn-on at 4.74-4.75 us), the same numerical failure as the step-Ls50 stall. The Gear fallback is therefore
+applied to these alternatives under the same rule (Gear pairs only, used where the trapezoidal pair is unusable,
+valid because the declared Gear check passed): R80-3.3@ramp-Ls0-gear, R80-2.2-dt7.5@{ramp-Ls0,step-Ls0,ramp-Ls50}-gear
+and their partners stock@ramp-Ls0-gear and stock@ramp-Ls50-gear (stock@step-Ls0-gear exists). Report:
+results/gan/epc90133-design-round1-rev2-gear2.json.
+
 Round 3 (declared 5 October 2026 after the rev-2 results, before any round-3 run; owner decision of 5 October,
 plans/layout-round-2-plan.md). Objective: the lowest worst-case overshoot over the four alternatives. Constraints
 under every alternative: C1 FET loss (estimator revision 2, settled) at most 5 % above stock's; C2 Q2 die gate peak
