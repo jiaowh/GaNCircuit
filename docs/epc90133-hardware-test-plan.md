@@ -7,7 +7,7 @@ approved (plan section 8). v0.3 applies the project audit at 8284dbd (docs/proje
 setup is declared, the hypothesis signatures are treated as non-exclusive, prediction freezing has two stages, the
 held-out set is chosen from feasible conditions (60 V is optional), efficiency is a named deliverable, and the
 first-power procedure has a required structure (its values are still open). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
-reviews of 30 September 2026. It measures the stock board first, as the plan requires. v0.4 (5 October 2026) adds the input-logic evaluation (open item 5) and equipment-independent first-power content: connections by silkscreen label (the QSG's pin text would reverse VDD), pre-power checks, sequence and shutdown order, discharge and pulse-width formulas.
+reviews of 30 September 2026. It measures the stock board first, as the plan requires. v0.4 (5 October 2026) adds the static input-logic evaluation (open item 5; power-up wording corrected after the audit at f4767b1) and equipment-independent first-power content: connections by silkscreen label (the QSG's pin text would reverse VDD), pre-power checks, sequence and shutdown order, discharge and pulse-width formulas.
 
 ## Purpose
 
@@ -56,19 +56,25 @@ not, beyond that uncertainty.
   dead-time circuitry and on the PWM source, which must be assessed from the schematic and on the bench (E1).
   The driver cannot be credited with it.
 - **What the board's input logic does** (schematic evaluation, not a measurement; docs/build.md "EPC90133 input
-  logic"; results/gan/epc90133-input-logic.json). Only J630 1-2 or 3-4 with J640 5-6 (single-input buck or
-  boost, no bypass) gives complementary gate commands with an RC delay on each turn-on. Plausible jumper errors
+  logic"; results/gan/epc90133-input-logic-rev3.json). In the static evaluation, only J630 1-2 or 3-4 with
+  J640 5-6 (single-input buck or boost, no bypass) gives complementary static gate commands with the RC paths
+  selected. This is a steady-state truth table; it does not exclude transient overlap. Plausible jumper errors
   command both gates on: **no J630 jumper** (both gates follow PWM1, both on while PWM1 is high), **J630 1-2 and
   3-4 together** (both on at idle, before any PWM), **J630 1-2 with 5-6** (both on while PWM1 is high with PWM2
   open). **No J640 jumper** falls back to dead-time bypass: complementary commands with no added dead time.
   Dual-input and full-bypass settings leave shoot-through protection to the PWM source. Open PWM inputs read
-  low (10 kOhm pull-downs). The logic shares U80's 5 V supply and is valid before U80's POR enables the outputs,
-  so the gate commands at enable are the static idle state of the jumper setting.
+  low (10 kOhm pull-downs). The logic shares U80's 5 V supply, and U80's minimum POR threshold (3.8 V) is above
+  the logic's minimum supply (1.65 V). That is a supply-threshold ordering only: it does not show when the logic
+  outputs, select inputs and RC nodes settle relative to driver enable. **The gate commands at power-up and
+  power-down, and transient overlap, are not established**; E1 measures them with the bus off (corrected after
+  the project audit at f4767b1).
 - **The nominal 10 ns dead time is not guaranteed by datasheet limits.** The RC delay is 9.6 ns typical (EPC's
   rule: 9.9 ns) and 6.3-12.9 ns over component and threshold limits at room temperature (5.3-14.8 ns with X7R
   temperature drift). The two logic channels may differ by up to 7.3 ns and the uP1966E's delay matching is up
-  to 6 ns, so stacked datasheet limits leave about -7 ns at the gate commands (typical about 8 ns), before the
-  capacitor's discharge delay, which no datasheet bounds. The uP1966E datasheet recommends at least 30 ns of
+  to 6 ns, so stacked datasheet limits give a conditional lower bound of about -7 ns at the gate commands
+  (-8 ns with X7R temperature drift; typical about 8 ns). The bound is conditional on assumed threshold
+  interpolation and residual capacitor voltage, and the capacitor's discharge delay, which no datasheet bounds,
+  would lower it further, so no positive value can be guaranteed from these data. The uP1966E datasheet recommends at least 30 ns of
   external dead time; EPC recommends 5-15 ns for this board. Dead time is therefore measured at the driver outputs
   in E1 before any bus voltage is applied.
 - Start-up order: gate-drive supply, then PWM, then raise the bus slowly from 0 V.
@@ -202,7 +208,7 @@ Entries marked *hardware* are implemented and acceptance-tested independently of
 | Pulse-width limit | hardware | maximum double-pulse width, enforced independently of the PWM source; resulting maximum inductor current for the chosen inductor at each bus step | open |
 | Interlock and emergency stop | hardware | what they disconnect; acceptance test before each session | open |
 | Discharge verification | hardware + operator | discharge path and time constant; bus voltage measured below a stated value at the board terminals before any contact | open |
-| Gate-drive states at power-up and power-down | operator, from E1 | evidence that no input state, including an open input, commands both gates on (the driver has no lockout) | schematic part done (input-logic check: safe only with J630 1-2 or 3-4 and J640 5-6); confirmation on the actual board in E1 open |
+| Gate-drive states at power-up and power-down | operator, from E1 | evidence that no input state, including an open input, commands both gates on (the driver has no lockout) | static jumper classification done (input-logic check: complementary static commands only with J630 1-2 or 3-4 and J640 5-6); commands at power-up and power-down and transient overlap open, measured in E1 |
 | Jumper configuration | operator | J630 and J640 positions recorded (photograph) and checked against the one approved setting before every session and after any handling; the shoot-through settings (no J630 jumper; J630 1-2 with 3-4 or with 5-6) and the zero-dead-time setting (no J640 jumper) named as stop conditions; whether to fix the setting physically is the lab's decision | open |
 | Dead time at the driver outputs | operator, from E1 | both dead times measured at VIN = 0 with the approved jumper setting, with a stated minimum before any bus voltage is applied (datasheet limits do not guarantee a positive value) | open |
 | Starting bus voltage and steps | operator | approved first value and steps (12/24/36/48 V is a proposal) | open |
@@ -386,8 +392,9 @@ Report the first held-out score as it is; later corrections create new revisions
    of 30 September 2026.
 4. Approval of the envelope and the step-wise bus increase before G4, after its open values (safety envelope
    section) are filled in.
-5. The board's input and dead-time circuitry: the schematic part is answered (5 October 2026, "What the
-   board's input logic does" above): with J630 1-2 or 3-4 and J640 5-6 no input state, including power-up and
-   open inputs, commands both gates on; several jumper errors do. Still open: the actual board's jumper
-   positions on arrival, the measured dead time (E1), and whether the lab wants the approved setting fixed
-   physically.
+5. The board's input and dead-time circuitry: the static part is answered (5 October 2026, "What the board's
+   input logic does" above): with J630 1-2 or 3-4 and J640 5-6, no steady input state, including open inputs,
+   commands both gates on; several jumper errors do. Reopened after the project audit at f4767b1: the commands
+   during power-up and power-down and any transient overlap are not established by the schematic evaluation.
+   Still open: those (E1, bus off), the actual board's jumper positions on arrival, the measured dead time (E1),
+   and whether the lab wants the approved setting fixed physically.

@@ -1417,9 +1417,18 @@ and R625/C625/D625 delay networks, the pull-downs and the J630/J640 headers. Bot
 `devices/epc/epc90133-sources.json`. `scripts/epc90133_input_logic.py` (checks declared at fab26fd before the first
 run; [report](../results/gan/epc90133-input-logic.json); tests/test_epc90133_input_logic.py) evaluates the
 transcription as recorded: L1 BOM, L2 the gate function against all 16 rows of the 74LVC1G99 function table parsed
-from the PDF, L3 the QSG's documented settings, L5 power-up. All pass. Run 1's class label for two-input settings
-was wrong where a polarity jumper inverts one channel (its recorded states were right); it is kept as
-`results/gan/epc90133-input-logic-run1-label-defect.json`, and run 2 changed only the label.
+from the PDF, L3 the QSG's documented settings, L5 supply-threshold order. All pass. Run 1's class label for
+two-input settings was wrong where a polarity jumper inverts one channel (its recorded states were right); it is kept
+as `results/gan/epc90133-input-logic-run1-label-defect.json`, and run 2 changed only the label.
+
+*Corrected after the project audit at f4767b1* (revision 3, [report](../results/gan/epc90133-input-logic-rev3.json);
+the run-2 report is kept unchanged). Run 2's L5 described the commands at driver enable as the static idle state,
+which a supply-threshold comparison cannot show; L5 is now only that comparison, and power-up, power-down and
+transient overlap are open (E1). The dead-time bound is conditional and never reported as a guarantee while the
+discharge delay is unbounded (run 2's `worst > 0` rule could have reported one for a larger resistor; at 120 ohm
+it correctly reported none). Revision 3 binds an input manifest (evaluator, transcription, imported helper, both
+source records, the five vendor files read and the uP1966E datasheet behind the driver constants, with the
+repository revision as context). Its classifications and L1-L3 are identical to run 2.
 
 Each input channel is Y = (C ? B : A) XOR D: U610 gives InBufQup = PWM1 XOR PolQup; U611 gives InBufQlow = (Dual ?
 PWM2 : PWM1) XOR PolQlow. U612/U614 select the RC-delayed copy when UseDT is high and are disabled (3-state) when
@@ -1428,8 +1437,9 @@ SWbyp is high, when U615/U616 connect PWM1/PWM2 straight to HIN/LIN. J630 sets P
 
 Across all 64 horizontal jumper combinations:
 
-- **Safe as designed, 4 combinations**: J630 1-2 or 3-4 with J640 5-6 (and the same with an ineffective 3-4 on
-  J640). Gate commands are complementary from PWM1, with an RC delay on each turn-on. With open inputs only the
+- **Complementary static commands with the RC paths selected, 4 combinations**: J630 1-2 or 3-4 with J640 5-6
+  (and the same with an ineffective 3-4 on J640). In steady state the gate commands are complementary from PWM1,
+  and each turn-on passes through an RC delay; this does not exclude transient overlap. With open inputs only the
   synchronous-rectifier FET is commanded on.
 - **Both gates on at idle, 8**: J630 1-2 and 3-4 together (both polarity bits set) without full bypass. Both
   commands are high with PWM1 low or unplugged.
@@ -1440,17 +1450,20 @@ Across all 64 horizontal jumper combinations:
 - **Two-input, 40**: dual mode or full bypass. Both gates are on for one PWM1/PWM2 combination (usually both high;
   PWM1 low with PWM2 high for J630 3-4 with 5-6), which the PWM source must avoid.
 
-Power-up: the logic and U80 share the 5 V VCC from U100. U80 enables its outputs only above its POR (3.8 V minimum),
-where the 74LVC parts (1.65 V minimum) already give their static outputs, so the commands at enable are the idle
-state of the jumper setting.
+Supply-threshold order: the logic and U80 share the 5 V VCC from U100, and U80's minimum POR threshold (3.8 V) is
+above the 74LVC parts' 1.65 V minimum supply. (Run 2 concluded from this that the commands at enable are the idle
+state of the jumper setting; that is withdrawn. The ordering says nothing about when outputs, select inputs and RC
+nodes settle during the supply ramp, nor about power-down.)
 
 Dead time from datasheet limits (L4, arithmetic, informational): the RC delay R C ln((VOH - V0)/(VOH - VT+)) is 9.6 ns
 typical (EPC's Fig. 4 rule gives 9.9 ns for 120 Ω) and 6.3-12.9 ns over R ±1 %, C ±10 %, VT+ limits (interpolated to
 5.0 V) and an assumed 0-0.3 V residual voltage, or 5.3-14.8 ns with X7R temperature drift. The two channels'
-gate delays may differ by up to 7.3 ns and the uP1966E's delay matching by up to 6 ns, so stacked limits give
-about -7 ns at the gate commands (typical about 8 ns). The capacitor's discharge delay, which shortens the dead time,
-is not bounded by any datasheet used here. Stacked worst cases are pessimistic, but they mean the datasheets do not
-guarantee a positive dead time. The uP1966E datasheet recommends at least 30 ns; EPC recommends 5-15 ns for this
+gate delays may differ by up to 7.3 ns and the uP1966E's delay matching by up to 6 ns, so stacked limits give a
+conditional lower bound of about -7 ns at the gate commands (-8 ns with X7R drift; typical about 8 ns), conditional
+on the interpolated thresholds and assumed residual voltage. The capacitor's discharge delay, which shortens the dead
+time, is not bounded by any datasheet used here, so no guarantee can follow from these data whatever the bound's
+sign. Stacked worst cases are pessimistic; the result is only that the datasheets do not guarantee a positive dead
+time. The uP1966E datasheet recommends at least 30 ns; EPC recommends 5-15 ns for this
 board.
 
 Consequences (hardware plan): the first-power procedure gains a jumper-configuration entry, with the shoot-through

@@ -138,7 +138,7 @@ Preparation completed so far includes:
 
 - **Probe locations on the published layout.** Candidate points exist for the switch node, low-side gate and driver PHASE-to-ground voltage. Their connection paths and loading need checking with the actual board and selected probes. Connector fitting is deferred to the lab's review.
 - **Driver supply and bootstrap simulation.** This bounded study shows that a bus-off gate measurement could distinguish the two driver models. A short pre-charge leaves the high-side gate supply below the switching bench's ideal 5 V. Its original charge-balance check failed because the declaration omitted a recharge path; that failure is kept. Start-up without a low-side pulse and dead-time overcharge remain unanswered. See the [assessment](results/gan/epc90133-driver-only-assessment.json).
-- **Input-logic review, 5 October.** The current [report](results/gan/epc90133-input-logic.json) checks the transcribed logic against the BOM, logic function table and guide settings. It identifies input and jumper combinations that can command both gates on. Its calculation from datasheet limits does not guarantee positive dead time. This is a static check, not a timing or start-up measurement, and does not qualify shoot-through protection.
+- **Input-logic review, 5 October.** The current [report](results/gan/epc90133-input-logic-rev3.json) checks the transcribed logic against the BOM, logic function table and guide settings. It identifies input and jumper combinations that can command both gates on. Its calculation from datasheet limits does not guarantee positive dead time. This is a static check, not a timing or start-up measurement, and does not qualify shoot-through protection.
 
 The next steps are:
 

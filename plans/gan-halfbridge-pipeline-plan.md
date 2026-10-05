@@ -574,7 +574,9 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    driver forms within the model; short pre-charges leave the high side near 4.4 V; start-up state and
    dead-time overcharge not answered; its charge check C1 failed by design error and is kept);
    (d2) the board's input logic against shoot-through (hardware-plan open item 5; done 5 October 2026,
-   docs/build.md "EPC90133 input logic"): safe only with J630 1-2 or 3-4 and J640 5-6; several jumper
+   docs/build.md "EPC90133 input logic"; corrected after the audit at f4767b1): complementary static
+   commands only with J630 1-2 or 3-4 and J640 5-6 (power-up, power-down and transient overlap not
+   established; E1); several jumper
    errors command both gates on; datasheet limits do not guarantee a positive dead time, so the jumpers are
    checked and the dead time is measured at VIN = 0 before any bus voltage;
    (c, partial, 5 October 2026) equipment-independent first-power content and derived channel
