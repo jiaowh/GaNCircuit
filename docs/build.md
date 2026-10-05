@@ -1525,8 +1525,8 @@ Result (change against stock under each alternative that ran):
 | R80 2.2 ohm, dead time 7.5 ns | -16 to -61 % | +7.4 to +13 % | -0.8 to +15 % | -9 to -41 % |
 | R80 3.3 ohm | -44 to -75 % | +14 to +17 % | +9 to +20 % | -23 to -47 % |
 
-*T3 and the efficiency figures in this section are invalid (loss-estimator revision 2, see "layout round 2a"); the
-rerun is results/gan/epc90133-design-round1-rev2.json.*
+*T3 and the efficiency figures in the table above are invalid (loss-estimator revision 2, see "layout round 2a"); the
+rerun is revision 2 below.*
 
 Verdicts: **no candidate meets all three targets.** T1 holds under every alternative that ran but stays undetermined
 (the stock step-driver, 50 pH case is missing). T2 and T3 are not met. A larger R80 slows Q1's turn-on: Eon rises
@@ -1540,6 +1540,41 @@ energy; none lowers both. Meeting all three targets would need a change that low
 inductance rather than slowing the edge, which means a layout change and a new board. The trade-off and its size are
 frozen predictions for E4 (R80 2.2 ohm) on the purchased board; they are not validated values (EPC2302 Fig. 7
 exception, behavioural driver, exploratory extraction).
+
+**Revision 2 (loss-estimator revision 2; 5 October 2026).** The first rev-2 launch (PID 29988) ended at 16:52 with no
+error output after 7 of 16 cases, apparently when its launching session closed (Start-Process did not detach it from
+the session's process tree). Long runs are now started through WMI (`Win32_Process.Create`), outside any session.
+The 9 cases that never started ran unchanged as a continuation
+([report](../results/gan/epc90133-design-round1-rev2-cont.json)). The persistent stock step-driver, 50 pH stall is
+not a start-up stall: the partial raw file shows normal progress to 1.753 µs and then steps of about 1e-19 s, 0.76 ns
+after Q2's turn-on command. Further trapezoidal runs stalled the same way at other edges (20 ns, 1.82-1.94 µs,
+4.74-4.75 µs), and a smaller step makes it worse (75 ps stalls at 20 ns in profiling). Declared fallbacks, each
+committed before the results it affects (d5184f3, 55d9f7d, 1b24989): Gear integration at the same 100 ps step, Gear
+pairs compared with each other only, valid if a declared Gear-versus-trapezoidal check passes
+([report](../results/gan/epc90133-design-round1-rev2-gear.json),
+[extension](../results/gan/epc90133-design-round1-rev2-gear2.json)). **The check passes by a wide margin**: on
+stock and R80 2.2 ohm (step-Ls0), R80 2.2 ohm (step-Ls50) and stock (ramp-Ls0), overshoot, FET loss and Q2 gate peak
+agree within 0.05 %, and the stock-to-candidate differences within 0.3 %. Gear stalls too, but rarely: stock ramp-Ls50
+with Gear stopped at 4.98 µs. Where only a trapezoidal stock case and a Gear candidate exist, a cross-method comparison
+is allowed, and it decides a constraint only outside a 0.1 % margin. The rev-2 timeouts are kept in the reports.
+
+Rev-2 result, against stock under each alternative (all four alternatives now resolved for every candidate;
+[assessment, round-1 rule](../results/gan/epc90133-design-round1-rev2-assessment.json),
+[assessment, owner's round-3 rule](../results/gan/epc90133-design-round1-rev2-assessment-round3.json)):
+
+| Design | Overshoot (stock 25.1 / 16.6 / 11.2 / 10.9 V) | FET loss | Q2 gate peak |
+|---|---|---|---|
+| R80 2.2 ohm | 10.0 / 6.9 / 9.4 / 8.0 V (-16 to -60 %) | +5.5 to +9.0 % | -10 to -41 % |
+| R80 3.3 ohm | 5.0 / 4.2 / 6.3 / 5.0 V (-44 to -80 %) | +10.4 to +14.2 % | -23 to -57 % |
+| R80 2.2 ohm, dead time 7.5 ns | 9.9 / 6.8 / 9.4 / 8.0 V (-16 to -61 %) | +3.0 to +6.3 % | -9 to -41 % |
+
+(Alternatives in the order ramp-Ls0, step-Ls0, ramp-Ls50, step-Ls50.) Under the round-1 rule T1 is now met by every
+candidate, and T2 and T3 are not. Under the owner's rule (overshoot objective; FET loss at most +5 % and Q2 gate
+peak not above stock under all four), **every round-1 candidate fails the loss constraint**. The binding alternative
+is the ramp driver without package inductance, where the slower edge costs the most. The shorter dead time recovers
+about 2.5 points of loss and fails only there (+6.3 %), but it stays inadmissible until E1 measures the dead-time
+margin. A straight-line reading puts the largest admissible R80 at about 1.6-1.8 ohm, so round 3 tests 1.2, 1.5
+and 1.8 ohm.
 
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
