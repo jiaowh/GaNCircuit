@@ -57,7 +57,12 @@ def load_board():
         raise SystemExit("Gerber zip checksum differs from devices/epc/epc90133-sources.json")
     grids = {e: rasterize(load_layer(GERBERS / f"{PREFIX}Gerbers.{e}"), BOARD, PITCH) for e in LAYERS + ("GTO",)}
     holes = parse_excellon((GERBERS / f"{PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
+    return derive(grids, holes)
 
+
+def derive(grids, holes):
+    """Connectivity, via bonding and net names from rasterized layers and drills (split out of load_board on
+    5 October 2026 so that edited geometry, scripts/epc90133_board_edit.py, is derived by the same code)."""
     labels, counts = {}, {}
     for e in LAYERS:
         labels[e], counts[e] = ndimage.label(grids[e].grid)
