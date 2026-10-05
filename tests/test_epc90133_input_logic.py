@@ -64,6 +64,16 @@ class InputLogicTest(unittest.TestCase):
         c = self.m.classify(self.logic, ("3-4", "5-6"), ("5-6",))
         self.assertEqual(c["both_on_states"], ["PWM1=0,PWM2=1"])
 
+    def test_dead_time_never_guaranteed_with_unbounded_term(self):
+        # audit at f4767b1: a larger resistor gave a positive bound and a false "guarantee"
+        logic = json.loads(json.dumps(self.logic))
+        logic["component_values"]["R620_R625"]["ohm"] = 1000
+        dt = self.m.dead_time_bounds(logic)
+        self.assertGreater(dt["conditional_lower_bound_room_ns"], 0)
+        self.assertTrue(dt["unbounded_subtractive_terms"])
+        self.assertFalse(dt["datasheet_limits_guarantee_positive_dead_time"])
+        self.assertLessEqual(dt["conditional_lower_bound_with_x7r_temperature_ns"], dt["conditional_lower_bound_room_ns"])
+
     def test_full_bypass_passes_inputs_through(self):
         c = self.m.classify(self.logic, ("1-2", "3-4"), ("1-2",))
         self.assertEqual(c["both_on_states"], ["PWM1=1,PWM2=1"])

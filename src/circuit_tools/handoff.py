@@ -30,6 +30,10 @@ Kind-specific fields:
 Rules: a downstream record inherits every upstream exception id (or is rejected_input); it is complete only if
 its upstream is complete; rejected_input/failed/incomplete records carry no predictions; evidence paths must be
 listed among inputs or artifacts.
+
+Revision 2 (5 October 2026, project audit at f4767b1, finding 4): nested fields are type-checked before they are
+hashed or compared, so a malformed record (evidence entries that are not strings, ids that are not strings)
+yields structured problems instead of an exception. The rules themselves are unchanged.
 """
 from __future__ import annotations
 
@@ -46,6 +50,10 @@ SHA = re.compile(r"^[0-9a-f]{64}$")
 
 def _str(x) -> bool:
     return isinstance(x, str) and x.strip() != ""
+
+
+def _paths_among(v, paths) -> bool:
+    return isinstance(v, list) and all(isinstance(e, str) and e in paths for e in v)
 
 
 def _files(rec, key, problems):
@@ -79,7 +87,8 @@ def validate(rec: Any, upstream: Any = None) -> list[str]:
     if not isinstance(rec, dict):
         return ["record is not a JSON object"]
     p: list[str] = []
-    kind = KINDS.get(rec.get("schema"))
+    schema = rec.get("schema")
+    kind = KINDS.get(schema) if isinstance(schema, str) else None
     if kind is None:
         return [f"unknown schema {rec.get('schema')!r}"]
     if rec.get("produced_by") not in ("reference", "agent"):
@@ -94,16 +103,21 @@ def validate(rec: Any, upstream: Any = None) -> list[str]:
         p.append("stop_reason must be null unless the record is stopped")
     paths = set(_files(rec, "inputs", p)) | set(_files(rec, "artifacts", p))
     checks = _list_of(rec, "checks", ("id", "description", "outcome", "evidence"), p)
-    for c in checks:
+    for i, c in enumerate(checks):
+        if not _str(c.get("id")):
+            p.append(f"checks[{i}]: id must be a nonempty string")
         if c.get("outcome") not in OUTCOMES:
-            p.append(f"check {c.get('id')}: outcome {c.get('outcome')!r} not in {OUTCOMES}")
-        if not isinstance(c.get("evidence"), list) or any(e not in paths for e in c.get("evidence") or []):
-            p.append(f"check {c.get('id')}: evidence must list paths among inputs/artifacts")
+            p.append(f"check {c.get('id')!r}: outcome {c.get('outcome')!r} not in {OUTCOMES}")
+        if not _paths_among(c.get("evidence"), paths):
+            p.append(f"check {c.get('id')!r}: evidence must list paths among inputs/artifacts")
     ids = [c.get("id") for c in checks]
     if len(set(map(str, ids))) != len(ids):
         p.append("duplicate check ids")
     exceptions = _list_of(rec, "exceptions", ("id", "description", "consequence"), p)
-    exc_ids = {e.get("id") for e in exceptions}
+    for i, e in enumerate(exceptions):
+        if not _str(e.get("id")):
+            p.append(f"exceptions[{i}]: id must be a nonempty string")
+    exc_ids = {e.get("id") for e in exceptions if _str(e.get("id"))}
     claims = _list_of(rec, "claims", ("statement", "scope", "status", "evidence"), p)
     for i, c in enumerate(claims):
         if not (_str(c.get("statement")) and _str(c.get("scope"))):
@@ -111,14 +125,14 @@ def validate(rec: Any, upstream: Any = None) -> list[str]:
         if c.get("status") not in CLAIM_STATUS:
             p.append(f"claims[{i}]: status {c.get('status')!r} not in {CLAIM_STATUS}")
         ev = c.get("evidence")
-        if not isinstance(ev, list) or not ev or any(e not in paths for e in ev):
+        if not ev or not _paths_among(ev, paths):
             p.append(f"claims[{i}]: evidence must be a nonempty list of paths among inputs/artifacts")
     for i, a in enumerate(_list_of(rec, "assumptions", ("name", "value", "units", "source"), p)):
         if not (_str(a.get("name")) and isinstance(a.get("units"), str) and _str(a.get("source"))
                 and isinstance(a.get("value"), (int, float, str, bool))):
             p.append(f"assumptions[{i}] needs name, scalar value, units string and source")
-    failed = {c.get("id") for c in checks if c.get("outcome") == "fail"}
-    not_run = {c.get("id") for c in checks if c.get("outcome") == "not_run"}
+    failed = {c.get("id") for c in checks if c.get("outcome") == "fail" and _str(c.get("id"))}
+    not_run = {c.get("id") for c in checks if c.get("outcome") == "not_run" and _str(c.get("id"))}
     if status == "complete" and (failed or not_run or exceptions):
         p.append("complete requires every check passed and no exceptions")
     if status == "provisional" and not failed <= exc_ids:
@@ -148,7 +162,9 @@ def validate(rec: Any, upstream: Any = None) -> list[str]:
             if status == "complete" and u_status != "complete":
                 p.append("complete requires a complete upstream")
             if status in ("complete", "provisional"):
-                missing = {e.get("id") for e in upstream.get("exceptions") or [] if isinstance(e, dict)} - exc_ids
+                up_exc = upstream.get("exceptions")
+                up_exc = up_exc if isinstance(up_exc, list) else []
+                missing = {str(e.get("id")) for e in up_exc if isinstance(e, dict)} - exc_ids
                 if missing:
                     p.append(f"upstream exceptions not carried: {sorted(map(str, missing))}")
     if kind == "I-2":
