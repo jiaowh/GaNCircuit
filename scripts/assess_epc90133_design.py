@@ -9,6 +9,13 @@ stock design under the same alternative:
 A target is met only if it holds under all four alternatives, and only usable cases (checks passed) count: a
 missing or unusable case makes the target 'undetermined' for that design, never met. Also reported (not targets):
 Q2 die gate peak during the rise and the falling-edge minimum, each against stock.
+
+Revision 2 (5 October 2026, after round 1's results): verdict precedence corrected. Revision 1 reported
+'undetermined' whenever an alternative was missing, even when another alternative already failed; since a target is
+met only if it holds under every alternative, one failure means 'not met' (kept:
+results/gan/epc90133-design-round1-assessment-v1-precedence-defect.json). Also, declared before the fix runs: an
+alternative whose 100 ps stock or candidate case is unusable (round 1: solver stalls in three timing runs) is
+compared using the pair run at 50 ps (stock and candidate both at 50 ps, never mixed steps), when both exist.
 """
 import argparse
 import hashlib
@@ -34,22 +41,41 @@ def metrics(case):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("report", type=Path, nargs="?", default=ROOT / "results/gan/epc90133-design-round1.json")
+    ap.add_argument("--extra", type=Path, nargs="*", default=[], help="further reports (fix runs) merged by case name")
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-design-round1-assessment.json")
     args = ap.parse_args()
     rep = json.loads(args.report.read_text(encoding="utf-8"))
-    cases = rep["cases"]
+    cases = dict(rep["cases"])
+    extra_reports = []
+    for x in args.extra:
+        xr = json.loads(x.read_text(encoding="utf-8"))
+        clash = set(xr["cases"]) & set(cases)
+        if clash:
+            raise SystemExit(f"{x}: cases already present: {sorted(clash)}")
+        cases.update(xr["cases"])
+        extra_reports.append({"path": x.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(x.read_bytes()).hexdigest(),
+                              "complete": xr.get("complete")})
     main_cases = {k: c for k, c in cases.items() if not k.endswith("-ms50")}
     designs = sorted({c["parameters"]["design"] for c in main_cases.values()}, key=lambda d: (d != "stock", d))
     alts = sorted({c["parameters"]["alternative"] for c in main_cases.values()})
     table, verdicts = {}, {}
     for d in designs:
         table[d] = {a: metrics(cases.get(f"{d}@{a}")) for a in alts}
+    pair_step = {}
+    for a in alts:
+        for d in designs:
+            if d == "stock":
+                continue
+            if table["stock"][a] is None or table[d][a] is None:
+                s50, c50 = metrics(cases.get(f"stock@{a}-ms50")), metrics(cases.get(f"{d}@{a}-ms50"))
+                if s50 and c50:
+                    pair_step[(d, a)] = (s50, c50)
     for d in designs:
         if d == "stock":
             continue
         per = {"T1_overshoot_lower": [], "T2_switching_energy_not_higher": [], "T3_efficiency_not_lower": []}
         for a in alts:
-            s, c = table["stock"][a], table[d][a]
+            s, c = pair_step.get((d, a), (table["stock"][a], table[d][a]))
             if s is None or c is None:
                 for k in per:
                     per[k].append(None)
@@ -57,15 +83,17 @@ def main():
             per["T1_overshoot_lower"].append(c["overshoot_V"] <= s["overshoot_V"] - max(1.0, 0.10 * s["overshoot_V"]))
             per["T2_switching_energy_not_higher"].append(c["eon_eoff_J"] <= s["eon_eoff_J"] * 1.02)
             per["T3_efficiency_not_lower"].append(c["fet_loss_W"] <= s["fet_loss_W"] * 1.02)
-        v = {k: ("undetermined" if None in x else "met" if all(x) else "not met") for k, x in per.items()}
-        v["all_three"] = ("met" if all(x == "met" for x in v.values()) else
-                          "undetermined" if "undetermined" in v.values() else "not met")
-        verdicts[d] = {"per_alternative": per, "verdict": v}
+        v = {k: ("not met" if False in x else "undetermined" if None in x else "met") for k, x in per.items()}
+        v["all_three"] = ("not met" if "not met" in v.values() else
+                          "undetermined" if "undetermined" in v.values() else "met")
+        verdicts[d] = {"per_alternative": per, "verdict": v,
+                       "compared_at_50ps": sorted(a for (dd, a) in pair_step if dd == d)}
     rel = {d: {a: ({k: (table[d][a][k] / table["stock"][a][k] - 1) for k in table[d][a]}
                    if table[d][a] and table["stock"][a] else None) for a in alts} for d in designs if d != "stock"}
     out = {"schema": "epc90133-design-assessment/1",
            "report": {"path": args.report.relative_to(ROOT).as_posix(),
                       "sha256": hashlib.sha256(args.report.read_bytes()).hexdigest(), "complete": rep.get("complete")},
+           "extra_reports": extra_reports,
            "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
            "rule": "declared in scripts/epc90133_switching.py (design round 1); every alternative must hold",
            "scope": "ranking within the unvalidated model (EPC2302 Fig. 7 exception, behavioural driver, exploratory G extraction); frozen predictions for the board, not validated values",

@@ -237,6 +237,14 @@ driver with 50 pH at a 50 ps step, every target metric within 2 %. Budget: 16 de
 further round only if round 1 leaves a target unmet, declared in this docstring before it runs.
 Gate-charge-dependent quantities (energies, edge times, losses) carry the EPC2302 Fig. 7 exception: the results
 rank designs within this model; they are frozen predictions for the board, not validated values.
+Round 1 fix runs (declared 5 October 2026 after round 1, before running): three 100 ps timing runs stalled at the
+start of the transient (LTspice resetting Tseed down to 1e-17 s) and hit the 1800 s limit: stock@step-Ls50,
+R80-3.3@ramp-Ls0, R80-3.3@step-Ls50. Every other case completed. The step-Ls50 alternative is resolved for R80-2.2
+by the on-request pair stock@step-Ls50-ms50 and R80-2.2@step-Ls50-ms50 (both at 50 ps, compared with each other
+only); R80-2.2@step-Ls50-ms50 against its 100 ps run is also the declared numerical check (every target metric
+within 2 %). Written to results/gan/epc90133-design-round1-fix.json. The R80-3.3 stalls are not rerun: under the
+corrected assessment its T2 and T3 already fail under the alternatives that ran, so no rerun could change its
+all-three verdict.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
