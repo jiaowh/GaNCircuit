@@ -205,6 +205,39 @@ Reading: material differences mean the excitation depends on a driver property t
 measuring the driver's gate edges (hardware plan E1) is a model input, not only a check; no difference means
 this family is not a major excitation uncertainty. Both are model statements; neither identifies the real driver.
 
+Design round 1 (--study design; declared 5 October 2026 at the owner's request, before any run). Owner targets,
+each relative to the EPC original (the stock BOM in this same simulation, not EPC's measurement):
+  T1 switch-node voltage overshoot lower than the original;
+  T2 switching energy Eon + Eoff not higher than the original;
+  T3 estimated efficiency at 48 V -> 12 V not lower than the original.
+Operating point: continuous buck 48 V -> 12 V, 20 A, 250 kHz, the QSG's 2.2 uH (duty 0.25, ripple 16.4 A, so the
+double pulse turns Q1 off at 28.2 A and on at 11.8 A). Network G-m1-mid (the only extraction with the gate loops),
+the test 7/11 settings (100 ps step, Q2 sense source, the bench ends 80 ns after the valley turn-on).
+Design space (changes that can be made on the stock board by replacing parts): R80 (Q1 turn-on) 1 (stock), 2.2,
+3.3 ohm; and R80 2.2 ohm with dead time 7.5 ns (R620/R625 = 87 ohm by the QSG rule). A shorter dead time is
+admissible only after E1 has measured the board's dead-time margin (input-logic check: datasheet limits do not
+guarantee a positive dead time even at 10 ns); the candidate is run to see whether it could close a trade-off.
+Robustness: every design runs under the four unresolved alternatives {test-11 ramp, step driver} x {package
+source inductance 0, 50 pH}; a target is met only if it holds under all four:
+  T1 overshoot above the bus at the valley turn-on lower than the original's by at least max(1 V, 10 %)
+     (the bench's materiality rule);
+  T2 Q1 Eon (valley turn-on) + Eoff (peak turn-off), die terminals, at most 2 % above the original's (the
+     numerical tolerance of the earlier step checks);
+  T3 FET loss at most 2 % above the original's, which bounds the efficiency drop.
+Estimated efficiency (power stage, FET losses only; inductor, copper, capacitor and gate-drive losses excluded;
+the gate-drive total Qg x V x f does not depend on R80 or the dead time): the FET energy (Q1 + Q2, die terminals)
+from 2 ns before the peak turn-off command to 40 ns after the valley turn-on command covers one off interval
+with both edges and both dead times at the converter's currents; Q1's remaining on-time conduction is
+Rds x D x (Iv^2 + Iv Ip + Ip^2) / 3 x (1 - 40 ns f / D), with Rds = Vds / Id of Q1 averaged 40-70 ns after the valley
+turn-on. Loss = f x E_window + on-time conduction; efficiency = Pout / (Pout + loss), Pout = 12 V x 20 A. The
+absolute value is optimistic by the excluded terms; the comparison between designs is the target.
+Also reported, not targets: Q2's die gate peak during the rise (false-turn-on margin) and the falling-edge minimum.
+Checks per case as before (edge currents, spikes). Numerical check: the best-ranked candidate under the step
+driver with 50 pH at a 50 ps step, every target metric within 2 %. Budget: 16 design cases plus the check; one
+further round only if round 1 leaves a target unmet, declared in this docstring before it runs.
+Gate-charge-dependent quantities (energies, edge times, losses) carry the EPC2302 Fig. 7 exception: the results
+rank designs within this model; they are frozen predictions for the board, not validated values.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -355,7 +388,7 @@ def pin_regularization(stages, pin_c):
     return out + [PIN_DIODE]
 
 
-def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"), pin_c=None):
+def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"), pin_c=None, gate_r=None):
     """Test 7: uP1966E stages at the extracted ball terminals, gate resistors between their pad terminals.
 
     drive_stage ties its pull-up and pull-down resistors to one gate node; here the pull-down resistor is
@@ -371,7 +404,8 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"),
         if text.count(old) != 1:
             raise RuntimeError("drive_stage output changed; cannot split its outputs")
         out.append(text.replace(old, f"R{tag}d {dn} pd{tag}"))
-    for ref, ohm in (("R80", R_GON), ("R81", R_GOFF), ("R82", R_GON), ("R83", R_GOFF)):
+    gr = {"R80": R_GON, "R81": R_GOFF, "R82": R_GON, "R83": R_GOFF, **(gate_r or {})}  # design study: overrides
+    for ref, ohm in gr.items():
         if STAGE_OF[ref] not in stages:
             continue
         out.append(f"{ref} {ref.lower()}_d {ref.lower()}_g {max(ohm, 1e-3):g}")
@@ -388,7 +422,10 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
-          pin_c=None, full_r=False, internal=False):
+          pin_c=None, full_r=False, internal=False, gate_r=None, dead=None):
+    dead = DEAD if dead is None else dead
+    if gate_r and not is_gate_extraction(ext):
+        raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
     net, terms = network(ext, ideal, r_scale, no_gate_power_k, full_r)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -423,7 +460,7 @@ Rbret bn {node(at + '.GND')} 1u"""
         t_off1 = t_on1 + timing.get("t1", I_PEAK / ((VIN - VOUT) / L_OUT))
         t_on2 = t_off1 + timing.get("t_off", T_OFF)
         hi = [(t_on1, 1), (t_off1, 0), (t_on2, 1), (t_on2 + T_ON2, 0)]
-        lo = [(t_off1 + DEAD, 1), (t_on2 - DEAD, 0), (t_on2 + T_ON2 + DEAD, 1)]
+        lo = [(t_off1 + dead, 1), (t_on2 - dead, 0), (t_on2 + T_ON2 + dead, 1)]
         t_end = t_on2 + T_ON2 + 100e-9
         if t_after_b is not None:  # test 6: stop after the measured window; drop later edges
             t_end = t_on2 + t_after_b
@@ -446,12 +483,12 @@ Rbret bn {node(at + '.GND')} 1u"""
         T = 1 / F_SW
         duty = timing.get("duty", DUTY)
         t1 = timing["t1"]
-        hi, lo = [(t_on1, 1), (t_on1 + t1, 0)], [(t_on1 + t1 + DEAD, 1)]
+        hi, lo = [(t_on1, 1), (t_on1 + t1, 0)], [(t_on1 + t1 + dead, 1)]
         starts = [t_on1 + t1 + (1 - duty) * T + k * T for k in range(periods)]
         for t0 in starts:
-            lo.append((t0 - DEAD, 0))
+            lo.append((t0 - dead, 0))
             hi += [(t0, 1), (t0 + duty * T, 0)]
-            lo.append((t0 + duty * T + DEAD, 1))
+            lo.append((t0 + duty * T + dead, 1))
         t_end = starts[-1] + duty * T + 100e-9
         times = {"t_off1": starts[-1] + duty * T, "t_on2": starts[-1], "t_end": t_end, "duty": duty,
                  "period_starts_s": starts,
@@ -506,7 +543,7 @@ Rbret bn {node(at + '.GND')} 1u"""
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, pin_c=pin_c) if g_ext and not gate_ctl else
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, pin_c=pin_c, gate_r=gate_r) if g_ext and not gate_ctl else
           gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=[x for x in ("u", "l") if x != gate_ctl])
           + [ideal_stage(gate_ctl, hi, lo, te_rise, te_fall, r_src, r_snk, t_end)]
           if g_ext and gate_ctl in ("u", "l") else [
@@ -578,6 +615,31 @@ def metrics(s, times, at):
                           "switch_node_metrics": "Q2 drain pad to circuit ground (Q2 source pad)",
                           "die_nodes": die, "energies_exclude": "energy stored in package or gate-loop inductors"},
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
+
+
+def period_loss(s, times):
+    """Design study: FET loss per period at the converter's currents (see the docstring); needs sense_q2."""
+    t = s["time"]
+    die = times["die_nodes"]
+    zero = [0.0] * len(t)
+    v = lambda nd: zero if nd == "0" else s[f"v({nd})"]
+    d1 = v("q1_d" if die["d1"] == "q1dd" else die["d1"])
+    vds1 = [a - b for a, b in zip(d1, v(die["s1"]))]
+    d2 = v("q2_d" if die["d2"] == "q2dd" else die["d2"])
+    vds2 = [a - b for a, b in zip(d2, v(die["s2"]))]
+    p = [a * b + c * d for a, b, c, d in zip(vds1, s["i(vq1d)"], vds2, s["i(vq2d)"])]
+    ta, tb = times["t_off1"], times["t_on2"]
+    e_win = integral(t, p, ta - 2e-9, tb + 40e-9)
+    on = [(a, b) for tt, a, b in zip(t, vds1, s["i(vq1d)"]) if tb + 40e-9 <= tt <= tb + 70e-9]
+    rds = sum(a for a, _ in on) / sum(b for _, b in on)
+    duty = VOUT / VIN
+    i_rms2 = (I_VALLEY ** 2 + I_VALLEY * I_PEAK + I_PEAK ** 2) / 3
+    p_on = rds * duty * i_rms2 * (1 - 40e-9 * F_SW / duty)
+    loss = F_SW * e_win + p_on
+    pout = VOUT * IOUT
+    return {"window_energy_J": e_win, "q1_rds_on_ohm": rds, "on_time_conduction_W": p_on, "fet_loss_W": loss,
+            "pout_W": pout, "estimated_efficiency": pout / (pout + loss),
+            "scope": "FET losses only (inductor, copper, capacitor and gate-drive losses excluded); for ranking"}
 
 
 def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
@@ -883,6 +945,38 @@ def driver_cases(exts):
                                  "maxstep": MAXSTEP_PKG / 2}}
 
 
+DESIGN_POINT = {"VOUT": 12.0, "IOUT": 20.0}
+DESIGNS = {"stock": {}, "R80-2.2": {"gate_r": {"R80": 2.2}}, "R80-3.3": {"gate_r": {"R80": 3.3}},
+           "R80-2.2-dt7.5": {"gate_r": {"R80": 2.2}, "dead": 7.5e-9}}
+ALTERNATIVES = {"ramp-Ls0": {}, "step-Ls0": {"driver": "step"}, "ramp-Ls50": {"l_s": 50e-12},
+                "step-Ls50": {"driver": "step", "l_s": 50e-12}}
+
+
+def design_cases(exts):
+    """Design round 1 (see the module docstring): every design under every alternative."""
+    if "G-m1-mid" not in exts:
+        raise SystemExit("the design study needs extraction G-m1-mid")
+    common = {"ext": "G-m1-mid", "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "period_loss": True}
+    cases = {}
+    for d, dp in DESIGNS.items():
+        for a, ap_ in ALTERNATIVES.items():
+            cases[f"{d}@{a}"] = {**common, **ap_, **dp, "design": d, "alternative": a}
+            # numerical check (declared): run on request with --only, at half the step
+            cases[f"{d}@{a}-ms50"] = {**cases[f"{d}@{a}"], "maxstep": MAXSTEP_PKG / 2, "base": f"{d}@{a}",
+                                      "on_request": True}
+    return cases
+
+
+def set_operating_point(vout, iout):
+    """Design study: move the module's operating point (the double pulse reads these at call time)."""
+    global VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
+    VOUT, IOUT = vout, iout
+    DUTY = VOUT / VIN
+    T_OFF = (1 - DUTY) / F_SW
+    RIPPLE = (VIN - VOUT) * DUTY / (F_SW * L_OUT)
+    I_PEAK, I_VALLEY = IOUT + RIPPLE / 2, IOUT - RIPPLE / 2
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -892,7 +986,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -900,6 +994,8 @@ def main():
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
+    if args.study == "design":
+        set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
@@ -920,7 +1016,7 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
-    if args.study == "driver":
+    if args.study in ("driver", "design"):
         rs, fs = [], []
         for name, text in driver_step_bench().items():
             raw = run(name, text)
@@ -954,6 +1050,12 @@ def main():
         cases = driver_cases(exts)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "design":
+        cases = design_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+        else:
+            cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "fullr":
         cases = fullr_cases(exts)
         if args.only:
@@ -1009,7 +1111,8 @@ def main():
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
                   no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
-                  full_r=c.get("full_r", False), internal=c.get("internal", False))
+                  full_r=c.get("full_r", False), internal=c.get("internal", False),
+                  gate_r=c.get("gate_r"), dead=c.get("dead"))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
@@ -1052,6 +1155,8 @@ def main():
         raw = run(name, text)
         s = raw.step(0) if raw else None
         m = metrics(s, times, at) if raw else None
+        if m and c.get("period_loss"):
+            m["period_loss"] = period_loss(s, times)
         if m and c.get("periods"):
             valleys = [interp(s["time"], s["i(l1)"], t) for t in times["period_starts_s"]]
             m["periodicity"] = {"inductor_current_at_period_starts_A": valleys, "timing": timing,
@@ -1107,7 +1212,9 @@ def main():
                 "input_manifest": manifest,
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
-                               "source": "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)"},
+                               "dead_time_note": "per-case 'dead' overrides it (design study)",
+                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study == "design"
+                                          else "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)")},
                 "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
                                       "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"},
