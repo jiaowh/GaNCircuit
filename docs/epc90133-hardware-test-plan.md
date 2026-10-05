@@ -1,4 +1,4 @@
-# EPC90133 hardware test plan (draft v0.4, 5 October 2026)
+# EPC90133 hardware test plan (draft v0.5, 5 October 2026)
 
 Status: **draft for owner review; not approved, and not yet an executable lab procedure** (the envelope values
 below are still open). v0.2 applies an external audit: the driver has no input lockout, the driver's PHASE/BOOT
@@ -322,9 +322,17 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   - H1 (common-source) predicts a stronger rise-time dependence on switched current than H2 does;
   - H3 predicts damping that changes with bus voltage at nearly constant frequency;
   - H2 predicts the dependence computed with the E1-measured driver edge; it does not predict independence.
-- **E4, gate-resistor change (H2 against H1).** Replace R80 (1 Ω) with 2.2 Ω, and repeat part of E3. The model
-  predicts how rise time and overshoot scale with the gate resistance under H1 and under H2, and the predictions
-  differ.
+- **E4, gate-resistor change (design check, and H2 against H1).** Replace R80 (1 Ω) with 1.5 Ω, the design
+  selected in simulation (docs/build.md, "design round 3": the largest E12 value that keeps the simulated FET
+  loss within +5 % of stock and Q2's gate spike not above stock under all four unresolved alternatives). Repeat
+  part of E3, including the 48 V point at the converter's edge currents (turn-off 28 A, turn-on 12 A) if the
+  approved envelope includes it. Simulated change at that point: overshoot -31 to -33 % without package source
+  inductance and only -4 to -11 % with an assumed 50 pH. The stock-board E3 data therefore indicate, before the swap,
+  which regime applies. Q2's gate spike falls 5-23 %, and FET loss rises +2.4 to +4.3 %. The model predicts how rise
+  time and overshoot scale with the gate resistance under H1 and under H2, and the predictions differ; a second
+  step to 2.2 Ω (simulated: overshoot -16 to -60 %, loss +5.5 to +9 %) widens the contrast if the diagnosis needs
+  it. These simulated changes enter the frozen prediction record (below) at the approved conditions; they are not
+  frozen yet, because the conditions are not.
 - **E5, second temperature.** Repeat an E3 subset at a controlled higher case temperature (for example 75 °C):
   RDS(on), damping (H3) and switching times.
 - **E6, Fig. 9 conditions with a known probe (H4).** Continuous buck, 48 V → 13.8 V, 20 A, 250 kHz, 2.2 µH, with the
