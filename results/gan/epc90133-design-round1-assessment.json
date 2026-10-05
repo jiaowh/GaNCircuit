@@ -5,8 +5,14 @@
   "sha256": "776a7d46b864f920d2ad27bbde46b6a00ec54e41673c1aff0f3f1a5d9a3fb1b5",
   "complete": true
  },
- "extra_reports": [],
- "evaluator_sha256": "d70b296854326077fc36b323d53fc5818bde974bce0c0b524b86349b60d0b5ab",
+ "extra_reports": [
+  {
+   "path": "results/gan/epc90133-design-round1-fix.json",
+   "sha256": "c3947909884c877182e903cbeef3453c25e690fb7f8d208b5eab559b3788b3af",
+   "complete": true
+  }
+ ],
+ "evaluator_sha256": "c72742c2e91b9851057a73d34ed2e34fa458d7466700d8658b91e19b8a147bb2",
  "rule": "declared in scripts/epc90133_switching.py (design round 1); every alternative must hold",
  "scope": "ranking within the unvalidated model (EPC2302 Fig. 7 exception, behavioural driver, exploratory G extraction); frozen predictions for the board, not validated values",
  "metrics": {

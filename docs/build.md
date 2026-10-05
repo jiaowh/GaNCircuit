@@ -1491,6 +1491,53 @@ gate measurement needs at least 54 dB CMRR. Probe tip capacitance does not limit
 by 1 %). The first version computed the edge dv/dt from the largest step and the fastest edge of different cases.
 It was corrected to a per-case value before the result was recorded.
 
+### EPC90133 design round 1: owner targets on the stock board (5 October 2026)
+
+Owner targets, each relative to the EPC original (the stock BOM in the same simulation): T1 lower switch-node
+overshoot, T2 Q1 Eon + Eoff not higher, T3 estimated efficiency at 48 V -> 12 V not lower. Declared at 832a5e1 before
+any run (`scripts/epc90133_switching.py --study design`; assessment `scripts/assess_epc90133_design.py`, committed at
+b7af345 before the results). Operating point: continuous buck 48 V -> 12 V, 20 A, 250 kHz, 2.2 µH, as a double pulse at
+the converter's edge currents (28.2 A turn-off, 11.8 A turn-on). Network G-m1-mid, 100 ps step. Design space: parts
+that can be changed on the stock board: R80 (Q1 turn-on resistor) 1 (stock), 2.2 and 3.3 ohm, and R80 2.2 ohm with a
+7.5 ns dead time. The dead-time candidate is inadmissible until E1 measures the dead-time margin. Robust rule: a target
+counts only if it holds under all four unresolved alternatives ({ramp, step driver} x {package source inductance 0,
+50 pH}): T1 at least max(1 V, 10 %) lower, T2 and T3 at most 2 % higher. The efficiency estimate counts FET losses only
+(one off interval with both edges and dead times at the converter's currents, plus Q1's on-time conduction). It
+excludes inductor, copper, capacitor and gate-drive losses, so its absolute value (about 99.1-99.2 %) is optimistic.
+It serves only for ranking.
+
+Run ([report](../results/gan/epc90133-design-round1.json); fix runs
+[report](../results/gan/epc90133-design-round1-fix.json);
+[assessment](../results/gan/epc90133-design-round1-assessment.json)): 13 of 16 cases are usable. Three 100 ps timing
+runs stalled at the start of the transient (LTspice reduced Tseed to 1e-17 s) and hit the 1800 s limit: stock with
+the step driver and 50 pH, and R80 3.3 ohm under two alternatives. The declared 50 ps fix pair resolved the candidate
+(R80 2.2 ohm at 50 ps matches 100 ps within 0.011 % on every target metric: the numerical check passes). The stock
+case stalled again at 50 ps (3600 s), so that alternative's T1 comparison stays open. Assessment revision 1 reported
+'undetermined' wherever an alternative was missing, even when another had already failed. One failure already decides
+'not met', so revision 2 corrects the precedence; the v1 output is kept as
+`results/gan/epc90133-design-round1-assessment-v1-precedence-defect.json`.
+
+Result (change against stock under each alternative that ran):
+
+| Design | Overshoot | Q1 Eon + Eoff | FET loss | Q2 gate peak |
+|---|---|---|---|---|
+| R80 2.2 ohm | -16 to -60 % | +7.5 to +14 % | +1.5 to +18 % | -10 to -41 % |
+| R80 2.2 ohm, dead time 7.5 ns | -16 to -61 % | +7.4 to +13 % | -0.8 to +15 % | -9 to -41 % |
+| R80 3.3 ohm | -44 to -75 % | +14 to +17 % | +9 to +20 % | -23 to -47 % |
+
+Verdicts: **no candidate meets all three targets.** T1 holds under every alternative that ran but stays undetermined
+(the stock step-driver, 50 pH case is missing). T2 and T3 are not met. A larger R80 slows Q1's turn-on: Eon rises
+while the overshoot falls. The shorter dead time recovers only about 0.05 W of the roughly 0.3 W extra loss. The
+overshoot benefit shrinks to about 16 % when an assumed 50 pH package source inductance already slows the edge, so
+the size of the trade depends on an unresolved device property. A side result, not a target: Q2's gate spike during
+Q1's turn-on falls by 10-47 %, a better false-turn-on margin.
+
+Reading, within this model: the gate-drive changes available on the stock board trade overshoot against switching
+energy; none lowers both. Meeting all three targets would need a change that lowers the loop or common-source
+inductance rather than slowing the edge, which means a layout change and a new board. The trade-off and its size are
+frozen predictions for E4 (R80 2.2 ohm) on the purchased board; they are not validated values (EPC2302 Fig. 7
+exception, behavioural driver, exploratory extraction).
+
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
 Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node

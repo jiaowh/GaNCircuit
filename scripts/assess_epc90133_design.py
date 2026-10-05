@@ -47,7 +47,9 @@ def main():
     rep = json.loads(args.report.read_text(encoding="utf-8"))
     cases = dict(rep["cases"])
     extra_reports = []
+    args.report = args.report.resolve()
     for x in args.extra:
+        x = x.resolve()
         xr = json.loads(x.read_text(encoding="utf-8"))
         clash = set(xr["cases"]) & set(cases)
         if clash:

@@ -583,6 +583,9 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    checked and the dead time is measured at VIN = 0 before any bus voltage;
    (c, partial, 5 October 2026) equipment-independent first-power content and derived channel
    requirements in hardware plan v0.4; values that depend on equipment wait for the inventory;
+   (design round 1, 5 October 2026, owner targets; docs/build.md) on the stock board, R80 and dead-time
+   changes cannot meet overshoot, switching energy and efficiency targets together within the model; a
+   further round needs layout changes (new extraction, new board) and is the owner's decision;
    (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
    conditions, then the approved energized measurements.
    Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to
