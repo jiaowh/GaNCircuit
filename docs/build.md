@@ -1584,6 +1584,31 @@ should become total loss and whether the tolerance should allow small increases.
 and inner layers are missing, and its loop L (0.50 nH) is about twice G's, so the size of these changes on the board
 would differ.
 
+### EPC90133 layout round 2b: added return vias, and the geometry-edit layer (5 October 2026)
+
+`scripts/epc90133_board_edit.py` edits the rasterized layers in memory; the Gerber files are never touched.
+`scripts/read_epc90133_geometry.py` now has `derive(grids, holes)` split out of `load_board`, and its via bonds,
+probes, counts and labels were verified identical. An added plated via gets a pad where it sits on its own net's
+copper and an antipad where other copper is within the clearance. Rules: R1 drill at least 0.198 mm (the board's
+smallest); R2 at least 0.52 mm to any hole (the smallest via spacing in the power area); R3 no component pad (paste)
+nearby; R4 bonds on at least two layers; R5 no net merges and no split islands, re-derived after each edit; R6 no
+antipad in VIN or SW copper. The 0.125 mm annular ring and 0.2 mm clearance are assumptions (fab rules open).
+`scripts/epc90133_extract.py --edits <json>` applies a checked edit list and records it with hashes. Tests:
+tests/test_epc90133_board_edit.py (6).
+
+Declared at e07063a. The candidate: every GND via the rules accept on a 0.25 mm grid over the loop area, applied
+greedily. Revision 1 (before R6, kept as devices/epc/layout-edits/vias-gnd-greedy-r1-cuts-power-path.json) accepted
+22 vias. Most sat between the FETs, where their antipads perforated the top-layer switch-node copper, the main path
+from Q1's source to Q2's drain, and the A mesh lost Q1's source connection. R6 was added in response. Revision 2
+accepts only 4 vias, all about 3.5 mm left of Q2. Their extraction on A: loop L 0.5016 nH against 0.5017 nH for stock
+(-0.02 %). The declared switching runs were skipped because a 0.02 % network change cannot move any target beyond its
+tolerance (a deviation from the declaration, recorded here).
+
+Reading: **at the board's own via spacing, and without perforating the power path, the published layout leaves
+essentially no room for more return vias in the loop area.** EPC's layout is already saturated with vias there.
+Further loop-inductance reduction would have to come from capacitor placement (L3) or the stackup (round 2a), and in
+this model both raise the turn-on energy (round 2a).
+
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
 Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node

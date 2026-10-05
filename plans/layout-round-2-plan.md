@@ -48,6 +48,17 @@ changes to the power loop, but not to the common-source or gate routing, and its
    terminal energy included a stored-energy swing of several µJ. Estimator revision 2 (window to 450 ns after the
    turn-on, settling check) is declared. Round 2a reruns with it on 5 October; round 1 reruns overnight on G.
 
+3. **Status at the end of 5 October.** Steps 1-5 ran early. Round 2a (stackup): no gap meets all three targets;
+   with the corrected loss estimator, FET loss rises 1-4 % as the gap shrinks. Round 2b (vias): the geometry-edit
+   layer works (6 tests), but under the board's spacing and without perforating the power path only 4 vias fit, and
+   they change loop L by 0.02 %. Round 1 is rerunning on G overnight with the corrected estimator
+   (results/gan/epc90133-design-round1-rev2.json; assess with `scripts/assess_epc90133_design.py
+   results/gan/epc90133-design-round1-rev2.json --output results/gan/epc90133-design-round1-rev2-assessment.json`).
+   **First decision for 6 October:** with every change tried so far, the overshoot and loss targets pull against
+   each other in this model. Either redefine the targets (for example a loss tolerance, or total loss in place of
+   Eon + Eoff), or accept the trade and freeze the best candidates as predictions for the board measurements. Then
+   choose between L3 (capacitor placement, hard, the last loop-L lever) and track R (editable design).
+
 ## Candidate changes, balancing effort and effect
 
 | # | Change | Expected effect on loop L | Effort | Tooling needed | Manufacturability question |
