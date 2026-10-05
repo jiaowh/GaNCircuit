@@ -1,0 +1,47 @@
+{
+ "schema": "microstrip-bem-reference/1",
+ "declared": "2026-10-03, before it was run (docstring)",
+ "evaluator_sha256": "3194190a4744058303126962b0447d961ba756231a853f6377c42cb306d9e942",
+ "dependencies_sha256": {
+  "src/circuit_tools/bem2d.py": "5816862ac8a6058930773506bbe391aa8c7421ecd1a81f3772cc817a6343d576",
+  "scripts/fastercap_known_answer.py": "78da8b4b67a17f1e9e610c1b14a35a70b29426cf895f47c020a98f2cc1828203"
+ },
+ "values_F_per_m": {
+  "S=40h": {
+   "128": 1.225195055183697e-10,
+   "256": 1.2282229170803675e-10,
+   "512": 1.2296831031257507e-10
+  },
+  "S=10h": {
+   "128": 1.2285719558687357e-10,
+   "256": 1.2298380074345956e-10,
+   "512": 1.2304176148327828e-10
+  }
+ },
+ "checks": {
+  "B1": {
+   "richardson_S40h": 1.231143289171134e-10,
+   "hammerstad_jensen": 1.2304490474198107e-10,
+   "relative_error": 0.0005642182037355337,
+   "pass": true
+  },
+  "B2": {
+   "richardson_128_256": 1.2311040590004555e-10,
+   "richardson_256_512": 1.23099722223097e-10,
+   "change": 8.67812665423795e-05,
+   "pass": true
+  }
+ },
+ "reference_S10h_F_per_m": 1.23099722223097e-10,
+ "fastercap_2d_case_h": {
+  "0.005": {
+   "value": 1.038106e-10,
+   "vs_bem": -0.15669509138403082
+  },
+  "0.001": {
+   "value": 1.232296e-10,
+   "vs_bem": 0.0010550614945143977
+  }
+ },
+ "all_pass": true
+}

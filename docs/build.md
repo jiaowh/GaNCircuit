@@ -199,6 +199,270 @@ the earlier discretization error (via, pad, junction or planes) was not isolated
 difference only: R still changes by 7.8 % and 4.9 % between the last two meshes, so R is not converged. The scope is unchanged: board via arrays, plane holes, Kelvin and multi-layer vias are
 still not qualified, and the bracket width (23.5 and 33.7 pH here) remains the per-via representation uncertainty.
 
+### Via-array, plane-hole and FasterCap qualification: plan review and first bounded step (2 October 2026)
+
+A session drafted three qualification plans while hardware is blocked: via arrays in a closed cavity against an
+independent 2D reference, plane holes and slots, and a FasterCap diagnosis. An external review accepted the topics and
+asked for revised acceptance criteria before any expensive run. Disposition, after checking both against the code and the
+stored logs:
+
+- **Accepted from the review.** Benchmark errors are reported as discretization and representation errors of declared
+  benchmark geometries, with a separate statement of their applicability to the board. They are not board error bars.
+  The drafted V2 check is dropped, because nothing derives its premise (the same fractional position in the bracket for
+  every arrangement). A via-array benchmark needs new cavity sizes (six vias at 0.6 mm span 3 mm between centres, wider
+  than the existing 1.5 and 3 mm cavities), the board's via section (square, side 0.847 × drill, drill 0.198 mm) and a
+  stated excitation (individual ports or a parallel array). It also needs a later case for the 35-via source cluster.
+  "Exact square coax" is not available: the via script uses an equivalent-diameter approximation. The extractor checks copper only
+  on each segment's centre line ([epc90133_extract.py](../scripts/epc90133_extract.py), `connect`). Vias whose nearest
+  nodes coincide keep separate vertical segments. FasterCap's reference point sets each panel's side by the sign of
+  (point − vertex)·normal (`Autorefine.cpp` around line 6142). Case H's point is the centre of a convex box, so every slab
+  face was already oriented correctly. The drafted D3 (moving the point outside) is dropped for that reason. K1 needs
+  side-edge fringing removed, not only end effects. Compute estimates are guesses until one case is profiled.
+- **Added from the stored logs.** The air diagnostics took 11–25 minutes per refinement step at `-a0.01` and reached
+  2–4 million panels, so "minutes each" was wrong. Case H's dielectric runs did not refine: iteration 0 (3,576 panels)
+  and iteration 1 (4,132 panels) gave identical, unphysical matrices. The stopping rule therefore fired at once, with
+  FasterCap's relative-refinement indicator at 14,299 (about 1.5 in air). In air the same geometry also started
+  unphysical but refined to a physical matrix. The FasterCap evidence therefore points first at automatic refinement
+  stopping on an unresolved starting mesh, ahead of the dielectric description. That is not yet tested. The drafted D1
+  (slab at εr = 1) cannot test the interface: the earlier εr 1/1 run reports "0 dielectric" panels, so FasterCap drops
+  an interface whose two permittivities are equal.
+- **Order.** (1) The topology audit below, at no solver cost. (2) A FasterCap diagnosis with user-controlled meshes,
+  declared separately. (3) A precise declaration of the via-array and slot benchmarks, using the audit's geometry.
+  Profile one case before committing compute. Measurement readiness keeps priority when the equipment inventory arrives.
+
+**Mesh topology audit** (`python scripts/audit_epc90133_mesh_topology.py`, declared in its docstring and committed at
+89e5e32 before its run; [result](../results/gan/epc90133-mesh-topology-audit.json)). The audit parses the decks that
+the unchanged production extractor builds (A, B at m1 and m2, G at m1, B with pad junctions, and B with the grid shifted
+by half a pitch). It computes no inductance. Findings:
+
+- **Slots.** On the ground return planes (mid-layers 1–4), each row of six switch-node or VIN vias under a transistor
+  pin has antipads that merge into one slot, about 0.66 × 3.66 mm (six such slots, plus nine two-via slots, about
+  0.69 × 1.37 mm, under the capacitors). Every hole of at least half a pitch is crossed by a grid line, so no hole is
+  invisible to the mesh (F1 = 0 in every deck).
+- **Width overreach (T1).** Segment widths extend into those holes. On mid-layer 1, 27 % of the hole area is covered at
+  m1 with the production grid. The grid's x-lines are aligned to the pin rows, so they run down the slot centres, and
+  segments 0.425 mm wide either side reach about 0.12 mm into each slot. With the grid shifted by s/2 in x the cover is
+  9–11 %; at m2 it is 8–9 % at every offset tested. 3–12 segments per m1 deck, and 0–23 per m2 or shifted deck, have more
+  than half their width off their own copper. The electrical effect of this cover is not known; the slot benchmark is
+  where it gets measured.
+- **Via attachments (T4).** No grid node is shared by two vias in any deck, offsets included (F4 = 0), so the merge
+  risk raised for 0.6 mm via rows does not occur on these grids. One via end (group SW-03, top layer, m1) attaches
+  0.59 mm from its centre (F3); at m2 the largest distance is 0.13 mm.
+- **Mesh splitting (T3).** On the top layer a 15-node (m1) or 72-node (m2) fragment of one island is joined to the rest
+  only through vias.
+
+Consequences for the benchmarks: the slot benchmark uses the measured slot (0.66 × 3.66 mm, six 0.198 mm drills at
+0.6 mm) at m1 and m2, with the production alignment (slot-centred) and a shifted grid. The via-array benchmark does not
+need a merged-attachment case for these grids.
+
+**Benchmark designs (draft for review; no script, criterion or run yet).** Each becomes a script whose docstring
+declares the criteria, committed before its first run, after one profiled case.
+
+- *Via arrays.* Closed plane-pair cavities at the top-layer/mid-layer-1 stack, as in the single-via check. The wall
+  clearance from the array's bounding box is declared, and two clearances are used so that differences can be formed.
+  Board via section (square, side 0.847 × 0.198 mm), arrangements: one via, a row of six at 0.6 mm, a row of six at
+  1.2 mm, 3 × 3 at 0.6 mm, and later the 35-via source cluster from the board's drill coordinates. Each via is its own
+  port, so FastHenry returns the full N × N matrix; the parallel-array inductance is derived from it, not measured
+  separately. Two representations: the production rule (via end tied to the nearest plate node, plates at the board's
+  m1/m2 pitches, production alignment and a shifted grid) and a resolved one (fine plates, ideal pads).
+  Reference: between perfectly conducting plates the field is two-dimensional, so L = μ0 ε0 (h + δ) C2D⁻¹. Here C2D is
+  the 2D capacitance matrix of the via cross-sections inside the wall, with the wall as reference and every conductor
+  equipotential (the perfect-conductor limit). FasterCap 2D gives C2D: it passed its 2D coax known answer to 0.01 %
+  and is independent of FastHenry. A small Python solver could cross-check it, but is not needed for this step. The
+  2D reference cannot fix the via's length inside the copper (the E2 bracket), so it is compared through quantities in
+  which that cancels: ratios of mutual inductances (Mij/M12; the factor h + δ cancels), and cavity-size differences of
+  self, mutual and parallel-array values (the E1 construction). Absolute values are reported against the E2 bracket
+  only. Tolerances: reference accuracy plus the 2D mesh change, declared with the script.
+- *Plane holes and slots.* P1, holes through both plates: for hole sizes much larger than the plate gap, current in the
+  plane pair is a 2D sheet current with an inductance per square of μ0 (h + δ), and the hole is an insulating
+  boundary. The reference is therefore a 2D sheet-current (Laplace, Neumann at the hole edge) count of squares. A
+  Python finite-difference solver gives it for any hole shape, including the measured slot, and is itself checked
+  against exact strip results (L/W squares without a hole) and the small-circular-hole limit. The sheet picture
+  has an O(h/size) error at hole edges, so its applicability is stated as a ratio and tested with two plate gaps.
+  The strip is long enough that the terminals sit several widths from the hole. P2, a slot in the return plate only
+  (the board case): no reference exists. Checks are mesh stability of the added inductance (with an absolute floor, so
+  a near-zero addition does not make the relative change unstable), the trend as the slot shrinks, and agreement
+  between the production-rule mesh at m1/m2 (slot-centred and shifted) and a resolved mesh. That last comparison is
+  the number the audit's 27 % cover calls for.
+- *Applicability.* Each result is reported as the error of the benchmark geometry, with a separate statement of which
+  board features it resembles and how. Turning it into board uncertainty needs a transfer argument or a
+  representative board-subgeometry check, declared separately.
+
+**FasterCap with user-controlled meshes** (`python scripts/fastercap_manual_mesh_check.py`, declared at 4cf9434,
+revision 2 at de2aebf; criteria in the docstring). The script writes its own graded panel meshes for case H's geometry
+(three meshes), switches FasterCap's refinement off, and adds a partly filled plate capacitor (K1). K1 runs only if the
+case-H part passes.
+
+- *Run 1 failed and was stopped, kept* ([report](../results/gan/fastercap-manual-mesh-check-run1-failed.json)). With
+  `-m1e9` alone every 4 mm matrix was unphysical, air included, and the 2 mm values did not converge. FasterCap sets the
+  threshold that decides at which hierarchy level two panels interact to `-d` × `-m` (`SolveCapacitance.cpp`;
+  `Autorefine.cpp`, `RefineCriteria`). `-m1e9` therefore made panels interact through coarse super-panels. The same
+  coupling makes every automatic iteration 0 (`-m` 1e32) unphysical, which is what case H and the air diagnostics show.
+  On a 1 m probe cube the threshold moves the result from 69.0 pF (1e9) to 72.66 pF (0.01) and 72.67 pF (all links).
+- *Revision 2* uses threshold 0.01 (`-d1e-11`) and adds D5, a rerun of M2 at threshold 0.001.
+  - Air form: complete and passing. C′ = 37.53, 37.52 and 37.50 pF/m on M1–M3: a 0.05 % change from M2 to M3 (D2,
+    limit 1 %) and −0.53 % against Hammerstad–Jensen (D3, limit 1 %). Every matrix is physical and no run refined (D0).
+    So FasterCap's 3D solver gives a physical, mesh-stable, accurate result for this thin strip when the mesh is
+    resolved and the interaction threshold is tight.
+  - Dielectric form: see the run state below.
+- *Reading so far.* Case H's unphysical matrices are explained, at least in part, by settings rather than by the
+  dielectric input: the automatic mode never left a coarse interaction threshold. Whether the dielectric description is
+  also sound is what the dielectric form of revision 2 decides.
+- *An independent 2D reference for D4* ([script](../scripts/microstrip_bem_reference.py),
+  [result](../results/gan/microstrip-bem-reference.json); declared before run 4 produced any finer dielectric value).
+  D4 compares with FasterCap's own 2D value, and FasterCap's automatic 2D refinement is now known to stall. The new
+  boundary-element solver ([circuit_tools/bem2d.py](../src/circuit_tools/bem2d.py)) gained dielectric interfaces: bound
+  charge with normal-field continuity, exact coated coax reproduced to 0.005 % after extrapolation. For case H's cross-section it gives
+  **123.10 pF/m**: B1, the wide-slab version, lies within 0.06 % of Hammerstad–Jensen, and B2, panel convergence, is
+  0.009 %. FasterCap's case H value at `-a0.001` (123.23) agrees within 0.11 %, so D4's reference stands. Its `-a0.005`
+  value was 15.7 % low, another automatic stall.
+
+- *Run state, 2 October 2026.* Revision 2 was stopped at the end of the working day during the dielectric M2 call ([report](../results/gan/fastercap-manual-mesh-check-run2-incomplete.json), outcome 'incomplete, stopped'; no check evaluated). Completed: air M1–M3 and dielectric M1. Dielectric M1 took 10 and 27 minutes for its two lengths and gave physical matrices, unlike case H, with C′ = 116.8 pF/m, 5.2 % below the 2D reference (123.2 pF/m). The air form was within 0.5 % on the same mesh, so the dielectric value is either not converged at M1 or still carries an error; the finer meshes decide. Not run: dielectric M2/M3, D5, the automatic run from M1, and K1. The rerun takes an estimated 3–5 hours and should be launched detached, so it is not a child of a session shell.
+- *Run 3, 2–3 October 2026, failed, kept* ([report](../results/gan/fastercap-manual-mesh-check-run3-failed.json)). It was
+  launched detached at 23:33 but shared the host with the two FastHenry benchmarks below and the via-array references.
+- *Run 4, 3 October 2026, failed, kept* ([report](../results/gan/fastercap-manual-mesh-check-run4-failed.json)). It ran
+  mostly alone. It reproduced air M1–M3 and dielectric M1 exactly and gave dielectric M2 C′ = 118.3 pF/m (−3.9 % against
+  the 2D reference). Dielectric M3 at 2 mm exceeded its 1 h limit, so D2 and D4 cannot pass and K1 was not run. It was
+  stopped during M3 at 4 mm.
+- *Diagnosis: discretisation at the strip edges, not the dielectric description.* A 2D boundary-element emulation with
+  the same panel layout as each 3D mesh (`emulate_2d` in
+  [fastercap_edge_mesh_check.py](../scripts/fastercap_edge_mesh_check.py)) gives air −0.48 % and dielectric −5.5 % and
+  −4.0 % on M1 and M2. FasterCap's 3D values are −0.46 %, −5.1 % and −3.9 %. So FasterCap's 3D dielectric solution is
+  what these meshes should give, and the shortfall comes from panels too coarse where strip and dielectric meet; at M3
+  it would still be −2.8 %. In 2D, refining only the panels at the strip's side edges removes it: 1.25 µm gives −0.76 %,
+  0.6 µm gives −0.13 %. The diagnosis is therefore substantially resolved, and the 3D qualification unfinished. Case H's
+  unphysical matrices came from the automatic settings (a coarse interaction threshold that the automatic mode never
+  tightened). With a tight threshold and the declared meshes, FasterCap's 3D dielectric values match an independent 2D
+  emulation of the same panels. No edge-refined 3D value exists yet (see the next item), so FasterCap's 3D dielectric
+  accuracy has not been shown directly.
+- *Edge-refined 3D confirmation, run 1 failed and stopped* (`python scripts/fastercap_edge_mesh_check.py`, declared at
+  bcd1c3e; [report](../results/gan/fastercap-edge-mesh-check-run1-failed.json)). Mesh E1 has 1.25 µm panels at the strip
+  edges, with a predicted error of −0.76 %. The 2 mm case took 2.6 h and gave a physical matrix. The 4 mm case was
+  stopped at the owner's decision after about 2 h 10 min, so no C′ and no D4 or D6 verdict exists. Its 3 h limit had
+  been set without profiling and would very likely have been exceeded. In future, time limits come from a profiled or
+  scaled estimate with margin. The diagnosis above does not depend on this run. FasterCap stays unqualified for board
+  geometry, and K1 (partly filled plates) has not been run.
+  Dielectric M1 at 4 mm exceeded its 1 h limit (27 minutes in run 2), so D2 could not pass. It was stopped during
+  dielectric M2. The air results reproduce run 2 exactly. Run 4 is queued to start alone after the FastHenry jobs.
+
+**FasterCap runner: a false-success path closed (3 October 2026).** With three jobs running, WSL's *free* memory fell to
+tens of MB, while most of the 8 GB sat in page cache. FasterCap sizes its out-of-core storage from free memory, and in some
+via-array reference runs it printed "Cannot go out-of-core, terminating process" during an automatic iteration and still
+exited 0. The shared runner then read the last matrix printed, from an earlier, unconverged iteration, as the result.
+`run_problem` in [fastercap_known_answer.py](../scripts/fastercap_known_answer.py) now rejects a log that reports that
+termination, or that ends an automatic run with its last change above the requested `-a` value. It is unit-tested on
+synthetic logs (tests/test_fastercap_run_problem.py). Every earlier FasterCap result log passes the gate except
+known-answer case E at `-a0.001`, which was already recorded as failed (time). No earlier result was a hidden false
+success. The case H assessment was regenerated to bind the changed helper's hash; only the hash changed.
+
+**Plane-pair slot benchmark** (`python scripts/plane_hole_benchmark.py`, declared at b5c1775;
+[report](../results/gan/plane-hole-benchmark.json)). A plane-pair strip (6.8 × 5.1 mm, board stack) with a slot of
+the measured size (0.65 × 3.65 mm) across or along the current, or a smaller one. The slot is cut through both plates
+(P1) or only through the return plate (P2), as on the board. Meshes use the production rule at the board pitches m1 and
+m2 (grid aligned to the slot centre, as the production grid is to the pin rows, and shifted by half a pitch) and at
+finer pitches. The P1 reference is a new 2D sheet-current solver ([circuit_tools/sheet.py](../src/circuit_tools/sheet.py);
+exact for a plain strip, and within about 1 % of the dilute-hole formula after extrapolation). It gives dL = μ0 (h + δ) dN
+for the slot's added squares dN, with slot edges on cell faces so that no staircase error enters.
+
+- *Reference (R1 converged: 0.06 % and 0.04 % between the two finest cells; a 2D sheet picture with the slot through
+  both plates).* A slot across the current adds 0.89 squares, 150 pH in this plane pair. The same slot along the current adds 0.12 squares, 21 pH, seven times less. On the
+  board the slots run along y, as does most of the return current under the transistors (a geometric reading, not an
+  extracted current), which resembles the cheaper orientation.
+- *Board pitches.* FastHenry's slot inductance there is well below the reference, and it depends on grid alignment:
+
+  | Slot (P1) | m1 aligned | m1 shifted | m2 aligned | m2 shifted | 2D reference |
+  |---|---|---|---|---|---|
+  | across, 0.65 × 3.65 | 97.6 pH | 90.1 | 94.2 | 123.0 | 149.7 |
+  | along, 3.65 × 0.65 | 7.4 | 17.7 | 12.1 | 19.3 | 20.7 |
+  | small, across | 26.9 | – | 17.0 | – | 27.4 |
+
+  The slot in the return plate only (P2, the board's case) behaves similarly: 83/77 pH (m1) and 79/103 pH (m2) across the
+  current, 6/14 and 9/15 pH along it. The unslotted strip comes out at 204–205 pH against 224 pH from L/W. That matches
+  every copper edge being widened by half a pitch (L/(W + s) gives 207 pH at m1), the same width overreach the topology
+  audit measured on the board.
+- *Network diagnostic, not supported* ([assessment](../results/gan/plane-hole-network-assessment.json),
+  [script](../scripts/assess_plane_hole_network.py), declared before it was run). In the plane-pair limit, the production
+  mesh should act as a resistor network of its kept segments. That network reproduces the unslotted strip (FastHenry
+  within 1–5 %) and the direction of every alignment effect, but FastHenry's slot inductance is only 0.62–0.77 of the
+  network's. So mesh topology alone does not explain the board-pitch values, and a slot-specific factor remains. One
+  candidate is 3D field fringing at the slot edges, which both the network and the sheet reference omit. The fine meshes
+  and the half-gap case (check P1c) test it.
+- *Run 1 complete; declared outcome: fail* ([report](../results/gan/plane-hole-benchmark.json)). The f4 profile (the
+  unslotted strip) exceeded both the 75-minute rule and its 3 h limit, so as declared every f4 run was dropped. The checks
+  then use f3 as the finest mesh with m2 for comparison. Each f3 run took 22–89 minutes on the shared host.
+  - R1 passes (reference converged to 0.1 % or better).
+  - **P1a fails:** across-slot dL changes 14.7 % from m2 to f3. **P2a fails:** 13.6 % (10.7 pH).
+  - **P1b fails:** at f3 FastHenry's across-slot dL through both plates is 108.0 pH against the sheet reference's 149.7 pH
+    (−27.9 %). The along-slot and small slots show similar ratios (0.73 and 0.58).
+  - **P1c passes:** with the gap halved the shortfall falls to −16.0 %. An error that scales roughly with h is what
+    field fringing over a distance of order h at the slot edges would give. A straight-line extrapolation to zero gap
+    leaves about −4 %, comparable to the unconverged f3 mesh error. So the sheet picture is not an accurate known
+    answer at the board's ratio of gap to slot size; it overestimates the slot's effect. The extrapolation is a
+    reading, not a declared check, and f3 is not converged.
+  - *Production-mesh differences from f3* (reported; f3 is itself not converged, so these are differences, not
+    established accuracy errors): across-slot cases −17 % to +15 %. The
+    along-current slot in the return plate only, the board-like case, gives 5.6–15.3 pH against 11.6 pH (−52 % to
+    +32 %). The production alignment (grid lines through the slot centre) gives the low end: −52 % at m1 and −21 % at m2.
+    The small slot at m1 is +68 %. Grid alignment alone moves these values by factors of up to 2.4.
+  - *What this might mean for the board extraction (a hypothesis).* The board's pin-row slots lie along the return
+    current. For that case, slot in the return plate only, the finest mesh gives 11.6 pH in this benchmark strip
+    (unconverged), and the production m1 grid about half of it. Against a loop inductance of 260–280 pH in variants B
+    and G, that would make slot representation a percent-level effect rather than a dominant one. The hypothesis needs
+    a transfer argument or a board-subgeometry check: the board's current paths, layer stack and slot count are not
+    reproduced here. The 150 and 21 pH figures above belong to the 2D reference with both plates slotted, not to the
+    board-like case.
+
+**Via-array benchmark** (`python scripts/via_array_benchmark.py`, declared at d220f0e; revision 5 at the commit before
+567de11; [report](../results/gan/via-array-benchmark.json)). Closed plane-pair cavities at the board stack hold one via,
+a row of six at 0.6 mm (as under each pin), a row of six at 1.2 mm, or a 3 × 3 grid at 0.6 mm. Each cavity is used at two
+wall clearances, with the board's via section. Each via is its own FastHenry port, so the full inductance matrix comes
+out. Representations: the production rule at the board pitches m1 and m2 (nearest-node attachment, grid through the
+via rows), and a resolved single mesh (pitch about w/2, ideal pads). The reference is the 2D field between perfectly
+conducting plates, L = μ0 ε0 (h + δ) C2D⁻¹. It is compared through quantities in which the via's length inside the
+copper cancels: mutual-inductance ratios, and cavity-size differences.
+
+- *Runs 1–4, kept as failed.* Run 1 solved every case but could not read FastHenry's full impedance matrix. Runs 2 and 3
+  took some references from memory-terminated FasterCap runs (the runner gap above). Run 4 completed and failed V0:
+  FasterCap's automatic 2D refinement sometimes stalls. Some single-via references sat 1.3–2.1 % above the closed form
+  at one or both `-a` settings, while converged ones agreed with it to 0.02 %. Two `-a` settings therefore cannot
+  certify a reference.
+- *Revision 5: a new reference solver,* [circuit_tools/bem2d.py](../src/circuit_tools/bem2d.py). It is a 2D
+  boundary-element solver with explicit corner-graded panels: exact coax to 4 × 10⁻⁷, square via to 0.004 % of the closed
+  form (tests/test_bem2d.py). **V0 passes:** every reference changes by ≤ 0.05 % between 16 and 32 panels per via side,
+  and every single-via reference is within 0.004 % of the closed form. In three of 23 cavities FasterCap's run-4
+  reference differed from it by 1.3–2.1 %.
+- *Resolved FastHenry mesh (single mesh, as declared).* Mutual-inductance ratios agree within 2.9 %, except the farthest
+  pair in the smaller cavity, 7.2 % (**V1 fails**). Cavity differences agree within 1.3 % for the six-via row, but the
+  single via is 4.5 % off (**V2 fails**). The parallel-array inductance lies inside the physical bracket (**V3 passes**).
+  For comparison, the single-via cavity check at this pitch was also several percent off before refinement, so these
+  failures may be mesh error. That is not established: no second resolved mesh was run (the six-via row took 2.9 h at
+  this pitch).
+- *Board pitches (reported, not judged).* Individual mutual ratios are off by up to 12 % at m2 and 19 % at m1, and the
+  six-via row's cavity difference of via 1's self inductance is off by 22 % at m1. The parallel-array inductance lands
+  anywhere between 0.19 and 1.06 of the physical bracket; the 3 × 3 grid at m1 lies above it. For arrays it sits nearer
+  the gap-only end (0.19–0.44) than for a single via (0.45–0.82), so one bracket position cannot be carried from a single
+  via to an array.
+- *Dividing by the via count is wrong by a factor 1.6–2.6.* In the same cavity, six vias at 0.6 mm have 2.05 times the
+  inductance of one via divided by six, six at 1.2 mm 1.56 times, and nine at 0.6 mm 2.62 times (reference values).
+- *Applicability.* These are errors of closed cavities with these arrangements at 100 MHz. On the board, vias pass
+  through slotted planes and meet several layers. The numbers show the size of representation effects at the board
+  pitches; they are not error bars for the extracted board network.
+
+**Audit at 9ca735d (3 October 2026), applied without reruns.**
+- The user-mesh FasterCap runner (also used by the edge-mesh check) now applies the same `run_problem` gate as the
+  shared runner. None of the 37 stored user-mesh and edge-mesh logs reports a memory termination.
+- Both FastHenry benchmarks now run through [circuit_tools/wslrun.py](../src/circuit_tools/wslrun.py), which records
+  the Linux solver's PID and on timeout stops that process after checking its name (tests/test_wslrun.py). Before,
+  only wsl.exe was stopped, so a timed-out case could keep running beside the next one, and the via script did not
+  catch a timeout at all.
+- The via benchmark binds `bem2d.py` and `wslrun.py` in its manifest. On `--resume`, both benchmarks refuse a report whose
+  dependencies changed.
+- V1 now fails if any expected ratio is missing (tests/test_via_array_checks.py). The stored V1 used complete ratio
+  sets, so its failure stands.
+- The stored reports predate these changes, and their verdicts are unchanged.
+- Wording narrowed: slot figures are differences from an unconverged mesh, via figures are mutual-inductance ratios,
+  and the FasterCap diagnosis is substantially resolved with its 3D qualification unfinished.
+
 ### EPC90133 geometry reader and nets (G3 preparation)
 
 ```sh
@@ -1144,6 +1408,76 @@ circuit; they do not establish the energized board's gate supply:
 These are statements about the behavioural driver and the vendor model, not about the board. (Wording corrected
 after an external review, 1 October 2026.)
 
+### EPC90133 input logic: can any input state command both gates on? (hardware plan open item 5)
+
+The uP1966E has no HI/LI lockout, so shoot-through protection rests on the board's input logic, its jumpers and the
+PWM source. `devices/epc/epc90133-input-logic.json` transcribes QSG Fig. 16 (dead-time and bypass) with the
+main-sheet and driver-sheet connections: four 74LVC1G99 configurable gates, two SN74LVC1G66 switches, the R620/C620/D620
+and R625/C625/D625 delay networks, the pull-downs and the J630/J640 headers. Both logic datasheets are recorded in
+`devices/epc/epc90133-sources.json`. `scripts/epc90133_input_logic.py` (checks declared at fab26fd before the first
+run; [report](../results/gan/epc90133-input-logic.json); tests/test_epc90133_input_logic.py) evaluates the
+transcription as recorded: L1 BOM, L2 the gate function against all 16 rows of the 74LVC1G99 function table parsed
+from the PDF, L3 the QSG's documented settings, L5 power-up. All pass. Run 1's class label for two-input settings
+was wrong where a polarity jumper inverts one channel (its recorded states were right); it is kept as
+`results/gan/epc90133-input-logic-run1-label-defect.json`, and run 2 changed only the label.
+
+Each input channel is Y = (C ? B : A) XOR D: U610 gives InBufQup = PWM1 XOR PolQup; U611 gives InBufQlow = (Dual ?
+PWM2 : PWM1) XOR PolQlow. U612/U614 select the RC-delayed copy when UseDT is high and are disabled (3-state) when
+SWbyp is high, when U615/U616 connect PWM1/PWM2 straight to HIN/LIN. J630 sets PolQlow (1-2), PolQup (3-4) and Dual
+(5-6); J640 sets SWbyp (1-2) and UseDT (5-6); pin 3 of J640 is unconnected, so its 3-4 position equals no jumper.
+
+Across all 64 horizontal jumper combinations:
+
+- **Safe as designed, 4 combinations**: J630 1-2 or 3-4 with J640 5-6 (and the same with an ineffective 3-4 on
+  J640). Gate commands are complementary from PWM1, with an RC delay on each turn-on. With open inputs only the
+  synchronous-rectifier FET is commanded on.
+- **Both gates on at idle, 8**: J630 1-2 and 3-4 together (both polarity bits set) without full bypass. Both
+  commands are high with PWM1 low or unplugged.
+- **Both follow PWM1, 8**: no J630 jumper, or J630 1-2 with 5-6, without full bypass. Both gates are on whenever
+  PWM1 is high (PWM2 open).
+- **Complementary but no added dead time, 4**: a single-input polarity jumper with no J640 jumper (the pull-downs
+  select dead-time bypass).
+- **Two-input, 40**: dual mode or full bypass. Both gates are on for one PWM1/PWM2 combination (usually both high;
+  PWM1 low with PWM2 high for J630 3-4 with 5-6), which the PWM source must avoid.
+
+Power-up: the logic and U80 share the 5 V VCC from U100. U80 enables its outputs only above its POR (3.8 V minimum),
+where the 74LVC parts (1.65 V minimum) already give their static outputs, so the commands at enable are the idle
+state of the jumper setting.
+
+Dead time from datasheet limits (L4, arithmetic, informational): the RC delay R C ln((VOH - V0)/(VOH - VT+)) is 9.6 ns
+typical (EPC's Fig. 4 rule gives 9.9 ns for 120 Ω) and 6.3-12.9 ns over R ±1 %, C ±10 %, VT+ limits (interpolated to
+5.0 V) and an assumed 0-0.3 V residual voltage, or 5.3-14.8 ns with X7R temperature drift. The two channels'
+gate delays may differ by up to 7.3 ns and the uP1966E's delay matching by up to 6 ns, so stacked limits give
+about -7 ns at the gate commands (typical about 8 ns). The capacitor's discharge delay, which shortens the dead time,
+is not bounded by any datasheet used here. Stacked worst cases are pessimistic, but they mean the datasheets do not
+guarantee a positive dead time. The uP1966E datasheet recommends at least 30 ns; EPC recommends 5-15 ns for this
+board.
+
+Consequences (hardware plan): the first-power procedure gains a jumper-configuration entry, with the shoot-through
+and zero-dead-time settings named as stop conditions, and a measured dead time at the driver outputs before any bus
+voltage. Open item 5 is answered for the schematic. The actual board's jumpers and its measured dead time remain
+open. Scope: static logic of the published schematic; no timing simulation, no PWM-source behaviour, no noise, not a
+measurement of our board.
+
+### EPC90133 first-power content and channel requirements (5 October 2026)
+
+Equipment-independent parts of the first-power procedure are drafted in the hardware plan (v0.4) for the lab's
+review. **The QSG's procedure text does not match this board's connectors.** It names VDD "J1, Pin-1" and ground
+"J1, Pin-2", but the 12 V input is J90, whose pin 1 is GND in both the schematic and the layout. The silkscreen marks
+GND at the square pad and VDD at the round pad. Following the QSG's pin numbers would reverse the gate-drive supply,
+so connections are made by silkscreen label. J80's silkscreen (PWM1, GND, PWM2, GND) matches the schematic. The
+board has no bleed resistor on VIN, so a discharge path and its verification are part of the procedure. Shutdown
+keeps VDD and PWM on until the bus is verified discharged, because the driver's output state below POR is not stated
+in the datasheet text read. The double-pulse width limit is given as t1 = L I / V for the user-fitted inductor.
+
+`scripts/epc90133_probe_requirements.py` ([result](../results/gan/epc90133-probe-requirements.json); a derivation
+with declared allowances, no pass/fail) turns recorded waveform features into channel requirements. At Fig. 9's
+features, the system bandwidth is 0.89 GHz (set by the 264 MHz ring at 3 % amplitude error), with 6.0 GS/s and
+168 ps deskew. At the fastest usable simulated case (0.80 ns, 300 MHz): 1.36 GHz, 12.5 GS/s, 80 ps. A floating Q1
+gate measurement needs at least 54 dB CMRR. Probe tip capacitance does not limit the choice (20 pF shifts the ring
+by 1 %). The first version computed the edge dv/dt from the largest step and the fastest edge of different cases.
+It was corrected to a per-case value before the result was recorded.
+
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
 Owner, 1 October 2026 (plan section 9, item 10): audit EPC9165's published files and locate gate and switch-node
@@ -1252,9 +1586,48 @@ reachable, so these were not blinded fault tests.
 faults: it reported `completed` whatever the comparison's exit code and output; it crashed on a missing figure or a
 malformed switching report; and its K3 passed a figure record whose checks named no panel. Completion now needs a
 zero exit, a readable comparison holding its result keys and the summary file (otherwise `failed`, with the captured
-output); both panels are required by name; unreadable inputs become structured stops
-(tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
+output); both panels are required by name; unreadable inputs become structured stops; the manifest's structure (entries, bare file names, hashes, kinds,
+one figure) is validated before any entry is used (tests/test_agent_milestone_baseline.py). The recorded milestone outcomes stand: the scorer compared the agents'
 outputs with the baseline's comparison directly, and the faults above were not among the declared fault kinds.
+
+### E2E-0 pilot: the simulation workflow end to end through stage handoffs
+
+Declared before its runs in `scripts/e2e_pilot.py` (2 October 2026; [result](../results/gan/e2e-pilot.json)) after an
+external review of the end-to-end plan, which reduced it to this pilot. **Non-blind.** Its endpoint is a simulation
+assessment against QSG Fig. 9; it is not Stage 3 closure. The stages hand off through frozen records
+(`src/circuit_tools/handoff.py`: I-1, I-2 and the assessment, with complete/provisional/incomplete/failed/rejected_input
+states and exception inheritance). An independent checker (`scripts/e2e_check.py`) rehashes cited files, recomputes
+every required check, compares predictions with the report and requires stops to be warranted. Configuration:
+EPC2302 Stage 1 benches, extraction A:m1:mid, the switching sensitivity study on A (nine cases), then the Fig. 9
+comparison. Each stage ran in a copied workspace without results, docs or plans, one fresh subagent per stage on the
+operator's frontier model, given only its stage card.
+
+- **Reference.** Run 1 stopped on a driver bug: it treated exit status 2 (report written, declared check failed) as
+  a failed step. It is kept. Run 2 completed in 21.6 min of compute; all three records are provisional and the
+  checker found no problems.
+- **Clean run C1.** It matched the reference exactly: statuses, every check outcome, all 63 predictions, loop L
+  0.502 nH and the per-case Fig. 9 verdicts. All 12 reference assumptions were named with equal values, plus 23
+  more. The checker passes all three records. Stages took 3.6, 25 and 4.5 min, with 15/36/22 tool calls and
+  94k/121k/132k tokens. No interventions or retries.
+- **Fault run F1** (C1's Stage 1, then the EPC2302 model's k2 changed, the archive rebuilt and both source records
+  updated, so every script's own check passes). Stage 2 rejected its input before any step: both integrity checks
+  failed, nothing was predicted and no protected file was touched. The assessment rejected in turn. The checker
+  passes both stopped records.
+- **Claims review** (operator, non-blind). All 18 C1 claims were warranted, with no overreach or underclaim. The
+  assessment's needed measurements cite hardware-plan items (E7, E8, J1/J2, B1506A) that no artifact in the run
+  supports, and some sentences echo AGENTS.md almost verbatim.
+- **Containment.** Every subagent receives the repository's AGENTS.md as project instructions, so the answers were in
+  the agents' context whatever the workspace held. The transcript audit found no tool call touching the repository
+  outside the workspaces. One stage wrote a scratch note outside its allowed folder; the cards never named that
+  folder.
+
+Reading: agents on a frontier model can execute this workflow and hand it off through declared records, and they
+stopped on an upstream change that the scripts accepted. Consistency with the reference checks execution, not
+engineering truth (same models, assumptions and helpers). The pilot does not show judgement on unseen material. A
+blind test needs a separate session in an isolated directory with only permitted inputs, a frozen reference method,
+and an independent review of geometry, ports, pinout, driver and benchmark applicability. Per the review, a second
+target waits for the owner's assessment of value, interventions and cost. The agents took about 33 min of wall time
+and 347k tokens; the scripts alone took 22 min and no tokens.
 
 ### KiCad groundwork (G5 preparation)
 
@@ -2265,7 +2638,8 @@ What this shows:
     bound to its hash (`scripts/assess_fastercap_board3d.py`,
     [result](../results/gan/fastercap-board3d-assessment.json)) records the disposition: all five 3D matrices
     invalid (non-positive diagonal, positive off-diagonal, not positive definite), both 2D matrices valid, derived
-    C' unusable, declared verdict failed and unchanged.
+    C' unusable, declared verdict failed and unchanged. The assessment binds by hash the gate module it imports and
+    that module's helpers (`scripts/fastercap_known_answer.py`); the check's future reports bind those helpers too.
   - FasterCap stays unqualified for 3D board geometry. Before any board capacitance extraction, the 3D dielectric
     description needs its own small known-answer check (for example a parallel-plate capacitor partly filled with
     dielectric). Nothing depends on this now.

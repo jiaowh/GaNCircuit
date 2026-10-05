@@ -1,0 +1,101 @@
+{
+ "schema": "plane-hole-network-assessment/1",
+ "declared": "2026-10-03, before it was run (docstring)",
+ "evaluator_sha256": "2b4a02644ed5392ef12939d1fe3442d934e3ac629b887668b52db088f3cae31b",
+ "benchmark_report_sha256": "be5399c86b47dc400c44deeebb15d3bece37309dfa6f602a915ba27b62c3d77a",
+ "cases": {
+  "none m1": {
+   "N_net": 1.2307692307692297,
+   "N_ideal": 1.3333333333333335,
+   "L_fasthenry_over_L_net": 0.9870866451491289
+  },
+  "none m2": {
+   "N_net": 1.279999999999965,
+   "N_ideal": 1.3333333333333335,
+   "L_fasthenry_over_L_net": 0.9539873183461537
+  },
+  "P1-perp m1 aligned": {
+   "dN_net": 0.7770668824514539,
+   "dL_net_pH": 130.46755176343956,
+   "dL_fasthenry_pH": 97.64951533403239,
+   "ratio": 0.7484582489222148,
+   "dN_sheet_reference": 0.8914868926210846
+  },
+  "P1-perp m1 shifted": {
+   "dN_net": 0.7006045462553288,
+   "dL_net_pH": 117.629720128986,
+   "dL_fasthenry_pH": 90.10397948204563,
+   "ratio": 0.7659967173537673,
+   "dN_sheet_reference": 0.8914868926210846
+  },
+  "P1-perp m2 aligned": {
+   "dN_net": 0.7861540163986842,
+   "dL_net_pH": 131.99325842449474,
+   "dL_fasthenry_pH": 94.1544727837344,
+   "ratio": 0.7133278919513484,
+   "dN_sheet_reference": 0.8914868926210846
+  },
+  "P1-perp m2 shifted": {
+   "dN_net": 1.033725814956912,
+   "dL_net_pH": 173.55993327964316,
+   "dL_fasthenry_pH": 123.04586960320617,
+   "ratio": 0.7089531971929965,
+   "dN_sheet_reference": 0.8914868926210846
+  },
+  "P1-par m1 aligned": {
+   "dN_net": 0.07039051246457984,
+   "dL_net_pH": 11.818387884007326,
+   "dL_fasthenry_pH": 7.37683161230935,
+   "ratio": 0.6241825606597071,
+   "dN_sheet_reference": 0.12319276630664988
+  },
+  "P1-par m1 shifted": {
+   "dN_net": 0.14731586023353693,
+   "dL_net_pH": 24.73395798307663,
+   "dL_fasthenry_pH": 17.712353616697033,
+   "ratio": 0.7161148098018162,
+   "dN_sheet_reference": 0.12319276630664988
+  },
+  "P1-par m2 aligned": {
+   "dN_net": 0.11262539718967934,
+   "dL_net_pH": 18.90951753260494,
+   "dL_fasthenry_pH": 12.092592576122243,
+   "ratio": 0.6394976791592625,
+   "dN_sheet_reference": 0.12319276630664988
+  },
+  "P1-par m2 shifted": {
+   "dN_net": 0.16905317150763732,
+   "dL_net_pH": 28.38359721992683,
+   "dL_fasthenry_pH": 19.256156564688418,
+   "ratio": 0.6784255151129873,
+   "dN_sheet_reference": 0.12319276630664988
+  },
+  "P1-small m1 aligned": {
+   "dN_net": 0.21605560524314882,
+   "dL_net_pH": 36.27518621294841,
+   "dL_fasthenry_pH": 26.900368481392153,
+   "ratio": 0.7415638977971691,
+   "dN_sheet_reference": 0.16325601173107218
+  },
+  "P1-small m2 aligned": {
+   "dN_net": 0.1535637745319549,
+   "dL_net_pH": 25.782966891512906,
+   "dL_fasthenry_pH": 17.018438064816383,
+   "ratio": 0.6600651560553498,
+   "dN_sheet_reference": 0.16325601173107218
+  }
+ },
+ "supported": false,
+ "outside_0.9_1.1": [
+  "P1-perp m1 aligned",
+  "P1-perp m1 shifted",
+  "P1-perp m2 aligned",
+  "P1-perp m2 shifted",
+  "P1-par m1 aligned",
+  "P1-par m1 shifted",
+  "P1-par m2 aligned",
+  "P1-par m2 shifted",
+  "P1-small m1 aligned",
+  "P1-small m2 aligned"
+ ]
+}

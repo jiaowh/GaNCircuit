@@ -1,0 +1,73 @@
+{
+ "schema": "fastercap-edge-mesh-check/1",
+ "declared": "2026-10-03, before the first run (docstring)",
+ "evaluator_sha256": "8c92d6074f9f9a3e111af5232855fa82f0dd9e04dc3cfd88d56247dd493fb304",
+ "dependencies_sha256": {
+  "scripts/fastercap_manual_mesh_check.py": "542566fed53be6bc50300341421704d48bc20f37642d35c30c1bf38f87d91e71",
+  "scripts/fastercap_board3d_check.py": "6f92e81227208bd45ad2c0a9a64680166b32c3227e61a6ff2b766ea314c6485b",
+  "scripts/fastercap_known_answer.py": "78da8b4b67a17f1e9e610c1b14a35a70b29426cf895f47c020a98f2cc1828203",
+  "src/circuit_tools/bem2d.py": "5816862ac8a6058930773506bbe391aa8c7421ecd1a81f3772cc817a6343d576",
+  "results/gan/microstrip-bem-reference.json": "df824618f7ff49e01d64b6add28ce5a3984db7de0ea534c375476d0149d3e1cd"
+ },
+ "binary_sha256": "9f7be612ead06f1f56f34f921f9cdf12be250c38903b47eae11b3b7df87e073d",
+ "run_directory": "runs/fastercap-edge-mesh-f999d35af66d",
+ "reference_2d_F_per_m": 1.23099722223097e-10,
+ "errors": [
+  "L=0.004: FasterCap failed in C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\fastercap-edge-mesh-f999d35af66d\\e1-L4mm (status 15): putePrecondVectFast().\n/home/jiaowh/fcbuild/FasterCap/Solver/SolveCapacitance.cpp(3502): assert \"fabs(m_clsMulthier.m_clsSelfPotCoeff[i]) < 1E20\" failed in ComputePrecondVectFast().\n/home/jiaowh/fcbuild/FasterCap/Solver/SolveCapacitance.cpp(3502): assert \"fabs(m_clsMulthier.m_clsSelfPotCoeff[i]) < 1E20\" failed in ComputePrecondVectFast().\n/home/jiaowh/fcbuild/FasterCap/Solver/SolveCapacitance.cpp(3502): assert \"fabs(m_clsMulthier.m_clsSelfPotCoeff[i]) < 1E20\" failed in ComputePrecondVectFast().\n"
+ ],
+ "emulation_2d": {
+  "declared_meshes": {
+   "M1": {
+    "air": 3.7522445130549515e-11,
+    "diel": 1.1630702427550668e-10
+   },
+   "M2": {
+    "air": 3.7620382412119375e-11,
+    "diel": 1.1816514222708966e-10
+   },
+   "M3": {
+    "air": 3.766069701171367e-11,
+    "diel": 1.1967653758237344e-10
+   }
+  },
+  "E1": 1.2216819069511219e-10
+ },
+ "runs": {
+  "0.002": {
+   "matrix": [
+    [
+     1.44297e-13,
+     -1.09166e-13
+    ],
+    [
+     -1.09162e-13,
+     1.44294e-13
+    ]
+   ],
+   "validity": [],
+   "input_panels": 105440,
+   "panels_after_refinement": 105440,
+   "seconds": 9408.640625,
+   "C_pair_F": 1.2672975002490638e-13
+  },
+  "0.004": {
+   "error": "FasterCap failed in C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\runs\\fastercap-edge-mesh-f999d35af66d\\e1-L4mm (status 15): putePrecondVectFast().\n/home/jiaowh/fcbuild/FasterCap/Solver/SolveCapacitance.cpp(3502): assert \"fabs(m_clsMulthier.m_clsSelfPotCoeff[i]) < 1E20\" failed in ComputePrecondVectFast().\n/home/jiaowh/fcbuild/FasterCap/Solver/SolveCapacitance.cpp(3502): assert \"fabs(m_clsMulthier.m_clsSelfPotCoeff[i]) < 1E20\" failed in ComputePrecondVectFast().\n/home/jiaowh/fcbuild/FasterCap/Solver/SolveCapacitance.cpp(3502): assert \"fabs(m_clsMulthier.m_clsSelfPotCoeff[i]) < 1E20\" failed in ComputePrecondVectFast().\n"
+  }
+ },
+ "C_per_m": null,
+ "checks": {
+  "D1_valid": false,
+  "D4_vs_reference": {
+   "relative_error": null,
+   "pass": false
+  },
+  "D6_vs_emulation": {
+   "emulation_F_per_m": 1.2216819069511219e-10,
+   "relative_error": null,
+   "pass": false
+  }
+ },
+ "all_pass": false,
+ "outcome": "failed, stopped",
+ "stop_note": "L=2 mm completed in 2.6 h with a physical matrix (C_pair 126.73 fF). L=4 mm was stopped by the operator at the owner's decision on 3 October 2026 after about 2 h 10 min, before its 3 h limit: the limit had been set without profiling and would very likely have been exceeded, and the one extra 3D point would not change the diagnosis (the 2D emulation already reproduces the M1/M2 3D values). An attempt to let it outlive the limit (extra pipe readers, PID file replaced) was abandoned with it."
+}

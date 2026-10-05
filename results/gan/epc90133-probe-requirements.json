@@ -1,0 +1,305 @@
+{
+ "schema": "epc90133-probe-requirements/1",
+ "scope": "Requirements derived from recorded waveform features and declared allowances; proposals, not lab-approved; no equipment assessed.",
+ "evaluator_sha256": "0b5b2b581226739d744f811ea8ba2e8070f21b1d7f27f95d6be26d698e2d9faf",
+ "inputs": {
+  "results\\gan\\epc90133-fig9-comparison.json": "e73f30f020f54e608bc27a432acb8486856f5333aefa7050da306cfd74e2b531"
+ },
+ "allowances": {
+  "rise_time_error": 0.05,
+  "ring_amplitude_error": 0.03,
+  "ring_frequency_shift": 0.01,
+  "floating_vgs_error_V": 0.1,
+  "bandwidth_rise_time_product": 0.35
+ },
+ "features": [
+  {
+   "case": "QSG Fig. 9",
+   "tr_s": 1.6813355862835502e-09,
+   "f_Hz": 264001348.83717778,
+   "swing_V": 45.810867130316986,
+   "overshoot_V": 5.698080279232109
+  },
+  {
+   "case": "B-m1-mid",
+   "tr_s": 8.306642208864487e-10,
+   "f_Hz": 283573355.98989505,
+   "swing_V": 48.82982925282714,
+   "overshoot_V": 35.0233575
+  },
+  {
+   "case": "B-m1-mid-ms100",
+   "tr_s": 8.306554769402707e-10,
+   "f_Hz": 283573308.45885724,
+   "swing_V": 48.829845002827135,
+   "overshoot_V": 35.023441749999996
+  },
+  {
+   "case": "B-pkg50pH",
+   "tr_s": 1.6695777310916807e-09,
+   "f_Hz": 222757005.22672808,
+   "swing_V": 47.46181013559321,
+   "overshoot_V": 21.25417800000001
+  },
+  {
+   "case": "B-pkg150pH",
+   "tr_s": 3.025324371807552e-09,
+   "f_Hz": 165468469.99667555,
+   "swing_V": 48.66257125431035,
+   "overshoot_V": 18.496957624999993
+  },
+  {
+   "case": "B-rskin",
+   "tr_s": 8.309706802168824e-10,
+   "f_Hz": 283697092.3895531,
+   "swing_V": 48.71024520819871,
+   "overshoot_V": 35.021336375
+  },
+  {
+   "case": "B-drvmax",
+   "tr_s": 9.988730214428062e-10,
+   "f_Hz": 287956102.4941735,
+   "swing_V": 48.211331074074074,
+   "overshoot_V": 22.868446999999996
+  },
+  {
+   "case": "B-esr0.3",
+   "tr_s": 8.420614021106851e-10,
+   "f_Hz": 286380723.2958243,
+   "swing_V": 47.84965014423077,
+   "overshoot_V": 34.180636875
+  },
+  {
+   "case": "B-combined",
+   "tr_s": 1.7798641512597286e-09,
+   "f_Hz": 223733833.77920878,
+   "swing_V": 47.5040935284495,
+   "overshoot_V": 16.8912665
+  },
+  {
+   "case": "A-m1-mid",
+   "tr_s": 8.871424872320041e-10,
+   "f_Hz": 203880091.49904358,
+   "swing_V": 49.21849619665109,
+   "overshoot_V": 54.010190875000006
+  },
+  {
+   "case": "A-pkg50pH",
+   "tr_s": 1.5377794050149639e-09,
+   "f_Hz": 178820608.32897064,
+   "swing_V": 46.09049109136085,
+   "overshoot_V": 38.508601875000004
+  },
+  {
+   "case": "A-pkg50pH-r20GHz",
+   "tr_s": 1.538024562779363e-09,
+   "f_Hz": 178622411.02202937,
+   "swing_V": 45.99508989122136,
+   "overshoot_V": 38.720206750000024
+  },
+  {
+   "case": "A-pkg50pH-ms100",
+   "tr_s": 1.537859725280442e-09,
+   "f_Hz": 178819807.66423127,
+   "swing_V": 46.09049196636086,
+   "overshoot_V": 38.509101
+  },
+  {
+   "case": "B-esr1-ms100",
+   "tr_s": 8.741508610371416e-10,
+   "f_Hz": 286365943.9141927,
+   "swing_V": 47.29240627,
+   "overshoot_V": 31.043681250000006
+  },
+  {
+   "case": "B-cgd",
+   "tr_s": 9.05928531459022e-10,
+   "f_Hz": 283944965.9322792,
+   "swing_V": 48.754484820826654,
+   "overshoot_V": 29.009601374999995
+  },
+  {
+   "case": "B-Ld50",
+   "tr_s": 1.0951826780028004e-09,
+   "f_Hz": 242586684.1576223,
+   "swing_V": 48.365716636146495,
+   "overshoot_V": 39.739345625000006
+  },
+  {
+   "case": "B-Ls25-csi",
+   "tr_s": 1.1585435142892912e-09,
+   "f_Hz": 266765695.56514922,
+   "swing_V": 47.514054893987336,
+   "overshoot_V": 22.427129125000008
+  },
+  {
+   "case": "B-Ls50-csi",
+   "tr_s": 1.5076153636794998e-09,
+   "f_Hz": 250306990.63919687,
+   "swing_V": 48.20807854289026,
+   "overshoot_V": 17.352743250000003
+  },
+  {
+   "case": "B-Ls50-kelvin",
+   "tr_s": 1.0951845464744162e-09,
+   "f_Hz": 242586669.38271075,
+   "swing_V": 48.365727761146495,
+   "overshoot_V": 39.739734500000004
+  },
+  {
+   "case": "B-Lg0.5n",
+   "tr_s": 8.192835471885928e-10,
+   "f_Hz": 283149622.82863337,
+   "swing_V": 48.92361328094855,
+   "overshoot_V": 36.04137337500001
+  },
+  {
+   "case": "B-Lg2n",
+   "tr_s": 8.016643509721904e-10,
+   "f_Hz": 282232135.6825463,
+   "swing_V": 49.059994045525904,
+   "overshoot_V": 38.239388999999996
+  },
+  {
+   "case": "B-Lg0.5n-ms50",
+   "tr_s": 8.192954548418577e-10,
+   "f_Hz": 283149637.1978116,
+   "swing_V": 48.92362178094855,
+   "overshoot_V": 36.041464875
+  },
+  {
+   "case": "G-m1-mid-ctl",
+   "tr_s": 8.286643487859417e-10,
+   "f_Hz": 296674152.0448643,
+   "swing_V": 48.019995393203885,
+   "overshoot_V": 32.4650915
+  },
+  {
+   "case": "G-m1-mid",
+   "tr_s": 8.817819419673617e-10,
+   "f_Hz": 300359765.23967236,
+   "swing_V": 48.016098283891544,
+   "overshoot_V": 25.414787999999994
+  },
+  {
+   "case": "G-m1-mid-ctl-hs",
+   "tr_s": 8.256311145005219e-10,
+   "f_Hz": 298203327.0646422,
+   "swing_V": 48.03776279045307,
+   "overshoot_V": 32.175024750000006
+  },
+  {
+   "case": "G-m1-mid-ctl-ls",
+   "tr_s": 8.884624664549691e-10,
+   "f_Hz": 299120925.8863157,
+   "swing_V": 48.038775895933014,
+   "overshoot_V": 25.42370975
+  },
+  {
+   "case": "G-m1-mid-ms50",
+   "tr_s": 8.817825768433725e-10,
+   "f_Hz": 300359720.90495616,
+   "swing_V": 48.016092533891545,
+   "overshoot_V": 25.41499375
+  },
+  {
+   "case": "G-m1-mid-Ls25",
+   "tr_s": 1.2372662310449164e-09,
+   "f_Hz": 279767897.73471147,
+   "swing_V": 48.32211368233229,
+   "overshoot_V": 13.154669625000004
+  },
+  {
+   "case": "G-m1-mid-Ls50",
+   "tr_s": 1.6640047857432827e-09,
+   "f_Hz": 261817603.90767193,
+   "swing_V": 48.06370560509188,
+   "overshoot_V": 11.279815374999998
+  }
+ ],
+ "fastest_edge_s": 8.016643509721904e-10,
+ "highest_ring_Hz": 300359765.23967236,
+ "requirements": {
+  "at_fig9": {
+   "bandwidth_for_rise_Hz": 650207098.5345074,
+   "system_rise_time_max_s": 5.382900321895286e-10,
+   "bandwidth_for_ring_Hz": 890521847.8897306,
+   "bandwidth_Hz": 890521847.8897306,
+   "sample_rate_Sps": 5947652617.110277,
+   "deskew_max_s": 1.6813355862835503e-10
+  },
+  "at_fastest_usable_case": {
+   "bandwidth_for_rise_Hz": 1363683356.8743355,
+   "system_rise_time_max_s": 2.566578217997954e-10,
+   "bandwidth_for_ring_Hz": 1013165024.9178251,
+   "bandwidth_Hz": 1363683356.8743355,
+   "sample_rate_Sps": 12474048506.551214,
+   "deskew_max_s": 8.016643509721904e-11
+  }
+ },
+ "switch_node_loading": {
+  "probe_capacitance_max_F": 2.0000000000000002e-11,
+  "note": "tip capacitance only; the ground path's inductance and the probe's own resonance are set by the connection and are characterized in E0"
+ },
+ "q1_floating_gate": {
+  "common_mode_step_V": 103.2286870716511,
+  "cmrr_min_dB": 60.276008074824425,
+  "fig9_common_mode_step_V": 51.508947409549094,
+  "cmrr_min_at_fig9_dB": 54.23765350240859,
+  "edge_dv_dt_max_V_per_s": 48958139636.400314,
+  "edge_dv_dt_fig9_V_per_s": 21797369902.37768,
+  "note": "applies to a floating high-side gate measurement; a ground-referenced probe on J1's switch-node return would tie the switch node to earth"
+ },
+ "channels": [
+  {
+   "channel": "switch node (Q2 drain to GND)",
+   "range_V": [
+    -10,
+    100
+   ],
+   "resolution_target_V": 0.3,
+   "requirements": "bandwidth, sample rate and deskew as above; vertical resolution near the 0.31 V Fig. 9 pixel",
+   "connection": "J33 footprint (8.6 mm from Q2 drain) or as approved; probe-points section"
+  },
+  {
+   "channel": "Q2 VGS (low side, source = GND)",
+   "range_V": [
+    -4,
+    6
+   ],
+   "resolution_target_V": 0.1,
+   "requirements": "same bandwidth as the switch node (the predicted spike occurs during the switch-node edge); resolution against the 0.8 V minimum threshold",
+   "connection": "J2/R22 or the 100 mil pair on that net (unfitted; fitting needs the lab's approval)"
+  },
+  {
+   "channel": "PHASE to GND near U80",
+   "range_V": [
+    -10,
+    100
+   ],
+   "resolution_target_V": 0.5,
+   "requirements": "same bandwidth; undershoot against the -5 V rating is a stop criterion",
+   "connection": "C81 PHASE pad to C80 GND pad (3.9 mm apart)"
+  },
+  {
+   "channel": "Q1 VGS (high side, floating)",
+   "range_V": [
+    -4,
+    6
+   ],
+   "resolution_target_V": 0.1,
+   "requirements": "CMRR as in q1_floating_gate; optional, only with a probe class that meets it",
+   "connection": "J1/R11 (unfitted)"
+  },
+  {
+   "channel": "inductor current",
+   "range_A": [
+    0,
+    35
+   ],
+   "accuracy_target": "2 % at the 11.1 and 28.9 A edge currents",
+   "requirements": "DC-coupled; bandwidth to resolve the double-pulse ramp, not the switching edge",
+   "connection": "around the user-fitted inductor lead"
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "schema": "board-input-logic/1",
+ "board": "EPC90133, PCB B5253 Rev 2.0",
+ "transcribed": "2026-10-05",
+ "sources": {
+  "connectivity": "EPC90133 QSG v1.0 Fig. 16 (schematic page 13, dead-time and bypass), Fig. 13 (main sheet: J80 PWM1/PWM2 -> DT In1/In2; DT Qup -> HIN -> GD PWMH; DT Qlow -> LIN -> GD PWML), Fig. 15 (gate-driver sheet: PWMH -> R70 -> U80 Hin with R71 to GND; PWML -> R75 -> U80 Lin with R76 to GND); vendor/epc/epc90133/EPC90133_Schematic.pdf",
+  "jumper_meaning": "EPC90133 QSG v1.0 pp. 3-4 (J630 Figs. 2 and 6, J640 Fig. 5)",
+  "values": "EPC90133BOM.xlsx",
+  "gate_function": "74LVC1G99 datasheet Rev. 13, Table 3 (GN pinning) and Table 4 (function table)",
+  "switch_function": "SN74LVC1G66 datasheet SCES323R, function table (control high = on)",
+  "driver_inputs": "uP1966E datasheet p. 5 (no HI/LI lockout; 200 kOhm input pull-downs) and p. 8 (POR 3.8/4.0/4.2 V rising, 0.35 V hysteresis; delay matching 1.5 typ, 6 ns max)"
+ },
+ "reading_notes": [
+  "Read from a 500 dpi render of the vector schematic; pin numbers are EPC's symbol pins, which match the datasheet GN pinning (1 OE, 2 A, 3 B, 4 GND, 5 C, 6 D, 7 Y, 8 VCC).",
+  "EPC's 74LVC1G99 symbol draws Y = (C ? B : A) XOR D with an active-low output enable, the same function as the datasheet's Table 4.",
+  "D620/D625 are drawn with the cathode at the InBuf side and the anode at the R620/C620 (R625/C625) node, so a falling InBuf discharges the capacitor through the diode and only rising edges pass through R620 (R625).",
+  "J640 pin 3 has a stub with no net name; it is treated as unconnected, so a jumper across pins 3-4 leaves SWbyp and UseDT at their pull-downs (the QSG's dead-time bypass setting).",
+  "The logic gates and U80 share the 5 V VCC net from U100 (MCP1703, 5.0 V); R78 (0 ohm) feeds U80 and R77 (0 ohm, default population) ties the '4.7 V' net to it."
+ ],
+ "supply": {"VCC_nominal_V": 5.0, "logic_parts": ["U610", "U611", "U612", "U614", "U615", "U616"], "driver": "U80"},
+ "pull_downs": {
+  "In1": "R601 10k (C601 47 pF to GND)",
+  "In2": "R602 10k (C602 47 pF to GND)",
+  "PolQup": "R603 10k", "PolQlow": "R604 10k", "Dual": "R605 10k",
+  "UseDT": "R621 10k, R626 10k", "SWbyp": "R641 10k, R643 10k",
+  "HIN": "R71 10k, plus U80's internal 200 kOhm", "LIN": "R76 10k, plus U80's internal 200 kOhm"
+ },
+ "headers": {
+  "J630": {"pins": {"1": "PolQlow", "2": "VCC", "3": "PolQup", "4": "VCC", "5": "Dual", "6": "VCC"},
+           "jumper": "JP630 (one blue jumper in the BOM)",
+           "positions_qsg": {"1-2": "single-input buck", "3-4": "single-input boost", "5-6": "dual input"}},
+  "J640": {"pins": {"1": "SWbyp", "2": "VCC", "3": null, "4": "VCC", "5": "UseDT", "6": "VCC"},
+           "jumper": "JP640 (one red jumper in the BOM)",
+           "positions_qsg": {"1-2": "full bypass", "3-4": "dead-time bypass", "5-6": "no bypass"}}
+ },
+ "gates": {
+  "U610": {"part": "74LVC1G99GN,115", "OE": "GND", "A": "In1", "B": "GND", "C": "GND", "D": "PolQup", "Y": "InBufQup"},
+  "U611": {"part": "74LVC1G99GN,115", "OE": "GND", "A": "In1", "B": "In2", "C": "Dual", "D": "PolQlow", "Y": "InBufQlow"},
+  "U612": {"part": "74LVC1G99GN,115", "OE": "SWbyp", "A": "InBufQup", "B": "DTnodeQup", "C": "UseDT", "D": "GND", "Y": "Qup"},
+  "U614": {"part": "74LVC1G99GN,115", "OE": "SWbyp", "A": "InBufQlow", "B": "DTnodeQlow", "C": "UseDT", "D": "GND", "Y": "Qlow"}
+ },
+ "delay_networks": {
+  "DTnodeQup": {"from": "InBufQup", "R": "R620", "C": "C620", "diode": "D620", "delays": "rising edge only"},
+  "DTnodeQlow": {"from": "InBufQlow", "R": "R625", "C": "C625", "diode": "D625", "delays": "rising edge only"}
+ },
+ "switches": {
+  "U615": {"part": "SN74LVC1G66DBV", "control": "SWbyp", "a": "In1", "b": "Qup"},
+  "U616": {"part": "SN74LVC1G66DBV", "control": "SWbyp", "a": "In2", "b": "Qlow"}
+ },
+ "driver_inputs": {"HIN": {"from": "Qup", "series": "R70 2.2 ohm", "u80_pin": "HI", "drives": "Q1 (high side)"},
+                   "LIN": {"from": "Qlow", "series": "R75 2.2 ohm", "u80_pin": "LI", "drives": "Q2 (low side)"}},
+ "bom_parts": {
+  "U610": "74LVC1G99GN,115", "U611": "74LVC1G99GN,115", "U612": "74LVC1G99GN,115", "U614": "74LVC1G99GN,115",
+  "U615": "SN74LVC1G66DBV", "U616": "SN74LVC1G66DBV", "U100": "MCP1703T-5002E/MC",
+  "R620": "RC0603FR-07120RL", "R625": "RC0603FR-07120RL", "C620": "CC0402KRX7R9BB101", "C625": "CC0402KRX7R9BB101",
+  "D620": "SDM03U40-7", "D625": "SDM03U40-7", "J630": "GRPB032VWVN-RC", "J640": "GRPB032VWVN-RC",
+  "JP630": "M50-2030005", "JP640": "M50-2020005",
+  "R601": "RC0402FR-0710KL", "R602": "RC0402FR-0710KL", "R603": "RC0402FR-0710KL", "R604": "RC0402FR-0710KL",
+  "R605": "RC0402FR-0710KL", "R621": "RC0402FR-0710KL", "R626": "RC0402FR-0710KL", "R641": "RC0402FR-0710KL",
+  "R643": "RC0402FR-0710KL", "R71": "RC0402FR-0710KL", "R76": "RC0402FR-0710KL"
+ },
+ "component_values": {
+  "R620_R625": {"ohm": 120, "tolerance": 0.01, "basis": "BOM RC0603FR (1 %)"},
+  "C620_C625": {"F": 1e-10, "tolerance": 0.10, "temperature_char": "X7R (+/-15 % over -55..125 C)", "basis": "BOM CC0402KRX7R9BB101 (K = 10 %)"},
+  "qsg_dead_time_rule": "R(ohm) = 13.5 DT(ns) - 14 (QSG Fig. 4, EPC's own curve; 120 ohm -> 9.9 ns, referenced to the driver input); QSG recommends 5-15 ns"
+ },
+ "not_transcribed": "C70/C75 (empty), R70/R75 series values are not used by the static evaluation; the PWM source's own levels and edges are outside the board."
+}

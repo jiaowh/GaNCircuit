@@ -5,7 +5,9 @@ The stored report (results/gan/fastercap-board3d-check.json, schema /1) predates
 scripts/fastercap_board3d_check.py. Its declared verdict (all_pass false: H1/H2 not evaluated, H3 15.8 %) stands and
 the report is not rewritten. This assessment, bound to the report's sha256, applies the gate to every stored matrix
 and records the disposition that the prose already gave: the 3D Maxwell matrices are unphysical, so the derived
-C' values (about 178 pF/m) are not accuracy results. It reruns no solver.
+C' values (about 178 pF/m) are not accuracy results. It reruns no solver. Besides itself and the report, it binds
+by sha256 the gate it imports (scripts/fastercap_board3d_check.py) and that module's own imported helpers
+(scripts/fastercap_known_answer.py).
 
     python scripts/assess_fastercap_board3d.py   # results/gan/fastercap-board3d-assessment.json
 """
@@ -16,7 +18,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from fastercap_board3d_check import REL_TOL, matrix_validity  # noqa: E402
+from fastercap_board3d_check import DEPENDENCIES, REL_TOL, dependency_hashes, matrix_validity  # noqa: E402
 
 REPORT = ROOT / "results/gan/fastercap-board3d-check.json"
 OUTPUT = ROOT / "results/gan/fastercap-board3d-assessment.json"
@@ -46,6 +48,7 @@ def main():
            "basis": "audit at 75d6f35; post-hoc, not a declared check; the report is not rewritten",
            "report": REPORT.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(raw).hexdigest(),
            "report_schema": rep.get("schema"), "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+           "dependencies_sha256": dependency_hashes(("scripts/fastercap_board3d_check.py", *DEPENDENCIES)),
            "gate_rel_tol": REL_TOL, **assess(rep)}
     OUTPUT.write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     print(json.dumps(out["disposition"], indent=1))

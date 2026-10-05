@@ -1,0 +1,233 @@
+{
+ "schema": "fastercap-manual-mesh-check/1",
+ "declared": "2026-10-02, before the first run (docstring)",
+ "evaluator_sha256": "eb6e176c7304d2fec8269c2e41be07ea1c81bfc2d62300c3a251c9043e84b588",
+ "dependencies_sha256": {
+  "scripts/fastercap_known_answer.py": "fc14536f183dc3ba35f5e003ba188698f9744bfc1a6030ebfef407ff512aa76e",
+  "scripts/fastercap_board3d_check.py": "6f92e81227208bd45ad2c0a9a64680166b32c3227e61a6ff2b766ea314c6485b",
+  "results/gan/fastercap-board3d-check.json": "65d5a063dd57edfd4d4886432d1fe46af6aa507edbb9930982e03946eb0f5974"
+ },
+ "binary_sha256": "9f7be612ead06f1f56f34f921f9cdf12be250c38903b47eae11b3b7df87e073d",
+ "run_directory": "runs/fastercap-manual-mesh-3f757074d447",
+ "references": {
+  "hj_air_F_per_m": 3.770247832493649e-11,
+  "hj_diel_F_per_m": 1.2304490474198107e-10,
+  "case_h_2d_a0.001_F_per_m": 1.232296e-10
+ },
+ "part_d": {
+  "air": {
+   "M1": {
+    "0.002": {
+     "matrix": [
+      [
+       7.10502e-14,
+       -5.28722e-14
+      ],
+      [
+       -5.28722e-14,
+       7.10502e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 5296,
+     "panels_after_refinement": 5296,
+     "seconds": 0.193157,
+     "C_pair_F": 6.19612e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       -9.63423e-13,
+       9.90647e-13
+      ],
+      [
+       9.90683e-13,
+       -9.63203e-13
+      ]
+     ],
+     "validity": [
+      "non-positive diagonal",
+      "positive off-diagonal",
+      "not positive definite"
+     ],
+     "input_panels": 9552,
+     "panels_after_refinement": 9552,
+     "seconds": 0.276008,
+     "C_pair_F": null
+    },
+    "C_per_m": null
+   },
+   "M2": {
+    "0.002": {
+     "matrix": [
+      [
+       7.48175e-14,
+       -5.64896e-14
+      ],
+      [
+       -5.64896e-14,
+       7.48175e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 7296,
+     "panels_after_refinement": 7296,
+     "seconds": 0.213854,
+     "C_pair_F": 6.565354999999998e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       -1.2966e-12,
+       1.32383e-12
+      ],
+      [
+       1.32383e-12,
+       -1.29659e-12
+      ]
+     ],
+     "validity": [
+      "non-positive diagonal",
+      "positive off-diagonal",
+      "not positive definite"
+     ],
+     "input_panels": 13088,
+     "panels_after_refinement": 13088,
+     "seconds": 0.329011,
+     "C_pair_F": null
+    },
+    "C_per_m": null
+   },
+   "M3": {
+    "0.002": {
+     "matrix": [
+      [
+       6.33469e-14,
+       -4.55255e-14
+      ],
+      [
+       -4.55256e-14,
+       6.33469e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 12112,
+     "panels_after_refinement": 12112,
+     "seconds": 0.259882,
+     "C_pair_F": 5.4436225000070137e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       -1.66635e-11,
+       1.66909e-11
+      ],
+      [
+       1.66916e-11,
+       -1.6665e-11
+      ]
+     ],
+     "validity": [
+      "non-positive diagonal",
+      "positive off-diagonal",
+      "not positive definite"
+     ],
+     "input_panels": 21776,
+     "panels_after_refinement": 21776,
+     "seconds": 0.755677,
+     "C_pair_F": null
+    },
+    "C_per_m": null
+   }
+  },
+  "diel": {
+   "M1": {
+    "0.002": {
+     "matrix": [
+      [
+       1.77809e-13,
+       -1.32314e-13
+      ],
+      [
+       -1.32314e-13,
+       1.77809e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 19712,
+     "panels_after_refinement": 19712,
+     "seconds": 1.195556,
+     "C_pair_F": 1.5506150000000003e-13
+    },
+    "0.004": {
+     "matrix": [
+      [
+       -2.43244e-12,
+       2.50121e-12
+      ],
+      [
+       2.50126e-12,
+       -2.4319e-12
+      ]
+     ],
+     "validity": [
+      "non-positive diagonal",
+      "positive off-diagonal",
+      "not positive definite"
+     ],
+     "input_panels": 26128,
+     "panels_after_refinement": 26128,
+     "seconds": 1.556454,
+     "C_pair_F": null
+    },
+    "C_per_m": null
+   },
+   "M2": {
+    "0.002": {
+     "matrix": [
+      [
+       1.92621e-13,
+       -1.45439e-13
+      ],
+      [
+       -1.4544e-13,
+       1.9262e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 35952,
+     "panels_after_refinement": 35952,
+     "seconds": 2.558176,
+     "C_pair_F": 1.6902999999999996e-13
+    },
+    "0.004": {
+     "matrix": [
+      [
+       -3.34726e-12,
+       3.41756e-12
+      ],
+      [
+       3.41756e-12,
+       -3.34724e-12
+      ]
+     ],
+     "validity": [
+      "non-positive diagonal",
+      "positive off-diagonal",
+      "not positive definite"
+     ],
+     "input_panels": 46976,
+     "panels_after_refinement": 46976,
+     "seconds": 5.040532,
+     "C_pair_F": null
+    },
+    "C_per_m": null
+   }
+  }
+ },
+ "part_k1": {},
+ "errors": [],
+ "checks": {},
+ "outcome": "failed, stopped",
+ "stop_note": "Run 1 stopped by the operator on 2 October 2026 after its M3 diel L=2 mm call had run 30 min (D1 had already failed for air: every L=4 mm matrix unphysical), so M3 diel, the -a0.01 run, the checks and K1 were not evaluated. Cause found in FasterCap's source: -m1e9 with the default -d1 sets the interaction threshold to 1e9 (revision 2 in the script docstring)."
+}

@@ -1,4 +1,4 @@
-# EPC90133 hardware test plan (draft v0.3, 1 October 2026)
+# EPC90133 hardware test plan (draft v0.4, 5 October 2026)
 
 Status: **draft for owner review; not approved, and not yet an executable lab procedure** (the envelope values
 below are still open). v0.2 applies an external audit: the driver has no input lockout, the driver's PHASE/BOOT
@@ -7,7 +7,7 @@ approved (plan section 8). v0.3 applies the project audit at 8284dbd (docs/proje
 setup is declared, the hypothesis signatures are treated as non-exclusive, prediction freezing has two stages, the
 held-out set is chosen from feasible conditions (60 V is optional), efficiency is a named deliverable, and the
 first-power procedure has a required structure (its values are still open). This draft follows plan section 4 (Stage 3), section 7 (safety) and the external
-reviews of 30 September 2026. It measures the stock board first, as the plan requires.
+reviews of 30 September 2026. It measures the stock board first, as the plan requires. v0.4 (5 October 2026) adds the input-logic evaluation (open item 5) and equipment-independent first-power content: connections by silkscreen label (the QSG's pin text would reverse VDD), pre-power checks, sequence and shutdown order, discharge and pulse-width formulas.
 
 ## Purpose
 
@@ -55,6 +55,22 @@ not, beyond that uncertainty.
   devices can be driven on at the same time." Shoot-through protection depends on the board's input and
   dead-time circuitry and on the PWM source, which must be assessed from the schematic and on the bench (E1).
   The driver cannot be credited with it.
+- **What the board's input logic does** (schematic evaluation, not a measurement; docs/build.md "EPC90133 input
+  logic"; results/gan/epc90133-input-logic.json). Only J630 1-2 or 3-4 with J640 5-6 (single-input buck or
+  boost, no bypass) gives complementary gate commands with an RC delay on each turn-on. Plausible jumper errors
+  command both gates on: **no J630 jumper** (both gates follow PWM1, both on while PWM1 is high), **J630 1-2 and
+  3-4 together** (both on at idle, before any PWM), **J630 1-2 with 5-6** (both on while PWM1 is high with PWM2
+  open). **No J640 jumper** falls back to dead-time bypass: complementary commands with no added dead time.
+  Dual-input and full-bypass settings leave shoot-through protection to the PWM source. Open PWM inputs read
+  low (10 kOhm pull-downs). The logic shares U80's 5 V supply and is valid before U80's POR enables the outputs,
+  so the gate commands at enable are the static idle state of the jumper setting.
+- **The nominal 10 ns dead time is not guaranteed by datasheet limits.** The RC delay is 9.6 ns typical (EPC's
+  rule: 9.9 ns) and 6.3-12.9 ns over component and threshold limits at room temperature (5.3-14.8 ns with X7R
+  temperature drift). The two logic channels may differ by up to 7.3 ns and the uP1966E's delay matching is up
+  to 6 ns, so stacked datasheet limits leave about -7 ns at the gate commands (typical about 8 ns), before the
+  capacitor's discharge delay, which no datasheet bounds. The uP1966E datasheet recommends at least 30 ns of
+  external dead time; EPC recommends 5-15 ns for this board. Dead time is therefore measured at the driver outputs
+  in E1 before any bus voltage is applied.
 - Start-up order: gate-drive supply, then PWM, then raise the bus slowly from 0 V.
 - Dead time is set by R620/R625 (120 Ω populated, nominally 10 ns).
 - The switch-node MMCX J32 is described in the guide but absent from the published layout. Plan the probe
@@ -112,6 +128,32 @@ not, beyond that uncertainty.
 | Network or impedance analyzer (E8, optional) | loop inductance of the unpowered board, separating layout from device and driver | VNA to at least 100 MHz with fixture de-embedding, or an impedance analyzer to 120 MHz | — |
 | Second EPC90133 (E8, optional) | shunt-thru measurement needs the FETs removed | one board, not used for switching tests | — |
 
+### Derived channel requirements (5 October 2026)
+
+`scripts/epc90133_probe_requirements.py` ([result](../results/gan/epc90133-probe-requirements.json)) derives these from
+the measured Fig. 9 features and the usable simulated cases. Its allowances are proposals: 5 % rise-time error, 3 %
+ring-amplitude error with a Gaussian response, 10 samples per edge, deskew within 10 % of the edge, and at most 1 %
+ring-frequency shift from probe capacitance. The board's waveform is unknown. If Fig. 9 was itself
+bandwidth-limited (H4), the board's edges are faster, so both ends are given. The bandwidth applies to the whole
+probe-plus-scope system; for Gaussian-like parts the system bandwidth is about 1/sqrt(1/B1² + 1/B2²).
+
+| Quantity | At Fig. 9 features (1.68 ns, 264 MHz) | At the fastest usable simulated case (0.80 ns, 300 MHz) |
+|---|---|---|
+| System bandwidth | 0.89 GHz (set by the ring) | 1.36 GHz (set by the edge) |
+| Sample rate | 6.0 GS/s | 12.5 GS/s |
+| Channel deskew | 168 ps | 80 ps |
+| Floating Q1 gate: CMRR for 0.1 V error | 54 dB (51.5 V step, 22 V/ns) | 60 dB (step up to 103 V in the unvalidated cases, up to 49 V/ns) |
+
+- Switch-node probe tip capacitance up to 20 pF shifts the ring by at most 1 % (EPC2302 COSS 1000 pF at 50 V), so
+  tip capacitance does not limit the choice. The ground path and the probe's own resonance do, and E0
+  characterizes them.
+- The Q2 gate spike occurs during the switch-node edge, so its channel needs the switch-node bandwidth. The
+  checklist's 500 MHz minimum for the low-side gate probe is below that and must be raised or justified.
+- The checklist's minimum oscilloscope (1 GHz, 5 GS/s) meets the bandwidth at Fig. 9 features but not the sample
+  rate (6.0 GS/s for 10 samples per 1.68 ns edge), and neither value at the fastest simulated case.
+- A floating Q1 gate measurement needs at least 54 dB CMRR across the edge's spectrum. That points to an optically
+  isolated probe class; without one, Q1's VGS is not measured.
+
 ## Probe connection points (published layout)
 
 `scripts/epc90133_probe_points.py` locates them in EPC's published B5253 Rev 2.0 files, with declared checks
@@ -160,12 +202,68 @@ Entries marked *hardware* are implemented and acceptance-tested independently of
 | Pulse-width limit | hardware | maximum double-pulse width, enforced independently of the PWM source; resulting maximum inductor current for the chosen inductor at each bus step | open |
 | Interlock and emergency stop | hardware | what they disconnect; acceptance test before each session | open |
 | Discharge verification | hardware + operator | discharge path and time constant; bus voltage measured below a stated value at the board terminals before any contact | open |
-| Gate-drive states at power-up and power-down | operator, from E1 | evidence that no input state, including an open input, commands both gates on (the driver has no lockout) | open |
+| Gate-drive states at power-up and power-down | operator, from E1 | evidence that no input state, including an open input, commands both gates on (the driver has no lockout) | schematic part done (input-logic check: safe only with J630 1-2 or 3-4 and J640 5-6); confirmation on the actual board in E1 open |
+| Jumper configuration | operator | J630 and J640 positions recorded (photograph) and checked against the one approved setting before every session and after any handling; the shoot-through settings (no J630 jumper; J630 1-2 with 3-4 or with 5-6) and the zero-dead-time setting (no J640 jumper) named as stop conditions; whether to fix the setting physically is the lab's decision | open |
+| Dead time at the driver outputs | operator, from E1 | both dead times measured at VIN = 0 with the approved jumper setting, with a stated minimum before any bus voltage is applied (datasheet limits do not guarantee a positive value) | open |
 | Starting bus voltage and steps | operator | approved first value and steps (12/24/36/48 V is a proposal) | open |
 | Numerical stop thresholds per step | operator | switch-node peak and undershoot, PHASE-to-GND undershoot, Q2 VGS peak, case temperature; each with its margin to the governing rating and the measurement uncertainty included | open |
 | Temperature limit | operator | case-temperature limit, sensor and location | open |
 | Measurement uncertainty per channel | record | probe and connection-point allowances (probe-points section), bandwidth, deskew, from E0 | open (needs the probes) |
 | Checkpoint record | record | who decides at each step, what is recorded, the decision | open |
+
+### Equipment-independent content (draft, 5 October 2026)
+
+Proposals from the published files for the lab's responsible person to review. Values that depend on equipment
+stay open. The approved procedure replaces this draft.
+
+**Connections by silkscreen label, not by the QSG's text.** The QSG's procedure (p. 4) connects VDD to "J1, Pin-1"
+and ground to "J1, Pin-2", with PWM ground on "J2". On this board J1 and J2 are the unfitted gate MMCX footprints.
+The 12 V input is J90, whose pin 1 is GND and pin 2 VDD in both the schematic and the layout: the top silkscreen
+reads "7.5 V - 12V", GND at the square pad and VDD at the round pad. PWM is J80 (pin 1 PWM1, 2 GND, 3 PWM2, 4 GND,
+the same order as its silkscreen). Bus and switch node are the bottom-side header J3: J3A VIN, J3B SW, J3C GND.
+Every connection is made to the silkscreen label and checked on the actual board before power, because the
+QSG's pin numbers would reverse the VDD supply.
+
+**Pre-power checks (unpowered, board discharged):**
+1. Board identity and population against the published BOM (first-power table, row 1).
+2. J630 and J640 in the approved setting (single-input buck: J630 1-2, J640 5-6), photographed. The shoot-through
+   settings named in "What the board's input logic does" are stop conditions.
+3. Resistance checks with a meter, in both polarities and settled readings (the bus and gate capacitors charge
+   from the meter): VIN-GND, VIN-SW and SW-GND not low-resistance; J90 GND and J80 GND continuous with J3C GND;
+   J90 VDD not shorted to GND. Thresholds are set with the meter chosen.
+
+**Sequence (QSG order with additions):**
+1. VDD on (7.5-12 V, current limit set). Check VCC near 5 V at C80. With PWM1 low or open and the buck setting,
+   expect the low-side gate command high and the high-side command low; confirm at the accessible gate points.
+2. PWM source connected with its output low, then enabled. E1 runs here at VIN = 0, including both measured dead
+   times and the verified bootstrap state (BOOT-PHASE at C81) before the first high-side pulse.
+3. Bus from 0 V in the approved steps. Hardware trips are armed and acceptance-tested before the first step.
+4. Shutdown in reverse: switching stopped, bus off, **bus discharge verified at J3 below the stated threshold**,
+   then PWM off, then VDD off. VDD and PWM stay on while the bus is charged: the uP1966E datasheet text read so far
+   says the outputs "only function" above POR, but does not state that they hold the gates low below it. The gate
+   state of an unpowered driver is therefore not credited.
+
+**Discharge.** The board has no bleed resistor on VIN (BOM: the only VIN-GND parts are Ci1-Ci7 and Cm1-Cm10). On
+the board alone, the bus therefore decays only through leakage. Board capacitance is at most 11.5 µF (nominal values;
+DC-bias derating lowers it). That stores at most 0.8, 3.3, 7.5, 13.3 and 36.9 mJ at 12, 24, 36, 48 and 80 V. The bus
+supply's output capacitance and any external bulk capacitance add to this and are taken from the equipment. An
+external discharge path of resistance R discharges the total capacitance C from V0 to Vsafe in R C ln(V0/Vsafe). For
+example, 10 kOhm on the board's 11.5 µF takes 0.37 s from 48 V to 2 V and dissipates 0.64 W at 80 V. The path, its
+rating, Vsafe and the verifying measurement are entries in the first-power table.
+
+**Pulse-width limit.** The inductor is user-fitted (L1 and Cout are empty), so the limit is stated as a formula: the
+first pulse that builds current I at bus voltage V is t1 = L I / V. For Fig. 9's edge currents (11.1 A turn-on,
+28.9 A turn-off):
+
+| L | 12 V | 24 V | 36 V | 48 V |
+|---|---|---|---|---|
+| 2.2 µH | 2.0 / 5.3 µs | 1.0 / 2.6 µs | 0.68 / 1.8 µs | 0.51 / 1.3 µs |
+| 4.7 µH | 4.4 / 11.3 µs | 2.2 / 5.7 µs | 1.5 / 3.8 µs | 1.1 / 2.8 µs |
+| 10 µH | 9.3 / 24.1 µs | 4.6 / 12.0 µs | 3.1 / 8.0 µs | 2.3 / 6.0 µs |
+
+The hardware limit caps the pulse width independently of the PWM source, so a stuck-high PWM cannot drive the
+current past the inductor's saturation current or the chosen stop current. Its value follows from the selected
+inductor and step. The QSG's minimum PWM widths (50 ns high, 200 ns low for bootstrap refresh) also apply.
 
 ## Experiments
 
@@ -175,7 +273,9 @@ identity (silkscreen revision, fitted population), the case temperature and the 
 - **E0, measurement chain first.** Probe deskew on a known edge. The step response of each probe and connection
   gives its bandwidth and ringing. Without this, no device or layout conclusion is drawn (plan section 4).
 - **E1, driver alone (H2, H6).** Power stage unpowered (VIN = 0 V): measure PWM-to-gate delays, gate-voltage
-  edges and the dead time at the accessible gate points. This isolates driver timing from the power stage, but it
+  edges and the dead time at the accessible gate points. The dead time is also a first-power prerequisite: it is
+  measured with the approved J630/J640 setting at both edges before any bus voltage, because datasheet limits do
+  not guarantee it is positive (input-logic check, above). This isolates driver timing from the power stage, but it
   does not uniquely identify the loaded switching drive: at VIN = 0 the gate load is the FETs' input capacitance at
   zero drain bias, without a Miller plateau, and the high-side supply is the bootstrap capacitor's state. Each E1
   record therefore declares: the gate load (the fitted EPC2302s and anything fitted to J1/J2), the bootstrap state
@@ -286,5 +386,8 @@ Report the first held-out score as it is; later corrections create new revisions
    of 30 September 2026.
 4. Approval of the envelope and the step-wise bus increase before G4, after its open values (safety envelope
    section) are filled in.
-5. The board's input and dead-time circuitry (schematic review and E1): whether any input state, including
-   power-up and an open input, can command both gates on.
+5. The board's input and dead-time circuitry: the schematic part is answered (5 October 2026, "What the
+   board's input logic does" above): with J630 1-2 or 3-4 and J640 5-6 no input state, including power-up and
+   open inputs, commands both gates on; several jumper errors do. Still open: the actual board's jumper
+   positions on arrival, the measured dead time (E1), and whether the lab wants the approved setting fixed
+   physically.

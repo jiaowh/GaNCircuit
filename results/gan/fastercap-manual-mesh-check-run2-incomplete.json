@@ -1,0 +1,176 @@
+{
+ "schema": "fastercap-manual-mesh-check/2",
+ "declared": "2026-10-02, before the first run (docstring)",
+ "evaluator_sha256": "542566fed53be6bc50300341421704d48bc20f37642d35c30c1bf38f87d91e71",
+ "dependencies_sha256": {
+  "scripts/fastercap_known_answer.py": "fc14536f183dc3ba35f5e003ba188698f9744bfc1a6030ebfef407ff512aa76e",
+  "scripts/fastercap_board3d_check.py": "6f92e81227208bd45ad2c0a9a64680166b32c3227e61a6ff2b766ea314c6485b",
+  "results/gan/fastercap-board3d-check.json": "65d5a063dd57edfd4d4886432d1fe46af6aa507edbb9930982e03946eb0f5974"
+ },
+ "binary_sha256": "9f7be612ead06f1f56f34f921f9cdf12be250c38903b47eae11b3b7df87e073d",
+ "run_directory": "runs/fastercap-manual-mesh-e3de372ebbd7",
+ "references": {
+  "hj_air_F_per_m": 3.770247832493649e-11,
+  "hj_diel_F_per_m": 1.2304490474198107e-10,
+  "case_h_2d_a0.001_F_per_m": 1.232296e-10
+ },
+ "part_d": {
+  "air": {
+   "M1": {
+    "0.002": {
+     "matrix": [
+      [
+       5.05826e-14,
+       -2.92893e-14
+      ],
+      [
+       -2.92893e-14,
+       5.05826e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 5296,
+     "panels_after_refinement": 5296,
+     "seconds": 2.239394,
+     "C_pair_F": 3.993595000000001e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       9.44886e-14,
+       -6.04401e-14
+      ],
+      [
+       -6.04401e-14,
+       9.44886e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 9552,
+     "panels_after_refinement": 9552,
+     "seconds": 4.269161,
+     "C_pair_F": 7.746435e-14
+    },
+    "C_per_m": 3.752839999999999e-11
+   },
+   "M2": {
+    "0.002": {
+     "matrix": [
+      [
+       5.07043e-14,
+       -2.93738e-14
+      ],
+      [
+       -2.93738e-14,
+       5.07043e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 7296,
+     "panels_after_refinement": 7296,
+     "seconds": 3.709967,
+     "C_pair_F": 4.0039050000000006e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       9.46077e-14,
+       -6.05103e-14
+      ],
+      [
+       -6.05103e-14,
+       9.46077e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 13088,
+     "panels_after_refinement": 13088,
+     "seconds": 97.880516,
+     "C_pair_F": 7.755899999999998e-14
+    },
+    "C_per_m": 3.751994999999997e-11
+   },
+   "M3": {
+    "0.002": {
+     "matrix": [
+      [
+       5.07018e-14,
+       -2.93697e-14
+      ],
+      [
+       -2.93697e-14,
+       5.07018e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 12112,
+     "panels_after_refinement": 12112,
+     "seconds": 96.145584,
+     "C_pair_F": 4.003575e-14
+    },
+    "0.004": {
+     "matrix": [
+      [
+       9.45933e-14,
+       -6.04838e-14
+      ],
+      [
+       -6.04838e-14,
+       9.45933e-14
+      ]
+     ],
+     "validity": [],
+     "input_panels": 21776,
+     "panels_after_refinement": 21776,
+     "seconds": 377.939911,
+     "C_pair_F": 7.753855000000001e-14
+    },
+    "C_per_m": 3.7502800000000013e-11
+   }
+  },
+  "diel": {
+   "M1": {
+    "0.002": {
+     "matrix": [
+      [
+       1.38607e-13,
+       -1.0531e-13
+      ],
+      [
+       -1.05307e-13,
+       1.38606e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 19712,
+     "panels_after_refinement": 19712,
+     "seconds": 589.085693,
+     "C_pair_F": 1.2195750003003183e-13
+    },
+    "0.004": {
+     "matrix": [
+      [
+       2.63892e-13,
+       -2.13693e-13
+      ],
+      [
+       -2.13691e-13,
+       2.63891e-13
+      ]
+     ],
+     "validity": [],
+     "input_panels": 26128,
+     "panels_after_refinement": 26128,
+     "seconds": 1630.71582,
+     "C_pair_F": 2.3879175000747016e-13
+    },
+    "C_per_m": 1.1683424997743832e-10
+   }
+  }
+ },
+ "part_k1": {},
+ "errors": [],
+ "checks": {},
+ "outcome": "incomplete, stopped",
+ "stop_note": "Revision 2 run stopped by the operator on 2 October 2026 at the end of the working day, during the diel M2 L=2 mm call. Completed: air M1-M3 (both lengths) and diel M1 (both lengths); not run: diel M2/M3, D5, the -a0.01 run, the checks and K1. No check is evaluated in this report; the docs quote the completed values only."
+}

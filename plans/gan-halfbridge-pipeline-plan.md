@@ -545,6 +545,21 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    the plain baseline crashed on a missing file until fixed. Next: a task that requires an engineering decision,
    designed so the expected answer is not reachable by the agent (hidden scorer, held-out material, structural
    scoring); a first draft did not meet this and was not run (external review, 1 October 2026).
+   *E2E-0 pilot, declared 2 October 2026* (scripts/e2e_pilot.py docstring; owner: frontier-model agents;
+   reduced after an external review of the end-to-end plan). Non-blind: the established EPC90133 workflow
+   (Stage 1 EPC2302 model checks, Stage 2 extraction A:m1:mid and switching, then a simulation assessment
+   against QSG Fig. 9, which is not Stage 3 closure) runs through frozen I-1/I-2/assessment records
+   (src/circuit_tools/handoff.py) with an independent checker (scripts/e2e_check.py). Order: one
+   deterministic reference, then one clean agent run and one fault run (class: upstream model revision
+   changed after the I-1 handoff, records consistently updated; Stage 2 must reject). Consistency with the
+   reference checks execution, not engineering truth. Review value, interventions and cost before any other
+   target; a held-out target needs an isolated environment, a frozen reference method and an independent
+   review of geometry, ports, pinout, driver and benchmark applicability. Yields priority to the probe/channel
+   plan and first-power procedure once the equipment inventory arrives.
+   *Run, 2 October 2026* (docs/build.md "E2E-0 pilot"): reference run 1 stopped on a driver bug (kept), run 2
+   provisional throughout; clean run identical to the reference; fault run rejected at Stage 2 and the assessment;
+   no interventions. Found: every subagent of this session receives AGENTS.md, so excluding files does not hide
+   answers; blind runs need a separate isolated session. Next: owner review of value and cost.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:
@@ -558,11 +573,37 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    outputs and stop rules, not a fit to Fig. 9 (done 1 October 2026, docs/build.md: E1 can separate the
    driver forms within the model; short pre-charges leave the high side near 4.4 V; start-up state and
    dead-time overcharge not answered; its charge check C1 failed by design error and is kept);
+   (d2) the board's input logic against shoot-through (hardware-plan open item 5; done 5 October 2026,
+   docs/build.md "EPC90133 input logic"): safe only with J630 1-2 or 3-4 and J640 5-6; several jumper
+   errors command both gates on; datasheet limits do not guarantee a positive dead time, so the jumpers are
+   checked and the dead time is measured at VIN = 0 before any bus voltage;
    (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
    conditions, then the approved energized measurements.
    Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to
    be written. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
    G mesh, broad sweeps.
+
+9. Extraction-tool qualification while hardware is blocked (2 October 2026; docs/build.md "Via-array,
+   plane-hole and FasterCap qualification"). The external review of the drafted via-array, plane-hole and FasterCap
+   plans is adopted. Benchmark errors stay benchmark errors until a transfer argument or a representative board
+   subgeometry check links them to the board. V2 and D3 are dropped, and K1 must remove side-edge fringing. One case is
+   profiled before compute is committed. Done: the mesh topology audit. The return-plane slots under the transistors are
+   seen by every grid, but at m1 the segment widths cover 27 % of the hole area on mid-layer 1 (9 % at m2). No two vias
+   share an attachment node. FasterCap with user-controlled meshes (scripts/fastercap_manual_mesh_check.py): run 1
+   failed (-m1e9 also coarsened the interaction threshold, kept). Revision 2: the air form passes (C' within 0.53 % of
+   Hammerstad-Jensen, 0.05 % mesh change), and the dielectric form gives physical matrices, 5.2 % low on the coarsest
+   mesh, 3.9 % low on the next (run 4, 3 October, failed: M3 over its time limit); a 2D emulation of the same panels
+   reproduces this, so the shortfall is most likely edge discretisation (diagnosis substantially resolved; 3D qualification
+   unfinished: the edge-refined 3D check was stopped with no C' or verdict, run 1 failed, kept). FasterCap's
+   runner now rejects memory-terminated or unconverged automatic runs (a false-success path found on 3 October).
+   Slot benchmark (scripts/plane_hole_benchmark.py, run 1): fails P1a/P1b/P2a, passes R1 and P1c; the 2D sheet
+   reference (both plates slotted) overestimates slots by an error of order h (edge fringing); board-pitch slot values
+   differ from the unconverged f3 mesh by -52 % to +68 %; the board-like slot gives 11.6 pH at f3 in the benchmark strip;
+   a minor effect on the board loop is a hypothesis needing a transfer argument. Via-array benchmark (scripts/via_array_benchmark.py, revision 5 with a new 2D
+   boundary-element reference, circuit_tools.bem2d): V0/V3 pass, V1/V2 fail on the single resolved mesh; board pitches
+   give mutual-inductance-ratio differences up to about 20 % (ratios, not absolute couplings); dividing a single via by the count is off by 1.6-2.6x. Neither benchmark is a
+   board error bar. Next, only if a decision needs it: a board-subgeometry slot check, a second resolved via mesh, a
+   finer slot mesh. Yields to item 8 when the equipment inventory arrives.
 
 G3 remains open, and gate-charge-dependent timing and losses remain unvalidated.
 Physical board identity, lab inventory and any EPC request remain open; sending a
