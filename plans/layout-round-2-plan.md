@@ -59,6 +59,28 @@ changes to the power loop, but not to the common-source or gate routing, and its
    Eon + Eoff), or accept the trade and freeze the best candidates as predictions for the board measurements. Then
    choose between L3 (capacitor placement, hard, the last loop-L lever) and track R (editable design).
 
+## Owner decision, 5 October 2026 (evening): one objective, overshoot
+
+The owner adopted Claude's recommendation. For this evaluation board, overshoot is the objective, because it sets
+how much bus voltage the board can use safely (EPC2302 rated 100 V; the uP1966E PHASE pin only 85 V absolute
+maximum; the board is rated 80 V in). Efficiency becomes a constraint, and the separate Eon + Eoff target is dropped
+(it is part of the loss).
+
+**Round 3 (to declare in the script before running, 6 October):**
+- Objective: minimise the switch-node overshoot above the bus at Q1's turn-on, at 48 V -> 12 V, 20 A, 250 kHz.
+- Constraints, under all four alternatives ({ramp, step driver} x {package source L 0, 50 pH}):
+  C1 FET loss per period (estimator revision 2, settled) at most 5 % above stock (about 0.1 W, 0.04 efficiency
+     points at 240 W);
+  C2 Q2's die gate peak during Q1's turn-on not above stock's (false-turn-on margin);
+  C3 only changes allowed by the board-edit rules or by part swaps on the stock board.
+- A candidate is ranked by its worst-case overshoot over the four alternatives, among candidates that meet C1-C3
+  under all four.
+- Order: (1) assess round 1 rev 2 (overnight G run: R80 1 / 2.2 / 3.3 ohm with the corrected loss estimator);
+  (2) R80 sweep on G to find the largest R80 that keeps C1 (for example 1.5, 1.8, 2.7 ohm, chosen from (1) and
+  declared before running); (3) only if a layout lever could beat the R80 result within C1, the stackup gap
+  combined with the chosen R80 (A ranks, G confirms).
+- The result is a frozen prediction for the purchased board: R80 swap at experiment E4.
+
 ## Candidate changes, balancing effort and effect
 
 | # | Change | Expected effect on loop L | Effort | Tooling needed | Manufacturability question |
