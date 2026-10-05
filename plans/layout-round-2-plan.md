@@ -64,6 +64,25 @@ range cannot deliver it even optimistically, we skip straight to L2/L3.
 Budget for tomorrow: at most 12 A extractions, at most 40 A switching cases, at most 2 G extractions overnight.
 Profile the first case of each kind before committing the rest, and set time limits from those profiles.
 
+## Parallel track R: editable design reconstructed from the Gerbers
+
+Needed only to fabricate a redesigned board, not for the simulation. It resolves owner decision 1 without an
+Altium request.
+
+1. Copper: KiCad GerbView exports each copper layer into a `.kicad_pcb` as tracks and polygons (no nets).
+2. Parts: footprints from EPC's KiCad library (installed; EPC2302 = D0606F_100V) and standard libraries, placed
+   from the layout PDF's pad tokens (designator and pin per pad, e.g. PAJ9001 = J90 pin 1) and checked against
+   the BOM.
+3. Nets: assigned from our own connectivity extraction (scripts/read_epc90133_geometry.py) and checked against
+   the transcribed schematic (power stage, gate driver, input logic; the remaining sheets need transcribing).
+4. Pours become KiCad zones with the same net and clearance; vias carry their drill sizes from the drill file.
+5. **Acceptance: round trip.** The reconstructed design's exported Gerbers and drill file must match EPC's originals
+   layer by layer (raster difference and drill-by-drill comparison) within a stated tolerance, and KiCad's design
+   rule check must pass or every exception must be explained. Only a design that passes is used as a base for edits.
+
+Effort: about one to two days. Terms: the result is a derivative of EPC's layout; internal design work only,
+not published or shared until EPC's reuse terms are checked.
+
 ## Rules that carry over
 
 - Declare before running: candidates, rule and budget in the docstring, committed and pushed.
@@ -78,7 +97,7 @@ Profile the first case of each kind before committing the rest, and set time lim
 
 ## Decisions needed from the owner
 
-1. **Fabrication route.** A redesigned board needs editable design files. We have Gerbers only; KiCad 10 and EPC's
+1. **Fabrication route** (proposed answer: track R below). A redesigned board needs editable design files. We have Gerbers only; KiCad 10 and EPC's
    KiCad library are installed, but the route is undecided (no Altium request, under the no-inquiry decision).
    Tomorrow's work does not depend on it; a fabricated test does. Gerbers are editable text, but they hold
    only flattened shapes per layer (no components, nets or design rules). Small changes (stackup, added vias)
