@@ -535,6 +535,8 @@ def main():
     ap.add_argument("cases", nargs="+",
                     help="variant:mesh:junction[:d<mm>], e.g. A:m1:mid or A:m1:mid:d0.075 (top-to-G1 dielectric)")
     ap.add_argument("--jobs", type=int, default=3)
+    ap.add_argument("--edits", type=Path, default=None,
+                    help="layout round 2: JSON list of checked geometry edits (scripts/epc90133_board_edit.py)")
     ap.add_argument("--build-only", action="store_true", help="write decks and report mesh statistics only")
     ap.add_argument("--outdir", type=Path, default=ROOT / "results/gan/epc90133-extraction")
     args = ap.parse_args()
@@ -542,6 +544,12 @@ def main():
     loop = json.loads(LOOP.read_text(encoding="utf-8"))
     gate = json.loads(GATE_LOOP.read_text(encoding="utf-8")) if GATE_LOOP.is_file() else None
     b = load_board()
+    edit_records, edit_name = None, None
+    if args.edits:
+        import epc90133_board_edit as be
+        spec = json.loads(args.edits.read_text(encoding="utf-8"))
+        b, edit_records = be.apply(b, spec["edits"])
+        edit_name = spec["name"]
     per_layer = via_layers(b)
     run_root = ROOT / "runs" / ("epc90133-extract-" + uuid.uuid4().hex[:12])
     args.outdir.mkdir(parents=True, exist_ok=True)
@@ -557,14 +565,18 @@ def main():
         print(case, json.dumps({k: stats[k] for k in ("grid", "nodes", "segments", "filaments_before_refine", "via",
                                                        "nodes_dropped_unconnected", "terminal_contacts_without_nodes")}))
         report = {"schema": "epc90133-extraction/1", "case": {"variant": variant, "mesh": mesh, "junction": junction,
-                                                             **({"gap1_mm": gap1} if gap1 is not None else {})},
+                                                             **({"gap1_mm": gap1} if gap1 is not None else {}),
+                                                             **({"edits": edit_name} if edit_name else {})},
                   "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   "power_loop_sha256": hashlib.sha256(LOOP.read_bytes()).hexdigest(),
                   **({"gate_loop_sha256": hashlib.sha256(GATE_LOOP.read_bytes()).hexdigest()} if is_g else {}),
                   "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
                   "window_mm": G_WINDOW if is_g else WINDOW, "frequency_Hz": FREQ, "skin_depth_um": skin_depth(FREQ) * 1e6,
                   "mesh_stats": stats, "ports": [{"name": p[0], "terminal": p[1], "reference": p[2]} for p in ports],
-                  "checks": {"all_ports_connected": all(connected.values())}}
+                  "checks": {"all_ports_connected": all(connected.values())},
+                  **({"edits": {"file": args.edits.resolve().relative_to(ROOT).as_posix(),
+                                "sha256": hashlib.sha256(args.edits.read_bytes()).hexdigest(),
+                                "records": edit_records}} if edit_name else {})}
         if is_g:
             report["checks"]["every_g_terminal_has_nodes"] = not stats["terminal_contacts_without_nodes"] \
                 and not stats["scheme_branches_without_port"]
@@ -600,7 +612,8 @@ def main():
             "summary": (g_summary if is_g else loop_summary)(order, (Z + Z.T) / 2, ports),
         })
         report["outcome"] = "complete" if all(report["checks"].values()) else "check failed"
-        out = args.outdir / (f"{variant}-{mesh}-{junction}" + (f"-d{gap1:.3f}" if gap1 is not None else "") + ".json")
+        out = args.outdir / (f"{variant}-{mesh}-{junction}" + (f"-d{gap1:.3f}" if gap1 is not None else "")
+                             + (f"-{edit_name}" if edit_name else "") + ".json")
         out.write_text(json.dumps(report, indent=1) + "\n")
         print(f"  {report['outcome']}; {report['wall_time_s']:.0f} s; filaments {filaments}; "
               f"L_loop {report['summary']['L_loop_nH']:.4f} nH; asym {asym:.2e}; -> {out.relative_to(ROOT)}")

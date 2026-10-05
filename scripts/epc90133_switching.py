@@ -256,6 +256,13 @@ assessment as design round 1; 100 ps step, Q2 sense source, the bench ends 80 ns
 candidate that passes on A is confirmed on G before any claim. Budget: 3 extractions (about 90 s each) and 16 switching
 cases; 50 ps checks on request.
 
+Layout round 2b (declared 5 October 2026 before any run): 22 added GND vias, every position on a 0.25 mm grid over
+x 17-24, y 24-36 mm accepted by scripts/epc90133_board_edit.py in row order (devices/epc/layout-edits/
+vias-gnd-greedy.json; several sit in the switch-node area between the FETs, bonded to the inner GND planes with a
+checked antipad in the top-layer SW copper). Extracted on A with the stock stackup; run under the four alternatives
+with estimator revision 2 (--only its four cases, report results/gan/epc90133-layout-round2b.json) and assessed
+against the stock cases of round 2a revision 2 (same estimator and settings).
+
 Loss-estimator revision 2 (declared 5 October 2026 after round 2a's results, before any rerun). The revision-1
 window ended 40 ns after the valley turn-on, while the switch node was still ringing (damping ratio about 0.006 on A,
 0.01-0.03 on G). FET terminal energy over a window equals loss only if the energy stored in the device capacitances
@@ -1007,7 +1014,7 @@ def design_cases(exts):
 
 
 LAYOUTS = {"stock": "A-m1-mid", "gap0.100": "A-m1-mid-d0.100", "gap0.075": "A-m1-mid-d0.075",
-           "gap0.050": "A-m1-mid-d0.050"}
+           "gap0.050": "A-m1-mid-d0.050", "vias-gnd-greedy": "A-m1-mid-vias-gnd-greedy"}
 
 
 def layout_cases(exts):
