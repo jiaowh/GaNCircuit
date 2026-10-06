@@ -8,13 +8,28 @@ its holes, because KiCad graphic polygons have no holes). They are written as fi
 F.Cu, In1.Cu-In6.Cu and B.Cu, with the GM1 outline on Edge.Cuts. Board coordinates map as
 x_kicad = x + 100, y_kicad = 150 - y (mm), which keeps the board on the page.
 
-Round trip (declared 6 October 2026 before the first run): kicad-cli exports Gerbers of the eight copper layers and
-Edge.Cuts; our reader (circuit_tools.gerber) maps them back and rasterizes them at 0.0254 mm over the board window,
-as it rasterizes EPC's originals. Per copper layer:
-  R1 XOR area (original vs round trip) <= 0.1 % of the original copper area;
-  R2 largest connected (8-neighbour) mismatch region <= 0.005 mm^2 (about 8 pixels);
-and R3 the exported outline's bounds equal GM1's within 0.001 mm. Arcs are already polygons (5 degree steps) in our
-reader, so the reconstruction inherits that approximation; the round trip tests the conversion, not the reader.
+Round trip, revision 1 (declared 6 October 2026 before the first run): kicad-cli exports Gerbers of the eight
+copper layers and Edge.Cuts; our reader maps them back and rasterizes them at 0.0254 mm, as it rasterizes EPC's
+originals. Per copper layer R1 XOR area <= 0.1 % of the original copper area, R2 largest connected mismatch region
+<= 0.005 mm^2, and R3 outline bounds within 0.001 mm. Run 1 crashed (hole splitting recursion, no report). Run 2
+FAILED R1/R2 on every layer (XOR 0.20-0.58 %, regions up to 0.73 mm^2; R3 passed), kept as
+results/gan/epc90133-reconstruct-copper-run2-failed.json. Diagnosis (not a pass): the mismatch is already present
+before KiCad (converted shapes vs the reader's raster, GTL 0.2895 % against 0.2906 % after the round trip), and
+every mismatched pixel lies within 0.041 mm (1.6 pixels) of a true edge of the original geometry. The reader's
+raster fills every pixel an edge touches, for dark and clear primitives alike, so a pixel XOR between an
+order-dependent original and a flattened copy cannot meet R1/R2. Revision 1's criteria tested the raster, not the
+conversion.
+
+Round trip, revision 2 (declared 6 October 2026 after run 2, before run 3): compare geometry exactly. The original
+is each layer's primitives applied in order with shapely (as written to the board); the round trip is KiCad's
+exported Gerber read by the same reader and resolved the same way. Per copper layer:
+  V1 area of the symmetric difference <= 0.01 % of the original copper area;
+  V2 largest single difference polygon <= 0.001 mm^2;
+  V3 raster cross-check against the reader used elsewhere in the project: every pixel where the reader's raster of
+     EPC's original disagrees with the round-trip geometry at pixel centres lies within 0.0508 mm (2 pixels) of an
+     edge of the original geometry;
+and R3 as before. V1/V2 test file writing, hole splitting and KiCad's export. V3 ties the shapely reading of
+polarity and order to the reader's, independently of V1/V2.
 
 Terms: the board file is a derivative of EPC's layout. The repository is public, so the board file and exported
 Gerbers stay in the git-ignored vendor/epc/epc90133/reconstruction/; only this script and the summary report
@@ -29,6 +44,7 @@ import sys
 import uuid
 
 import numpy as np
+import shapely
 from scipy import ndimage
 from shapely import ops
 from shapely.geometry import LineString, MultiLineString, Polygon, box
@@ -44,7 +60,8 @@ OUT = ROOT / "vendor/epc/epc90133/reconstruction"
 KICAD_CLI = Path.home() / "AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe"
 KICAD_LAYER = dict(zip(LAYERS, ("F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu")))
 DX, DY = 100.0, 150.0
-R1_XOR_FRACTION, R2_BLOB_MM2, R3_OUTLINE_MM = 0.001, 0.005, 0.001
+R3_OUTLINE_MM = 0.001
+V1_FRACTION, V2_MM2, V3_EDGE_MM = 1e-4, 0.001, 2 * PITCH  # revision 2
 
 
 def to_kicad(x, y):
@@ -154,6 +171,16 @@ def build(board_path):
     return report
 
 
+def mapped_layer(path):
+    layer = load_layer(path)
+    for p in layer.primitives:
+        if p.kind == "poly":
+            p.data = ([from_kicad_gerber(*q) for q in p.data[0]],) + tuple(p.data[1:])
+        else:
+            p.data = (from_kicad_gerber(*p.data[0]), from_kicad_gerber(*p.data[1]), p.data[2])
+    return layer
+
+
 def round_trip(board_path, report):
     gdir = board_path.parent / "roundtrip-gerbers"
     gdir.mkdir(exist_ok=True)
@@ -165,26 +192,30 @@ def round_trip(board_path, report):
     exported = {p.stem.split("-")[-1].replace("_", "."): p for p in gdir.glob("*.gbr")}
     checks = {}
     for e in LAYERS:
-        name = KICAD_LAYER[e]
-        orig = rasterize(load_layer(GERBERS / f"{PREFIX}Gerbers.{e}"), BOARD, PITCH).grid
-        rt_layer = load_layer(exported[name])
-        for p in rt_layer.primitives:
-            if p.kind == "poly":
-                p.data = ([from_kicad_gerber(*q) for q in p.data[0]],) + tuple(p.data[1:])
-            else:
-                p.data = (from_kicad_gerber(*p.data[0]), from_kicad_gerber(*p.data[1]), p.data[2])
-        rt = rasterize(rt_layer, BOARD, PITCH).grid
-        xor = orig ^ rt
-        lab, n = ndimage.label(xor, structure=np.ones((3, 3)))
-        blob = (np.bincount(lab.ravel())[1:].max() if n else 0) * PITCH ** 2
-        area = orig.sum() * PITCH ** 2
-        checks[e] = {"original_area_mm2": area, "roundtrip_area_mm2": rt.sum() * PITCH ** 2,
-                     "xor_area_mm2": xor.sum() * PITCH ** 2, "xor_fraction": xor.sum() / max(orig.sum(), 1),
-                     "largest_mismatch_mm2": blob, "mismatch_regions": int(n)}
-        checks[e]["R1"] = checks[e]["xor_fraction"] <= R1_XOR_FRACTION
-        checks[e]["R2"] = blob <= R2_BLOB_MM2
-    edge = load_layer(exported["Edge.Cuts"])
-    pts = [from_kicad_gerber(*q) for p in edge.primitives for q in (p.data[:2] if p.kind == "line" else p.data[0])]
+        src = load_layer(GERBERS / f"{PREFIX}Gerbers.{e}")
+        orig = layer_geometry(src).intersection(box(*BOARD).buffer(1.0))
+        rt = layer_geometry(mapped_layer(exported[KICAD_LAYER[e]]))
+        diff = orig.symmetric_difference(rt)
+        parts = polygons(diff)
+        largest = max((q.area for q in parts), default=0.0)
+        # V3: the reader's raster of the original against the round-trip geometry at pixel centres
+        ras = rasterize(src, BOARD, PITCH)
+        ny, nx = ras.grid.shape
+        X, Y = np.meshgrid(ras.origin[0] + np.arange(nx) * PITCH, ras.origin[1] + np.arange(ny) * PITCH)
+        shapely.prepare(rt)
+        inside = shapely.contains_xy(rt, X.ravel(), Y.ravel()).reshape(ny, nx)
+        iy, ix = np.nonzero(inside ^ ras.grid)
+        dist = shapely.distance(orig.boundary, shapely.points(X[iy, ix], Y[iy, ix])) if len(iy) else np.zeros(0)
+        checks[e] = {"original_area_mm2": orig.area, "roundtrip_area_mm2": rt.area,
+                     "symmetric_difference_mm2": diff.area, "difference_fraction": diff.area / orig.area,
+                     "largest_difference_mm2": largest, "difference_polygons": len(parts),
+                     "raster_mismatch_pixels": int(len(iy)),
+                     "raster_mismatch_max_edge_distance_mm": float(dist.max()) if len(dist) else 0.0}
+        checks[e]["V1"] = checks[e]["difference_fraction"] <= V1_FRACTION
+        checks[e]["V2"] = largest <= V2_MM2
+        checks[e]["V3"] = checks[e]["raster_mismatch_max_edge_distance_mm"] <= V3_EDGE_MM
+    edge = mapped_layer(exported["Edge.Cuts"])
+    pts = [q for p in edge.primitives for q in (p.data[:2] if p.kind == "line" else p.data[0])]
     xs, ys = [q[0] for q in pts], [q[1] for q in pts]
     gm1 = load_layer(GERBERS / f"{PREFIX}Gerbers.GM1")
     g = [q for p in gm1.primitives if p.kind == "line" for q in p.data[:2]]
@@ -205,10 +236,13 @@ def main():
     board = OUT / "epc90133-copper.kicad_pcb"
     report = build(board)
     checks, outline = round_trip(board, report)
-    passed = all(c["R1"] and c["R2"] for c in checks.values()) and outline["R3"]
-    out = {"schema": "epc90133-reconstruct/1", "step": "track R step 1: copper only", "passed": passed,
-           "criteria": {"R1_xor_fraction_max": R1_XOR_FRACTION, "R2_largest_mismatch_mm2_max": R2_BLOB_MM2,
-                        "R3_outline_mm_max": R3_OUTLINE_MM, "raster_pitch_mm": PITCH},
+    passed = all(c["V1"] and c["V2"] and c["V3"] for c in checks.values()) and outline["R3"]
+    out = {"schema": "epc90133-reconstruct/2", "step": "track R step 1: copper only", "passed": passed,
+           "check_revision": 2, "earlier_runs": {"run1": "crashed, no report",
+                                                  "run2": "results/gan/epc90133-reconstruct-copper-run2-failed.json"},
+           "criteria": {"V1_difference_fraction_max": V1_FRACTION, "V2_largest_difference_mm2_max": V2_MM2,
+                        "V3_raster_edge_distance_mm_max": V3_EDGE_MM, "R3_outline_mm_max": R3_OUTLINE_MM,
+                        "raster_pitch_mm": PITCH},
            "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
            "gerber_zip_sha256": ZIP_SHA,
            "kicad_cli": subprocess.run([str(KICAD_CLI), "version"], capture_output=True, text=True).stdout.strip(),
@@ -218,7 +252,8 @@ def main():
     for e in LAYERS:
         c = out["layers"][e]
         print(f"{e:4s} {c['kicad_layer']:7s} pieces {c['hole_free_pieces']:5d}  area {c['original_area_mm2']:8.2f} mm2  "
-              f"xor {c['xor_fraction'] * 100:7.4f} %  blob {c['largest_mismatch_mm2']:.4f} mm2  R1 {c['R1']} R2 {c['R2']}")
+              f"diff {c['difference_fraction'] * 100:.6f} %  largest {c['largest_difference_mm2']:.2e} mm2  "
+              f"raster edge {c['raster_mismatch_max_edge_distance_mm']:.4f} mm  V1 {c['V1']} V2 {c['V2']} V3 {c['V3']}")
     print("outline", outline, "PASSED" if passed else "FAILED")
     raise SystemExit(0 if passed else 1)
 

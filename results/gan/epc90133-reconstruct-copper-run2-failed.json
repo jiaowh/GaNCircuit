@@ -1,0 +1,152 @@
+{
+ "schema": "epc90133-reconstruct/1",
+ "step": "track R step 1: copper only",
+ "passed": false,
+ "criteria": {
+  "R1_xor_fraction_max": 0.001,
+  "R2_largest_mismatch_mm2_max": 0.005,
+  "R3_outline_mm_max": 0.001,
+  "raster_pitch_mm": 0.0254
+ },
+ "script_sha256": "14fdcdb8ab691611dd9d730279184b69d7f34c01f62bd114af2c8b62b43aa806",
+ "gerber_zip_sha256": "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1",
+ "kicad_cli": "10.0.6",
+ "board_file": "vendor/epc/epc90133/reconstruction/epc90133-copper.kicad_pcb (git-ignored; EPC derivative)",
+ "layers": {
+  "GTL": {
+   "kicad_layer": "F.Cu",
+   "area_mm2": 2386.90899128049,
+   "polygons": 60,
+   "hole_free_pieces": 117,
+   "piece_area_mm2": 2386.9089912804925,
+   "original_area_mm2": 2376.93331064,
+   "roundtrip_area_mm2": 2383.0855564,
+   "xor_area_mm2": 6.90837328,
+   "xor_fraction": 0.0029064228470675473,
+   "largest_mismatch_mm2": 0.73419208,
+   "mismatch_regions": 619,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "G1": {
+   "kicad_layer": "In1.Cu",
+   "area_mm2": 2396.7359362283946,
+   "polygons": 219,
+   "hole_free_pieces": 670,
+   "piece_area_mm2": 2396.7359362283837,
+   "original_area_mm2": 2374.3791222,
+   "roundtrip_area_mm2": 2386.0307118,
+   "xor_area_mm2": 11.82965376,
+   "xor_fraction": 0.004982209306590912,
+   "largest_mismatch_mm2": 0.0903224,
+   "mismatch_regions": 3713,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "G2": {
+   "kicad_layer": "In2.Cu",
+   "area_mm2": 2387.818950821933,
+   "polygons": 214,
+   "hole_free_pieces": 610,
+   "piece_area_mm2": 2387.8189508219207,
+   "original_area_mm2": 2364.9662378,
+   "roundtrip_area_mm2": 2378.37459808,
+   "xor_area_mm2": 13.6483598,
+   "xor_fraction": 0.0057710590459406855,
+   "largest_mismatch_mm2": 0.25999948,
+   "mismatch_regions": 3839,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "G3": {
+   "kicad_layer": "In3.Cu",
+   "area_mm2": 2400.3383399175445,
+   "polygons": 225,
+   "hole_free_pieces": 691,
+   "piece_area_mm2": 2400.3383399175327,
+   "original_area_mm2": 2377.21072944,
+   "roundtrip_area_mm2": 2389.25586664,
+   "xor_area_mm2": 12.172878879999999,
+   "xor_fraction": 0.005120656208239295,
+   "largest_mismatch_mm2": 0.0903224,
+   "mismatch_regions": 3771,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "G4": {
+   "kicad_layer": "In4.Cu",
+   "area_mm2": 2400.3383182463167,
+   "polygons": 225,
+   "hole_free_pieces": 691,
+   "piece_area_mm2": 2400.338318246305,
+   "original_area_mm2": 2377.21072944,
+   "roundtrip_area_mm2": 2389.25586664,
+   "xor_area_mm2": 12.172878879999999,
+   "xor_fraction": 0.005120656208239295,
+   "largest_mismatch_mm2": 0.0903224,
+   "mismatch_regions": 3771,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "G5": {
+   "kicad_layer": "In5.Cu",
+   "area_mm2": 2429.8533712107196,
+   "polygons": 96,
+   "hole_free_pieces": 335,
+   "piece_area_mm2": 2429.8533712107155,
+   "original_area_mm2": 2410.6151787599997,
+   "roundtrip_area_mm2": 2415.19710508,
+   "xor_area_mm2": 4.8374096799999995,
+   "xor_fraction": 0.0020067116985832316,
+   "largest_mismatch_mm2": 0.09096756,
+   "mismatch_regions": 1458,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "G6": {
+   "kicad_layer": "In6.Cu",
+   "area_mm2": 2429.786287751761,
+   "polygons": 97,
+   "hole_free_pieces": 336,
+   "piece_area_mm2": 2429.786287751757,
+   "original_area_mm2": 2410.53517892,
+   "roundtrip_area_mm2": 2415.11646008,
+   "xor_area_mm2": 4.8354742,
+   "xor_fraction": 0.0020059753710652975,
+   "largest_mismatch_mm2": 0.09096756,
+   "mismatch_regions": 1462,
+   "R1": 0.0,
+   "R2": 0.0
+  },
+  "GBL": {
+   "kicad_layer": "B.Cu",
+   "area_mm2": 2380.684312453876,
+   "polygons": 70,
+   "hole_free_pieces": 158,
+   "piece_area_mm2": 2380.68431245388,
+   "original_area_mm2": 2366.5642991199998,
+   "roundtrip_area_mm2": 2374.81331488,
+   "xor_area_mm2": 8.88514352,
+   "xor_fraction": 0.003754448388874925,
+   "largest_mismatch_mm2": 0.38580568,
+   "mismatch_regions": 937,
+   "R1": 0.0,
+   "R2": 0.0
+  }
+ },
+ "outline": {
+  "original_bounds": [
+   0.0,
+   0.0,
+   50.8,
+   50.8
+  ],
+  "roundtrip_bounds": [
+   0.0,
+   0.0,
+   50.80000000000001,
+   50.8
+  ],
+  "R3": true
+ }
+}
