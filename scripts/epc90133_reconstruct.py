@@ -31,7 +31,7 @@ import uuid
 import numpy as np
 from scipy import ndimage
 from shapely import ops
-from shapely.geometry import LineString, MultiPolygon, Polygon, box
+from shapely.geometry import LineString, MultiLineString, Polygon, box
 from shapely.validation import make_valid
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,14 +89,24 @@ def polygons(geom):
 
 
 def split_holes(poly):
-    """Hole-free polygons covering poly: split along a vertical line through a hole until none remain."""
-    if not poly.interiors:
-        return [poly]
-    hx = poly.interiors[0].representative_point().x if hasattr(poly.interiors[0], "representative_point") \
-        else Polygon(poly.interiors[0]).representative_point().x
-    x0, y0, x1, y1 = poly.bounds
-    pieces = ops.split(poly, LineString([(hx, y0 - 1), (hx, y1 + 1)]))
-    return [q for g in pieces.geoms for pp in polygons(g) for q in split_holes(pp)]
+    """Hole-free polygons covering poly: split along vertical lines through every hole at once, repeated (bounded)
+    for any piece that still has a hole. Run 1 split one hole per recursion level and exceeded Python's recursion
+    limit on the inner planes (hundreds of holes); kept as a failed run, no report written."""
+    todo, done = [poly], []
+    for _ in range(20):
+        nxt = []
+        for p in todo:
+            if not p.interiors:
+                done.append(p)
+                continue
+            x0, y0, x1, y1 = p.bounds
+            xs = sorted({round(Polygon(h).representative_point().x, 9) for h in p.interiors})
+            cutter = MultiLineString([[(x, y0 - 1), (x, y1 + 1)] for x in xs])
+            nxt += [q for g in ops.split(p, cutter).geoms for q in polygons(g)]
+        todo = nxt
+        if not todo:
+            return done
+    raise RuntimeError(f"holes remain after 20 splitting passes ({len(todo)} pieces)")
 
 
 def poly_sexpr(points, layer):
