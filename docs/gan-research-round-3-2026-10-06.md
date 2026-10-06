@@ -46,6 +46,16 @@ EPC2302 value; it says only, without numbers, that QFN packages exceed LGA. Usef
 Our board values (L_cs about 1 pH for Q1 and 48 pH for Q2, extracted) and the 0 / 50 pH package cases lie well below
 those levels. Nothing here changes the E4 prediction or the package-inductance question.
 
+A further claim passed on by the owner (from Gemini, same day): that EPC's official "PSPICE Level 3" EPC2302 model
+contains package parasitics Ld 0.2 nH, Ls 0.3 nH and Lg about 4 nH, as used in an MDPI Micromachines paper. This is
+false for the model we hold. The EPC2302 subcircuit in EPC's library (vendor/epc/ltspice/EPCGaNLibrary.lib,
+identical in the EPCGaNLibrary.zip copy) has no inductors at all; its only parasitic elements are rd, rs and rg
+(0.5 ohm). "Level 3" in EPC's AN005 describes the DC current equations ("similar to a level 3 MESFET model"), not
+a parasitic network. The nearest match is AN005's example test circuit for the old EPC1001: external,
+user-adjustable PCB stray inductances of 0.6 nH (drain), 0.3 nH (source) and 2 nH (gate drive loop), outside the
+device model. The Micromachines paper was not identified; any values it used are the authors' own circuit choices,
+not EPC2302 package data.
+
 ## 2. Geometry for our own board
 
 - **Infineon DG165832 (2025)**, half-bridge design guide for 60-200 V GaN: component selection, PCB architecture and
