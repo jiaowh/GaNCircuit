@@ -36,6 +36,9 @@ KiCad's own DRC found zero shorts and zero unconnected items with the saved fill
 exactly. N3 failed in the comparison, not the board: our Excellon reader ignored the decimal point in KiCad's
 "decimal" coordinates (X105.25 read as 10.5). Fixed in src/circuit_tools/gerber.py with a regression test; EPC's
 drill file has no decimal points, so its reading is unchanged. Run 2 uses the same construction and checks.
+
+Audit at 0f07a6a (6 October 2026; no rerun, run 2's stored report stands): the N4 DRC now runs through
+circuit_tools.kicad.run_drc, so a failed command or a stale report can no longer pass N4.
 """
 import argparse
 import collections
@@ -55,6 +58,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from circuit_tools.gerber import load_layer, parse_excellon
+from circuit_tools.kicad import KiCadError, run_drc
 from read_epc90133_geometry import BOARD, GERBERS, LAYERS, PREFIX
 from epc90133_reconstruct import KICAD_CLI, KICAD_LAYER, OUT, box, layer_geometry, mapped_layer, polygons, to_kicad
 
@@ -254,10 +258,10 @@ def main():
     n3 = not unmatched and not pool
 
     # N4 DRC without refill
-    drc_path = OUT / "nets-drc.json"
-    subprocess.run([str(KICAD_CLI), "pcb", "drc", "--format", "json", "--severity-all", "-o", str(drc_path), str(board)],
-                   capture_output=True, text=True)
-    d = json.loads(drc_path.read_text(encoding="utf-8")) if drc_path.exists() else {}
+    try:  # audit at 0f07a6a: fresh report path, exit status, schema and board identity checked
+        d = run_drc(KICAD_CLI, board, OUT / "drc-runs", "nets")["report"]
+    except KiCadError as exc:
+        raise SystemExit(f"DRC failed: {exc}")
     viol = collections.Counter(v.get("type") for v in d.get("violations", []))
     unconnected = d.get("unconnected_items", [])
     n4 = bool(d) and viol.get("shorting_items", 0) == 0 and len(unconnected) == 0

@@ -52,6 +52,17 @@ Revision 2 (declared 6 October 2026 after run 2, before run 3):
     outline ring), and padstack items for pads listed as ringless;
   - R4 clearance evidence: a second DRC with the clearance rule set to 0.150114 - 0.001 mm must report zero
     clearance items (an empty list is not affected by the cap). The EPC-rule DRC stays the reported one.
+    This shows no gap below the rule within the declared 1 micrometre geometric tolerance, not below the rule itself.
+
+Revision 3 (audit at 0f07a6a, 6 October 2026; runner and report fixes, no rerun; run 3's stored report was made by
+revision 2): both DRC runs go through circuit_tools.kicad.run_drc (fresh per-run report path, exit status 0,
+drc.v1 schema with list fields, report source = the board checked, board unchanged), so a failed command can no
+longer pass R3/R4 on a stale or empty report; the report binds the board, project, input board, both DRC reports,
+the KiCad version and the imported helpers by SHA-256. R5 as coded checks only the pads this script assigned;
+the independent check of the saved board's pad nets and rings is scripts/verify_epc90133_reconstruction.py
+(KiCad IPC-D-356 readback against EPC's PDF netlist). The saved fills are EPC's frozen copper: KiCad's refill does
+NOT reproduce them (audit: 0.98-1.85 % area difference in the power/gate window), so this board reproduces the
+saved geometry, and editing with refill is not yet qualified.
 """
 import argparse
 import collections
@@ -72,6 +83,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from circuit_tools.gerber import load_layer, parse_excellon
+from circuit_tools.kicad import KiCadError, run_drc, sha256_file
 from read_epc90133_geometry import BOARD, GERBERS, LAYERS, PREFIX
 from epc90133_reconstruct import KICAD_CLI, KICAD_LAYER, OUT, box, layer_geometry, mapped_layer, polygons, split_holes, to_kicad
 from epc90133_reconstruct_nets import fracture, stackup_sexpr, xy
@@ -82,6 +94,8 @@ WIDTH = 5.0 * MIL
 MASK_EXP = 2.0 * MIL
 ARC_TOL = 0.001
 TOL_FRACTION, TOL_PIECE_MM2, DRILL_TOL = 1e-4, 0.001, 0.001
+DEPENDENCIES = ("src/circuit_tools/gerber.py", "src/circuit_tools/kicad.py", "scripts/read_epc90133_geometry.py",
+                "scripts/epc90133_reconstruct.py", "scripts/epc90133_reconstruct_nets.py")
 SILK_TYPES = {"silk_over_copper", "silk_overlap", "silk_edge_clearance", "text_height", "text_thickness"}
 
 
@@ -342,10 +356,11 @@ def main():
     r2 = not unmatched and not pool
 
     # --- R3/R4 DRC -----------------------------------------------------------------------------------------------
-    drc_path = OUT / "final-drc.json"
-    subprocess.run([str(KICAD_CLI), "pcb", "drc", "--format", "json", "--severity-all", "-o", str(drc_path), str(board)],
-                   capture_output=True, text=True)
-    d = json.loads(drc_path.read_text(encoding="utf-8"))
+    try:  # revision 3: fresh report path, exit status, schema and board identity checked (circuit_tools.kicad)
+        drc_run = run_drc(KICAD_CLI, board, OUT / "drc-runs", "final")
+    except KiCadError as exc:
+        raise SystemExit(f"DRC failed: {exc}")
+    d = drc_run["report"]
     viol = d.get("violations", [])
     counts = collections.Counter(v.get("type") for v in viol)
     r3 = counts.get("shorting_items", 0) == 0 and not d.get("unconnected_items")
@@ -386,9 +401,13 @@ def main():
     pro_tol["board"]["design_settings"]["rules"]["min_clearance"] = CLEARANCE - ARC_TOL
     pro_tol["net_settings"]["classes"][0]["clearance"] = CLEARANCE - ARC_TOL
     (tol_dir / "epc90133.kicad_pro").write_text(json.dumps(pro_tol, indent=2) + "\n", encoding="utf-8")
-    subprocess.run([str(KICAD_CLI), "pcb", "drc", "--format", "json", "--severity-all", "-o", str(tol_dir / "drc.json"),
-                    str(tol_dir / "epc90133.kicad_pcb")], capture_output=True, text=True)
-    dt = json.loads((tol_dir / "drc.json").read_text(encoding="utf-8"))
+    try:
+        tol_run = run_drc(KICAD_CLI, tol_dir / "epc90133.kicad_pcb", OUT / "drc-runs", "final-tolerance")
+    except KiCadError as exc:
+        raise SystemExit(f"tolerance DRC failed: {exc}")
+    if tol_run["board_sha256"] != drc_run["board_sha256"]:
+        raise SystemExit("tolerance DRC checked a different board")
+    dt = tol_run["report"]
     clearance_below_tolerance = sum(1 for v in dt.get("violations", []) if v.get("type") == "clearance")
     r4 = not unexplained and not below and iso_ok and clearance_below_tolerance == 0
     epc_net_changed = [c for c in pad_net_change if any(p[0] + "-" + p[1] == c["pad"] and p[6] for p in pads)]
@@ -409,7 +428,14 @@ def main():
                    "clearance_items_at_rule_minus_tolerance": clearance_below_tolerance},
            "revision": 2, "earlier_runs": {"run1": "crashed, no report",
                                            "run2": "results/gan/epc90133-reconstruct-final-run2-failed.json"},
-           "board_file": "vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb (git-ignored; EPC derivative)"}
+           "board_file": "vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb (git-ignored; EPC derivative)",
+           "identity": {"board_sha256": sha256_file(board), "project_sha256": sha256_file(OUT / "epc90133.kicad_pro"),
+                        "input_footprint_board_sha256": sha256_file(OUT / "epc90133-footprints.kicad_pcb"),
+                        "kicad_version": drc_run["kicad_version"],
+                        "drc_reports": {k: {"path": r["report_path"].relative_to(ROOT).as_posix(),
+                                            "sha256": r["report_sha256"], "board_sha256": r["board_sha256"]}
+                                        for k, r in (("rule", drc_run), ("rule_minus_tolerance", tol_run))},
+                        "dependencies": {f: sha256_file(ROOT / f) for f in DEPENDENCIES}}}
     args.output.write_text(json.dumps(out, indent=1, default=float) + "\n", encoding="utf-8")
     for name, v in rt.items():
         print(f"{name:8s} diff {v['difference_fraction'] * 100:.6f} %  largest {v['largest_piece_mm2']:.2e}  pass {v['pass']}")
