@@ -51,6 +51,20 @@ Revision 2 (declared 6 October 2026 after run 1, before run 2):
     the pad's mask opening. Any other off-island pad fails S3;
   - S5 also requires that no opening serves two pads.
 
+Run 2 FAILED S2 and S5 (kept: results/gan/epc90133-reconstruct-sides-run2-failed.json); S1, S3 and S4 passed.
+With one-to-one matching every net lies on one island, so run 1's U100 pin 4 was a snapping error, not a gap in
+EPC's copper (the bare-pad allowance was not used). S5: Q1 and Q2 each have an unnamed pad (no pin name, no net)
+inside the gate pad's opening, so one-to-one matching failed. S2: L1's large pads (about 10 x 7 mm) have tag
+centres about 0.7 mm from their openings, beyond the fixed 0.6 mm snap; SO1-SO3 are standoffs on 3 mm holes with
+no net and no matching mask opening.
+
+Revision 3 (declared 6 October 2026 after run 2, before run 3):
+  - an unnamed pad (empty pin name) is matched after the named pads and may share an opening with a named pad of
+    the same part;
+  - the snap radius is max(0.6 mm, 15 % of the tag's larger dimension);
+  - a part with no pad on any net and a drill hole of at least 1.5 mm inside every pad's tag box is mechanical:
+    its side comes from rule 4's silkscreen test (side_cosmetic), and it is excluded from S5.
+
 Outputs: the per-part sides and per-pad opening centres are EPC-derived, so they go to the git-ignored
 vendor/epc/epc90133/reconstruction/parts-sides.json; the committed report holds counts, check results and the list
 of parts per rule (designators only).
@@ -82,6 +96,12 @@ SNAP_MM, SIZE_MARGIN_MM = 0.6, 0.05
 ANCHORS = {**{f"Ci{i}": "top" for i in range(1, 8)}, **{f"Cm{i}": "bot" for i in range(1, 11)},
            **{r: "top" for r in ("Q1", "Q2", "U80", "R80", "R81", "R82", "R83")}}
 COPPER = {"top": "GTL", "bot": "GBL"}
+
+
+def snap(tag):
+    """Revision 3: snap radius grows with the pad's size."""
+    x0, y0, x1, y1 = tag.bounds
+    return max(SNAP_MM, 0.15 * max(x1 - x0, y1 - y0))
 
 
 def to_mm(x, y):
@@ -146,15 +166,29 @@ class Openings:
 
     def assign(self, pp):
         """Revision 2: pin -> (error, opening index), one-to-one within the part; None if any pad has no
-        opening within SNAP_MM or there are fewer openings than pads."""
+        opening within the snap radius or there are fewer openings than pads. Revision 3: unnamed pads are
+        matched afterwards to their best opening within the radius, shared openings allowed."""
+        named = {k: v for k, v in pp.items() if k}
+        out = self._assign(named) if named else {}
+        if out is None:
+            return None
+        for k in (k for k in pp if not k):
+            cand = [(self.error(pp[k], int(i)), int(i)) for i in self.tree.query(pp[k].centroid.buffer(snap(pp[k])))
+                    if pp[k].centroid.distance(self.g[int(i)].centroid) <= snap(pp[k])]
+            if not cand:
+                return None
+            out[k] = min(cand)
+        return out
+
+    def _assign(self, pp):
         pins = list(pp)
-        cand = sorted({int(i) for b in pp.values() for i in self.tree.query(b.centroid.buffer(SNAP_MM))})
+        cand = sorted({int(i) for b in pp.values() for i in self.tree.query(b.centroid.buffer(snap(b)))})
         if len(cand) < len(pins):
             return None
         cost = np.full((len(pins), len(cand)), 1e6)
         for a, pin in enumerate(pins):
             for k, i in enumerate(cand):
-                if pp[pin].centroid.distance(self.g[i].centroid) <= SNAP_MM:
+                if pp[pin].centroid.distance(self.g[i].centroid) <= snap(pp[pin]):
                     cost[a, k] = self.error(pp[pin], i)
         rows, cols = linear_sum_assignment(cost)
         if any(cost[r, c] >= 1e6 for r, c in zip(rows, cols)):
@@ -222,8 +256,15 @@ def main():
                 ok += mine == collections.Counter(others).most_common(1)[0][0]
         return ok, tot
 
+    holes = parse_excellon((GERBERS / f"{PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
+    mechanical = {r for r, pp in pads.items()
+                  if not any(f"{r}-{pin}" in padnet for pin in pp)
+                  and all(any(h.diameter >= 1.5 and b.contains(Point(h.x, h.y)) for h in holes) for b in pp.values())}
     final, rule, flags = {}, {}, []
-    for r in sorted(pads):
+    for r in sorted(r for r in pads if r in mechanical):
+        at, ab = ((silk[s].intersection(designator[r]).area if r in designator else 0.0) for s in ("top", "bot"))
+        final[r], rule[r] = ("top" if at >= ab else "bot"), 4
+    for r in sorted(r for r in pads if r not in mechanical):
         nt, nb = net_score(r, "top"), net_score(r, "bot")
         if nt[0] != nb[0]:
             final[r], rule[r] = ("top" if nt[0] > nb[0] else "bot"), 1
@@ -235,7 +276,7 @@ def main():
         final[r], rule[r] = None, None
     claimed = {(s, i): r for r, s in final.items() if s for _, i in (assigned[(r, s)] or {}).values()}
     for r in sorted(pads):
-        if final[r]:
+        if final.get(r):
             continue
         free = {s: assigned[(r, s)] is not None and not any((s, i) in claimed and claimed[(s, i)] != r
                                                              for _, i in assigned[(r, s)].values())
@@ -268,7 +309,6 @@ def main():
         roots = [x for x in roots if x is not None]
         if len(roots) >= 2:
             per_net[n] = (collections.Counter(roots).most_common(1)[0][1], len(roots))
-    holes = parse_excellon((GERBERS / f"{PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
     exact = {s: polygons(layer_geometry(load_layer(GERBERS / f"{PREFIX}Gerbers.{COPPER[s]}"))) for s in ("top", "bot")}
     inside_part, s3_fail = [], []
     for n, pl in nets.items():
@@ -302,6 +342,8 @@ def main():
             if o is None:
                 unmatched.append(f"{r}-{pin}")
                 continue
+            if not pin:
+                continue  # revision 3: an unnamed pad may share its part's opening
             if (s, o[1]) in used:
                 clash.append((f"{r}-{pin}", used[(s, o[1])]))
             used[(s, o[1])] = f"{r}-{pin}"
@@ -314,12 +356,14 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "parts-sides.json").write_text(json.dumps({"nets": nets, "parts": detail}, indent=1) + "\n",
                                           encoding="utf-8")
-    report = {"schema": "epc90133-reconstruct-sides/2", "step": "track R step 2a: part sides and pad openings",
+    report = {"schema": "epc90133-reconstruct-sides/3", "step": "track R step 2a: part sides and pad openings",
               "passed": passed, "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "parts": len(final), "pads": len(tagged), "bookmark_pads": len(bookmark_pads), "nets": len(nets),
               "checks": {"S1_all_pads_tagged": s1, "S2_all_decided_no_flags": s2, "S3_nets_on_one_island": s3,
                          "S4_anchors": s4, "S5_pads_matched_no_clash": s5},
-              "revision": 2, "earlier_runs": {"run1": "results/gan/epc90133-reconstruct-sides-run1-failed.json"},
+              "revision": 3, "earlier_runs": {"run1": "results/gan/epc90133-reconstruct-sides-run1-failed.json",
+                                              "run2": "results/gan/epc90133-reconstruct-sides-run2-failed.json"},
+              "mechanical": sorted(mechanical),
               "connected_inside_part": inside_part, "s3_failures": s3_fail, "unmatched_pads": unmatched, "opening_clashes": clash,
               "net_consistency": {n: list(v) for n, v in per_net.items()},
               "by_rule": {str(k): sorted(r for r in final if rule[r] == k) for k in (1, 2, "2b", 3, 4, 5)},
