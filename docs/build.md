@@ -1685,6 +1685,20 @@ R80-R83 top) were all placed correctly by the evidence; the anchor rule was not 
 pad positions are EPC-derived and stay in the git-ignored reconstruction folder. Next: footprints built from these
 pads (mask, paste, copper, drills), placed in the KiCad board, and a mask/paste round trip.
 
+**Step 2b: footprints from the board's own pads (6 October 2026).** `scripts/epc90133_reconstruct_footprints.py`
+places 106 footprints built from EPC's pads, not from libraries, because several parts have none and EPC's land
+patterns may differ. Each pad's copper is its mask opening cut to the existing copper, so pads add no copper.
+Each footprint carries its own mask and paste shapes, plated pads get drill-size holes, and the two standoffs get
+non-plated holes. All 299 named pads carry EPC's net names. Runs 1-4 failed and are kept:
+- run 1 crashed: our Gerber reader could not parse KiCad's parameterised macros (fixed, regression test added;
+  EPC's files are read unchanged);
+- run 2 failed on a coordinate bug, and run 3 was an accidental identical repeat;
+- run 4 failed only on mask openings wrongly given to the two standoff holes.
+**Run 5 passes all checks** ([report](../results/gan/epc90133-reconstruct-footprints.json)). Copper, mask and
+paste on every layer round-trip through KiCad with at most 0.000023 % difference, every named pad has copper and
+EPC's net, and every drill is accounted for. KiCad's DRC is reported, not checked: the copper is still unnetted
+graphics, so shorts and clearance hits against it are expected until step 3 gives it nets.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
