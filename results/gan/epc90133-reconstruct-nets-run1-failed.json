@@ -1,0 +1,348 @@
+{
+ "schema": "epc90133-reconstruct-nets/1",
+ "step": "track R steps 3-4: nets, vias, stackup, round trip, DRC",
+ "passed": false,
+ "script_sha256": "275061499c1d4adf46396f4c2dad2585fded949159a824f1dd73f48fdf946078",
+ "checks": {
+  "N1_gerber_round_trip": true,
+  "N2_no_shorts": true,
+  "N3_drills": false,
+  "N4_drc_shorts_unconnected": true,
+  "N5_stackup_total": true
+ },
+ "zones": 1206,
+ "zones_without_net": 29,
+ "vias": 394,
+ "pads_off_copper": [],
+ "shorts": {},
+ "drill": {
+  "original": 445,
+  "exported": 445,
+  "unmatched_original": [
+   [
+    4.943,
+    2.479,
+    0.19812,
+    true
+   ],
+   [
+    5.869,
+    2.479,
+    0.19812,
+    true
+   ],
+   [
+    6.15,
+    4.85,
+    0.19812,
+    true
+   ],
+   [
+    7.1,
+    5.3,
+    0.19812,
+    true
+   ],
+   [
+    4.7,
+    4.75,
+    0.19812,
+    true
+   ],
+   [
+    5.012,
+    8.45,
+    0.19812,
+    true
+   ],
+   [
+    5.925,
+    8.45,
+    0.19812,
+    true
+   ],
+   [
+    6.3,
+    11.1,
+    0.19812,
+    true
+   ],
+   [
+    4.923,
+    10.7,
+    0.19812,
+    true
+   ],
+   [
+    2.778,
+    12.1,
+    0.19812,
+    true
+   ],
+   [
+    9.068,
+    11.69,
+    0.19812,
+    true
+   ],
+   [
+    10.344,
+    11.75,
+    0.19812,
+    true
+   ],
+   [
+    10.398,
+    8.65,
+    0.19812,
+    true
+   ],
+   [
+    9.147,
+    8.05,
+    0.19812,
+    true
+   ],
+   [
+    17.899,
+    10.09,
+    0.19812,
+    true
+   ],
+   [
+    17.888,
+    16.2,
+    0.19812,
+    true
+   ],
+   [
+    17.934,
+    23.629,
+    0.19812,
+    true
+   ],
+   [
+    18.742,
+    23.629,
+    0.19812,
+    true
+   ],
+   [
+    19.55,
+    23.629,
+    0.19812,
+    true
+   ],
+   [
+    20.35,
+    23.629,
+    0.19812,
+    true
+   ]
+  ],
+  "unmatched_exported": [
+   [
+    -89.5,
+    138.8,
+    3.0,
+    false
+   ],
+   [
+    -86.6,
+    138.8,
+    3.0,
+    false
+   ],
+   [
+    -89.8,
+    137.2,
+    0.198,
+    true
+   ],
+   [
+    -89.8,
+    137.0,
+    0.198,
+    true
+   ],
+   [
+    -89.8,
+    137.7,
+    0.198,
+    true
+   ],
+   [
+    -89.8,
+    137.5,
+    0.198,
+    true
+   ],
+   [
+    -89.8,
+    136.3,
+    0.198,
+    true
+   ],
+   [
+    -89.7,
+    137.1,
+    0.198,
+    true
+   ],
+   [
+    -89.7,
+    137.7,
+    0.198,
+    true
+   ],
+   [
+    -89.7,
+    137.2,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    137.8,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    139.5,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    137.4,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    136.9,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    135.5,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    136.1,
+    0.198,
+    true
+   ],
+   [
+    -89.6,
+    135.3,
+    0.198,
+    true
+   ],
+   [
+    -89.5,
+    135.9,
+    0.198,
+    true
+   ],
+   [
+    -89.5,
+    137.5,
+    0.198,
+    true
+   ],
+   [
+    -89.5,
+    137.0,
+    0.198,
+    true
+   ]
+  ]
+ },
+ "stackup_total_mil": 63.199999999999996,
+ "layers": {
+  "F.Cu": {
+   "difference_fraction": 2.1417304203498435e-08,
+   "largest_piece_mm2": 2.0681058148069893e-06,
+   "pass": true
+  },
+  "In1.Cu": {
+   "difference_fraction": 3.4774495635078225e-08,
+   "largest_piece_mm2": 1.7107963504484933e-07,
+   "pass": true
+  },
+  "In2.Cu": {
+   "difference_fraction": 3.6653608868444034e-08,
+   "largest_piece_mm2": 6.23986163853857e-07,
+   "pass": true
+  },
+  "In3.Cu": {
+   "difference_fraction": 3.547037889915994e-08,
+   "largest_piece_mm2": 1.7583261625255843e-07,
+   "pass": true
+  },
+  "In4.Cu": {
+   "difference_fraction": 3.546373547591752e-08,
+   "largest_piece_mm2": 1.7107963504484933e-07,
+   "pass": true
+  },
+  "In5.Cu": {
+   "difference_fraction": 1.4246450406098105e-08,
+   "largest_piece_mm2": 1.4762461415557544e-07,
+   "pass": true
+  },
+  "In6.Cu": {
+   "difference_fraction": 1.4247279732066664e-08,
+   "largest_piece_mm2": 1.4762461415557544e-07,
+   "pass": true
+  },
+  "B.Cu": {
+   "difference_fraction": 1.6662035463393602e-08,
+   "largest_piece_mm2": 6.639678744035774e-07,
+   "pass": true
+  },
+  "F.Mask": {
+   "difference_fraction": 1.6573835007477165e-07,
+   "largest_piece_mm2": 1.3290849412795234e-06,
+   "pass": true
+  },
+  "B.Mask": {
+   "difference_fraction": 2.30735326044932e-07,
+   "largest_piece_mm2": 7.359497799291556e-07,
+   "pass": true
+  },
+  "F.Paste": {
+   "difference_fraction": 3.286610827353547e-08,
+   "largest_piece_mm2": 2.836919907551782e-07,
+   "pass": true
+  },
+  "B.Paste": {
+   "difference_fraction": 2.9464210976892726e-08,
+   "largest_piece_mm2": 1.9989800517650202e-07,
+   "pass": true
+  }
+ },
+ "drc": {
+  "violations": {
+   "annular_width": 199,
+   "hole_clearance": 199,
+   "clearance": 499,
+   "zones_intersect": 28,
+   "copper_edge_clearance": 24,
+   "drill_out_of_range": 199,
+   "invalid_outline": 12,
+   "via_diameter": 199,
+   "isolated_copper": 29,
+   "padstack": 49,
+   "lib_footprint_issues": 106,
+   "nonmirrored_text_on_back_layer": 59
+  },
+  "unconnected_items": 0,
+  "unconnected_examples": []
+ },
+ "board_file": "vendor/epc/epc90133/reconstruction/epc90133-nets.kicad_pcb (git-ignored; EPC derivative)"
+}

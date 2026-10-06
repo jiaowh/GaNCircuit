@@ -68,6 +68,15 @@ class ExcellonTests(unittest.TestCase):
     self.assertFalse(holes[1].plated)
     self.assertAlmostEqual(holes[1].diameter, 0.11811 * 25.4)
 
+  def test_metric_decimal_coordinates(self):
+    # KiCad's default drill export (track R steps 3-4 run 1 misread X105.25 as 10.5)
+    text = "M48\nFMAT,2\nMETRIC\nT1C3.000\n%\nG90\nG05\nT1\nX105.25Y-112.0\nX-0.5Y7\nM30\n"
+    holes = parse_excellon(text)
+    self.assertAlmostEqual(holes[0].x, 105.25)
+    self.assertAlmostEqual(holes[0].y, -112.0)
+    self.assertAlmostEqual(holes[1].x, -0.5)
+    self.assertAlmostEqual(holes[0].diameter, 3.0)
+
 
 if __name__ == "__main__":
   unittest.main()

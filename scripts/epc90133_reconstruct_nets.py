@@ -30,6 +30,12 @@ Checks:
      (clearance, annular width from drill-size vias, ...) are reported, not checked, because KiCad's default rules
      are not EPC's;
   N5 the stackup's total thickness equals the file's 63.2 mil within 0.1 mil.
+
+Run 1 FAILED N3 only (kept: results/gan/epc90133-reconstruct-nets-run1-failed.json). N1, N2, N4 and N5 passed:
+KiCad's own DRC found zero shorts and zero unconnected items with the saved fills, and the Gerbers round-trip
+exactly. N3 failed in the comparison, not the board: our Excellon reader ignored the decimal point in KiCad's
+"decimal" coordinates (X105.25 read as 10.5). Fixed in src/circuit_tools/gerber.py with a regression test; EPC's
+drill file has no decimal points, so its reading is unchanged. Run 2 uses the same construction and checks.
 """
 import argparse
 import collections
