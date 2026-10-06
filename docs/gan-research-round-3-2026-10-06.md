@@ -32,8 +32,7 @@ package), and D2PAK at 5-7 nH (background figure, no source checked).
 
 The MDPI source, identified later the same day by the owner: Singh and Tripathi, "Paralleling of Gallium Nitride
 Power Semiconductor Devices: A Review and Future Perspectives", Electronics 2026, 15, 1607
-(doi:10.3390/electronics15081607, CC BY; read in full from the owner's copy; the publisher blocks automated
-download, so no local file). Its 0.2 nH (p. 11) repeats EPC's LGA estimate (its ref. [73], Reusch and Strydom,
+(doi:10.3390/electronics15081607, CC BY; owner's copy filed in the manifest). Its 0.2 nH (p. 11) repeats EPC's LGA estimate (its ref. [73], Reusch and Strydom,
 PCIM 2014). Its 0.1 nH (p. 15, Fig. 11) is a simulation setting for the common-source inductance of one of two
 paralleled half bridges (48 V to 12 V, 25 A), and a mismatch at which current sharing degrades. It is not an
 extracted or measured package inductance, so the claim built on it misreads the source. The review gives no QFN or
@@ -53,8 +52,13 @@ identical in the EPCGaNLibrary.zip copy) has no inductors at all; its only paras
 (0.5 ohm). "Level 3" in EPC's AN005 describes the DC current equations ("similar to a level 3 MESFET model"), not
 a parasitic network. The nearest match is AN005's example test circuit for the old EPC1001: external,
 user-adjustable PCB stray inductances of 0.6 nH (drain), 0.3 nH (source) and 2 nH (gate drive loop), outside the
-device model. The Micromachines paper was not identified; any values it used are the authors' own circuit choices,
-not EPC2302 package data.
+device model. The Micromachines paper, supplied by the owner (Reali et al., "Development of GaN-Based, 6.6 kW, 450 V,
+Bi-Directional On-Board Charger...", Micromachines 2024, 15, 1470, doi:10.3390/mi15121470), settles it. The
+values Lg 4 nH, Ld 0.2 nH and Ls 0.3 nH "from Pspice level 3 model" are in its Table 3 (p. 5), which is headed
+"Datasheet parameters of GaN HEMT GS-065-060-5-T-A": a 650 V, 60 A GaN Systems transistor in another package,
+whose vendor model includes package inductances. EPC2302 appears only on p. 21, as the secondary-side rectifier
+(two in parallel per switch), with no parasitic values. The claim attached a different device's numbers to the
+EPC2302.
 
 ## 2. Geometry for our own board
 

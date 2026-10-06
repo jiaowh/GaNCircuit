@@ -91,6 +91,28 @@
       "retrieved": "2026-10-06",
       "reuse_terms": "arXiv distribution; licence of the record not checked. Keep outside git.",
       "review_scope": "Abstract: LLM retrieval of datasheet parameters (EM 0.86, F1 0.92); not specific to power transistors; abstract reports no electrical validation of the generated models."
+    },
+    {
+      "title": "Singh, Tripathi, Paralleling of Gallium Nitride Power Semiconductor Devices: A Review and Future Perspectives, Electronics 2026, 15, 1607",
+      "url": "https://doi.org/10.3390/electronics15081607",
+      "local_path": "vendor/literature/2026-10-06-research-3/MDPI_Electronics_15_1607_paralleling_GaN_review.pdf",
+      "sha256": "7157d0e94bc386ba9334c3ad9b1d204756c3f045ae4abb1f5030a94b93af2538",
+      "bytes": 7359901,
+      "pages": 38,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "CC BY 4.0 (MDPI open access); copy supplied by the owner (publisher blocks automated download); kept outside git like the other PDFs.",
+      "review_scope": "Read in full: 0.2 nH repeats EPC's LGA estimate; 0.1 nH is a simulation setting and current-sharing mismatch, not a package inductance; no EPC2302 value."
+    },
+    {
+      "title": "Reali, Alemanno, Ronchi, Rossi, Florian, Development of GaN-Based, 6.6 kW, 450 V, Bi-Directional On-Board Charger with Integrated 1 kW, 12 V Auxiliary DC-DC Converter, Micromachines 2024, 15, 1470",
+      "url": "https://doi.org/10.3390/mi15121470",
+      "local_path": "vendor/literature/2026-10-06-research-3/MDPI_Micromachines_15_1470_GaN_OBC.pdf",
+      "sha256": "13762c44774479b6a7edbf5a3e777aa352d46a1c120aea292768701d6886871d",
+      "bytes": 21985025,
+      "pages": 35,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "CC BY 4.0 (MDPI open access); copy supplied by the owner (publisher blocks automated download); kept outside git like the other PDFs.",
+      "review_scope": "Table 3 (p. 5) and p. 21: the Lg/Ld/Ls 4/0.2/0.3 nH 'from Pspice level 3 model' belong to the GaN Systems GS-065-060-5-T-A (650 V); EPC2302 appears once, as a secondary-side rectifier, with no parasitic values."
     }
   ],
   "not_obtained": [
@@ -113,11 +135,6 @@
       "title": "EPC2302 package inductance",
       "url": null,
       "reason": "searched again; still not published. EPC's 3x5 mm QFN overview (Controllers_Gate_Drive_PCB_Layout.pdf, page 5) lists ratings and charges only"
-    },
-    {
-      "title": "Singh, Tripathi, Paralleling of Gallium Nitride Power Semiconductor Devices: A Review and Future Perspectives, Electronics 2026, 15, 1607",
-      "url": "https://doi.org/10.3390/electronics15081607",
-      "reason": "CC BY; read in full from the owner's copy; mdpi.com returns 403 to automated download, so no local file or checksum"
     }
   ]
 }
