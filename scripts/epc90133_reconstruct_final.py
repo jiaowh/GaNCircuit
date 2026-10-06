@@ -35,6 +35,9 @@ Checks:
      silkscreen checks (silk_over_copper, silk_overlap, silk_edge_clearance, text_height, text_thickness: EPC's
      silkscreen as drawn). Anything else fails;
   R5 no pad with an EPC net changed net; every via and plated pad has a ring larger than its drill, or is listed.
+
+Run 1 crashed in the comparison (no report): KiCad names the silkscreen Gerbers F_Silkscreen/B_Silkscreen, which
+the file lookup did not map. Fixed for run 2; construction and checks unchanged.
 """
 import argparse
 import collections
@@ -285,7 +288,7 @@ def main():
                            "-o", str(gdir), str(board)], capture_output=True, text=True)
     if proc.returncode:
         raise SystemExit(f"kicad-cli gerbers failed ({proc.returncode}): {proc.stderr[-1500:]}")
-    exported = {p.stem.split("-")[-1].replace("_", "."): p for p in gdir.glob("*.gbr")}
+    exported = {p.stem.split("-")[-1].replace("_", ".").replace("Silkscreen", "SilkS"): p for p in gdir.glob("*.gbr")}
     orig_ext = {**{KICAD_LAYER[e]: e for e in LAYERS}, "F.Mask": "GTS", "B.Mask": "GBS", "F.Paste": "GTP",
                 "B.Paste": "GBP", "F.SilkS": "GTO", "B.SilkS": "GBO"}
     rt = {}
