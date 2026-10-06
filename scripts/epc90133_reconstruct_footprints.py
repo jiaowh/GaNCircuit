@@ -41,6 +41,12 @@ outer layers and could add copper; EPC's copper already covers every plated hole
 outer layers (remove_unused_layers with keep_end_layers), with the pad's net; and the mechanical footprints use a
 valid attribute (through_hole exclude_from_pos_files exclude_from_bom). Checks F1-F5 are unchanged.
 
+Run 2 FAILED F1-F3 (kept: results/gan/epc90133-reconstruct-footprints-run2-failed.json): a coding bug wrote
+every board-level polygon (copper, leftover mask and paste) shifted by (-100, -150) mm. Run 3 was an accidental
+repeat of run 2 with the identical script (a fix patch failed and the next command ran anyway); identical result,
+report results/gan/epc90133-reconstruct-footprints-run3-repeat.json. Fixed for run 4 (absolute coordinates for
+board-level shapes); construction and checks unchanged.
+
 Terms: the board file is an EPC derivative and stays in the git-ignored vendor/epc/epc90133/reconstruction/.
 """
 import argparse
@@ -78,8 +84,14 @@ def pts(points, origin):
     return " ".join(f"(xy {x - ox:.6f} {y - oy:.6f})" for x, y in (to_kicad(*q) for q in points))
 
 
+def abs_pts(points):
+    return " ".join(f"(xy {x:.6f} {y:.6f})" for x, y in (to_kicad(*q) for q in points))
+
+
 def board_poly(poly, layer):
-    return "".join(f'\t(gr_poly (pts {pts(list(q.exterior.coords)[:-1], (0.0, 0.0))}) (stroke (width 0) (type solid))'
+    # runs 2-3 bug: these used pts(..., (0, 0)), which subtracts to_kicad(0, 0) and moved every board-level shape
+    # by (-100, -150) mm; board-level shapes take absolute coordinates
+    return "".join(f'\t(gr_poly (pts {abs_pts(list(q.exterior.coords)[:-1])}) (stroke (width 0) (type solid))'
                    f' (fill yes) (layer "{layer}") (uuid "{uid()}"))\n' for q in split_holes(poly))
 
 
