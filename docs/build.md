@@ -1538,7 +1538,7 @@ Q1's turn-on falls by 10-47 %, a better false-turn-on margin.
 Reading, within this model: the gate-drive changes available on the stock board trade overshoot against switching
 energy; none lowers both. Meeting all three targets would need a change that lowers the loop or common-source
 inductance rather than slowing the edge, which means a layout change and a new board. The trade-off and its size are
-frozen predictions for E4 (R80 2.2 ohm) on the purchased board; they are not validated values (EPC2302 Fig. 7
+provisional simulation predictions, not a frozen prediction record and not validated values (EPC2302 Fig. 7
 exception, behavioural driver, exploratory extraction).
 
 **Revision 2 (loss-estimator revision 2; 5 October 2026).** The first rev-2 launch (PID 29988) ended at 16:52 with no
@@ -1548,8 +1548,10 @@ The 9 cases that never started ran unchanged as a continuation
 ([report](../results/gan/epc90133-design-round1-rev2-cont.json)). The persistent stock step-driver, 50 pH stall is
 not a start-up stall: the partial raw file shows normal progress to 1.753 µs and then steps of about 1e-19 s, 0.76 ns
 after Q2's turn-on command. Further trapezoidal runs stalled the same way at other edges (20 ns, 1.82-1.94 µs,
-4.74-4.75 µs), and a smaller step makes it worse (75 ps stalls at 20 ns in profiling). Declared fallbacks, each
-committed before the results it affects (d5184f3, 55d9f7d, 1b24989): Gear integration at the same 100 ps step, Gear
+4.74-4.75 µs), and a smaller step makes it worse (75 ps stalls at 20 ns in profiling). Declared fallbacks: the Gear
+fallback and its extension were committed before the runs they cover (d5184f3, 55d9f7d); the cross-method rule
+(1b24989, 19:58) is a retrospective amendment, committed after R80-2.2-dt7.5@ramp-Ls50-gear, a result it affects,
+had finished (19:28; audit at 5d72e4e). Gear integration at the same 100 ps step, Gear
 pairs compared with each other only, valid if a declared Gear-versus-trapezoidal check passes
 ([report](../results/gan/epc90133-design-round1-rev2-gear.json),
 [extension](../results/gan/epc90133-design-round1-rev2-gear2.json)). **The check passes by a wide margin**: on
@@ -1557,6 +1559,8 @@ stock and R80 2.2 ohm (step-Ls0), R80 2.2 ohm (step-Ls50) and stock (ramp-Ls0), 
 agree within 0.05 %, and the stock-to-candidate differences within 0.3 %. Gear stalls too, but rarely: stock ramp-Ls50
 with Gear stopped at 4.98 µs. Where only a trapezoidal stock case and a Gear candidate exist, a cross-method comparison
 is allowed, and it decides a constraint only outside a 0.1 % margin. The rev-2 timeouts are kept in the reports.
+Without this amendment the dead-time candidate's ramp-Ls50 comparison is undetermined; its verdict stays 'not met'
+either way, because its matched ramp-Ls0 comparison already fails C1.
 
 Rev-2 result, against stock under each alternative (all four alternatives now resolved for every candidate;
 [assessment, round-1 rule](../results/gan/epc90133-design-round1-rev2-assessment.json),
@@ -1589,7 +1593,8 @@ fallbacks [a](../results/gan/epc90133-design-round3-gear-a.json) and
 [b](../results/gan/epc90133-design-round3-gear-b.json), [numerical check](../results/gan/epc90133-design-round3-check.json),
 [assessment](../results/gan/epc90133-design-round3-assessment.json). Trapezoidal stalls were frequent (6 of 13 cases;
 Gear stalled in 2 of 8). Each was handled by a fallback declared beforehand. The R80 1.2 ohm 50 ps ramp-Ls50 pair
-(results/gan/epc90133-design-round3-ms50-a.json) was started but no decision depends on it.
+(results/gan/epc90133-design-round3-ms50-a.json) finished after the assessment: stock usable, R80 1.2 ohm unusable;
+no decision depends on it.
 
 | R80 | Overshoot ramp-Ls0 / step-Ls0 / ramp-Ls50 / step-Ls50 (stock 25.1 / 16.6 / 11.2 / 10.9 V) | FET loss | Q2 gate peak | Verdict |
 |---|---|---|---|---|
@@ -1598,7 +1603,9 @@ Gear stalled in 2 of 8). Each was handled by a fallback declared beforehand. The
 | 1.8 ohm | - / 9.2 / 10.2 / 9.0 V (-44, -9, -17 %) | +5.1 % (step-Ls0), +3.7, +3.9 % | lower | not met (C1, step-Ls0) |
 | 2.2 ohm (rev 2) | 10.0 / 6.9 / 9.4 / 8.0 V | +5.5 to +9.0 % | lower | not met |
 
-**Result: R80 1.5 ohm is the selected design.** It is the only candidate that meets both constraints under every
+**Result: R80 1.5 ohm is the best tested candidate** (the tested grid does not exclude values between 1.5 and
+1.8 ohm or other parts; no further search is needed to justify E4). It is the only candidate that meets both
+constraints under every
 alternative, and it lowers the worst-case overshoot from 25.1 V to 16.8 V (-33 %). In absolute terms the loss cost
 is at most 0.09 W at 240 W, about 0.035 efficiency points under this FET-only estimate. R80 1.2 ohm cannot outrank
 it whatever its missing cases show, because its ramp-Ls0 overshoot alone (21.3 V) exceeds 16.8 V. R80 1.8 ohm misses
@@ -1608,13 +1615,35 @@ C1 by 0.1 points under step-Ls0, a same-method comparison. Numerical check (decl
 Reading: the benefit depends on the unresolved package source inductance. Without it, R80 1.5 ohm cuts the overshoot
 by about a third. With an assumed 50 pH the edge is already slow, and the cut is only 4-11 %. The decision is robust
 to that unknown (C1 and C2 hold in all four alternatives), but the size of the improvement is not. Measuring the stock
-board's overshoot and Q2 gate waveform before the swap (E3/E4) tells which regime the real board is in. The shorter
+board's overshoot and Q2 gate waveform before the swap (E3/E4) can constrain the alternatives, but cannot by itself
+identify the package inductance: driver behaviour, model discrepancy and probe response are competing explanations.
+The before/after swap tests the predicted response. The largest predicted loss increase, +4.34 %, leaves 0.66 points
+to C1; that is a margin within the model, not a hardware margin or an uncertainty bound, and the half-step check
+covers step-Ls0 only. The shorter
 dead time would allow a larger R80 (rev 2: 2.2 ohm with 7.5 ns fails C1 only under ramp-Ls0, at +6.3 %), but it stays
 inadmissible until E1. A layout lever was not run (plan order step 3). Round 2a on A gives at most -11 to -23 %
-overshoot for +3.1-3.8 % loss at the 0.050 mm gap, so combined with R80 1.5 ohm it would exceed C1. Combined with
-1.2 ohm, the estimate (about -25 % at about +4-6 % loss, from adding A's figures to G's, not a simulation) does not
-clearly beat 1.5 ohm alone, and it needs a new board. These are frozen predictions for experiment E4 (R80 swap) on the
-purchased board, not validated values (EPC2302 Fig. 7 exception, behavioural driver, exploratory extraction G).
+overshoot for +3.1-3.8 % loss at the 0.050 mm gap; adding that to R80 1.5 ohm's +4.3 % suggests, but does not show,
+that the combination would exceed C1 (percentages from two different models; the combination was not simulated).
+Combined with 1.2 ohm, the same addition (about -25 % at about +4-6 % loss) does not clearly beat 1.5 ohm alone. It
+needs a new board, and deferring it for that reason stands without a verdict. These are provisional simulation
+predictions for experiment E4 (R80 swap) on the purchased board, not yet a frozen prediction record (that needs the
+approved conditions, hardware plan 'Frozen prediction record') and not validated values (EPC2302 Fig. 7 exception,
+behavioural driver, exploratory extraction G).
+
+**Assessor revision 4 (6 October 2026; audit at 5d72e4e, docs/project-audit-5d72e4e.md).** The audit reproduced the
+round-3 assessment exactly and found the evaluator unsafe as an unattended gate: a missing alternative dropped out of
+the rule, the declared reproduction and half-step controls did not affect the selection, missing Gear-check cases were
+skipped, and incompatible inputs (estimator revision 1, unsettled loss, another extraction) were accepted.
+`scripts/assess_epc90133_design.py` revision 4 requires the four declared alternatives, checks every case's name
+against its parameters and the reports' conditions and extraction/library hashes (input rejected otherwise, exit 2),
+counts a loss only from estimator revision 2 with a settled window, requires the Gear check's whole case set, gates
+the selection on the reproduction control and the top candidate's half-step check, and emits each comparison as a
+resolved pair. It reports verdicts under the amended rule and under the original rule without the cross-method
+fallback. Fault tests: tests/test_design_assessment.py (every audit probe now yields no selection or a rejection).
+Rerun on the same inputs plus the finished ms50-a report, no simulation:
+[assessment rev 4](../results/gan/epc90133-design-round3-assessment-rev4.json); per-alternative verdicts and
+overshoots identical to the stored assessment (kept), and **R80 1.5 ohm is selected under both rules**, with all four
+of its comparisons same-method (two trapezoidal, two Gear).
 
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 

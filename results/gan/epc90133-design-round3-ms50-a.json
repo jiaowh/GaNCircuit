@@ -40343,6 +40343,76 @@
      ]
     }
    }
+  },
+  "R80-1.2@ramp-Ls50-ms50": {
+   "parameters": {
+    "ext": "G-m1-mid",
+    "maxstep": 5e-11,
+    "t_after_b": 5.2e-07,
+    "sense_q2": true,
+    "period_loss": true,
+    "long_pulse": true,
+    "l_s": 5e-11,
+    "gate_r": {
+     "R80": 1.2
+    },
+    "design": "R80-1.2",
+    "alternative": "ramp-Ls50",
+    "on_request": true,
+    "base": "R80-1.2@ramp-Ls50"
+   },
+   "extraction_case": {
+    "variant": "G",
+    "mesh": "m1",
+    "junction": "mid"
+   },
+   "timing_run": {
+    "edge_currents_A": [
+     27.46913337711334,
+     11.197582244861634
+    ],
+    "slopes_A_per_s": [
+     15949819.38025936,
+     5423850.377417237
+    ],
+    "corrected_timing_s": {
+     "t1": 1.766905161114114e-06,
+     "t_off": 3.0169778340066415e-06
+    }
+   },
+   "extraction_summary": {
+    "L_loop_nH": 0.2574481089070031,
+    "R_loop_mohm": 2.0342266224763277,
+    "source_pin_current_share": {
+     "Q1.S2": 0.31251922369063967,
+     "Q2.S2": 0.25129728151421127
+    },
+    "L_cs_Q1_pH": 0.8981214288941651,
+    "R_cs_Q1_mohm": 0.01569870695819421,
+    "L_cs_Q2_pH": 47.671221893440894,
+    "R_cs_Q2_mohm": 0.4040735263875214,
+    "definition": "Variant G diagnostics: power-loop inductance at Q1 and the board common-source inductance of each FET."
+   },
+   "times_s": {
+    "t_off1": 1.786905161114114e-06,
+    "t_on2": 4.803882995120756e-06,
+    "t_end": 5.323882995120756e-06,
+    "die_nodes": {
+     "g1": "gu",
+     "d1": "q1dd",
+     "s1": "p1s",
+     "g2": "gl",
+     "d2": "q2dd",
+     "s2": "p2s"
+    }
+   },
+   "bus_attachment": "Cm10",
+   "metrics": null,
+   "checks": null,
+   "spikes": null,
+   "usable": false,
+   "interpretation_invalid": null,
+   "traces": null
   }
  },
  "comparison_to_reference": {},
@@ -40500,8 +40570,22 @@
    "duration_s": 460.4070000000065,
    "warnings": [],
    "netlist_sha256": "67c71821b29499c850c5cf9ae0c7423dc42c62169a0358ad58c99f69fbb62246"
+  },
+  "R80-1.2@ramp-Ls50-ms50-timing": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 3562.9839999999967,
+   "warnings": [],
+   "netlist_sha256": "22f007d0340eb70f991c8d1890bcc7d0394a05e730cf8b4e695eecdcd72383de"
+  },
+  "R80-1.2@ramp-Ls50-ms50": {
+   "status": "failed",
+   "message": "timeout",
+   "duration_s": 3600.0470000000205,
+   "warnings": null,
+   "netlist_sha256": "a0e3e487dd5178c806f6d9dbd8bec9cbfca4a1f07a6431a9d1d3e6d75efa330b"
   }
  },
  "evidence_directory": "runs\\epc90133-switching-96939b45325d",
- "complete": false
+ "complete": true
 }

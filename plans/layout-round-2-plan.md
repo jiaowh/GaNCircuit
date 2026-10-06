@@ -79,15 +79,18 @@ maximum; the board is rated 80 V in). Efficiency becomes a constraint, and the s
   (2) R80 sweep on G to find the largest R80 that keeps C1 (for example 1.5, 1.8, 2.7 ohm, chosen from (1) and
   declared before running); (3) only if a layout lever could beat the R80 result within C1, the stackup gap
   combined with the chosen R80 (A ranks, G confirms).
-- The result is a frozen prediction for the purchased board: R80 swap at experiment E4.
+- The result is a provisional simulation prediction for the purchased board (R80 swap at experiment E4); it becomes a
+  frozen prediction only in the frozen prediction record at the approved conditions.
 
 **Round 3 done (5 October 2026, evening; docs/build.md "design round 3").** Round 1 rev 2: every candidate fails C1
 (R80 2.2 ohm +5.5 to +9.0 %, 3.3 ohm +10 to +14 %, 2.2 ohm with 7.5 ns +3.0 to +6.3 %). Round 3 (R80 1.2/1.5/1.8 ohm):
-**R80 1.5 ohm is selected**, the only candidate that meets C1 and C2 under all four alternatives. Worst-case overshoot
+**R80 1.5 ohm is the best tested candidate**, the only one that meets C1 and C2 under all four alternatives. Worst-case overshoot
 25.1 -> 16.8 V (-33 %), FET loss +2.4 to +4.3 %, Q2 gate peak lower in all four. 1.8 ohm misses C1 by 0.1 point;
-1.2 ohm cannot outrank 1.5. Step (3) was not run: by round 2a's figures a gap change would not beat 1.5 ohm within C1,
-and it needs a new board. The improvement shrinks to 4-11 % if the package source inductance is near 50 pH, so the
-stock-board measurement before the swap (E3/E4) decides how much it is worth. Solver note: trapezoidal stalls are
+1.2 ohm cannot outrank 1.5. Step (3) was not run: adding round 2a's figures (a different model) suggests, without a simulated verdict, that a
+gap change would not beat 1.5 ohm within C1, and it needs a new board. The improvement shrinks to 4-11 % if the
+package source inductance is near 50 pH; stock-board measurements (E3) can constrain that, and the swap (E4) tests
+the predicted response. Evaluator hardened after the audit at 5d72e4e (revision 4, docs/build.md 'design round 3');
+the selection is unchanged. Solver note: trapezoidal stalls are
 frequent on this bench, and Gear (checked equal within 0.05 %) is the declared fallback.
 
 ## Candidate changes, balancing effort and effect
@@ -147,7 +150,7 @@ not published or shared until EPC's reuse terms are checked.
   A ranks candidates; G confirms them. An A result is never reported as a board prediction.
 - A target is met only under all four alternatives. One failure means "not met"; a missing case means
   "undetermined", never "met".
-- Results are frozen predictions for a redesigned board. They cannot be validated without fabricating it. The
+- Results become frozen predictions for a redesigned board once recorded. They cannot be validated without fabricating it. The
   stock-board measurements (E1-E4) still decide whether the model's trends can be trusted.
 - Keep failed and stalled runs. Do not tune the vendor model. Never kill processes by name, and keep the host's
   other project in mind.

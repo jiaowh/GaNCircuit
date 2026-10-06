@@ -322,13 +322,15 @@ identity (silkscreen revision, fitted population), the case temperature and the 
   - H1 (common-source) predicts a stronger rise-time dependence on switched current than H2 does;
   - H3 predicts damping that changes with bus voltage at nearly constant frequency;
   - H2 predicts the dependence computed with the E1-measured driver edge; it does not predict independence.
-- **E4, gate-resistor change (design check, and H2 against H1).** Replace R80 (1 Ω) with 1.5 Ω, the design
-  selected in simulation (docs/build.md, "design round 3": the largest E12 value that keeps the simulated FET
+- **E4, gate-resistor change (design check, and H2 against H1).** Replace R80 (1 Ω) with 1.5 Ω, the best tested
+  candidate in simulation (docs/build.md, "design round 3": of the tested E12 values, the largest that keeps the simulated FET
   loss within +5 % of stock and Q2's gate spike not above stock under all four unresolved alternatives). Repeat
   part of E3, including the 48 V point at the converter's edge currents (turn-off 28 A, turn-on 12 A) if the
   approved envelope includes it. Simulated change at that point: overshoot -31 to -33 % without package source
-  inductance and only -4 to -11 % with an assumed 50 pH. The stock-board E3 data therefore indicate, before the swap,
-  which regime applies. Q2's gate spike falls 3-23 %, and FET loss rises +2.4 to +4.3 %. The model predicts how rise
+  inductance and only -4 to -11 % with an assumed 50 pH. The stock-board E3 data can constrain these alternatives
+  before the swap, but cannot by themselves identify the package inductance (driver behaviour, model discrepancy and
+  probe response compete); the swap tests the predicted response. Q2's gate spike falls 3-23 %, and FET loss rises +2.4 to +4.3 % (0.66 points below the
+  +5 % constraint at worst: a margin within the model, not a hardware margin). The model predicts how rise
   time and overshoot scale with the gate resistance under H1 and under H2, and the predictions differ; a second
   step to 2.2 Ω (simulated: overshoot -16 to -60 %, loss +5.5 to +9 %) widens the contrast if the diagnosis needs
   it. These simulated changes enter the frozen prediction record (below) at the approved conditions; they are not
