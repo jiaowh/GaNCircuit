@@ -1699,6 +1699,34 @@ paste on every layer round-trip through KiCad with at most 0.000023 % difference
 EPC's net, and every drill is accounted for. KiCad's DRC is reported, not checked: the copper is still unnetted
 graphics, so shorts and clearance hits against it are expected until step 3 gives it nets.
 
+**Steps 3-4: nets on the copper, vias, stackup (6 October 2026).** `scripts/epc90133_reconstruct_nets.py` turns
+each copper island into a KiCad zone. The zone takes the net of the EPC pads on its connected group (islands joined
+across layers through plated holes). Its fill is EPC's copper exactly, written as KiCad stores fills: one outline,
+with every hole joined by a zero-width slit; a known-answer test reproduces the area exactly. Every plated hole
+that is not a component pad becomes a drill-size via with its net. The stackup comes from EPC's stackup file
+(8 x 2.8 mil copper; dielectrics 5/5/7.2/5/7.2/5/5 mil FR370-HR; 63.2 mil total). Core/prepreg is not stated in
+the file, so all dielectrics are written as prepreg, an assumption with no effect on the Gerbers.
+
+Run 1 failed only the drill comparison, because our Excellon reader ignored KiCad's decimal points (fixed,
+regression test; EPC's file is read unchanged). It is kept
+([report](../results/gan/epc90133-reconstruct-nets-run1-failed.json)). **Run 2 passes all checks**
+([report](../results/gan/epc90133-reconstruct-nets.json)):
+- the Gerbers of all 12 copper, mask and paste layers round-trip exactly;
+- all 445 drill holes come back with the same position, size and plating;
+- no copper group carries two nets;
+- KiCad's own DRC finds zero shorts and zero unconnected items, so KiCad's connectivity matches EPC's netlist;
+- the stackup total is 63.2 mil.
+
+The result has 1206 zones and 394 vias; 29 islands carry no net, which KiCad also reports as isolated copper.
+Other DRC violations are reported, not checked, because KiCad's default rules are not EPC's: drill-size vias give
+annular-ring and via-diameter hits, and EPC's tighter clearances give clearance hits.
+
+Still open for track R:
+- the silkscreen layers are not yet reconstructed;
+- the DRC rules should be set to EPC's (from the .RUL file in the Gerber package) and every remaining violation
+  explained;
+- zone fills are EPC's copper frozen: a KiCad refill would regenerate them by KiCad's rules.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
