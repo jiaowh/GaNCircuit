@@ -73,7 +73,7 @@ def _rotate(points, deg):
 
 def _eval(expr, variables):
     expr = expr.strip()
-    for k in sorted(variables, key=len, reverse=True):
+    for k in sorted(variables, key=lambda v: len(str(v)), reverse=True):  # $10 before $1; keys are ints
         expr = expr.replace(f"${k}", repr(variables[k]))
     if not re.fullmatch(r"[0-9eE.+\-*/xX() ]*", expr):
         raise GerberUnsupported(f"macro expression {expr!r}")

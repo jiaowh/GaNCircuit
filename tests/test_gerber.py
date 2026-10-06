@@ -38,6 +38,13 @@ class GerberRasterTests(unittest.TestCase):
     self.assertTrue(r.at(0, 2.2))   # 5.08 x 2.54 mm rotated 90 degrees: 5.08 mm tall
     self.assertFalse(r.at(2.2, 0))  # and only 2.54 mm wide
 
+  def test_parameterised_macro(self):
+    # KiCad writes macros with $n parameters; integer variable keys once crashed the substitution (track R 2b run 1).
+    body = "%AMPBOX*\n21,1,$1,$2,0,0,0*\n%\n%ADD12PBOX,0.20000X0.10000*%\nD12*\nX0Y0D03*\n"
+    layer = parse_gerber(HEADER + body + "M02*\n")
+    r = rasterize(layer, (-5, -5, 5, 5), 0.01)
+    self.assertAlmostEqual(r.area_mm2(), 5.08 * 2.54, delta=0.02 * 5.08 * 2.54)
+
   def test_full_circle_region_by_multi_quadrant_arc(self):
     # G75 full circle of radius 0.5 in (12.7 mm), drawn as a region.
     body = "G75*\nG36*\nX50000Y0D02*\nG03*\nX50000Y0I-50000J0D01*\nG01*\nG37*\n"

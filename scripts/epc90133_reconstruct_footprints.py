@@ -15,8 +15,8 @@ Construction (declared 6 October 2026 before the first run). For each part on it
     the pad does not open mask or paste itself;
   - the pad's mask opening is a footprint polygon on F.Mask/B.Mask; paste openings on s that intersect one of the
     part's pad openings are footprint polygons on F.Paste/B.Paste;
-  - a pad whose opening contains a plated drill becomes a through-hole custom pad with that drill (copper only on
-    the outer layers it is used on: remove_unused_layers with keep_end_layers); a part on 'mechanical' holes
+  - a pad whose opening contains a plated drill becomes a through-hole pad (see revision 2 below); a part on
+    'mechanical' holes
     (step 2a) gets a non-plated hole of the drill's diameter;
   - mask and paste openings not used by any footprint stay as board-level graphic polygons on their layer.
 Copper stays step 1's graphic polygons; zones, tracks and vias are steps 3-4.
@@ -29,6 +29,17 @@ Round trip (kicad-cli Gerber export, read back, compared exactly as in step 1, r
   F5 every through-hole or mechanical pad of step 2a's rule-4 parts contains exactly one drill.
 Reported, not checked: KiCad DRC counts (graphic copper carries no connectivity until step 3, so unconnected-item
 counts are expected), and the openings left at board level.
+
+Run 1 (the declared version) crashed after writing the board: our Gerber reader could not parse KiCad's
+parameterised aperture macros (the $n substitution sorted integer keys by len()). Fixed in
+src/circuit_tools/gerber.py with a regression test; EPC's files never pass macro parameters, so their reading is
+unchanged. No report was written.
+
+Revision 2 (declared 6 October 2026 after run 1, before run 2), two corrections intended before run 1 but lost to a
+failed patch: a through-hole pad is a circle exactly the drill's size (KiCad would copy a custom shape to both
+outer layers and could add copper; EPC's copper already covers every plated hole position), flashed only on the
+outer layers (remove_unused_layers with keep_end_layers), with the pad's net; and the mechanical footprints use a
+valid attribute (through_hole exclude_from_pos_files exclude_from_bom). Checks F1-F5 are unchanged.
 
 Terms: the board file is an EPC derivative and stays in the git-ignored vendor/epc/epc90133/reconstruction/.
 """
@@ -119,7 +130,7 @@ def main():
                 x, y = to_kicad(*origin)
                 fps.append(f'\t(footprint "EPC90133:{ref}" (layer "{L}.Cu") (uuid "{uid()}") (at {x:.6f} {y:.6f})\n'
                            f'\t\t(property "Reference" "{ref}" (at 0 0) (layer "{L}.Fab") (uuid "{uid()}") '
-                           f'(effects (font (size 0.5 0.5) (thickness 0.08))))\n\t\t(attr exclude_from_pos_files)\n'
+                           f'(effects (font (size 0.5 0.5) (thickness 0.08))))\n\t\t(attr through_hole exclude_from_pos_files exclude_from_bom)\n'
                            + "".join(body) + "\t)\n")
             continue
         assign = mask[s].assign(pads[ref])
@@ -158,10 +169,9 @@ def main():
                 th = True
                 d = drill[0]
                 dx, dy = to_kicad(d.x, d.y)
-                body.append(f'\t\t(pad "{pin}" thru_hole custom (at {dx - ox:.6f} {dy - oy:.6f}) (size {d.diameter:.4f} '
-                            f'{d.diameter:.4f}) (drill {d.diameter:.4f}) (layers "*.Cu") (remove_unused_layers yes) '
-                            f'(keep_end_layers yes){nets_s} (options (clearance outline) (anchor circle)) '
-                            f'(primitives {pts_shift(parts, (d.x, d.y))}) (uuid "{uid()}"))\n')
+                body.append(f'\t\t(pad "{pin}" thru_hole circle (at {dx - ox:.6f} {dy - oy:.6f}) '
+                            f'(size {d.diameter:.4f} {d.diameter:.4f}) (drill {d.diameter:.4f}) (layers "*.Cu") '
+                            f'(remove_unused_layers yes) (keep_end_layers yes){nets_s} (uuid "{uid()}"))\n')
             else:
                 if len(drill) > 1:
                     f5_fail.append(f"{ref}-{pin}: {len(drill)} drills")
@@ -224,7 +234,7 @@ def main():
                       "unconnected_items": len(d.get("unconnected_items", [])),
                       "schematic_parity": len(d.get("schematic_parity", []))}
     passed = f1 and f2 and f3 and f4 and f5
-    out = {"schema": "epc90133-reconstruct-footprints/1", "step": "track R step 2b: footprints from the board's pads",
+    out = {"schema": "epc90133-reconstruct-footprints/2", "step": "track R step 2b: footprints from the board's pads",
            "passed": passed, "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
            "checks": {"F1_mask": f1, "F2_paste": f2, "F3_copper_unchanged": f3, "F4_pad_copper_and_nets": f4,
                       "F5_drills": f5},
