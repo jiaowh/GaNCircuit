@@ -1645,6 +1645,16 @@ Rerun on the same inputs plus the finished ms50-a report, no simulation:
 overshoots identical to the stored assessment (kept), and **R80 1.5 ohm is selected under both rules**, with all four
 of its comparisons same-method (two trapezoidal, two Gear).
 
+**Assessor revision 5 (6 October 2026; audit at 0f07a6a, docs/project-audit-0f07a6a.md finding 1).** Revision 4 still
+selected R80 1.5 ohm when one of its overshoot values was null (ranking `[["R80-1.5", null]]`), treated `usable:
+"false"` as true, and raised AttributeError on a null case or a list-valued manifest. Revision 5 checks types before
+use (objects where objects are expected, `usable` a literal boolean, absent only for a case with no metrics, every
+metric read a finite number or null) and rejects malformed input with exit 2 and reasons. A design whose overshoot is
+missing under any alternative has objective "undetermined" and is never ranked or selected. The audit's probes are
+fault tests in tests/test_design_assessment.py. Rerun on the stored inputs, no simulation:
+[assessment rev 5](../results/gan/epc90133-design-round3-assessment-rev5.json); verdicts, pairs, ranking and the
+**R80 1.5 ohm selection are identical to revision 4 under both rules**.
+
 ### EPC90133 track R step 1: copper in KiCad (6 October 2026)
 
 Track R (plans/layout-round-2-plan.md) rebuilds an editable KiCad design from EPC's Gerbers, for our own board
@@ -1749,17 +1759,43 @@ most 499 items per DRC type. **Run 3 passes all five checks**
 - KiCad finds 0 shorts and 0 unconnected items, and no EPC net changed;
 - every remaining DRC item is in a declared category:
   - 499+ clearance items at EPC's rule within 1 um, the arcs being 5-degree polygons. A second DRC at the rule
-    minus 1 um reports none, so no gap is below EPC's rule;
+    minus 1 um reports none, so no gap is below EPC's rule by more than the declared 1 um geometric tolerance;
   - 8 edge items on a 0.25 mm ring centred on the outline. EPC's Altium export draws the outline into every
     copper Gerber, and the fab trims it, so it is not real copper;
   - SO3's 3 mm plated hole, which EPC's copper gives no ring;
   - EPC's silkscreen near the edge, 13 isolated netless islands, and the footprints not being from a library.
 
 Limits:
-- the zones hold EPC's fills frozen, and a KiCad refill regenerates them by KiCad rules;
+- the zones hold EPC's fills frozen. A KiCad refill does NOT reproduce them (audit at 0f07a6a, on a scratch copy:
+  0.98-1.85 % symmetric-difference area in G's power/gate window, 2.3-2.8 % over the board interior with drills
+  excluded; isolated-copper items 13 -> 43, two solder-mask bridges). This board reproduces the saved geometry; an
+  edit/refill workflow is not qualified, and zero shorts/unconnected does not show that extraction geometry is
+  preserved;
 - the named EPC clearance rules (gate drive, logic, PSU, FET) lost their scopes, so only the board minimum is
   enforced;
 - this is EPC's published layout (B5253 Rev 2.0), not yet checked against the board we buy.
+
+**Audit at 0f07a6a: runner fixes and an independent readback (6 October 2026).** The audit found that both track R
+DRC steps ignored kicad-cli's exit status and read fixed report paths, so a failed command with a stale `{}` report
+passed R3 and R4; that the reports did not identify the board checked; and that R5 looked only at pads the script had
+itself assigned. `src/circuit_tools/kicad.py` `run_drc` now writes each report to a fresh path, requires exit status
+0, validates the drc.v1 structure and the report's source board, and checks that the board did not change
+(tests/test_kicad_drc.py with a fake kicad-cli). `scripts/epc90133_reconstruct_final.py` (revision 3) and
+`epc90133_reconstruct_nets.py` use it, and step 5 now binds board, project, input board, DRC reports, KiCad version
+and helpers by hash. The stored step 3-5 reports were made before this change and stand; nothing was rebuilt.
+`scripts/verify_epc90133_reconstruction.py` (declared at 4c69320 before its first run) checks the saved board
+without reusing the construction. Run 1 **passes V1-V4**
+([report](../results/gan/epc90133-reconstruct-verify.json)):
+- V1: KiCad's IPC-D-356 export of the saved board lists all 288 pads of EPC's netlist, read directly from the layout
+  PDF, each with EPC's net;
+- V2: the 13 other pad records are each explained by a declared rule: 10 numbered pads outside EPC's netlist carry
+  KiCad 'unconnected' nets, Q1/Q2's unnamed auxiliary gate pads coincide with gate pads and carry VGU/VGL, and SO1/SO2
+  are unplated N/C holes;
+- V3: all 443 vias and plated through-hole pads have rings larger than their drills or are listed as ringless;
+- V4: a fresh DRC of this exact board (SHA-256 79ba8e1e..., the hash the audit recorded) reports 0 shorts and 0
+  unconnected items, and 0 clearance items at EPC's rule minus 1 um.
+This binds the current local board to a passing check. It cannot show retroactively that run 3 checked the same file,
+and it does not address KiCad's refill (above).
 
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 

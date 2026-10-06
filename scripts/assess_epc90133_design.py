@@ -50,6 +50,14 @@ Revision 4 (6 October 2026, audit at 5d72e4e, docs/project-audit-5d72e4e.md; no 
   <d>@step-Ls0 (overshoot, FET loss and Q2 gate peak within 2 %). Without both, nothing is selected;
 - every design/alternative comparison is emitted as a resolved pair (both case names, kind, step, method, metrics,
   relative changes), and verdicts and relative changes derive from it.
+Revision 5 (6 October 2026, audit at 0f07a6a, docs/project-audit-0f07a6a.md finding 1; no simulation rerun):
+- types are checked before use: report, case table, each case, its parameters and metrics must be objects, the
+  input manifest and run table objects, 'usable' a literal boolean (absent or null only for a case with no
+  metrics, i.e. a run that produced no result: unusable), and every metric value read here null or a
+  finite number (not a string or boolean); anything else rejects the input (exit 2) with reasons;
+- a null metric is missing evidence: a design whose overshoot is missing under any alternative has objective
+  'undetermined' and is never ranked or selected (revision 4 ranked it with a null objective); round 1's targets
+  are undetermined, not an error, when a needed value is missing.
 Exit status: 0 selected (round 3) or assessed (round 1), 1 round 3 without a selection, 2 input rejected (the
 output then records the reasons and no verdicts).
 """
@@ -93,7 +101,54 @@ def parse_name(name):
     return None
 
 
+METRIC_FIELDS = {"event_a_turn_off_at_peak": ("q1_eoff_J", "sw_min_V", "sw_fall_time_90_10_s"),
+                 "event_b_turn_on_at_valley": ("q1_eon_J", "sw_overshoot_above_bus_V", "q2_gate_peak_during_rise_V",
+                                               "sw_rise_time_10_90_s"),
+                 "period_loss": ("fet_loss_W", "estimated_efficiency")}
+
+
+def is_number(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def type_problems(name, case):
+    """Revision 5: structural types of one case (before any other check reads it)."""
+    if not isinstance(case, dict):
+        return [f"{name}: case is not an object"]
+    out = []
+    if not isinstance(case.get("parameters"), dict):
+        out.append(f"{name}: parameters is not an object")
+    if case.get("usable") is None:  # a run that produced no result (stored reports omit the key): unusable
+        if case.get("metrics") is not None:
+            out.append(f"{name}: metrics present but usable is missing")
+    elif not isinstance(case["usable"], bool):
+        out.append(f"{name}: usable {case['usable']!r} is not a boolean")
+    elif case["usable"]:
+        m = case.get("metrics")
+        if not isinstance(m, dict):
+            return out + [f"{name}: usable case without a metrics object"]
+        for group, fields in METRIC_FIELDS.items():
+            g = m.get(group)
+            if g is None:
+                continue
+            if not isinstance(g, dict):
+                out.append(f"{name}: metrics.{group} is not an object")
+                continue
+            out += [f"{name}: metrics.{group}.{f} = {g[f]!r} is not a finite number or null"
+                    for f in fields if g.get(f) is not None and not is_number(g[f])]
+            if group == "period_loss":
+                if g.get("settled_within_2pct") is not None and not isinstance(g["settled_within_2pct"], bool):
+                    out.append(f"{name}: settled_within_2pct {g['settled_within_2pct']!r} is not a boolean")
+                rev = g.get("estimator_revision")
+                if rev is not None and (not isinstance(rev, int) or isinstance(rev, bool)):
+                    out.append(f"{name}: estimator_revision {rev!r} is not an integer")
+    return out
+
+
 def case_problems(name, case):
+    bad = type_problems(name, case)
+    if bad:
+        return bad
     parsed = parse_name(name)
     if parsed is None:
         return [f"{name}: name is not <design>@<declared alternative>[-ms50|-gear|-repro]"]
@@ -144,7 +199,9 @@ def load_reports(paths):
             raise InputRejected([f"{path}: unreadable report ({exc})"])
         if not isinstance(rep, dict) or not isinstance(rep.get("cases"), dict):
             raise InputRejected([f"{path}: no case table"])
-        manifest = rep.get("input_manifest") or {}
+        manifest = rep.get("input_manifest")
+        if not isinstance(manifest, dict) or not isinstance(rep.get("runs", {}), dict)                 or not all(isinstance(v, dict) for v in (rep.get("runs") or {}).values()):
+            raise InputRejected([f"{path}: input_manifest or runs is not an object (of objects)"])
         ident = {"conditions": rep.get("conditions"), "fixed_assumptions": rep.get("fixed_assumptions"),
                  "extractions": manifest.get("extractions"), "vendor_library": manifest.get("vendor_library")}
         if any(v is None for v in ident.values()):
@@ -270,6 +327,7 @@ def decide(pairs, designs, rule):
                 over.append(c["overshoot_V"])
             v = {k: verdict_of(x) for k, x in per.items()}
             v["constraints"] = verdict_of([{"met": True, "not met": False}.get(x) for x in v.values()])
+            v["objective"] = "undetermined" if None in over else "complete"  # revision 5
             verdicts[d] = {"per_alternative": per, "verdict": v, "overshoot_V": dict(zip(DECLARED_ALTERNATIVES, over)),
                            "worst_case_overshoot_V": None if None in over else max(over),
                            "pair_kinds": {a: pairs[d][a]["kind"] for a in DECLARED_ALTERNATIVES}}
@@ -282,7 +340,9 @@ def decide(pairs, designs, rule):
                     per[k].append(None)
                 continue
             s, c = pr["stock"], pr["candidate"]
-            per["T1_overshoot_lower"].append(c["overshoot_V"] <= s["overshoot_V"] - max(1.0, 0.10 * s["overshoot_V"]))
+            per["T1_overshoot_lower"].append(
+                None if c["overshoot_V"] is None or s["overshoot_V"] is None
+                else c["overshoot_V"] <= s["overshoot_V"] - max(1.0, 0.10 * s["overshoot_V"]))
             per["T2_switching_energy_not_higher"].append(c["eon_eoff_J"] <= s["eon_eoff_J"] * 1.02)
             per["T3_efficiency_not_lower"].append(None if c["fet_loss_W"] is None or s["fet_loss_W"] is None
                                                   else c["fet_loss_W"] <= s["fet_loss_W"] * 1.02)
@@ -330,14 +390,16 @@ def assess(cases, runs, rule):
         block = {"pairs": pairs, "verdicts": decide(pairs, designs, rule)}
         if rule == "round3":
             ranking = sorted(([d, v["worst_case_overshoot_V"]] for d, v in block["verdicts"].items()
-                              if v["verdict"]["constraints"] == "met"), key=lambda x: x[1])
+                              if v["verdict"]["constraints"] == "met" and v["worst_case_overshoot_V"] is not None),
+                             key=lambda x: x[1])
             repro = reproduction_control(cases, runs)
             half = half_step_check(cases, ranking[0][0]) if ranking else None
             selected = ranking[0][0] if ranking and repro["status"] == "pass" and half["status"] == "pass" else None
             block.update({"ranking": ranking, "reproduction_control": repro, "half_step_check": half,
                           "selection": selected,
-                          "selection_rule": "top-ranked candidate, only if the reproduction control and its "
-                                            "half-step check both pass"})
+                          "selection_rule": "top-ranked candidate (constraints met and overshoot known under every "
+                                            "alternative), only if the reproduction control and its half-step check "
+                                            "both pass"})
         out[label] = block
     return out
 
@@ -349,7 +411,7 @@ def main():
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-design-round1-assessment.json")
     ap.add_argument("--rule", choices=("round1", "round3"), default="round1")
     args = ap.parse_args()
-    head = {"schema": "epc90133-design-assessment/2",
+    head = {"schema": "epc90133-design-assessment/2", "revision": 5,
             "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "rule": ("declared in scripts/epc90133_switching.py (design round 1); every alternative must hold"
                      if args.rule == "round1" else
@@ -378,8 +440,9 @@ def main():
         for a, m in row.items():
             if m:
                 loss = f"{m['fet_loss_W']:6.3f} W" if m["fet_loss_W"] is not None else "loss invalid/unsettled"
-                print(f"{d:15s} {a:10s} over {m['overshoot_V']:6.2f} V  Eon+Eoff {m['eon_eoff_J'] * 1e6:6.2f} uJ  "
-                      f"loss {loss}  Q2g {m['q2_gate_peak_V']:5.2f} V")
+                over, q2g = (math.nan if m[k] is None else m[k] for k in ("overshoot_V", "q2_gate_peak_V"))
+                print(f"{d:15s} {a:10s} over {over:6.2f} V  Eon+Eoff {m['eon_eoff_J'] * 1e6:6.2f} uJ  "
+                      f"loss {loss}  Q2g {q2g:5.2f} V")
             else:
                 print(f"{d:15s} {a:10s} main case missing or unusable")
     for label in ("amended_rule", "original_rule"):

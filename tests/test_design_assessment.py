@@ -176,6 +176,58 @@ class AssessmentGateTests(unittest.TestCase):
         self.assertEqual(res["original_rule"]["pairs"]["R80-1.5"]["ramp-Ls50"]["kind"], "none")
         self.assertIsNone(res["original_rule"]["selection"])
 
+    def test_missing_objective_prevents_selection(self):
+        # audit at 0f07a6a: revision 4 selected R80-1.5 with ranking [["R80-1.5", null]]
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"]["metrics"]["event_b_turn_on_at_valley"]["sw_overshoot_above_bus_V"] = None
+        res = self.run_assess(report(cases))
+        for label in ("amended_rule", "original_rule"):
+            self.assertEqual(res[label]["verdicts"]["R80-1.5"]["verdict"]["objective"], "undetermined")
+            self.assertEqual(res[label]["ranking"], [])
+            self.assertIsNone(res[label]["selection"])
+        res = self.run_assess(report(cases), rule="round1")  # round 1: undetermined, not a TypeError
+        self.assertEqual(res["amended_rule"]["verdicts"]["R80-1.5"]["verdict"]["T1_overshoot_lower"], "undetermined")
+
+    def test_malformed_types_rejected(self):
+        # audit at 0f07a6a: usable "false" was treated as true; null cases and a list manifest raised AttributeError
+        probes = []
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"]["usable"] = "false"
+        probes.append(report(cases))
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"] = None
+        probes.append(report(cases))
+        probes.append(report(baseline(), input_manifest=["G-m1-mid.json"]))
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"]["metrics"]["event_b_turn_on_at_valley"]["sw_overshoot_above_bus_V"] = "15"
+        probes.append(report(cases))
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"]["metrics"]["period_loss"]["fet_loss_W"] = float("nan")
+        probes.append(report(cases))
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"]["metrics"]["period_loss"]["settled_within_2pct"] = "yes"
+        probes.append(report(cases))
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"]["metrics"] = []
+        probes.append(report(cases))
+        rep = report(baseline())
+        rep["runs"]["stock@ramp-Ls0"] = "h"
+        probes.append(rep)
+        for i, rep in enumerate(probes):
+            with self.subTest(probe=i), self.assertRaises(ad.InputRejected):
+                self.run_assess(rep)
+
+    def test_malformed_input_exit_status(self):
+        cases = baseline()
+        cases["R80-1.5@ramp-Ls50"] = None
+        with tempfile.TemporaryDirectory() as tmp:
+            src, out = Path(tmp) / "r.json", Path(tmp) / "a.json"
+            src.write_text(json.dumps(report(cases)), encoding="utf-8")
+            proc = subprocess.run([sys.executable, str(ROOT / "scripts/assess_epc90133_design.py"), str(src),
+                                   "--rule", "round3", "--output", str(out)], capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 2, proc.stderr)
+            self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["status"], "rejected")
+
     def test_rejected_input_exit_status(self):
         cases = baseline()
         cases["stock@ramp-Ls25"] = copy.deepcopy(cases["stock@ramp-Ls0"])

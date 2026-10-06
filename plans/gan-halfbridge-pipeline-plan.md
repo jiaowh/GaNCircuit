@@ -585,11 +585,16 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    requirements in hardware plan v0.4; values that depend on equipment wait for the inventory;
    (design round 1, 5 October 2026, owner targets; docs/build.md) on the stock board, R80 and dead-time
    changes cannot meet overshoot, switching energy and efficiency targets together within the model; a
-   further round needs layout changes (new extraction, new board) and is the owner's decision;
+   further round needs layout changes (new extraction, new board) and is the owner's decision; superseded
+   by the owner's single objective (5 October 2026: overshoot, with FET loss at most +5 % and Q2 gate peak
+   not above stock): design round 3 selects R80 1.5 ohm as the best tested candidate, a provisional
+   simulation prediction for E4, not frozen (docs/build.md 'design round 3');
    (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
    conditions, then the approved energized measurements.
-   Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to
-   be written. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
+   Efficiency (input/output power with uncertainty) is a named G4 deliverable; its draft procedure is
+   hardware-plan E9 (5 October 2026, not yet reviewed). E9 measures converter efficiency and does not by
+   itself resolve the FET-only loss increment of constraint C1 (about 0.05-0.09 W in the model); a thermal
+   FET-loss method is a candidate without a board-specific uncertainty budget. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
    G mesh, broad sweeps.
 
 9. Extraction-tool qualification while hardware is blocked (2 October 2026; docs/build.md "Via-array,

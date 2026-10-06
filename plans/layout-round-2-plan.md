@@ -1,5 +1,13 @@
 # Layout round 2: plan for 6 October 2026
 
+**Current status (6 October 2026; read first).** The three-target formulation below is historical. The owner's
+decision of 5 October 2026 makes overshoot the single objective, with FET loss at most 5 % above stock and the Q2 gate
+peak not above stock as constraints (round 3 specification below; result: R80 1.5 ohm is the best tested candidate,
+docs/build.md "design round 3"). The fabrication route is track R: a KiCad 10 reconstruction from EPC's Gerbers and
+layout PDF, which reproduces the saved geometry exactly. KiCad's zone refill does not reproduce EPC's copper (audit at
+0f07a6a: 1-2 % area change in the power/gate window), so an edit/refill workflow must be qualified before any G5
+geometry edit. Sections that state three targets or an undecided route are kept as written on 5 October.
+
 Draft, 5 October 2026. For the owner and the working session. Nothing here is declared yet: each step's
 declaration goes into its script's docstring and is committed before that step runs, as usual.
 
@@ -172,7 +180,7 @@ Board file: vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb (git-ignored).
 
 ## Decisions needed from the owner
 
-1. **Fabrication route** (proposed answer: track R below). A redesigned board needs editable design files. We have Gerbers only; KiCad 10 and EPC's
+1. **Fabrication route** (decided 6 October 2026: track R; the paragraph below is the 5 October text). A redesigned board needs editable design files. We have Gerbers only; KiCad 10 and EPC's
    KiCad library are installed, but the route is undecided (no Altium request, under the no-inquiry decision).
    Tomorrow's work does not depend on it; a fabricated test does. Gerbers are editable text, but they hold
    only flattened shapes per layer (no components, nets or design rules). Small changes (stackup, added vias)

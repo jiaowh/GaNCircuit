@@ -95,9 +95,10 @@ is not a substitute for the simulated switch-node prediction.
   voltage (so high current does not heat the tracks); Si, SiC and GaN.
 - Reading: round 3's C1 is a FET-loss constraint, while E9 as drafted measures converter efficiency (input minus
   output power). The difference in FET loss between stock and R80 1.5 ohm is about 0.05-0.09 W in the model. That
-  is well below what electrical input-output measurement resolves at 240 W, so the thermal method is the only one
-  of these that could test C1 directly. Recommend adding a thermal FET-loss option to E9 (case-temperature rise,
-  calibrated at low current) before E4 is approved.
+  is well below what electrical input-output measurement resolves at 240 W. Of these sources, the thermal method is
+  a candidate for testing C1 directly, but only its abstract was reviewed and no board-specific sensitivity or
+  uncertainty budget exists (correction after the audit at 0f07a6a). Recommend evaluating a thermal FET-loss option
+  for E9 (case-temperature rise, calibrated at low current) before E4 is approved.
 
 ## 5. Agent-driven design workflows
 
@@ -121,8 +122,8 @@ retrieved.
 
 ## How this changes the next work
 
-1. E9: add a thermal FET-loss method as the only one of these that can resolve C1's 0.05-0.09 W effect (draft
-   change, needs review).
+1. E9: evaluate a thermal FET-loss method as a candidate for resolving C1's 0.05-0.09 W effect (abstract-only
+   review; needs a board-specific uncertainty budget before adoption).
 2. E4 prediction record: include Q1's gate-voltage overshoot alongside the switch-node prediction. The Kozak models
    are an optional analytical cross-check.
 3. G5 geometry: the lever list is gap, capacitor size and position, and double-sided placement. Double-sided
