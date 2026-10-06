@@ -16,6 +16,17 @@ Controllers_Gate_Drive_PCB_Layout.pdf (already held, research round 2) lists rat
 resistance only. No EPC2302-specific value was found elsewhere. The 0 / 50 pH alternatives therefore stay
 assumptions, and only measurement (E3/E4, optionally E8) can narrow them.
 
+Added the same day, after a pointer from the owner: the EPC paralleling paper already held
+(vendor/literature/EPC_Paralleling_High_Speed_GaN_Reusch.pdf, p. 4) says that "the LGA GaN transistor has a total
+package inductance estimated to be under 0.2 nH". This is an estimate and an upper bound, for the LGA package rather
+than EPC2302's QFN, and for the whole package path rather than the source part shared with the gate loop. It is
+consistent with the 0 / 50 pH bracket, but it does not exclude larger source inductance (an even split of 0.2 nH
+gives up to about 100 pH per terminal). In round 3 the R80 1.5 ohm benefit fell from about -33 % at 0 pH to -4 to
+-11 % at 50 pH, so the lower end of the E4 prediction may be optimistic if the true value is above 50 pH. No rerun
+is planned; E3's stock-board data constrain this before the swap, and a single 100 pH case would be added only if
+the frozen prediction record needs it. Claims passed along with this pointer (an MDPI "0.1 nH benchmark", WLCSP
+below 100 pH, the document number AN020) were not traced to a source and are not used.
+
 ## 2. Geometry for our own board
 
 - **Infineon DG165832 (2025)**, half-bridge design guide for 60-200 V GaN: component selection, PCB architecture and
