@@ -212,7 +212,7 @@ Every EPC file needs a source URL, retrieval date, checksum and reuse terms. Pub
 
 FastHenry's MIT-authored notice is **not the standard MIT License**: the recorded permission covers internal non-commercial use and prohibits redistribution. FasterCap uses LGPL 2.1 or later. See the source and tool records before reusing either beyond the project's recorded scope.
 
-Gerbers and PDF schematics provide manufacturing and circuit information; they do not constitute an editable, connected KiCad design. EPC lists Altium files as available on request, but the route to the project's own layout remains undecided.
+Gerbers and PDF schematics provide manufacturing and circuit information; they do not constitute an editable, connected KiCad design. EPC lists Altium files as available on request. The project instead rebuilds an editable KiCad 10 design from EPC's Gerbers and layout PDF (`scripts/epc90133_reconstruct*.py`; [docs/build.md](docs/build.md) "track R"). The rebuilt design has EPC's copper, 106 parts with footprints taken from the board's own pads, EPC's net names, vias with rings measured from EPC's copper, and EPC's stackup and clearance rule. Its exported Gerbers and drill file reproduce EPC's exactly. KiCad's design-rule check finds no shorts and no unconnected pads, and every remaining finding has a declared explanation. The design is a derivative of EPC's layout, so it is kept out of this repository. Its copper pours are EPC's shapes frozen as drawn, and a KiCad refill regenerates them by KiCad's rules.
 
 ## Related and deferred work
 

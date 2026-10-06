@@ -143,6 +143,21 @@ Altium request.
 Effort: about one to two days. Terms: the result is a derivative of EPC's layout; internal design work only,
 not published or shared until EPC's reuse terms are checked.
 
+**Done, 6 October 2026** (docs/build.md "track R"). All five steps pass their declared checks; failed runs are
+kept. Deviations from the steps above:
+- footprints are built from the board's own pads rather than library footprints;
+- part positions and sides come from the layout PDF's hidden pad tags and EPC's bookmark netlist, decided by
+  netlist consistency on the copper;
+- copper pours are zones holding EPC's exact fills.
+
+Result:
+- all 14 Gerber layers and 445 drills round-trip exactly;
+- KiCad DRC finds 0 shorts and 0 unconnected items, with EPC's 5.91 mil clearance;
+- remaining items are explained: EPC's outline drawn into every copper Gerber, SO3's ringless 3 mm hole, EPC's
+  silkscreen at the edge, and gaps at EPC's rule within 1 um.
+
+Board file: vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb (git-ignored).
+
 ## Rules that carry over
 
 - Declare before running: candidates, rule and budget in the docstring, committed and pushed.

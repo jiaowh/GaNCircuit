@@ -1,0 +1,182 @@
+{
+ "schema": "epc90133-reconstruct-final/1",
+ "step": "track R step 5: rings, silkscreen, EPC rules, explained DRC",
+ "passed": true,
+ "script_sha256": "892f099f6fd9c809fa8b24fb6e8301c35165fcdf538ac7ac54da0106e2f1d617",
+ "checks": {
+  "R1_gerber_round_trip": true,
+  "R2_drills": true,
+  "R3_no_shorts_unconnected": true,
+  "R4_drc_explained": true,
+  "R5_epc_nets_unchanged": true
+ },
+ "rules_mm": {
+  "clearance": 0.150114,
+  "min_width": 0.127,
+  "mask_expansion": 0.0508
+ },
+ "via_nominal_diameter_mm": {
+  "0.1981": 0.6584937996677235,
+  "0.254": 0.649920881677831
+ },
+ "ringless": [
+  {
+   "x": 25.25,
+   "y": 21.3,
+   "drill": 2.999994,
+   "kind": "pad SO3-1"
+  }
+ ],
+ "netless_pads_assigned": [
+  {
+   "pad": "FD1-0",
+   "net": "unconnected-(FD1-Pad0)"
+  },
+  {
+   "pad": "FD2-0",
+   "net": "unconnected-(FD2-Pad0)"
+  },
+  {
+   "pad": "FD3-0",
+   "net": "unconnected-(FD3-Pad0)"
+  },
+  {
+   "pad": "J640-3",
+   "net": "unconnected-(J640-Pad3)"
+  },
+  {
+   "pad": "Q1-",
+   "net": "VGu"
+  },
+  {
+   "pad": "Q2-",
+   "net": "VGl"
+  },
+  {
+   "pad": "U100-2",
+   "net": "unconnected-(U100-Pad2)"
+  },
+  {
+   "pad": "U100-3",
+   "net": "unconnected-(U100-Pad3)"
+  },
+  {
+   "pad": "U100-7",
+   "net": "unconnected-(U100-Pad7)"
+  },
+  {
+   "pad": "U100-5",
+   "net": "unconnected-(U100-Pad5)"
+  },
+  {
+   "pad": "U100-6",
+   "net": "unconnected-(U100-Pad6)"
+  }
+ ],
+ "netless_islands": 13,
+ "drill": {
+  "original": 445,
+  "exported": 445,
+  "unmatched": [],
+  "extra": []
+ },
+ "layers": {
+  "F.Cu": {
+   "difference_fraction": 2.1421406425681418e-08,
+   "largest_piece_mm2": 2.0681058148069893e-06,
+   "pass": true
+  },
+  "In1.Cu": {
+   "difference_fraction": 3.477449563507823e-08,
+   "largest_piece_mm2": 1.7107963504484933e-07,
+   "pass": true
+  },
+  "In2.Cu": {
+   "difference_fraction": 3.6653608868444034e-08,
+   "largest_piece_mm2": 6.23986163853857e-07,
+   "pass": true
+  },
+  "In3.Cu": {
+   "difference_fraction": 3.547037889915994e-08,
+   "largest_piece_mm2": 1.7583261625255843e-07,
+   "pass": true
+  },
+  "In4.Cu": {
+   "difference_fraction": 3.546373547591752e-08,
+   "largest_piece_mm2": 1.7107963504484933e-07,
+   "pass": true
+  },
+  "In5.Cu": {
+   "difference_fraction": 1.4246450406098105e-08,
+   "largest_piece_mm2": 1.4762461415557544e-07,
+   "pass": true
+  },
+  "In6.Cu": {
+   "difference_fraction": 1.4247279732066664e-08,
+   "largest_piece_mm2": 1.4762461415557544e-07,
+   "pass": true
+  },
+  "B.Cu": {
+   "difference_fraction": 1.6668104429882308e-08,
+   "largest_piece_mm2": 6.639678744035774e-07,
+   "pass": true
+  },
+  "F.Mask": {
+   "difference_fraction": 1.6573835007477165e-07,
+   "largest_piece_mm2": 1.3290849412795234e-06,
+   "pass": true
+  },
+  "B.Mask": {
+   "difference_fraction": 2.30735326044932e-07,
+   "largest_piece_mm2": 7.359497799291556e-07,
+   "pass": true
+  },
+  "F.Paste": {
+   "difference_fraction": 3.286610827353547e-08,
+   "largest_piece_mm2": 2.836919907551782e-07,
+   "pass": true
+  },
+  "B.Paste": {
+   "difference_fraction": 2.9464210976892726e-08,
+   "largest_piece_mm2": 1.9989800517650202e-07,
+   "pass": true
+  },
+  "F.SilkS": {
+   "difference_fraction": 4.6553291122307405e-07,
+   "largest_piece_mm2": 4.7129699654036017e-07,
+   "pass": true
+  },
+  "B.SilkS": {
+   "difference_fraction": 4.6191222759847575e-07,
+   "largest_piece_mm2": 6.925969938675891e-07,
+   "pass": true
+  }
+ },
+ "outline_bounds_roundtrip": [
+  0.0,
+  0.0,
+  50.80000000000001,
+  50.8
+ ],
+ "drc": {
+  "counts": {
+   "clearance": 499,
+   "copper_edge_clearance": 8,
+   "isolated_copper": 13,
+   "silk_edge_clearance": 4,
+   "padstack": 1,
+   "lib_footprint_issues": 106
+  },
+  "unconnected_items": 0,
+  "unexplained": [],
+  "clearance_below_rule": [],
+  "report_cap_note": "KiCad lists at most 499 items per type",
+  "clearance_items_at_rule_minus_tolerance": 0
+ },
+ "revision": 2,
+ "earlier_runs": {
+  "run1": "crashed, no report",
+  "run2": "results/gan/epc90133-reconstruct-final-run2-failed.json"
+ },
+ "board_file": "vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb (git-ignored; EPC derivative)"
+}

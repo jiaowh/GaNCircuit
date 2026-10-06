@@ -1727,6 +1727,40 @@ Still open for track R:
   explained;
 - zone fills are EPC's copper frozen: a KiCad refill would regenerate them by KiCad's rules.
 
+**Step 5: rings, silkscreen, EPC's rules, explained DRC (6 October 2026). Track R complete.**
+`scripts/epc90133_reconstruct_final.py` writes the final board (vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb
+and .kicad_pro, git-ignored). Changes over steps 3-4:
+- vias and plated pads get real rings: the largest circle inside EPC's copper on every connected layer, capped
+  at the measured via pad (about 0.65 mm for both drill sizes) or the pad's mask opening;
+- zone priorities follow nesting;
+- netless pads follow KiCad's convention (unused pins get 'unconnected-(part-pin)'; the unnamed auxiliary pads
+  in Q1/Q2's gate pads take VGu/VGl);
+- the outline is one rectangle, the silkscreen is added, and back-side references are mirrored;
+- EPC's .RUL rules are applied: 5.91 mil clearance, the smallest of six (the export lost the named rules' net
+  scopes), 5 mil width and 2 mil mask expansion. Edge, hole and via minima are not in EPC's file and are not
+  enforced.
+
+Run 1 crashed (silkscreen file naming). Run 2 failed only on two undeclared DRC categories, and is kept
+([report](../results/gan/epc90133-reconstruct-final-run2-failed.json)). The run also showed that KiCad lists at
+most 499 items per DRC type. **Run 3 passes all five checks**
+([report](../results/gan/epc90133-reconstruct-final.json)):
+- all 14 Gerber layers (8 copper, mask, paste and silkscreen on both sides) and all 445 drills round-trip
+  exactly;
+- KiCad finds 0 shorts and 0 unconnected items, and no EPC net changed;
+- every remaining DRC item is in a declared category:
+  - 499+ clearance items at EPC's rule within 1 um, the arcs being 5-degree polygons. A second DRC at the rule
+    minus 1 um reports none, so no gap is below EPC's rule;
+  - 8 edge items on a 0.25 mm ring centred on the outline. EPC's Altium export draws the outline into every
+    copper Gerber, and the fab trims it, so it is not real copper;
+  - SO3's 3 mm plated hole, which EPC's copper gives no ring;
+  - EPC's silkscreen near the edge, 13 isolated netless islands, and the footprints not being from a library.
+
+Limits:
+- the zones hold EPC's fills frozen, and a KiCad refill regenerates them by KiCad rules;
+- the named EPC clearance rules (gate drive, logic, PSU, FET) lost their scopes, so only the board minimum is
+  enforced;
+- this is EPC's published layout (B5253 Rev 2.0), not yet checked against the board we buy.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
