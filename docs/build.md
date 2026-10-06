@@ -1645,6 +1645,27 @@ Rerun on the same inputs plus the finished ms50-a report, no simulation:
 overshoots identical to the stored assessment (kept), and **R80 1.5 ohm is selected under both rules**, with all four
 of its comparisons same-method (two trapezoidal, two Gear).
 
+### EPC90133 track R step 1: copper in KiCad (6 October 2026)
+
+Track R (plans/layout-round-2-plan.md) rebuilds an editable KiCad design from EPC's Gerbers, for our own board
+(G5). Step 1 converts the eight copper layers. `scripts/epc90133_reconstruct.py` applies each layer's drawing
+commands in order (copper added, cut-outs removed) with shapely. It splits polygons with holes into hole-free pieces,
+because KiCad graphic polygons have none, and writes a KiCad 10 board with the GM1 outline. kicad-cli then exports
+Gerbers for comparison. The board file is a derivative of EPC's layout and the repository is public, so it stays in
+the git-ignored vendor/epc/epc90133/reconstruction/. Only the script and the summary report are committed.
+
+Run 1 crashed (hole splitting exceeded the recursion limit; no report). Run 2 FAILED its declared pixel criteria on
+every layer (XOR 0.20-0.58 %, mismatch regions up to 0.73 mm^2) and is kept
+([report](../results/gan/epc90133-reconstruct-copper-run2-failed.json)). The diagnosis is that the mismatch exists
+before KiCad, and every mismatched pixel lies within 0.041 mm (1.6 pixels) of a true edge. The reader's raster
+fills every pixel an edge touches, so the revision-1 criteria tested the raster rather than the conversion.
+Revision 2, declared before run 3, compares geometry exactly and keeps a raster cross-check. **Run 3 passes**
+([report](../results/gan/epc90133-reconstruct-copper.json)): on every layer the symmetric difference is at most
+0.000004 % of the copper area (largest piece 2e-6 mm^2), every raster mismatch lies within 0.042 mm of an edge,
+and the outline is exact. Scope: copper shapes only, no parts, nets, vias, drills, mask or zones (steps 2-4). Arcs
+are 5-degree polygons, as in the reader. The raster reader used for the extractions has the same ~1-pixel
+(0.025-0.04 mm) edge uncertainty, which is far below the extraction meshes.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
