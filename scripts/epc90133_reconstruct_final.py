@@ -38,6 +38,20 @@ Checks:
 
 Run 1 crashed in the comparison (no report): KiCad names the silkscreen Gerbers F_Silkscreen/B_Silkscreen, which
 the file lookup did not map. Fixed for run 2; construction and checks unchanged.
+
+Run 2 FAILED R4 only (kept: results/gan/epc90133-reconstruct-final-run2-failed.json); R1-R3 and R5 passed (all 14
+layers and 445 drills exact, zero shorts and unconnected). Undeclared DRC items: 8 copper_edge_clearance, each a
+netless copper ring 0.25 mm wide centred on the board outline on every copper layer (bounds -0.125..50.925 mm,
+area 50.77 mm^2 = perimeter x 0.25 mm: EPC's Altium export draws the outline into every copper Gerber; the fab trims
+it), and 1 padstack (SO3's 3 mm plated hole, which EPC's copper gives no ring; listed under ringless). Also found:
+KiCad's DRC report lists at most 499 items per type (a 0.3 mm test rule also gives exactly 499), so a capped list
+cannot show that no gap is below the rule.
+
+Revision 2 (declared 6 October 2026 after run 2, before run 3):
+  - R4 additionally accepts copper_edge_clearance items whose copper item lies within 0.15 mm of the outline (the
+    outline ring), and padstack items for pads listed as ringless;
+  - R4 clearance evidence: a second DRC with the clearance rule set to 0.150114 - 0.001 mm must report zero
+    clearance items (an empty list is not affected by the cap). The EPC-rule DRC stays the reported one.
 """
 import argparse
 import collections
@@ -336,11 +350,24 @@ def main():
     counts = collections.Counter(v.get("type") for v in viol)
     r3 = counts.get("shorting_items", 0) == 0 and not d.get("unconnected_items")
     unexplained, below = [], []
+    ringless_pads = {r["kind"].split(" ", 1)[1].split("-")[0] for r in ringless if r["kind"].startswith("pad ")}
+
+    def on_outline_ring(item):
+        p = item.get("pos") or {}
+        if "x" not in p:
+            return False
+        bx, by = p["x"] - 100.0, 150.0 - p["y"]
+        return min(abs(bx - x0), abs(bx - x1), abs(by - y0), abs(by - y1)) <= 0.15
     for v in viol:
         t = v.get("type")
         if t in ("lib_footprint_issues",) or t in SILK_TYPES:
             continue
         if t == "isolated_copper":
+            continue
+        items = v.get("items", [])
+        if t == "copper_edge_clearance" and all(on_outline_ring(i) for i in items if "Edge.Cuts" not in i.get("description", "")):
+            continue
+        if t == "padstack" and any(any(f" of {r}" in i.get("description", "") for r in ringless_pads) for i in items):
             continue
         if t == "clearance":
             m = re.search(r"actual ([\d.]+) mm", v.get("description", ""))
@@ -351,7 +378,19 @@ def main():
         unexplained.append({"type": t, "description": v.get("description"),
                             "items": [i.get("description") for i in v.get("items", [])][:2]})
     iso_ok = counts.get("isolated_copper", 0) <= netless_islands
-    r4 = not unexplained and not below and iso_ok
+    # revision 2: uncapped evidence for clearance - a DRC at the rule minus the arc tolerance must be empty
+    tol_dir = OUT / "final-drc-tolerance"
+    tol_dir.mkdir(exist_ok=True)
+    (tol_dir / "epc90133.kicad_pcb").write_text(board.read_text(encoding="utf-8"), encoding="utf-8")
+    pro_tol = json.loads(json.dumps(pro))
+    pro_tol["board"]["design_settings"]["rules"]["min_clearance"] = CLEARANCE - ARC_TOL
+    pro_tol["net_settings"]["classes"][0]["clearance"] = CLEARANCE - ARC_TOL
+    (tol_dir / "epc90133.kicad_pro").write_text(json.dumps(pro_tol, indent=2) + "\n", encoding="utf-8")
+    subprocess.run([str(KICAD_CLI), "pcb", "drc", "--format", "json", "--severity-all", "-o", str(tol_dir / "drc.json"),
+                    str(tol_dir / "epc90133.kicad_pcb")], capture_output=True, text=True)
+    dt = json.loads((tol_dir / "drc.json").read_text(encoding="utf-8"))
+    clearance_below_tolerance = sum(1 for v in dt.get("violations", []) if v.get("type") == "clearance")
+    r4 = not unexplained and not below and iso_ok and clearance_below_tolerance == 0
     epc_net_changed = [c for c in pad_net_change if any(p[0] + "-" + p[1] == c["pad"] and p[6] for p in pads)]
     r5 = not epc_net_changed
     passed = r1 and r2 and r3 and r4 and r5
@@ -365,7 +404,11 @@ def main():
                                                          "unmatched": unmatched[:20], "extra": pool[:20]},
            "layers": rt, "outline_bounds_roundtrip": eb,
            "drc": {"counts": dict(counts), "unconnected_items": len(d.get("unconnected_items", [])),
-                   "unexplained": unexplained[:30], "clearance_below_rule": below[:30]},
+                   "unexplained": unexplained[:30], "clearance_below_rule": below[:30],
+                   "report_cap_note": "KiCad lists at most 499 items per type",
+                   "clearance_items_at_rule_minus_tolerance": clearance_below_tolerance},
+           "revision": 2, "earlier_runs": {"run1": "crashed, no report",
+                                           "run2": "results/gan/epc90133-reconstruct-final-run2-failed.json"},
            "board_file": "vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb (git-ignored; EPC derivative)"}
     args.output.write_text(json.dumps(out, indent=1, default=float) + "\n", encoding="utf-8")
     for name, v in rt.items():
