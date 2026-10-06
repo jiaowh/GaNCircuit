@@ -30,6 +30,22 @@ this pointer that were not traced to a source and are not used: an MDPI "0.1 nH 
 of the held PDFs states a package value other than AN020's), WLCSP connections below 100 pH (no source; a different
 package), and D2PAK at 5-7 nH (background figure, no source checked).
 
+The MDPI source, identified later the same day by the owner: Singh and Tripathi, "Paralleling of Gallium Nitride
+Power Semiconductor Devices: A Review and Future Perspectives", Electronics 2026, 15, 1607
+(doi:10.3390/electronics15081607, CC BY; read in full from the owner's copy; the publisher blocks automated
+download, so no local file). Its 0.2 nH (p. 11) repeats EPC's LGA estimate (its ref. [73], Reusch and Strydom,
+PCIM 2014). Its 0.1 nH (p. 15, Fig. 11) is a simulation setting for the common-source inductance of one of two
+paralleled half bridges (48 V to 12 V, 25 A), and a mismatch at which current sharing degrades. It is not an
+extracted or measured package inductance, so the claim built on it misreads the source. The review gives no QFN or
+EPC2302 value; it says only, without numbers, that QFN packages exceed LGA. Useful secondhand points:
+- common-source inductance is ranked the most damaging parasitic, ahead of loop inductance, which agrees with
+  tests 6-7 here;
+- quoting its ref. [88] (Lu et al., APEC 2016), about 300 pH of common-source inductance raises turn-on loss by
+  about 15 % and turn-off loss by about 10 %, and about 500 pH causes partial turn-off;
+- its Fig. 14 is from EPC's layout presentation, already held.
+Our board values (L_cs about 1 pH for Q1 and 48 pH for Q2, extracted) and the 0 / 50 pH package cases lie well below
+those levels. Nothing here changes the E4 prediction or the package-inductance question.
+
 ## 2. Geometry for our own board
 
 - **Infineon DG165832 (2025)**, half-bridge design guide for 60-200 V GaN: component selection, PCB architecture and

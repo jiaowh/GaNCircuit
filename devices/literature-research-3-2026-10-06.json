@@ -113,6 +113,11 @@
       "title": "EPC2302 package inductance",
       "url": null,
       "reason": "searched again; still not published. EPC's 3x5 mm QFN overview (Controllers_Gate_Drive_PCB_Layout.pdf, page 5) lists ratings and charges only"
+    },
+    {
+      "title": "Singh, Tripathi, Paralleling of Gallium Nitride Power Semiconductor Devices: A Review and Future Perspectives, Electronics 2026, 15, 1607",
+      "url": "https://doi.org/10.3390/electronics15081607",
+      "reason": "CC BY; read in full from the owner's copy; mdpi.com returns 403 to automated download, so no local file or checksum"
     }
   ]
 }
