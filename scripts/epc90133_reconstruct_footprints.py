@@ -46,6 +46,11 @@ every board-level polygon (copper, leftover mask and paste) shifted by (-100, -1
 repeat of run 2 with the identical script (a fix patch failed and the next command ran anyway); identical result,
 report results/gan/epc90133-reconstruct-footprints-run3-repeat.json. Fixed for run 4 (absolute coordinates for
 board-level shapes); construction and checks unchanged.
+Run 4 FAILED F1 only (kept: results/gan/epc90133-reconstruct-footprints-run4-failed.json): copper, paste, pad nets
+and drills pass exactly; the mask differs by two 3 mm circles at the standoffs SO1/SO2, because the non-plated
+holes were given "*.Mask" layers while EPC's mask has no such opening (any opening there is already a board-level
+shape); every other difference is a sliver below 0.001 mm^2. Fixed for run 5: the non-plated holes carry no mask
+layer. Construction otherwise and checks unchanged.
 
 Terms: the board file is an EPC derivative and stays in the git-ignored vendor/epc/epc90133/reconstruction/.
 """
@@ -137,7 +142,7 @@ def main():
                 h = inside[0]
                 origin = (h.x, h.y)
                 body.append(f'\t\t(pad "" np_thru_hole circle (at 0 0) (size {h.diameter:.4f} {h.diameter:.4f}) '
-                            f'(drill {h.diameter:.4f}) (layers "*.Cu" "*.Mask") (uuid "{uid()}"))\n')
+                            f'(drill {h.diameter:.4f}) (layers "*.Cu") (uuid "{uid()}"))\n')  # run 4: no mask
             if body:
                 x, y = to_kicad(*origin)
                 fps.append(f'\t(footprint "EPC90133:{ref}" (layer "{L}.Cu") (uuid "{uid()}") (at {x:.6f} {y:.6f})\n'

@@ -1,0 +1,142 @@
+{
+ "schema": "epc90133-reconstruct-footprints/2",
+ "step": "track R step 2b: footprints from the board's pads",
+ "passed": false,
+ "script_sha256": "1a3f0c7ea30d4483a0fa352b227a1ad134d76619e0973e2ec71562f6c70af968",
+ "checks": {
+  "F1_mask": false,
+  "F2_paste": true,
+  "F3_copper_unchanged": true,
+  "F4_pad_copper_and_nets": true,
+  "F5_drills": true
+ },
+ "footprints": 106,
+ "pads": 299,
+ "nets": 37,
+ "f4_failures": [],
+ "f5_failures": [],
+ "board_level_leftovers": {
+  "top": {
+   "mask": 47,
+   "paste": 1
+  },
+  "bot": {
+   "mask": 20,
+   "paste": 1
+  }
+ },
+ "layers": {
+  "F.Cu": {
+   "original_mm2": 2386.90899128049,
+   "roundtrip_mm2": 2386.9089943344584,
+   "difference_mm2": 5.200208240817741e-05,
+   "fraction": 2.1786369986515563e-08,
+   "largest_piece_mm2": 2.0681058148069893e-06,
+   "pass": true
+  },
+  "In1.Cu": {
+   "original_mm2": 2396.7359362283946,
+   "roundtrip_mm2": 2396.7358817280883,
+   "difference_mm2": 9.661634572041296e-05,
+   "fraction": 4.031163561241233e-08,
+   "largest_piece_mm2": 2.6741800787947936e-07,
+   "pass": true
+  },
+  "In2.Cu": {
+   "original_mm2": 2387.818950821933,
+   "roundtrip_mm2": 2387.8188978422945,
+   "difference_mm2": 9.922027266828926e-05,
+   "fraction": 4.155267828582052e-08,
+   "largest_piece_mm2": 6.23986163853857e-07,
+   "pass": true
+  },
+  "In3.Cu": {
+   "original_mm2": 2400.3383399175445,
+   "roundtrip_mm2": 2400.3382843560717,
+   "difference_mm2": 9.840386169148741e-05,
+   "fraction": 4.099582965244297e-08,
+   "largest_piece_mm2": 1.7583261625255843e-07,
+   "pass": true
+  },
+  "In4.Cu": {
+   "original_mm2": 2400.3383182463167,
+   "roundtrip_mm2": 2400.338262799728,
+   "difference_mm2": 9.838791445942767e-05,
+   "fraction": 4.098918627908658e-08,
+   "largest_piece_mm2": 1.7107963504484933e-07,
+   "pass": true
+  },
+  "In5.Cu": {
+   "original_mm2": 2429.8533712107196,
+   "roundtrip_mm2": 2429.8533529796123,
+   "difference_mm2": 4.02015586658064e-05,
+   "fraction": 1.6544849636657388e-08,
+   "largest_piece_mm2": 1.4762461415557544e-07,
+   "pass": true
+  },
+  "In6.Cu": {
+   "original_mm2": 2429.786287751761,
+   "roundtrip_mm2": 2429.7862692573044,
+   "difference_mm2": 4.025608655682763e-05,
+   "fraction": 1.6567747854925913e-08,
+   "largest_piece_mm2": 1.4762461415557544e-07,
+   "pass": true
+  },
+  "B.Cu": {
+   "original_mm2": 2380.684312453876,
+   "roundtrip_mm2": 2380.6843146778892,
+   "difference_mm2": 4.229100239012378e-05,
+   "fraction": 1.7764221055639497e-08,
+   "largest_piece_mm2": 7.762239901754411e-07,
+   "pass": true
+  },
+  "F.Mask": {
+   "original_mm2": 499.5475970415195,
+   "roundtrip_mm2": 508.8430223974978,
+   "difference_mm2": 9.295471016056656,
+   "fraction": 0.018607778460165567,
+   "largest_piece_mm2": 4.647804480618468,
+   "pass": false
+  },
+  "B.Mask": {
+   "original_mm2": 273.14281857272516,
+   "roundtrip_mm2": 287.18935742309685,
+   "difference_mm2": 14.046566208858515,
+   "fraction": 0.05142572036950176,
+   "largest_piece_mm2": 7.02325159258061,
+   "pass": false
+  },
+  "F.Paste": {
+   "original_mm2": 274.62649228108495,
+   "roundtrip_mm2": 274.62649432110425,
+   "difference_mm2": 9.025904030091391e-06,
+   "fraction": 3.286610827353547e-08,
+   "largest_piece_mm2": 2.836919907551782e-07,
+   "pass": true
+  },
+  "B.Paste": {
+   "original_mm2": 110.34365124798983,
+   "roundtrip_mm2": 110.3436519133482,
+   "difference_mm2": 3.2511886203314445e-06,
+   "fraction": 2.9464210976892726e-08,
+   "largest_piece_mm2": 1.9989800517650202e-07,
+   "pass": true
+  }
+ },
+ "drc_reported_not_checked": {
+  "violations": {
+   "annular_width": 49,
+   "clearance": 499,
+   "shorting_items": 18,
+   "hole_clearance": 2,
+   "copper_edge_clearance": 199,
+   "invalid_outline": 12,
+   "padstack": 49,
+   "lib_footprint_issues": 106,
+   "nonmirrored_text_on_back_layer": 59
+  },
+  "unconnected_items": 35,
+  "schematic_parity": 0
+ },
+ "board_file": "vendor/epc/epc90133/reconstruction/epc90133-footprints.kicad_pcb (git-ignored)"
+}
