@@ -24,8 +24,11 @@ consistent with the 0 / 50 pH bracket, but it does not exclude larger source ind
 gives up to about 100 pH per terminal). In round 3 the R80 1.5 ohm benefit fell from about -33 % at 0 pH to -4 to
 -11 % at 50 pH, so the lower end of the E4 prediction may be optimistic if the true value is above 50 pH. No rerun
 is planned; E3's stock-board data constrain this before the swap, and a single 100 pH case would be added only if
-the frozen prediction record needs it. Claims passed along with this pointer (an MDPI "0.1 nH benchmark", WLCSP
-below 100 pH, the document number AN020) were not traced to a source and are not used.
+the frozen prediction record needs it. The held paper is EPC application note AN020, "Effectively Paralleling
+Enhancement Mode Gallium Nitride Transistors" (D. Reusch, 2016; confirmed on epc-co.com). Claims passed along with
+this pointer that were not traced to a source and are not used: an MDPI "0.1 nH benchmark" (no paper named; none
+of the held PDFs states a package value other than AN020's), WLCSP connections below 100 pH (no source; a different
+package), and D2PAK at 5-7 nH (background figure, no source checked).
 
 ## 2. Geometry for our own board
 
