@@ -9,6 +9,15 @@ It does not trust a record's own account. For one record in a workspace it
 5. for a stopped record, requires the stop to be warranted by a recomputed failure (or a missing artifact).
 It reads only the workspace. It never judges whether a claim is warranted; that is the declared claims review.
 
+Revision 2 (5 October 2026, project audit at f4767b1, findings 3 and 4). A record that is not a JSON object, or
+that fails structural validation, is rejected with structured problems before any artifact is read (it no longer
+raises). Descriptive identity fields are bound to the pilot's frozen artifacts: I-1 model library and subcircuit
+(the library path, its listed hash, and the subcircuit named in the source record); I-2 network (the extraction
+path, listed with its hash, and variant/mesh/junction equal to the extraction file's own case); the assessment's
+reference_data (the Fig. 9 path, its hash and its listing). I-2 predictions must form exactly the set of report
+cases x metrics, with no duplicates and no extra rows. Identity is checked against the frozen pilot; a new target
+needs its own expected identities.
+
     python scripts/e2e_check.py <workspace> handoffs/I-1.json   # prints problems as JSON; exit 1 if any
 """
 import hashlib
@@ -75,6 +84,61 @@ def upstream_ok(ws, rec):
     return True, u
 
 
+def listed(rec, path):
+    """sha256 under which rec lists path among its inputs or artifacts, or None."""
+    for key in ("inputs", "artifacts"):
+        for f in rec.get(key) or []:
+            if isinstance(f, dict) and f.get("path") == path:
+                return f.get("sha256")
+    return None
+
+
+def bound(ws, rec, path, cited_sha, what):
+    """Problems if path is not the expected file, not listed by the record, or its hash differs."""
+    out = []
+    q = ws / path
+    if not q.is_file():
+        return [f"{what}: {path} does not exist"]
+    actual = sha(q)
+    if listed(rec, path) != actual:
+        out.append(f"{what}: {path} is not listed among inputs/artifacts with its current hash")
+    if cited_sha is not None and cited_sha != actual:
+        out.append(f"{what}: cited hash differs from {path}")
+    return out
+
+
+def identity(ws, kind, rec):
+    """Identity problems: the record's descriptive fields must name the pilot's frozen artifacts."""
+    out = []
+    if kind == "I-1":
+        m = rec.get("model") or {}
+        src = load(ws, SOURCES)
+        subckt = ((src or {}).get("model") or {}).get("subcircuit", "").split()[:1]
+        if m.get("library") != LIB:
+            out.append(f"model.library {m.get('library')!r} is not {LIB}")
+        else:
+            out += bound(ws, rec, LIB, m.get("sha256"), "model.library")
+        if not subckt or m.get("subckt") != subckt[0]:
+            out.append(f"model.subckt {m.get('subckt')!r} is not the source record's {subckt[:1]}")
+    elif kind == "I-2":
+        n = rec.get("network") or {}
+        if n.get("extraction") != STAGE2["extraction"]:
+            out.append(f"network.extraction {n.get('extraction')!r} is not {STAGE2['extraction']}")
+        else:
+            out += bound(ws, rec, STAGE2["extraction"], None, "network.extraction")
+            case = (load(ws, STAGE2["extraction"]) or {}).get("case") or {}
+            for k in ("variant", "mesh", "junction"):
+                if n.get(k) != case.get(k):
+                    out.append(f"network.{k} {n.get(k)!r} differs from the extraction's {case.get(k)!r}")
+    elif kind == "assessment":
+        r = rec.get("reference_data") or {}
+        if r.get("path") != STAGE3["fig9"]:
+            out.append(f"reference_data.path {r.get('path')!r} is not {STAGE3['fig9']}")
+        else:
+            out += bound(ws, rec, STAGE3["fig9"], r.get("sha256"), "reference_data")
+    return out
+
+
 def recompute(ws, kind, rec):
     """{check id: True/False/None} from the artifacts (None: the artifact needed is missing or unreadable)."""
     out = {}
@@ -131,11 +195,15 @@ def check(ws, rel):
     rec = load(ws, rel)
     if rec is None:
         return ["record missing or unreadable"]
-    kind = KIND.get(rec.get("schema"))
-    up = load(ws, rec["upstream"]["path"]) if isinstance(rec.get("upstream"), dict) and rec["upstream"].get("path") else None
+    if not isinstance(rec, dict):
+        return ["schema: record is not a JSON object"]
+    schema = rec.get("schema")
+    kind = KIND.get(schema) if isinstance(schema, str) else None
+    u = rec.get("upstream")
+    up = load(ws, u["path"]) if isinstance(u, dict) and isinstance(u.get("path"), str) and u["path"] else None
     problems = [f"schema: {x}" for x in validate(rec, up)]
-    if kind is None:
-        return problems
+    if kind is None or problems:
+        return problems  # structural rejection: nothing below is read from a malformed record
     for key in ("inputs", "artifacts"):
         for f in rec.get(key) or []:
             if not isinstance(f, dict) or "path" not in f:
@@ -145,9 +213,11 @@ def check(ws, rel):
                 problems.append(f"{key}: {f['path']} does not exist")
             elif sha(q) != f.get("sha256"):
                 problems.append(f"{key}: {f['path']} hash differs from the record")
+    stopped = rec.get("status") in STOPPED
+    if not stopped:
+        problems += [f"identity: {x}" for x in identity(ws, kind, rec)]
     truth = recompute(ws, kind, rec)
     stated = {c.get("id"): c.get("outcome") for c in rec.get("checks") or [] if isinstance(c, dict)}
-    stopped = rec.get("status") in STOPPED
     for cid in REQUIRED[kind]:
         t = truth.get(cid)
         if cid not in stated:
@@ -165,7 +235,13 @@ def check(ws, rel):
         problems.append(f"usable status despite a failed integrity check ({', '.join(REQUIRED[kind][:2])})")
     if kind == "I-2" and not stopped:
         s = load(ws, STAGE2["switching"])
-        rows = {(p.get("case"), p.get("metric")): p for p in rec.get("predictions") or [] if isinstance(p, dict)}
+        preds = [p for p in rec.get("predictions") or [] if isinstance(p, dict)]
+        rows = {(p.get("case"), p.get("metric")): p for p in preds}
+        if len(rows) != len(preds):
+            problems.append("predictions contain duplicate case/metric rows")
+        expected = {(case, metric) for case in ((s or {}).get("cases") or {}) for metric in METRICS}
+        for key in sorted(set(rows) - expected, key=str):
+            problems.append(f"prediction {key[0]}/{key[1]} is not in the switching report")
         for case, c in ((s or {}).get("cases") or {}).items():
             m = flat(c["metrics"]) if c.get("metrics") else {}
             usable = c.get("usable") is True and not c.get("interpretation_invalid")

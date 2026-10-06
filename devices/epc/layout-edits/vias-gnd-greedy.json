@@ -1,0 +1,30 @@
+{
+ "name": "vias-gnd-greedy",
+ "note": "layout round 2b candidate, revision 2 (rule R6: no antipads in VIN/SW copper): every GND via accepted by scripts/epc90133_board_edit.py on a 0.25 mm grid over x 17-24, y 24-36 mm, applied greedily in row order. Revision 1 (vias-gnd-greedy-r1-cuts-power-path.json) perforated the SW copper between the FETs and disconnected Q1's source in the A mesh.",
+ "edits": [
+  {
+   "edit": "add_via",
+   "x_mm": 17.25,
+   "y_mm": 24.0,
+   "net": "GND"
+  },
+  {
+   "edit": "add_via",
+   "x_mm": 17.25,
+   "y_mm": 24.75,
+   "net": "GND"
+  },
+  {
+   "edit": "add_via",
+   "x_mm": 17.25,
+   "y_mm": 25.5,
+   "net": "GND"
+  },
+  {
+   "edit": "add_via",
+   "x_mm": 17.0,
+   "y_mm": 26.0,
+   "net": "GND"
+  }
+ ]
+}

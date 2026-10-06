@@ -73,7 +73,7 @@ def _rotate(points, deg):
 
 def _eval(expr, variables):
     expr = expr.strip()
-    for k in sorted(variables, key=len, reverse=True):
+    for k in sorted(variables, key=lambda v: len(str(v)), reverse=True):  # $10 before $1; keys are ints
         expr = expr.replace(f"${k}", repr(variables[k]))
     if not re.fullmatch(r"[0-9eE.+\-*/xX() ]*", expr):
         raise GerberUnsupported(f"macro expression {expr!r}")
@@ -350,7 +350,14 @@ def parse_excellon(text: str) -> list[Drill]:
         elif not header and (m := re.fullmatch(r"T(\d+)", line)):
             tool = int(m.group(1))
         elif not header and line.startswith(("X", "Y")):
-            for axis, raw in re.findall(r"([XY])([+-]?\d+)", line):
+            for axis, raw in re.findall(r"([XY])([+-]?[\d.]+)", line):
+                if "." in raw:  # explicit decimal point (KiCad's "decimal" format): no implied digits
+                    v = float(raw) * scale
+                    if axis == "X":
+                        x = v
+                    else:
+                        y = v
+                    continue
                 sign = -1 if raw.startswith("-") else 1
                 raw = raw.lstrip("+-")
                 n = sum(digits)

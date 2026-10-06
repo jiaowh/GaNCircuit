@@ -1,3 +1,4 @@
+import platform
 import shutil
 import subprocess
 import time
@@ -32,8 +33,10 @@ class RunSolver(unittest.TestCase):
             run_solver("/bin/sleep", "30", d, 3, "sleep")
         self.assertLess(time.time() - t0, 25)
         pid = (d / "solver.pid").read_text().strip()
-        alive = subprocess.run(["wsl", "-e", "bash", "-c", f"cat /proc/{pid}/comm 2>/dev/null"],
-                               capture_output=True, text=True).stdout.strip()
+        probe = f"cat /proc/{pid}/comm 2>/dev/null"
+        # inspect the process where the runner launched it: through wsl on Windows, natively elsewhere
+        cmd = ["wsl", "-e", "bash", "-c", probe] if platform.system() == "Windows" else ["bash", "-c", probe]
+        alive = subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
         self.assertNotEqual(alive, "sleep")
 
     def test_normal_completion(self):

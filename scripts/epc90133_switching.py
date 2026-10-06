@@ -205,6 +205,121 @@ Reading: material differences mean the excitation depends on a driver property t
 measuring the driver's gate edges (hardware plan E1) is a model input, not only a check; no difference means
 this family is not a major excitation uncertainty. Both are model statements; neither identifies the real driver.
 
+Design round 1 (--study design; declared 5 October 2026 at the owner's request, before any run). Owner targets,
+each relative to the EPC original (the stock BOM in this same simulation, not EPC's measurement):
+  T1 switch-node voltage overshoot lower than the original;
+  T2 switching energy Eon + Eoff not higher than the original;
+  T3 estimated efficiency at 48 V -> 12 V not lower than the original.
+Operating point: continuous buck 48 V -> 12 V, 20 A, 250 kHz, the QSG's 2.2 uH (duty 0.25, ripple 16.4 A, so the
+double pulse turns Q1 off at 28.2 A and on at 11.8 A). Network G-m1-mid (the only extraction with the gate loops),
+the test 7/11 settings (100 ps step, Q2 sense source, the bench ends 80 ns after the valley turn-on).
+Design space (changes that can be made on the stock board by replacing parts): R80 (Q1 turn-on) 1 (stock), 2.2,
+3.3 ohm; and R80 2.2 ohm with dead time 7.5 ns (R620/R625 = 87 ohm by the QSG rule). A shorter dead time is
+admissible only after E1 has measured the board's dead-time margin (input-logic check: datasheet limits do not
+guarantee a positive dead time even at 10 ns); the candidate is run to see whether it could close a trade-off.
+Robustness: every design runs under the four unresolved alternatives {test-11 ramp, step driver} x {package
+source inductance 0, 50 pH}; a target is met only if it holds under all four:
+  T1 overshoot above the bus at the valley turn-on lower than the original's by at least max(1 V, 10 %)
+     (the bench's materiality rule);
+  T2 Q1 Eon (valley turn-on) + Eoff (peak turn-off), die terminals, at most 2 % above the original's (the
+     numerical tolerance of the earlier step checks);
+  T3 FET loss at most 2 % above the original's, which bounds the efficiency drop.
+Estimated efficiency (power stage, FET losses only; inductor, copper, capacitor and gate-drive losses excluded;
+the gate-drive total Qg x V x f does not depend on R80 or the dead time): the FET energy (Q1 + Q2, die terminals)
+from 2 ns before the peak turn-off command to 40 ns after the valley turn-on command covers one off interval
+with both edges and both dead times at the converter's currents; Q1's remaining on-time conduction is
+Rds x D x (Iv^2 + Iv Ip + Ip^2) / 3 x (1 - 40 ns f / D), with Rds = Vds / Id of Q1 averaged 40-70 ns after the valley
+turn-on. Loss = f x E_window + on-time conduction; efficiency = Pout / (Pout + loss), Pout = 12 V x 20 A. The
+absolute value is optimistic by the excluded terms; the comparison between designs is the target.
+Also reported, not targets: Q2's die gate peak during the rise (false-turn-on margin) and the falling-edge minimum.
+Checks per case as before (edge currents, spikes). Numerical check: the best-ranked candidate under the step
+driver with 50 pH at a 50 ps step, every target metric within 2 %. Budget: 16 design cases plus the check; one
+further round only if round 1 leaves a target unmet, declared in this docstring before it runs.
+Gate-charge-dependent quantities (energies, edge times, losses) carry the EPC2302 Fig. 7 exception: the results
+rank designs within this model; they are frozen predictions for the board, not validated values.
+Round 1 fix runs (declared 5 October 2026 after round 1, before running): three 100 ps timing runs stalled at the
+start of the transient (LTspice resetting Tseed down to 1e-17 s) and hit the 1800 s limit: stock@step-Ls50,
+R80-3.3@ramp-Ls0, R80-3.3@step-Ls50. Every other case completed. The step-Ls50 alternative is resolved for R80-2.2
+by the on-request pair stock@step-Ls50-ms50 and R80-2.2@step-Ls50-ms50 (both at 50 ps, compared with each other
+only); R80-2.2@step-Ls50-ms50 against its 100 ps run is also the declared numerical check (every target metric
+within 2 %). Written to results/gan/epc90133-design-round1-fix.json. The R80-3.3 stalls are not rerun: under the
+corrected assessment its T2 and T3 already fail under the alternatives that ran, so no rerun could change its
+all-three verdict.
+
+Layout round 2a (--study layout; declared 5 October 2026 before any run; plan: plans/layout-round-2-plan.md).
+Question: does a thinner top-to-mid-layer-1 dielectric (the power loop's return gap; stock 0.127 mm) meet round 1's
+three targets with the stock gate resistors? Candidates: 0.100, 0.075 and 0.050 mm, extracted on variant A
+(scripts/epc90133_extract.py A:m1:mid:d<mm>; results/gan/epc90133-extraction-layout/), against A-m1-mid (stock
+heights). Same operating point (48 V -> 12 V, 20 A), the same four alternatives, robust rule, efficiency estimate and
+assessment as design round 1; 100 ps step, Q2 sense source, the bench ends 80 ns after the valley turn-on. Variant A
+(top layer and mid-layer 1, Ci only, no gate loops) ranks power-loop changes; it is not a board prediction, and a
+candidate that passes on A is confirmed on G before any claim. Budget: 3 extractions (about 90 s each) and 16 switching
+cases; 50 ps checks on request.
+
+Layout round 2b (declared 5 October 2026 before any run): 22 added GND vias, every position on a 0.25 mm grid over
+x 17-24, y 24-36 mm accepted by scripts/epc90133_board_edit.py in row order (devices/epc/layout-edits/
+vias-gnd-greedy.json; several sit in the switch-node area between the FETs, bonded to the inner GND planes with a
+checked antipad in the top-layer SW copper). Extracted on A with the stock stackup; run under the four alternatives
+with estimator revision 2 (--only its four cases, report results/gan/epc90133-layout-round2b.json) and assessed
+against the stock cases of round 2a revision 2 (same estimator and settings).
+
+Loss-estimator revision 2 (declared 5 October 2026 after round 2a's results, before any rerun). The revision-1
+window ended 40 ns after the valley turn-on, while the switch node was still ringing (damping ratio about 0.006 on A,
+0.01-0.03 on G). FET terminal energy over a window equals loss only if the energy stored in the device capacitances
+is the same at both ends; at a ringing end it is not, and the stored-energy swing reached several uJ (Q2's turn-on
+segment 0.77 / 3.60 / 0.66 uJ in three neighbouring A cases). Every T3 verdict and efficiency figure from revision 1
+is therefore invalid (T1 and T2 use threshold-defined edge windows and are unaffected). Revision 2, for the design and
+layout studies only: Q1's second pulse lasts 600 ns (T_ON2_DESIGN) and the bench ends 520 ns after the valley turn-on;
+the loss window runs from 2 ns before the peak turn-off command to 450 ns after the valley turn-on; Q1's remaining
+on-time conduction uses Rds averaged 300-450 ns after the turn-on and the on-time less 450 ns. Settling check
+(declared): the window energy ending at 400 ns and at 450 ns differ by at most 2 %; a case failing it gives no T3
+value. Reports: results/gan/epc90133-layout-round2a-rev2.json and results/gan/epc90133-design-round1-rev2.json;
+revision-1 reports are kept.
+
+Design round 1 rev-2 continuation and Gear fallback (declared 5 October 2026, 17:15, before any Gear case ran).
+The rev-2 run (PID 29988) ended at 16:52 with no error output after 7 of 16 cases, apparently when its launching
+session closed; the 9 cases that never started run unchanged into results/gan/epc90133-design-round1-rev2-cont.json
+(launched through WMI, outside any session's process tree). stock@step-Ls50 stalled again (2400 s at 100 ps; at
+50 ps in the round-1 fix, 3600 s). Diagnosis from the partial raw file: the 100 ps run advanced normally to 1.753 us
+and then stepped at about 1e-19 s, 0.76 ns after Q2's turn-on command (step driver, 50 pH source L); not a start-up
+stall. Profiling on a copy cut at 1.8 us (not a result): trapezoidal at 75 ps stalls already at 20 ns; Gear at
+100 ps reaches 1.8 us in 28 s. Fallback: the step-Ls50 alternative is evaluated with Gear integration at 100 ps
+(cases <design>@step-Ls50-gear, method=gear, nothing else changed) for the stock and every candidate, compared with
+each other only (never with trapezoidal cases), used only where the 100 ps trapezoidal pair is unusable and no
+50 ps pair exists. Gear damps ringing numerically, so a declared check decides whether the Gear pairs count:
+stock@step-Ls0-gear and R80-2.2@step-Ls0-gear against their trapezoidal runs in rev 2, and
+R80-2.2@step-Ls50-gear against R80-2.2@step-Ls50 if the continuation's trapezoidal run is usable; check passes if
+overshoot, FET loss and Q2 gate peak each agree within 2 % and the stock-to-candidate DIFFERENCE in overshoot and
+loss agrees within 10 % between methods. If it fails, step-Ls50 stays undetermined and the Gear runs are kept as
+failed. Report: results/gan/epc90133-design-round1-rev2-gear.json.
+
+Rev-2 Gear extension (declared 5 October 2026, 19:20, before these runs). In the continuation the trapezoidal
+runs of R80-3.3@ramp-Ls0 and of R80-2.2-dt7.5 under ramp-Ls0, step-Ls0 and ramp-Ls50 timed out; the partial raw
+files show the step collapsing to about 1e-19 s at different edges (20 ns, near Q2's turn-on at 1.82-1.94 us, at the
+valley turn-on at 4.74-4.75 us), the same numerical failure as the step-Ls50 stall. The Gear fallback is therefore
+applied to these alternatives under the same rule (Gear pairs only, used where the trapezoidal pair is unusable,
+valid because the declared Gear check passed): R80-3.3@ramp-Ls0-gear, R80-2.2-dt7.5@{ramp-Ls0,step-Ls0,ramp-Ls50}-gear
+and their partners stock@ramp-Ls0-gear and stock@ramp-Ls50-gear (stock@step-Ls0-gear exists). Report:
+results/gan/epc90133-design-round1-rev2-gear2.json.
+
+Round 3 (declared 5 October 2026 after the rev-2 results, before any round-3 run; owner decision of 5 October,
+plans/layout-round-2-plan.md). Objective: the lowest worst-case overshoot over the four alternatives. Constraints
+under every alternative: C1 FET loss (estimator revision 2, settled) at most 5 % above stock's; C2 Q2 die gate peak
+during the rise not above stock's. Rev 2 (with the continuation and the Gear fallback, whose check passed: Gear
+within 0.05 % of trapezoidal) gives FET loss +5.5 to +9.0 % at R80 2.2 ohm and +10 to +12 % at 3.3 ohm, so both
+fail C1; a straight-line reading puts the C1 limit at about 1.6-1.8 ohm under ramp-Ls0. Candidates: R80 1.2, 1.5
+and 1.8 ohm (E12 values, a part swap on the stock board: C3), stock dead time, the same bench and alternatives.
+step-Ls50 runs directly with Gear (<d>@step-Ls50-gear), paired with rev 2's stock@step-Ls50-gear (the trapezoidal
+stock case stalls). Stock is not rerun; a reproduction control stock@ramp-Ls0-repro must match rev 2's stock@ramp-Ls0
+(netlist hashes identical, metrics within 1e-6 relative), otherwise round 3 is not compared with rev 2. A
+trapezoidal case that times out is rerun with Gear together with the matching stock case (declared now, applied only
+if needed). Assessment: scripts/assess_epc90133_design.py --rule round3 over rev 2, its continuation, the Gear report
+and results/gan/epc90133-design-round3.json. The result ranks R80 values within this model and is a frozen prediction
+for E4 on the purchased board, not a validated value.
+Round 3 numerical check (declared 5 October 2026, 21:30, after the interim verdict and before running): the
+leading candidate R80-1.5 at half the step, R80-1.5@step-Ls0-ms50 against R80-1.5@step-Ls0 (both trapezoidal):
+overshoot, FET loss and Q2 gate peak each within 2 %. Report results/gan/epc90133-design-round3-check.json.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -238,6 +353,7 @@ DEAD = 10e-9
 VCC = VBOOT = 5.0
 R_GON, R_GOFF = 1.0, 0.0
 T_ON2 = 150e-9
+T_ON2_DESIGN, T_AFTER_B_DESIGN, LOSS_END, RDS_WINDOW = 600e-9, 520e-9, 450e-9, (300e-9, 450e-9)  # estimator revision 2
 MAXSTEP, RELTOL = 20e-12, 1e-6
 CAP_MODEL = {"Ci": {"C": 110e-9, "ESL": 0.25e-9, "ESR": 10e-3}, "Cm": {"C": 0.5e-6, "ESL": 0.35e-9, "ESR": 10e-3}}
 N_CM = 10
@@ -248,6 +364,7 @@ MATERIAL = {"sw_fall_time_90_10_s": ("rel", 0.10), "sw_rise_time_10_90_s": ("rel
             "sw_overshoot_above_bus_V": ("rel_or_abs", 0.10, 1.0), "ringing_frequency_Hz": ("rel", 0.05),
             "ringing_damping_ratio": ("rel", 0.20)}
 EXTRACTIONS = ROOT / "results/gan/epc90133-extraction"
+LAYOUT_EXTRACTIONS = ROOT / "results/gan/epc90133-extraction-layout"  # layout round 2 only
 # Added 29 September 2026 after the literature review (docs/gan-layout-literature-notes.md), before
 # their first run. Package inductance: the vendor model has none (EPC AN005 structure) and the QFN
 # value is not published, so an assumed bracket in series with each FET drain and source terminal;
@@ -355,7 +472,7 @@ def pin_regularization(stages, pin_c):
     return out + [PIN_DIODE]
 
 
-def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"), pin_c=None):
+def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"), pin_c=None, gate_r=None):
     """Test 7: uP1966E stages at the extracted ball terminals, gate resistors between their pad terminals.
 
     drive_stage ties its pull-up and pull-down resistors to one gate node; here the pull-down resistor is
@@ -371,7 +488,8 @@ def gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=("u", "l"),
         if text.count(old) != 1:
             raise RuntimeError("drive_stage output changed; cannot split its outputs")
         out.append(text.replace(old, f"R{tag}d {dn} pd{tag}"))
-    for ref, ohm in (("R80", R_GON), ("R81", R_GOFF), ("R82", R_GON), ("R83", R_GOFF)):
+    gr = {"R80": R_GON, "R81": R_GOFF, "R82": R_GON, "R83": R_GOFF, **(gate_r or {})}  # design study: overrides
+    for ref, ohm in gr.items():
         if STAGE_OF[ref] not in stages:
             continue
         out.append(f"{ref} {ref.lower()}_d {ref.lower()}_g {max(ohm, 1e-3):g}")
@@ -388,7 +506,10 @@ def ideal_stage(tag, hi, lo, te_rise, te_fall, r_src, r_snk, t_end):
 def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, reltol=RELTOL, periods=None, timing=None,
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
-          pin_c=None, full_r=False, internal=False):
+          pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None):
+    dead = DEAD if dead is None else dead
+    if gate_r and not is_gate_extraction(ext):
+        raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
     net, terms = network(ext, ideal, r_scale, no_gate_power_k, full_r)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
@@ -422,9 +543,10 @@ Rbret bn {node(at + '.GND')} 1u"""
         # and main() corrects them once from each case's own first run.
         t_off1 = t_on1 + timing.get("t1", I_PEAK / ((VIN - VOUT) / L_OUT))
         t_on2 = t_off1 + timing.get("t_off", T_OFF)
-        hi = [(t_on1, 1), (t_off1, 0), (t_on2, 1), (t_on2 + T_ON2, 0)]
-        lo = [(t_off1 + DEAD, 1), (t_on2 - DEAD, 0), (t_on2 + T_ON2 + DEAD, 1)]
-        t_end = t_on2 + T_ON2 + 100e-9
+        t_on2_len = T_ON2_DESIGN if long_pulse else T_ON2
+        hi = [(t_on1, 1), (t_off1, 0), (t_on2, 1), (t_on2 + t_on2_len, 0)]
+        lo = [(t_off1 + dead, 1), (t_on2 - dead, 0), (t_on2 + t_on2_len + dead, 1)]
+        t_end = t_on2 + t_on2_len + 100e-9
         if t_after_b is not None:  # test 6: stop after the measured window; drop later edges
             t_end = t_on2 + t_after_b
             hi = [e for e in hi if e[0] <= t_end - 20e-9]
@@ -446,12 +568,12 @@ Rbret bn {node(at + '.GND')} 1u"""
         T = 1 / F_SW
         duty = timing.get("duty", DUTY)
         t1 = timing["t1"]
-        hi, lo = [(t_on1, 1), (t_on1 + t1, 0)], [(t_on1 + t1 + DEAD, 1)]
+        hi, lo = [(t_on1, 1), (t_on1 + t1, 0)], [(t_on1 + t1 + dead, 1)]
         starts = [t_on1 + t1 + (1 - duty) * T + k * T for k in range(periods)]
         for t0 in starts:
-            lo.append((t0 - DEAD, 0))
+            lo.append((t0 - dead, 0))
             hi += [(t0, 1), (t0 + duty * T, 0)]
-            lo.append((t0 + duty * T + DEAD, 1))
+            lo.append((t0 + duty * T + dead, 1))
         t_end = starts[-1] + duty * T + 100e-9
         times = {"t_off1": starts[-1] + duty * T, "t_on2": starts[-1], "t_end": t_end, "duty": duty,
                  "period_starts_s": starts,
@@ -506,7 +628,7 @@ Rbret bn {node(at + '.GND')} 1u"""
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
-        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, pin_c=pin_c) if g_ext and not gate_ctl else
+        *(gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, pin_c=pin_c, gate_r=gate_r) if g_ext and not gate_ctl else
           gate_drive(hi, lo, te_rise, te_fall, r_src, r_snk, t_end, stages=[x for x in ("u", "l") if x != gate_ctl])
           + [ideal_stage(gate_ctl, hi, lo, te_rise, te_fall, r_src, r_snk, t_end)]
           if g_ext and gate_ctl in ("u", "l") else [
@@ -522,7 +644,7 @@ Rbret bn {node(at + '.GND')} 1u"""
         # Test 9 (opt-in): vendor-model internal nodes, behind rg/rs; the vendor model itself is unchanged.
         + (" V(x1:gate) V(x1:source) V(x2:gate) V(x2:source) I(x1:bswitch) I(x2:bswitch)" if internal else ""),
         ".temp 25",
-        f".options plotwinsize=0 reltol={reltol:g}",
+        f".options plotwinsize=0 reltol={reltol:g}" + (f" method={method}" if method else ""),
         f".tran 0 {t_end:.9g} 0 {maxstep:g}",
         ".end", ""]
     head = (f"* EPC90133 switching sensitivity, extraction {ext['case']}{' (ideal copper)' if ideal else ''}; "
@@ -578,6 +700,35 @@ def metrics(s, times, at):
                           "switch_node_metrics": "Q2 drain pad to circuit ground (Q2 source pad)",
                           "die_nodes": die, "energies_exclude": "energy stored in package or gate-loop inductors"},
             "not_validated": "q1_eoff_J, q1_eon_J and the edge times depend on gate charge (EPC2302 Fig. 7 exception)"}
+
+
+def period_loss(s, times):
+    """Design study: FET loss per period at the converter's currents (see the docstring); needs sense_q2."""
+    t = s["time"]
+    die = times["die_nodes"]
+    zero = [0.0] * len(t)
+    v = lambda nd: zero if nd == "0" else s[f"v({nd})"]
+    d1 = v("q1_d" if die["d1"] == "q1dd" else die["d1"])
+    vds1 = [a - b for a, b in zip(d1, v(die["s1"]))]
+    d2 = v("q2_d" if die["d2"] == "q2dd" else die["d2"])
+    vds2 = [a - b for a, b in zip(d2, v(die["s2"]))]
+    p = [a * b + c * d for a, b, c, d in zip(vds1, s["i(vq1d)"], vds2, s["i(vq2d)"])]
+    ta, tb = times["t_off1"], times["t_on2"]
+    e_win = integral(t, p, ta - 2e-9, tb + LOSS_END)
+    e_400 = integral(t, p, ta - 2e-9, tb + LOSS_END - 50e-9)
+    settled = abs(e_win - e_400) <= 0.02 * abs(e_win)
+    on = [(a, b) for tt, a, b in zip(t, vds1, s["i(vq1d)"]) if tb + RDS_WINDOW[0] <= tt <= tb + RDS_WINDOW[1]]
+    rds = sum(a for a, _ in on) / sum(b for _, b in on)
+    duty = VOUT / VIN
+    i_rms2 = (I_VALLEY ** 2 + I_VALLEY * I_PEAK + I_PEAK ** 2) / 3
+    p_on = rds * duty * i_rms2 * (1 - LOSS_END * F_SW / duty)
+    loss = F_SW * e_win + p_on
+    pout = VOUT * IOUT
+    return {"estimator_revision": 2, "window_energy_J": e_win, "window_energy_to_400ns_J": e_400,
+            "settled_within_2pct": settled, "q1_rds_on_ohm": rds, "on_time_conduction_W": p_on,
+            "fet_loss_W": loss if settled else None, "pout_W": pout,
+            "estimated_efficiency": pout / (pout + loss) if settled else None,
+            "scope": "FET losses only (inductor, copper, capacitor and gate-drive losses excluded); for ranking"}
 
 
 def diagnostics(s, t, vgs1, vgs2, id1, ta, tb):
@@ -883,6 +1034,68 @@ def driver_cases(exts):
                                  "maxstep": MAXSTEP_PKG / 2}}
 
 
+DESIGN_POINT = {"VOUT": 12.0, "IOUT": 20.0}
+DESIGNS = {"stock": {}, "R80-2.2": {"gate_r": {"R80": 2.2}}, "R80-3.3": {"gate_r": {"R80": 3.3}},
+           "R80-2.2-dt7.5": {"gate_r": {"R80": 2.2}, "dead": 7.5e-9}}
+# Round 3 (declared in the docstring): on request only, so the default design run is unchanged.
+ROUND3_DESIGNS = {"R80-1.2": {"gate_r": {"R80": 1.2}}, "R80-1.5": {"gate_r": {"R80": 1.5}},
+                  "R80-1.8": {"gate_r": {"R80": 1.8}}}
+ALTERNATIVES = {"ramp-Ls0": {}, "step-Ls0": {"driver": "step"}, "ramp-Ls50": {"l_s": 50e-12},
+                "step-Ls50": {"driver": "step", "l_s": 50e-12}}
+
+
+def design_cases(exts):
+    """Design round 1 (see the module docstring): every design under every alternative."""
+    if "G-m1-mid" not in exts:
+        raise SystemExit("the design study needs extraction G-m1-mid")
+    common = {"ext": "G-m1-mid", "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True,
+              "period_loss": True, "long_pulse": True}  # estimator revision 2
+    cases = {}
+    for d, dp in {**DESIGNS, **ROUND3_DESIGNS}.items():
+        for a, ap_ in ALTERNATIVES.items():
+            cases[f"{d}@{a}"] = {**common, **ap_, **dp, "design": d, "alternative": a}
+            if d in ROUND3_DESIGNS:
+                cases[f"{d}@{a}"]["on_request"] = True
+            # numerical check (declared): run on request with --only, at half the step
+            cases[f"{d}@{a}-ms50"] = {**cases[f"{d}@{a}"], "maxstep": MAXSTEP_PKG / 2, "base": f"{d}@{a}",
+                                      "on_request": True}
+            # rev-2 Gear fallback (declared in the docstring): same step, Gear integration, on request
+            cases[f"{d}@{a}-gear"] = {**cases[f"{d}@{a}"], "method": "gear", "base": f"{d}@{a}", "on_request": True}
+    # Round 3 reproduction control: identical to stock@ramp-Ls0 (rev 2); must reproduce it exactly.
+    cases["stock@ramp-Ls0-repro"] = {**cases["stock@ramp-Ls0"], "base": "stock@ramp-Ls0", "on_request": True}
+    return cases
+
+
+LAYOUTS = {"stock": "A-m1-mid", "gap0.100": "A-m1-mid-d0.100", "gap0.075": "A-m1-mid-d0.075",
+           "gap0.050": "A-m1-mid-d0.050", "vias-gnd-greedy": "A-m1-mid-vias-gnd-greedy"}
+
+
+def layout_cases(exts):
+    """Layout round 2a (see the module docstring): every layout under every alternative, stock gate resistors."""
+    missing = [e for e in LAYOUTS.values() if e not in exts]
+    if missing:
+        raise SystemExit(f"layout study: extractions missing: {missing}")
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
+              "long_pulse": True}  # estimator revision 2
+    cases = {}
+    for d, e in LAYOUTS.items():
+        for a, ap_ in ALTERNATIVES.items():
+            cases[f"{d}@{a}"] = {"ext": e, **common, **ap_, "design": d, "alternative": a}
+            cases[f"{d}@{a}-ms50"] = {**cases[f"{d}@{a}"], "maxstep": MAXSTEP_PKG / 2, "base": f"{d}@{a}",
+                                      "on_request": True}
+    return cases
+
+
+def set_operating_point(vout, iout):
+    """Design study: move the module's operating point (the double pulse reads these at call time)."""
+    global VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
+    VOUT, IOUT = vout, iout
+    DUTY = VOUT / VIN
+    T_OFF = (1 - DUTY) / F_SW
+    RIPPLE = (VIN - VOUT) * DUTY / (F_SW * L_OUT)
+    I_PEAK, I_VALLEY = IOUT + RIPPLE / 2, IOUT - RIPPLE / 2
+
+
 def main():
     global REFERENCE
     ap = argparse.ArgumentParser()
@@ -892,7 +1105,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -900,6 +1113,8 @@ def main():
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
+    if args.study in ("design", "layout"):
+        set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
@@ -920,7 +1135,7 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
-    if args.study == "driver":
+    if args.study in ("driver", "design", "layout"):
         rs, fs = [], []
         for name, text in driver_step_bench().items():
             raw = run(name, text)
@@ -937,6 +1152,8 @@ def main():
             raise SystemExit("test 11 D1: the step representation needs resistances above the datasheet maximum")
 
     files = sorted(glob.glob(str(EXTRACTIONS / "*.json")))
+    if args.study == "layout":
+        files += sorted(glob.glob(str(LAYOUT_EXTRACTIONS / "*.json")))
     ext_files = {Path(f).stem: Path(f) for f in files}
     exts = {Path(f).stem: json.loads(Path(f).read_text(encoding="utf-8")) for f in files}
     exts = {k: v for k, v in exts.items() if v.get("outcome") == "complete" and (args.cases is None or k in args.cases)}
@@ -954,6 +1171,18 @@ def main():
         cases = driver_cases(exts)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "layout":
+        cases = layout_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+        else:
+            cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "design":
+        cases = design_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+        else:
+            cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "fullr":
         cases = fullr_cases(exts)
         if args.only:
@@ -1009,7 +1238,9 @@ def main():
                   l_d=c.get("l_d"), l_s=c.get("l_s"), l_g=c.get("l_g", 0.0), kelvin=c.get("kelvin", False),
                   t_after_b=c.get("t_after_b"), sense_q2=c.get("sense_q2", False), gate_ctl=c.get("gate_ctl", False),
                   no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
-                  full_r=c.get("full_r", False), internal=c.get("internal", False))
+                  full_r=c.get("full_r", False), internal=c.get("internal", False),
+                  gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
+                  method=c.get("method"))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
@@ -1052,6 +1283,8 @@ def main():
         raw = run(name, text)
         s = raw.step(0) if raw else None
         m = metrics(s, times, at) if raw else None
+        if m and c.get("period_loss"):
+            m["period_loss"] = period_loss(s, times)
         if m and c.get("periods"):
             valleys = [interp(s["time"], s["i(l1)"], t) for t in times["period_starts_s"]]
             m["periodicity"] = {"inductor_current_at_period_starts_A": valleys, "timing": timing,
@@ -1107,7 +1340,9 @@ def main():
                 "input_manifest": manifest,
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
-                               "source": "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)"},
+                               "dead_time_note": "per-case 'dead' overrides it (design study)",
+                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout")
+                                          else "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)")},
                 "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
                                       "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"},

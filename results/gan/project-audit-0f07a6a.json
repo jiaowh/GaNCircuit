@@ -1,0 +1,121 @@
+{
+    "audited_commit":  "0f07a6a",
+    "date":  "2026-10-06",
+    "geometry_and_assessor_probes":  {
+                                         "missing_objective":  {
+                                                                   "selection":  "R80-1.5",
+                                                                   "ranking":  [
+                                                                                   [
+                                                                                       "R80-1.5",
+                                                                                       null
+                                                                                   ]
+                                                                               ]
+                                                               },
+                                         "string_false_selection":  "R80-1.5",
+                                         "case_null":  "AttributeError: \u0027NoneType\u0027 object has no attribute \u0027get\u0027",
+                                         "manifest_list":  "AttributeError: \u0027list\u0027 object has no attribute \u0027get\u0027",
+                                         "original_board_sha256":  "79ba8e1e44fca735bf4fae516c5803054589077a1cfa07a115c767fe27f693b3",
+                                         "refill":  {
+                                                        "F.Cu":  {
+                                                                     "original_area_mm2":  2386.908994512526,
+                                                                     "refilled_area_mm2":  2399.580060967385,
+                                                                     "difference_fraction":  0.03907988337087013,
+                                                                     "interior_difference_fraction":  0.02856739604077429,
+                                                                     "interior_drilled_difference_fraction":  0.02290937785485401,
+                                                                     "power_gate_window_difference_fraction":  0.010185452694855022,
+                                                                     "power_gate_window_drilled_difference_fraction":  0.010612948431431554
+                                                                 },
+                                                        "In1.Cu":  {
+                                                                       "original_area_mm2":  2396.7358842220724,
+                                                                       "refilled_area_mm2":  2428.4172804351447,
+                                                                       "difference_fraction":  0.03569420666981917,
+                                                                       "interior_difference_fraction":  0.026905876916768018,
+                                                                       "interior_drilled_difference_fraction":  0.027641587387397012,
+                                                                       "power_gate_window_difference_fraction":  0.01003960022755635,
+                                                                       "power_gate_window_drilled_difference_fraction":  0.01045740976546826
+                                                                   },
+                                                        "In2.Cu":  {
+                                                                       "original_area_mm2":  2387.8188996745575,
+                                                                       "refilled_area_mm2":  2420.0331966756316,
+                                                                       "difference_fraction":  0.036056031174452725,
+                                                                       "interior_difference_fraction":  0.0272633715471218,
+                                                                       "interior_drilled_difference_fraction":  0.028011965345702643,
+                                                                       "power_gate_window_difference_fraction":  0.010041198771095966,
+                                                                       "power_gate_window_drilled_difference_fraction":  0.010457115951516082
+                                                                   },
+                                                        "In3.Cu":  {
+                                                                       "original_area_mm2":  2400.3382866594843,
+                                                                       "refilled_area_mm2":  2431.0094428040697,
+                                                                       "difference_fraction":  0.035263079362044196,
+                                                                       "interior_difference_fraction":  0.026451951895092477,
+                                                                       "interior_drilled_difference_fraction":  0.027174039134670203,
+                                                                       "power_gate_window_difference_fraction":  0.010041555619473563,
+                                                                       "power_gate_window_drilled_difference_fraction":  0.01045748708614131
+                                                                   },
+                                                        "In4.Cu":  {
+                                                                       "original_area_mm2":  2400.3382651031397,
+                                                                       "refilled_area_mm2":  2431.0097009943297,
+                                                                       "difference_fraction":  0.035262930454963544,
+                                                                       "interior_difference_fraction":  0.02645179006854631,
+                                                                       "interior_drilled_difference_fraction":  0.027173872897806924,
+                                                                       "power_gate_window_difference_fraction":  0.01004072072831159,
+                                                                       "power_gate_window_drilled_difference_fraction":  0.010456617647947721
+                                                                   },
+                                                        "In5.Cu":  {
+                                                                       "original_area_mm2":  2429.8533533023306,
+                                                                       "refilled_area_mm2":  2468.7046867133613,
+                                                                       "difference_fraction":  0.0375011278866617,
+                                                                       "interior_difference_fraction":  0.025739000618302824,
+                                                                       "interior_drilled_difference_fraction":  0.026430326476903146,
+                                                                       "power_gate_window_difference_fraction":  0.009417616787663941,
+                                                                       "power_gate_window_drilled_difference_fraction":  0.009805453088785115
+                                                                   },
+                                                        "In6.Cu":  {
+                                                                       "original_area_mm2":  2429.7862696309303,
+                                                                       "refilled_area_mm2":  2468.6732905263307,
+                                                                       "difference_fraction":  0.03752099076092839,
+                                                                       "interior_difference_fraction":  0.025760145670300123,
+                                                                       "interior_drilled_difference_fraction":  0.0264520606942614,
+                                                                       "power_gate_window_difference_fraction":  0.00957752214619569,
+                                                                       "power_gate_window_drilled_difference_fraction":  0.009972046429484028
+                                                                   },
+                                                        "B.Cu":  {
+                                                                     "original_area_mm2":  2380.684313172832,
+                                                                     "refilled_area_mm2":  2415.244986710947,
+                                                                     "difference_fraction":  0.03660663910842691,
+                                                                     "interior_difference_fraction":  0.027520949375414095,
+                                                                     "interior_drilled_difference_fraction":  0.028279012227809597,
+                                                                     "power_gate_window_difference_fraction":  0.017710545596205704,
+                                                                     "power_gate_window_drilled_difference_fraction":  0.018450005329966167
+                                                                 }
+                                                    },
+                                         "refilled_drc":  {
+                                                              "solder_mask_bridge":  2,
+                                                              "isolated_copper":  43,
+                                                              "silk_edge_clearance":  4,
+                                                              "padstack":  1,
+                                                              "lib_footprint_issues":  106
+                                                          },
+                                         "refilled_unconnected":  0
+                                     },
+    "drc_failure_probe":  {
+                              "commands_returncode":  1,
+                              "stale_reports":  {
+
+                                                },
+                              "R3":  true,
+                              "R4":  true
+                          },
+    "tests":  {
+                  "windows":  {
+                                  "seconds":  23.053,
+                                  "count":  185,
+                                  "passed":  true
+                              },
+                  "wsl":  {
+                              "seconds":  39.592,
+                              "count":  185,
+                              "passed":  true
+                          }
+              }
+}

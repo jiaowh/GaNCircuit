@@ -1,0 +1,374 @@
+{
+ "schema": "epc90133-design-assessment/1",
+ "report": {
+  "path": "results/gan/epc90133-design-round1.json",
+  "sha256": "776a7d46b864f920d2ad27bbde46b6a00ec54e41673c1aff0f3f1a5d9a3fb1b5",
+  "complete": true
+ },
+ "evaluator_sha256": "cdba66a4fa743da91c781b526278e0ced87b206de06fac3b64bb69c42ffc1d5f",
+ "rule": "declared in scripts/epc90133_switching.py (design round 1); every alternative must hold",
+ "scope": "ranking within the unvalidated model (EPC2302 Fig. 7 exception, behavioural driver, exploratory G extraction); frozen predictions for the board, not validated values",
+ "metrics": {
+  "stock": {
+   "ramp-Ls0": {
+    "overshoot_V": 25.075894698518255,
+    "eon_eoff_J": 5.0788243325430245e-06,
+    "eon_J": 3.3629303777507084e-06,
+    "eoff_J": 1.7158939547923157e-06,
+    "fet_loss_W": 1.8599655614660318,
+    "efficiency": 0.9923097418907333,
+    "q2_gate_peak_V": 1.9953573942184448,
+    "sw_min_V": -2.6276044845581055,
+    "rise_s": 8.79873522756132e-10,
+    "fall_s": 4.1986055959880715e-09
+   },
+   "ramp-Ls50": {
+    "overshoot_V": 11.195283740728861,
+    "eon_eoff_J": 5.5723289535547146e-06,
+    "eon_J": 3.868705701493679e-06,
+    "eoff_J": 1.7036232520610357e-06,
+    "fet_loss_W": 2.162602802236785,
+    "efficiency": 0.9910696252137541,
+    "q2_gate_peak_V": 1.930489420890808,
+    "sw_min_V": -2.7291667461395264,
+    "rise_s": 1.6737208468481707e-09,
+    "fall_s": 4.173085105654639e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 16.586298018231467,
+    "eon_eoff_J": 5.415977957707923e-06,
+    "eon_J": 3.719369757939845e-06,
+    "eoff_J": 1.696608199768078e-06,
+    "fet_loss_W": 1.941042883229642,
+    "efficiency": 0.9919772070910413,
+    "q2_gate_peak_V": 1.406273365020752,
+    "sw_min_V": -2.4502270221710205,
+    "rise_s": 1.0405712635352116e-09,
+    "fall_s": 4.2753941257778316e-09
+   },
+   "step-Ls50": null
+  },
+  "R80-2.2": {
+   "ramp-Ls0": {
+    "overshoot_V": 9.996317416432433,
+    "eon_eoff_J": 5.796052622132036e-06,
+    "eon_J": 4.0802107271758576e-06,
+    "eoff_J": 1.7158418949561783e-06,
+    "fet_loss_W": 2.1925979016777117,
+    "efficiency": 0.9909468830976914,
+    "q2_gate_peak_V": 1.1753112077713013,
+    "sw_min_V": -2.627657413482666,
+    "rise_s": 1.263693212321304e-09,
+    "fall_s": 4.198509141034045e-09
+   },
+   "ramp-Ls50": {
+    "overshoot_V": 9.37519329040424,
+    "eon_eoff_J": 5.990767087254223e-06,
+    "eon_J": 4.286850980924937e-06,
+    "eoff_J": 1.7039161063292863e-06,
+    "fet_loss_W": 2.195769616950823,
+    "efficiency": 0.9909339059867825,
+    "q2_gate_peak_V": 1.7435763478279114,
+    "sw_min_V": -2.729203462600708,
+    "rise_s": 1.916438790517694e-09,
+    "fall_s": 4.172989908685571e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 6.889369659647173,
+    "eon_eoff_J": 5.9622983611467366e-06,
+    "eon_J": 4.265686908342395e-06,
+    "eoff_J": 1.6966114528043415e-06,
+    "fet_loss_W": 2.181329414447544,
+    "efficiency": 0.9909929909967807,
+    "q2_gate_peak_V": 0.9316579699516296,
+    "sw_min_V": -2.4504778385162354,
+    "rise_s": 1.439844513909085e-09,
+    "fall_s": 4.275313689162762e-09
+   },
+   "step-Ls50": {
+    "overshoot_V": 8.015312429481185,
+    "eon_eoff_J": 6.18868460125127e-06,
+    "eon_J": 4.478006414695157e-06,
+    "eoff_J": 1.7106781865561125e-06,
+    "fet_loss_W": 2.2314784552347153,
+    "efficiency": 0.9907878262995984,
+    "q2_gate_peak_V": 1.4155545234680176,
+    "sw_min_V": -2.28521466255188,
+    "rise_s": 2.0137644920860124e-09,
+    "fall_s": 4.216302955534003e-09
+   }
+  },
+  "R80-2.2-dt7.5": {
+   "ramp-Ls0": {
+    "overshoot_V": 9.855071511107546,
+    "eon_eoff_J": 5.755384786991708e-06,
+    "eon_J": 4.07118762231153e-06,
+    "eoff_J": 1.6841971646801785e-06,
+    "fet_loss_W": 2.141553870654023,
+    "efficiency": 0.9911557771211875,
+    "q2_gate_peak_V": 1.1702525615692139,
+    "sw_min_V": -2.147998571395874,
+    "rise_s": 1.2618520963326277e-09,
+    "fall_s": 4.200040161082622e-09
+   },
+   "ramp-Ls50": {
+    "overshoot_V": 9.386511310966839,
+    "eon_eoff_J": 5.982045029591154e-06,
+    "eon_J": 4.3029968047319915e-06,
+    "eoff_J": 1.6790482248591622e-06,
+    "fet_loss_W": 2.144331273200545,
+    "efficiency": 0.9911444085354978,
+    "q2_gate_peak_V": 1.751673400402069,
+    "sw_min_V": -2.1260740756988525,
+    "rise_s": 1.910589609785068e-09,
+    "fall_s": 4.17472223466846e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 6.810161784292468,
+    "eon_eoff_J": 5.888944013288679e-06,
+    "eon_J": 4.260370569115115e-06,
+    "eoff_J": 1.6285734441735636e-06,
+    "fet_loss_W": 2.1317218597191667,
+    "efficiency": 0.9911960240345782,
+    "q2_gate_peak_V": 0.9299590587615967,
+    "sw_min_V": -1.4001692533493042,
+    "rise_s": 1.449888058845305e-09,
+    "fall_s": 4.285475758469767e-09
+   },
+   "step-Ls50": {
+    "overshoot_V": 7.959821559497179,
+    "eon_eoff_J": 6.142408409968106e-06,
+    "eon_J": 4.4865567828831366e-06,
+    "eoff_J": 1.6558516270849693e-06,
+    "fet_loss_W": 2.1873571426238647,
+    "efficiency": 0.9909683264707508,
+    "q2_gate_peak_V": 1.4166238903999329,
+    "sw_min_V": -1.330777645111084,
+    "rise_s": 2.0109794163779518e-09,
+    "fall_s": 4.222494119759833e-09
+   }
+  },
+  "R80-3.3": {
+   "ramp-Ls0": null,
+   "ramp-Ls50": {
+    "overshoot_V": 6.306197524251168,
+    "eon_eoff_J": 6.373379686457172e-06,
+    "eon_J": 4.67036307604336e-06,
+    "eoff_J": 1.7030166104138113e-06,
+    "fet_loss_W": 2.3618950172887794,
+    "efficiency": 0.9902546767216839,
+    "q2_gate_peak_V": 1.4944166541099548,
+    "sw_min_V": -2.7292304039001465,
+    "rise_s": 2.112412554571183e-09,
+    "fall_s": 4.172879523302968e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 4.161592313713399,
+    "eon_eoff_J": 6.307453530302968e-06,
+    "eon_J": 4.610861909535253e-06,
+    "eoff_J": 1.6965916207677154e-06,
+    "fet_loss_W": 2.322734766164448,
+    "efficiency": 0.9904147055438037,
+    "q2_gate_peak_V": 0.7428955435752869,
+    "sw_min_V": -2.450747013092041,
+    "rise_s": 1.7942096144997317e-09,
+    "fall_s": 4.275221523415868e-09
+   },
+   "step-Ls50": null
+  }
+ },
+ "relative_to_stock": {
+  "R80-2.2": {
+   "ramp-Ls0": {
+    "overshoot_V": -0.6013574974446227,
+    "eon_eoff_J": 0.14121935365893767,
+    "eon_J": 0.21329027629317188,
+    "eoff_J": -3.0339774781507067e-05,
+    "fet_loss_W": 0.17883790275638112,
+    "efficiency": -0.0013734207531260756,
+    "q2_gate_peak_V": -0.41097709554350026,
+    "sw_min_V": 2.014341384781737e-05,
+    "rise_s": 0.43622143369297905,
+    "fall_s": -2.297309233290079e-05
+   },
+   "ramp-Ls50": {
+    "overshoot_V": -0.1625765360196333,
+    "eon_eoff_J": 0.07509214498770356,
+    "eon_J": 0.10808402388163452,
+    "eoff_J": 0.00017190084010443307,
+    "fet_loss_W": 0.015336526282003105,
+    "efficiency": -0.0001369421718905306,
+    "q2_gate_peak_V": -0.0968215992484679,
+    "sw_min_V": 1.3453359430481981e-05,
+    "rise_s": 0.14501698065516244,
+    "fall_s": -2.2812132189575784e-05
+   },
+   "step-Ls0": {
+    "overshoot_V": -0.5846348804251282,
+    "eon_eoff_J": 0.10087197689962912,
+    "eon_J": 0.14688433416341873,
+    "eoff_J": 1.917376247329017e-06,
+    "fet_loss_W": 0.12379248974556223,
+    "efficiency": -0.0009921761177827948,
+    "q2_gate_peak_V": -0.3374986733551044,
+    "sw_min_V": 0.0001023645331412748,
+    "rise_s": 0.3837058204138679,
+    "fall_s": -1.8813847964205266e-05
+   },
+   "step-Ls50": null
+  },
+  "R80-2.2-dt7.5": {
+   "ramp-Ls0": {
+    "overshoot_V": -0.606990233864322,
+    "eon_eoff_J": 0.13321202115882635,
+    "eon_J": 0.21060716845245486,
+    "eoff_J": -0.01847246446880435,
+    "fet_loss_W": 0.1513943671978757,
+    "efficiency": -0.0011629078309228769,
+    "q2_gate_peak_V": -0.4135123036304048,
+    "sw_min_V": -0.18252591513706773,
+    "rise_s": 0.43412895569351706,
+    "fall_s": 0.00034167655469263813
+   },
+   "ramp-Ls50": {
+    "overshoot_V": -0.16156557275825367,
+    "eon_eoff_J": 0.07352690041299015,
+    "eon_J": 0.11225746716030538,
+    "eoff_J": -0.014425153667128376,
+    "fet_loss_W": -0.008448860335028563,
+    "efficiency": 7.54571826653283e-05,
+    "q2_gate_peak_V": -0.09262729883607745,
+    "sw_min_V": -0.22098051403189756,
+    "rise_s": 0.14152226363371856,
+    "fall_s": 0.00039230664421441297
+   },
+   "step-Ls0": {
+    "overshoot_V": -0.5894103809779122,
+    "eon_eoff_J": 0.08732791367949333,
+    "eon_J": 0.14545496855223394,
+    "eoff_J": -0.04010045195102474,
+    "fet_loss_W": 0.09823532397813883,
+    "efficiency": -0.000787501014014147,
+    "q2_gate_peak_V": -0.3387067679064848,
+    "sw_min_V": -0.42855529684400995,
+    "rise_s": 0.39335777342100564,
+    "fall_s": 0.002358059256139633
+   },
+   "step-Ls50": null
+  },
+  "R80-3.3": {
+   "ramp-Ls0": null,
+   "ramp-Ls50": {
+    "overshoot_V": -0.43670945102454306,
+    "eon_eoff_J": 0.1437551048366319,
+    "eon_J": 0.20721591054087352,
+    "eoff_J": -0.0003560890862991384,
+    "fet_loss_W": 0.09215386886850685,
+    "efficiency": -0.0008222918666228596,
+    "q2_gate_peak_V": -0.22588715693641626,
+    "sw_min_V": 2.3324980311434373e-05,
+    "rise_s": 0.2621056603011933,
+    "fall_s": -4.9263877075600426e-05
+   },
+   "step-Ls0": {
+    "overshoot_V": -0.7490945653370616,
+    "eon_eoff_J": 0.16460103411726656,
+    "eon_J": 0.23968903594280033,
+    "eoff_J": -9.77184972050793e-06,
+    "fet_loss_W": 0.19664268431809218,
+    "efficiency": -0.001575138557688871,
+    "q2_gate_peak_V": -0.4717275018827337,
+    "sw_min_V": 0.00021222152735855815,
+    "rise_s": 0.7242544334773646,
+    "fall_s": -4.037109957244489e-05
+   },
+   "step-Ls50": null
+  }
+ },
+ "verdicts": {
+  "R80-2.2": {
+   "per_alternative": {
+    "T1_overshoot_lower": [
+     true,
+     true,
+     true,
+     null
+    ],
+    "T2_switching_energy_not_higher": [
+     false,
+     false,
+     false,
+     null
+    ],
+    "T3_efficiency_not_lower": [
+     false,
+     true,
+     false,
+     null
+    ]
+   },
+   "verdict": {
+    "T1_overshoot_lower": "undetermined",
+    "T2_switching_energy_not_higher": "undetermined",
+    "T3_efficiency_not_lower": "undetermined",
+    "all_three": "undetermined"
+   }
+  },
+  "R80-2.2-dt7.5": {
+   "per_alternative": {
+    "T1_overshoot_lower": [
+     true,
+     true,
+     true,
+     null
+    ],
+    "T2_switching_energy_not_higher": [
+     false,
+     false,
+     false,
+     null
+    ],
+    "T3_efficiency_not_lower": [
+     false,
+     true,
+     false,
+     null
+    ]
+   },
+   "verdict": {
+    "T1_overshoot_lower": "undetermined",
+    "T2_switching_energy_not_higher": "undetermined",
+    "T3_efficiency_not_lower": "undetermined",
+    "all_three": "undetermined"
+   }
+  },
+  "R80-3.3": {
+   "per_alternative": {
+    "T1_overshoot_lower": [
+     null,
+     true,
+     true,
+     null
+    ],
+    "T2_switching_energy_not_higher": [
+     null,
+     false,
+     false,
+     null
+    ],
+    "T3_efficiency_not_lower": [
+     null,
+     false,
+     false,
+     null
+    ]
+   },
+   "verdict": {
+    "T1_overshoot_lower": "undetermined",
+    "T2_switching_energy_not_higher": "undetermined",
+    "T3_efficiency_not_lower": "undetermined",
+    "all_three": "undetermined"
+   }
+  }
+ }
+}

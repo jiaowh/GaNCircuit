@@ -1,0 +1,164 @@
+{
+    "original_handoffs/I-1.json":  [
+
+                                   ],
+    "original_handoffs/I-2.json":  [
+
+                                   ],
+    "original_handoffs/assessment.json":  [
+
+                                          ],
+    "wrong_device_identity":  {
+                                  "problems":  [
+
+                                               ]
+                              },
+    "wrong_network":  {
+                          "problems":  [
+
+                                       ]
+                      },
+    "extra_prediction":  {
+                             "problems":  [
+
+                                          ]
+                         },
+    "wrong_reference_data":  {
+                                 "problems":  [
+
+                                              ]
+                             },
+    "malformed_check_evidence":  {
+                                     "raised":  "TypeError",
+                                     "message":  "unhashable type: \u0027dict\u0027"
+                                 },
+    "malformed_exception_id":  {
+                                   "raised":  "TypeError",
+                                   "message":  "unhashable type: \u0027list\u0027"
+                               },
+    "list_record":  {
+                        "raised":  "AttributeError",
+                        "message":  "\u0027list\u0027 object has no attribute \u0027get\u0027"
+                    },
+    "dead_time_original":  {
+                               "vt_plus_5V_interpolated_V":  [
+                                                                 2.385,
+                                                                 2.755,
+                                                                 3.035
+                                                             ],
+                               "t_rc_typ_ns":  9.61,
+                               "t_rc_room_range_ns":  [
+                                                          6.27,
+                                                          12.88
+                                                      ],
+                               "t_rc_with_x7r_temperature_ns":  [
+                                                                    5.33,
+                                                                    14.81
+                                                                ],
+                               "qsg_rule_ns":  9.93,
+                               "logic_channel_skew_max_ns":  7.3,
+                               "driver_match_max_ns":  6.0,
+                               "worst_case_gate_command_dead_time_ns":  -7.03,
+                               "typical_gate_command_dead_time_ns":  8.11,
+                               "unbounded_reduction":  "turn-off delay of the diode discharge (InBuf output resistance, SDM03U40 forward behaviour); not bounded here",
+                               "datasheet_limits_guarantee_positive_dead_time":  false
+                           },
+    "dead_time_larger_R":  {
+                               "vt_plus_5V_interpolated_V":  [
+                                                                 2.385,
+                                                                 2.755,
+                                                                 3.035
+                                                             ],
+                               "t_rc_typ_ns":  80.07,
+                               "t_rc_room_range_ns":  [
+                                                          52.24,
+                                                          107.32
+                                                      ],
+                               "t_rc_with_x7r_temperature_ns":  [
+                                                                    44.4,
+                                                                    123.42
+                                                                ],
+                               "qsg_rule_ns":  75.11,
+                               "logic_channel_skew_max_ns":  7.3,
+                               "driver_match_max_ns":  6.0,
+                               "worst_case_gate_command_dead_time_ns":  38.94,
+                               "typical_gate_command_dead_time_ns":  78.57,
+                               "unbounded_reduction":  "turn-off delay of the diode discharge (InBuf output resistance, SDM03U40 forward behaviour); not bounded here",
+                               "datasheet_limits_guarantee_positive_dead_time":  true
+                           },
+    "input_logic_report_checks":  {
+                                      "L1_bom":  true,
+                                      "L2_function_table":  true,
+                                      "L3_qsg_settings":  true,
+                                      "L5_logic_valid_at_driver_enable":  true
+                                  },
+    "input_logic_hashes":  {
+                               "evaluator_matches":  true,
+                               "transcription_matches":  true
+                           },
+    "schema":  "project-audit/1",
+    "date":  "2026-10-05",
+    "revision":  "f4767b1; README rewrite present as an uncommitted change",
+    "scope":  "Targeted code and evidence audit; solver-free counterexamples; no field or circuit solver reruns and no hardware tests.",
+    "suite":  {
+                  "environment":  "WSL Python 3.12",
+                  "command":  "PYTHONPATH=src python3 -m pytest -q tests -p no:cacheprovider",
+                  "passed":  157,
+                  "subtests_passed":  68,
+                  "failed":  1,
+                  "seconds":  36.79,
+                  "failure":  "tests/test_wslrun.py::RunSolver::test_timeout_stops_the_solver_itself: FileNotFoundError for wsl in its Linux post-timeout assertion"
+              },
+    "input_logic_replay":  "Equal after CRLF-to-LF normalization; original report unchanged.",
+    "source_checks":  {
+                          "value":  [
+                                        {
+                                            "name":  "EPC2302_datasheet.pdf",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        },
+                                        {
+                                            "name":  "EPC90133_qsg.pdf",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        },
+                                        {
+                                            "name":  "EPC90133_Schematic.pdf",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        },
+                                        {
+                                            "name":  "EPC90133BOM.xlsx",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        },
+                                        {
+                                            "name":  "EPC90133 Development Board Gerbers.zip",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        },
+                                        {
+                                            "name":  "74LVC1G99.pdf",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        },
+                                        {
+                                            "name":  "sn74lvc1g66.pdf",
+                                            "exists":  true,
+                                            "hash_matches":  true
+                                        }
+                                    ],
+                          "Count":  7
+                      },
+    "files_sha256":  {
+                         "scripts/epc90133_input_logic.py":  "d1b5fe5d21a294991334a80806402499a88ea7d99434561183b1a7c6ccaef6d7",
+                         "src/circuit_tools/handoff.py":  "46cbee4f6373e60e24c814a4d9e3aa5789c5f0484b02ee98edde318e14b348c8",
+                         "scripts/e2e_check.py":  "438afc54b60da80a5baf819939a56ce6758b2c41062afc306a40b6f99351fdc2",
+                         "tests/test_wslrun.py":  "3bb49f7a9db24444d4f64658d8b7fbd8d668711c156b43735b81a0e94ec3865b",
+                         "runs/audit-f4767b1/reproduce.py":  "58e8c64d99053d570b6489e1ececc298cc0636337abf206b0f473ccba0b6114e",
+                         "results/gan/epc90133-input-logic.json":  "7b638357e4c3ab37e5e48bea40f18b6d382c26ba53a9855e171f54979f58c438",
+                         "runs/e2e-pilot/C1/workspace/handoffs/I-1.json":  "1248f3f1810e62ba46208cdf020680fbe00774acc89ab30998d2d59352263bde",
+                         "runs/e2e-pilot/C1/workspace/handoffs/I-2.json":  "c2bbb2a8173892696dd62befc06077b52e20515b2712daa035f174df93351f50",
+                         "runs/e2e-pilot/C1/workspace/handoffs/assessment.json":  "ef375d0567267d0066118355bdee932729e3179c7f8ea303405d3cb39116d9c6"
+                     }
+}

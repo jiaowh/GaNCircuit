@@ -126,6 +126,8 @@ The studies narrow the questions for measurement:
 - **Probe bandwidth alone is insufficient.** The tested bandwidth filters do not close the gap. Probe loading, connection location and resonances remain untested. A fixed added gate capacitor also does not resolve or bound the voltage-dependent gate-charge discrepancy.
 - **Low-side gate spikes and driver-pin stress still need measurements.** Sampled model traces show no appreciable positive low-side channel current during the examined turn-on windows. This does not establish immunity to false turn-on in hardware. Driver PHASE-pin voltage extremes remain unresolved and depend strongly on driver-model assumptions.
 
+- **A stock-board design change is selected for testing.** The goal is lower switch-node overshoot, with FET loss at most 5 % above stock and no larger low-side gate spike. Under those constraints the best of the tested part swaps is a 1.5 Ω high-side turn-on resistor instead of 1 Ω. It meets the constraints under all four unresolved driver and package assumptions, and it lowers the worst-case simulated overshoot by about a third. With an assumed 50 pH package inductance, the gain shrinks to 4-11 %. Larger resistors cut overshoot further but exceed the loss limit. Tested layout changes, a thinner power-loop dielectric and extra return vias, gave smaller or no gains. These are model rankings to be checked on the purchased board.
+
 Failed, incomplete and invalid cases remain in the record and are excluded from acceptance verdicts. Numerical checks include spike detection and selected smaller-time-step runs. Passing those checks establishes only their stated scope, not overall physical accuracy. The [build notes](docs/build.md) preserve the individual studies and their limitations.
 
 ## Stage 3: preparing for measurements
@@ -138,7 +140,7 @@ Preparation completed so far includes:
 
 - **Probe locations on the published layout.** Candidate points exist for the switch node, low-side gate and driver PHASE-to-ground voltage. Their connection paths and loading need checking with the actual board and selected probes. Connector fitting is deferred to the lab's review.
 - **Driver supply and bootstrap simulation.** This bounded study shows that a bus-off gate measurement could distinguish the two driver models. A short pre-charge leaves the high-side gate supply below the switching bench's ideal 5 V. Its original charge-balance check failed because the declaration omitted a recharge path; that failure is kept. Start-up without a low-side pulse and dead-time overcharge remain unanswered. See the [assessment](results/gan/epc90133-driver-only-assessment.json).
-- **Input-logic review, 5 October.** The current [report](results/gan/epc90133-input-logic.json) checks the transcribed logic against the BOM, logic function table and guide settings. It identifies input and jumper combinations that can command both gates on. Its calculation from datasheet limits does not guarantee positive dead time. This is a static check, not a timing or start-up measurement, and does not qualify shoot-through protection.
+- **Input-logic review, 5 October.** The current [report](results/gan/epc90133-input-logic-rev3.json) checks the transcribed logic against the BOM, logic function table and guide settings. It identifies input and jumper combinations that can command both gates on. Its calculation from datasheet limits does not guarantee positive dead time. This is a static check, not a timing or start-up measurement, and does not qualify shoot-through protection.
 
 The next steps are:
 
@@ -160,7 +162,7 @@ The agent experiments test whether an agent can execute a specified workflow, pr
 | [Milestone 2](results/gan/agent-milestone-2.json) | Four clean runs and five fault runs behaved as specified. | The containment check detects new git-status changes, not writes to ignored files. |
 | [E2E-0 pilot](results/gan/e2e-pilot.json) | Agents ran model checks, extraction, switching and assessment through versioned handoffs. The clean run matched the reference; a model changed after handoff was rejected. No interventions were needed. | A simulation-only, non-blind test. The assessment is not hardware closure. |
 
-The clean E2E-0 agent run took about 33 minutes and 347,000 tokens, compared with 21.6 minutes for the successful script reference. Its engineering results remained provisional throughout. A draft judgement evaluation was not run because the expected answers were accessible. Future blind evaluations need a separate isolated session and genuinely held-out material.
+The clean E2E-0 agent run took about 33 minutes and 347,000 tokens, compared with 21.6 minutes for the successful script reference. Its engineering results remained provisional throughout. A draft judgement evaluation was not run because the expected answers were accessible. Agent runs use the normal project context and tools, as in real use. Judgement is tested on material whose answer is not written down anywhere: predictions frozen before a measurement and scored against it.
 
 The pilot therefore demonstrates useful execution and handoff behaviour, while the value and cost of broader agent use still need review. Measurement readiness takes priority over another target.
 
@@ -210,7 +212,7 @@ Every EPC file needs a source URL, retrieval date, checksum and reuse terms. Pub
 
 FastHenry's MIT-authored notice is **not the standard MIT License**: the recorded permission covers internal non-commercial use and prohibits redistribution. FasterCap uses LGPL 2.1 or later. See the source and tool records before reusing either beyond the project's recorded scope.
 
-Gerbers and PDF schematics provide manufacturing and circuit information; they do not constitute an editable, connected KiCad design. EPC lists Altium files as available on request, but the route to the project's own layout remains undecided.
+Gerbers and PDF schematics provide manufacturing and circuit information; they do not constitute an editable, connected KiCad design. EPC lists Altium files as available on request. The project instead rebuilds an editable KiCad 10 design from EPC's Gerbers and layout PDF (`scripts/epc90133_reconstruct*.py`; [docs/build.md](docs/build.md) "track R"). The rebuilt design has EPC's copper, 106 parts with footprints taken from the board's own pads, EPC's net names, vias with rings measured from EPC's copper, and EPC's stackup and clearance rule. Its exported Gerbers and drill file reproduce EPC's exactly. KiCad's design-rule check finds no shorts and no unconnected pads, and every remaining finding has a declared explanation. The design is a derivative of EPC's layout, so it is kept out of this repository. A separate check reads the saved design back through KiCad and confirms that each of the 288 pads in EPC's netlist carries EPC's net. The copper pours are EPC's shapes frozen as drawn. A KiCad refill does not reproduce them: about 1-2 % of the copper area changes in the power and gate region. The design therefore reproduces the published geometry, but editing it with KiCad's refill is not yet qualified.
 
 ## Related and deferred work
 

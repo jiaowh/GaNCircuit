@@ -559,7 +559,9 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    *Run, 2 October 2026* (docs/build.md "E2E-0 pilot"): reference run 1 stopped on a driver bug (kept), run 2
    provisional throughout; clean run identical to the reference; fault run rejected at Stage 2 and the assessment;
    no interventions. Found: every subagent of this session receives AGENTS.md, so excluding files does not hide
-   answers; blind runs need a separate isolated session. Next: owner review of value and cost.
+   answers. Owner decision (5 October 2026): agents may read AGENTS.md, as they will in real use; judgement
+   is tested by frozen predictions scored against new measurements, not by isolating the session.
+   Next: owner review of value and cost.
 
 8. Measurement readiness (project audit at 8284dbd, 1 October 2026; supersedes further simulation
    diagnosis as the priority). In order:
@@ -574,13 +576,25 @@ Updated 29 September 2026 (owner review of the via check); item 8 added 1 Octobe
    driver forms within the model; short pre-charges leave the high side near 4.4 V; start-up state and
    dead-time overcharge not answered; its charge check C1 failed by design error and is kept);
    (d2) the board's input logic against shoot-through (hardware-plan open item 5; done 5 October 2026,
-   docs/build.md "EPC90133 input logic"): safe only with J630 1-2 or 3-4 and J640 5-6; several jumper
+   docs/build.md "EPC90133 input logic"; corrected after the audit at f4767b1): complementary static
+   commands only with J630 1-2 or 3-4 and J640 5-6 (power-up, power-down and transient overlap not
+   established; E1); several jumper
    errors command both gates on; datasheet limits do not guarantee a positive dead time, so the jumpers are
    checked and the dead time is measured at VIN = 0 before any bus voltage;
+   (c, partial, 5 October 2026) equipment-independent first-power content and derived channel
+   requirements in hardware plan v0.4; values that depend on equipment wait for the inventory;
+   (design round 1, 5 October 2026, owner targets; docs/build.md) on the stock board, R80 and dead-time
+   changes cannot meet overshoot, switching energy and efficiency targets together within the model; a
+   further round needs layout changes (new extraction, new board) and is the owner's decision; superseded
+   by the owner's single objective (5 October 2026: overshoot, with FET loss at most +5 % and Q2 gate peak
+   not above stock): design round 3 selects R80 1.5 ohm as the best tested candidate, a provisional
+   simulation prediction for E4, not frozen (docs/build.md 'design round 3');
    (e) after approval: measurement-chain and driver characterization, frozen predictions and held-out
    conditions, then the approved energized measurements.
-   Efficiency (input/output power with uncertainty) is a named G4 deliverable whose procedure is still to
-   be written. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
+   Efficiency (input/output power with uncertainty) is a named G4 deliverable; its draft procedure is
+   hardware-plan E9 (5 October 2026, not yet reviewed). E9 measures converter efficiency and does not by
+   itself resolve the FET-only loss increment of constraint C1 (about 0.05-0.09 W in the model); a thermal
+   FET-loss method is a candidate without a board-specific uncertainty budget. On hold until a named decision needs them: AC-versus-transient loss attribution, a finer
    G mesh, broad sweeps.
 
 9. Extraction-tool qualification while hardware is blocked (2 October 2026; docs/build.md "Via-array,

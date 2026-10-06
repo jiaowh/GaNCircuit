@@ -1,0 +1,373 @@
+{
+ "schema": "epc90133-design-assessment/1",
+ "report": {
+  "path": "results/gan/epc90133-design-round1-rev2.json",
+  "sha256": "432aef20001f5a37e5bba197e7c75e3ef63485362a563531af0ba4c96a595023",
+  "complete": false
+ },
+ "extra_reports": [
+  {
+   "path": "results/gan/epc90133-design-round1-rev2-cont.json",
+   "sha256": "f25f0ebad4cace97f4b93b025cb88e4276919e41ab19a928dacf0771f975e803",
+   "complete": true
+  },
+  {
+   "path": "results/gan/epc90133-design-round1-rev2-gear.json",
+   "sha256": "92ca7214fdba4bdda18b7de2837d66c47141454f740ad85c315b9721e0b83c1c",
+   "complete": true
+  },
+  {
+   "path": "results/gan/epc90133-design-round1-rev2-gear2.json",
+   "sha256": "0b02366699372b772806b9b1b8a882ea99fdef4b47c6aea943859df27a125f75",
+   "complete": true
+  }
+ ],
+ "evaluator_sha256": "5cead87e4a60df82f5d8b61879472124813a1d30f81d0d46c2d939d22f3f1ddc",
+ "rule": "declared in scripts/epc90133_switching.py (design round 1); every alternative must hold",
+ "ranking": null,
+ "scope": "ranking within the unvalidated model (EPC2302 Fig. 7 exception, behavioural driver, exploratory G extraction); frozen predictions for the board, not validated values",
+ "gear_check": {
+  "per_case": [
+   {
+    "case": "stock@step-Ls0",
+    "overshoot_V": 0.00016062458798193902,
+    "fet_loss_W": 0.000437808935473738,
+    "q2_gate_peak_V": 7.358004915958283e-05
+   },
+   {
+    "case": "R80-2.2@step-Ls0",
+    "overshoot_V": 0.0002697374714162315,
+    "fet_loss_W": 0.0002140710420739378,
+    "q2_gate_peak_V": 9.59654401579968e-05
+   },
+   {
+    "case": "R80-2.2@step-Ls50",
+    "overshoot_V": -0.0001242597322513861,
+    "fet_loss_W": 7.963100065122575e-05,
+    "q2_gate_peak_V": -9.89933750652483e-05
+   },
+   {
+    "case": "stock@ramp-Ls0",
+    "overshoot_V": 8.544849936487076e-05,
+    "fet_loss_W": 0.0004413612540230538,
+    "q2_gate_peak_V": 4.7794661706790365e-05
+   }
+  ],
+  "stock_to_candidate_difference": [
+   {
+    "metric": "overshoot_V",
+    "trap_difference": -9.696928358584294,
+    "gear_difference": -9.697734204717975,
+    "rel": 8.310323680671416e-05
+   },
+   {
+    "metric": "fet_loss_W",
+    "trap_difference": 0.1433499987912421,
+    "gear_difference": 0.14293414316366082,
+    "rel": -0.002900981033051031
+   }
+  ],
+  "passes": true,
+  "rule": "overshoot, FET loss, Q2 gate peak within 2 %; difference R80-2.2 minus stock within 10 %",
+  "tight_within_0.1pct": true
+ },
+ "metrics": {
+  "stock": {
+   "ramp-Ls0": {
+    "overshoot_V": 25.075894698518255,
+    "eon_eoff_J": 5.0788243325430245e-06,
+    "eon_J": 3.3629303777507084e-06,
+    "eoff_J": 1.7158939547923157e-06,
+    "fet_loss_W": 1.965496371925436,
+    "efficiency": 0.9918769560065528,
+    "q2_gate_peak_V": 1.9953573942184448,
+    "sw_min_V": -2.6276044845581055,
+    "rise_s": 8.79873522756132e-10,
+    "fall_s": 4.1986055959880715e-09
+   },
+   "ramp-Ls50": {
+    "overshoot_V": 11.195283740728861,
+    "eon_eoff_J": 5.5723289535547146e-06,
+    "eon_J": 3.868705701493679e-06,
+    "eoff_J": 1.7036232520610357e-06,
+    "fet_loss_W": 2.0771711423544046,
+    "efficiency": 0.9914193844361601,
+    "q2_gate_peak_V": 1.930489420890808,
+    "sw_min_V": -2.7291667461395264,
+    "rise_s": 1.6737208468481707e-09,
+    "fall_s": 4.173085105654639e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 16.586298018231467,
+    "eon_eoff_J": 5.415977957707923e-06,
+    "eon_J": 3.719369757939845e-06,
+    "eoff_J": 1.696608199768078e-06,
+    "fet_loss_W": 1.9958296040887398,
+    "efficiency": 0.9917526281037407,
+    "q2_gate_peak_V": 1.406273365020752,
+    "sw_min_V": -2.4502270221710205,
+    "rise_s": 1.0405712635352116e-09,
+    "fall_s": 4.2753941257778316e-09
+   },
+   "step-Ls50": null
+  },
+  "R80-2.2": {
+   "ramp-Ls0": {
+    "overshoot_V": 9.996317416432433,
+    "eon_eoff_J": 5.796052622132036e-06,
+    "eon_J": 4.0802107271758576e-06,
+    "eoff_J": 1.7158418949561783e-06,
+    "fet_loss_W": 2.1419141341337964,
+    "efficiency": 0.9911543024602205,
+    "q2_gate_peak_V": 1.1753112077713013,
+    "sw_min_V": -2.627657413482666,
+    "rise_s": 1.263693212321304e-09,
+    "fall_s": 4.198509141034045e-09
+   },
+   "ramp-Ls50": {
+    "overshoot_V": 9.37519329040424,
+    "eon_eoff_J": 5.990767087254223e-06,
+    "eon_J": 4.286850980924937e-06,
+    "eoff_J": 1.7039161063292863e-06,
+    "fet_loss_W": 2.1908005231183068,
+    "efficiency": 0.990954237244411,
+    "q2_gate_peak_V": 1.7435763478279114,
+    "sw_min_V": -2.729203462600708,
+    "rise_s": 1.916438790517694e-09,
+    "fall_s": 4.172989908685571e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 6.889369659647173,
+    "eon_eoff_J": 5.9622983611467366e-06,
+    "eon_J": 4.265686908342395e-06,
+    "eoff_J": 1.6966114528043415e-06,
+    "fet_loss_W": 2.139179602879982,
+    "efficiency": 0.9911654957847452,
+    "q2_gate_peak_V": 0.9316579699516296,
+    "sw_min_V": -2.4504778385162354,
+    "rise_s": 1.439844513909085e-09,
+    "fall_s": 4.275313689162762e-09
+   },
+   "step-Ls50": {
+    "overshoot_V": 8.015312429481185,
+    "eon_eoff_J": 6.18868460125127e-06,
+    "eon_J": 4.478006414695157e-06,
+    "eoff_J": 1.7106781865561125e-06,
+    "fet_loss_W": 2.185083916175319,
+    "efficiency": 0.9909776280155568,
+    "q2_gate_peak_V": 1.4155545234680176,
+    "sw_min_V": -2.28521466255188,
+    "rise_s": 2.0137644920860124e-09,
+    "fall_s": 4.216302955534003e-09
+   }
+  },
+  "R80-2.2-dt7.5": {
+   "ramp-Ls0": null,
+   "ramp-Ls50": null,
+   "step-Ls0": null,
+   "step-Ls50": null
+  },
+  "R80-3.3": {
+   "ramp-Ls0": null,
+   "ramp-Ls50": {
+    "overshoot_V": 6.306197524251168,
+    "eon_eoff_J": 6.373379686457172e-06,
+    "eon_J": 4.67036307604336e-06,
+    "eoff_J": 1.7030166104138113e-06,
+    "fet_loss_W": 2.293080140950504,
+    "efficiency": 0.9905359239330461,
+    "q2_gate_peak_V": 1.4944166541099548,
+    "sw_min_V": -2.7292304039001465,
+    "rise_s": 2.112412554571183e-09,
+    "fall_s": 4.172879523302968e-09
+   },
+   "step-Ls0": {
+    "overshoot_V": 4.16159949345316,
+    "eon_eoff_J": 6.307298026016022e-06,
+    "eon_J": 4.610709097872399e-06,
+    "eoff_J": 1.6965889281436228e-06,
+    "fet_loss_W": 2.237334975897487,
+    "efficiency": 0.9907638722324942,
+    "q2_gate_peak_V": 0.7429193258285522,
+    "sw_min_V": -2.450765371322632,
+    "rise_s": 1.7942109027258832e-09,
+    "fall_s": 4.275222126433658e-09
+   },
+   "step-Ls50": null
+  }
+ },
+ "relative_to_stock": {
+  "R80-2.2": {
+   "ramp-Ls0": {
+    "overshoot_V": -0.6013574974446227,
+    "eon_eoff_J": 0.14121935365893767,
+    "eon_J": 0.21329027629317188,
+    "eoff_J": -3.0339774781507067e-05,
+    "fet_loss_W": 0.0897573583590685,
+    "efficiency": -0.0007285717668467084,
+    "q2_gate_peak_V": -0.41097709554350026,
+    "sw_min_V": 2.014341384781737e-05,
+    "rise_s": 0.43622143369297905,
+    "fall_s": -2.297309233290079e-05
+   },
+   "ramp-Ls50": {
+    "overshoot_V": -0.1625765360196333,
+    "eon_eoff_J": 0.07509214498770356,
+    "eon_J": 0.10808402388163452,
+    "eoff_J": 0.00017190084010443307,
+    "fet_loss_W": 0.05470390881470988,
+    "efficiency": -0.0004691729847642323,
+    "q2_gate_peak_V": -0.0968215992484679,
+    "sw_min_V": 1.3453359430481981e-05,
+    "rise_s": 0.14501698065516244,
+    "fall_s": -2.2812132189575784e-05
+   },
+   "step-Ls0": {
+    "overshoot_V": -0.5846348804251282,
+    "eon_eoff_J": 0.10087197689962912,
+    "eon_J": 0.14688433416341873,
+    "eoff_J": 1.917376247329017e-06,
+    "fet_loss_W": 0.07182476825555106,
+    "efficiency": -0.0005920148859277496,
+    "q2_gate_peak_V": -0.3374986733551044,
+    "sw_min_V": 0.0001023645331412748,
+    "rise_s": 0.3837058204138679,
+    "fall_s": -1.8813847964205266e-05
+   },
+   "step-Ls50": null
+  },
+  "R80-2.2-dt7.5": {
+   "ramp-Ls0": null,
+   "ramp-Ls50": null,
+   "step-Ls0": null,
+   "step-Ls50": null
+  },
+  "R80-3.3": {
+   "ramp-Ls0": null,
+   "ramp-Ls50": {
+    "overshoot_V": -0.43670945102454306,
+    "eon_eoff_J": 0.1437551048366319,
+    "eon_J": 0.20721591054087352,
+    "eoff_J": -0.0003560890862991384,
+    "fet_loss_W": 0.1039437695785499,
+    "efficiency": -0.0008911067475408929,
+    "q2_gate_peak_V": -0.22588715693641626,
+    "sw_min_V": 2.3324980311434373e-05,
+    "rise_s": 0.2621056603011933,
+    "fall_s": -4.9263877075600426e-05
+   },
+   "step-Ls0": {
+    "overshoot_V": -0.749094132465317,
+    "eon_eoff_J": 0.16457232198288185,
+    "eon_J": 0.2396479505781286,
+    "eoff_J": -1.1358912716530334e-05,
+    "fet_loss_W": 0.12100500529403369,
+    "efficiency": -0.0009969783222425477,
+    "q2_gate_peak_V": -0.47171059033917695,
+    "sw_min_V": 0.0002197139884345667,
+    "rise_s": 0.7242556714763335,
+    "fall_s": -4.023005578279726e-05
+   },
+   "step-Ls50": null
+  }
+ },
+ "verdicts": {
+  "R80-2.2": {
+   "per_alternative": {
+    "T1_overshoot_lower": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "T2_switching_energy_not_higher": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "T3_efficiency_not_lower": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "verdict": {
+    "T1_overshoot_lower": "met",
+    "T2_switching_energy_not_higher": "not met",
+    "T3_efficiency_not_lower": "not met",
+    "all_three": "not met"
+   },
+   "compared_at_50ps": [
+    "step-Ls50"
+   ]
+  },
+  "R80-2.2-dt7.5": {
+   "per_alternative": {
+    "T1_overshoot_lower": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "T2_switching_energy_not_higher": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "T3_efficiency_not_lower": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "verdict": {
+    "T1_overshoot_lower": "met",
+    "T2_switching_energy_not_higher": "not met",
+    "T3_efficiency_not_lower": "not met",
+    "all_three": "not met"
+   },
+   "compared_at_50ps": [
+    "ramp-Ls0",
+    "ramp-Ls50",
+    "step-Ls0",
+    "step-Ls50"
+   ]
+  },
+  "R80-3.3": {
+   "per_alternative": {
+    "T1_overshoot_lower": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "T2_switching_energy_not_higher": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "T3_efficiency_not_lower": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "verdict": {
+    "T1_overshoot_lower": "met",
+    "T2_switching_energy_not_higher": "not met",
+    "T3_efficiency_not_lower": "not met",
+    "all_three": "not met"
+   },
+   "compared_at_50ps": [
+    "ramp-Ls0",
+    "step-Ls50"
+   ]
+  }
+ }
+}

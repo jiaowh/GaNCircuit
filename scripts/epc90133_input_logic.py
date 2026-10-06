@@ -35,10 +35,10 @@ L4  Dead time from datasheet limits (arithmetic, no simulation), declared formul
     not bounded by any datasheet here and is reported as an unbounded reduction.
     L4 is informational: it states whether datasheet limits guarantee a positive
     dead time; it has no pass threshold.
-L5  Power-up: U80 enables its outputs only above its POR threshold (3.8 V min), at
-    which the shared VCC is above the logic's 1.65 V minimum supply, so the gate
-    commands at enable are the static idle state (PWM inputs open = low via
-    R601/R602). Reported per configuration.
+L5  Supply-threshold order: U80's minimum POR threshold (3.8 V) exceeds the logic's
+    1.65 V minimum supply. (Revision 3: this ordering does not show when logic outputs,
+    select inputs or RC nodes settle relative to driver enable; the run-2 wording that the
+    commands at enable are the static idle state is withdrawn.)
 
 Findings, reported without a pass threshold: for all 64 combinations of horizontal
 jumper positions on J630 and J640 (no jumper, one, two or three per header; a
@@ -51,10 +51,22 @@ high together", which is wrong where a polarity jumper inverts one channel (J630
 5-6: both on at PWM1 = 0, PWM2 = 1); its both_on_states were correct. Kept as
 results/gan/epc90133-input-logic-run1-label-defect.json; run 2 changes only the label.
 
+Revision 3 (5 October 2026, project audit at f4767b1, findings 1, 2 and 5). The run-2 report
+(results/gan/epc90133-input-logic.json) is kept unchanged; revision 3 writes
+results/gan/epc90133-input-logic-rev3.json. Changes: L5 is a supply-threshold ordering check only.
+It does not establish the gate commands at driver enable, power-down behaviour or transient
+overlap, so its static-idle list is renamed. L4's interval is conditional on its listed
+assumptions. A positive-dead-time guarantee is never reported while a subtractive term is
+unbounded, and the room-temperature and temperature-inclusive results are separate. The report
+binds an input manifest: evaluator, transcription, imported helper, source records, the vendor
+files read and the uP1966E datasheet behind the hardcoded driver constants, plus the repository
+revision as context.
+
 Static logic only: no timing simulation, no PWM-source behaviour, no noise.
 """
 import argparse
 import hashlib
+import subprocess
 import itertools
 import json
 import math
@@ -67,6 +79,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from audit_epc90133_board_files import read_bom, verified
 
 LOGIC = ROOT / "devices/epc/epc90133-input-logic.json"
+HELPER = ROOT / "scripts/audit_epc90133_board_files.py"
+SOURCE_RECORDS = (ROOT / "devices/epc/epc90133-sources.json", ROOT / "devices/epc/sources.json")
+VENDOR_FILES = ("EPC90133BOM.xlsx", "EPC90133_Schematic.pdf", "EPC90133_qsg.pdf", "74LVC1G99.pdf", "sn74lvc1g66.pdf")
+DRIVER_DATASHEET = "uP1966E_datasheet.pdf"  # in devices/epc/sources.json; POR and delay-matching constants
 POSITIONS = ("1-2", "3-4", "5-6")
 VCC = 5.0
 LOGIC_VCC_MIN, DRIVER_POR_MIN = 1.65, 3.8
@@ -213,21 +229,65 @@ def dead_time_bounds(logic):
     temp = (t_rc(r * (1 - rt), c * (1 - ct) * 0.85, VCC, V0_RANGE[1], vt[0]),
             t_rc(r * (1 + rt), c * (1 + ct) * 1.15, VCC - 0.1, V0_RANGE[0], vt[2]))
     skew_max = (T_AY[2] + T_BY[2]) - (T_AY[0] + T_BY[0])
-    worst = room[0] - skew_max - DRIVER_MATCH_MAX
+    worst_room = room[0] - skew_max - DRIVER_MATCH_MAX
+    worst_temp = temp[0] - skew_max - DRIVER_MATCH_MAX
+    unbounded = ["turn-off delay of the diode discharge (InBuf output resistance, SDM03U40 forward behaviour)"]
     return {"vt_plus_5V_interpolated_V": [round(v, 3) for v in vt],
             "t_rc_typ_ns": round(typ, 2), "t_rc_room_range_ns": [round(v, 2) for v in room],
             "t_rc_with_x7r_temperature_ns": [round(v, 2) for v in temp],
             "qsg_rule_ns": round((r + 14) / 13.5, 2),
             "logic_channel_skew_max_ns": round(skew_max, 2), "driver_match_max_ns": DRIVER_MATCH_MAX,
-            "worst_case_gate_command_dead_time_ns": round(worst, 2),
+            "conditional_lower_bound_room_ns": round(worst_room, 2),
+            "conditional_lower_bound_with_x7r_temperature_ns": round(worst_temp, 2),
             "typical_gate_command_dead_time_ns": round(typ - DRIVER_MATCH_TYP, 2),
-            "unbounded_reduction": "turn-off delay of the diode discharge (InBuf output resistance, SDM03U40 forward behaviour); not bounded here",
-            "datasheet_limits_guarantee_positive_dead_time": worst > 0}
+            "assumptions": ["VT+ interpolated linearly to 5.0 V between the datasheet's 4.5 V and 5.5 V rows",
+                            "residual capacitor voltage after discharge 0-0.3 V (assumed, no datasheet)",
+                            "VOH between VCC - 0.1 V and VCC; VCC exactly 5.0 V",
+                            "logic skew from independent datasheet delay limits of the two channels"],
+            "unbounded_subtractive_terms": unbounded,
+            "datasheet_limits_guarantee_positive_dead_time": False if unbounded else min(worst_room, worst_temp) > 0}
+
+
+def sha(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+def record_entry(path, name):
+    """The entry for name anywhere in a source record (searched recursively)."""
+    def walk(o):
+        if isinstance(o, dict):
+            if o.get("name") == name and "sha256" in o:
+                return o
+            o = list(o.values())
+        if isinstance(o, list):
+            for v in o:
+                hit = walk(v)
+                if hit:
+                    return hit
+        return None
+    return walk(json.loads(Path(path).read_text(encoding="utf-8")))
+
+
+def manifest():
+    entry = record_entry(SOURCE_RECORDS[1], DRIVER_DATASHEET)
+    drv = ROOT / entry["local_path"]
+    if sha(drv) != entry["sha256"]:
+        raise SystemExit(f"{drv} sha256 does not match the recorded {entry['sha256']}")
+    files = [Path(__file__), LOGIC, HELPER, *SOURCE_RECORDS] + [verified(n) for n in VENDOR_FILES] + [drv]
+    try:
+        rev = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        dirty = bool(subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True,
+                                    text=True).stdout.strip())
+    except OSError:
+        rev, dirty = None, None
+    return {"files": {Path(f).resolve().relative_to(ROOT).as_posix(): sha(f) for f in files},
+            "repository_revision": rev, "working_tree_dirty": dirty,
+            "note": "revision is context only; vendor files are git-ignored and bound by their hashes"}
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-input-logic.json")
+    ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-input-logic-rev3.json")
     args = ap.parse_args()
     logic = json.loads(LOGIC.read_text(encoding="utf-8"))
     fitted, _ = read_bom(verified("EPC90133BOM.xlsx"))
@@ -243,21 +303,23 @@ def main():
                for n2 in range(4) for j640 in itertools.combinations(POSITIONS, n2)]
     dt = dead_time_bounds(logic)
     l5 = {"driver_por_min_V": DRIVER_POR_MIN, "logic_vcc_min_V": LOGIC_VCC_MIN,
-          "logic_valid_at_driver_enable": DRIVER_POR_MIN > LOGIC_VCC_MIN,
-          "both_on_at_enable": [c for c in configs if c["kind"].startswith("both on at idle")]}
-    l5["both_on_at_enable"] = [{"J630": c["J630"], "J640": c["J640"]} for c in l5["both_on_at_enable"]]
+          "supply_threshold_order": DRIVER_POR_MIN > LOGIC_VCC_MIN,
+          "scope": "supply-range ordering only; gate commands at driver enable, power-down behaviour and transient overlap are not established (E1)",
+          "static_idle_both_on": [{"J630": c["J630"], "J640": c["J640"]} for c in configs
+                                  if c["kind"].startswith("both on at idle")]}
     kinds = {}
     for c in configs:
         kinds.setdefault(c["kind"], []).append({"J630": c["J630"], "J640": c["J640"]})
     checks = {"L1_bom": all(r["match"] for r in bom), "L2_function_table": table["pass"],
-              "L3_qsg_settings": all(qsg.values()), "L5_logic_valid_at_driver_enable": l5["logic_valid_at_driver_enable"]}
+              "L3_qsg_settings": all(qsg.values()), "L5_supply_threshold_order": l5["supply_threshold_order"]}
     report = {
-        "schema": "epc90133-input-logic/1",
-        "scope": "Static logic of the transcribed input path and datasheet-limit dead-time arithmetic; no timing simulation, no PWM-source behaviour, not a measurement.",
+        "schema": "epc90133-input-logic/2",
+        "scope": "Static logic of the transcribed input path and conditional datasheet-limit dead-time arithmetic; no timing simulation, no supply-ramp or start-up model, no PWM-source behaviour, not a measurement.",
+        "input_manifest": manifest(),
         "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "transcription_sha256": hashlib.sha256(LOGIC.read_bytes()).hexdigest(),
         "checks": checks, "outcome": "pass" if all(checks.values()) else "fail",
-        "L1_bom": bom, "L2_function_table": table, "L3_qsg_settings": qsg, "L4_dead_time": dt, "L5_power_up": l5,
+        "L1_bom": bom, "L2_function_table": table, "L3_qsg_settings": qsg, "L4_dead_time": dt, "L5_supply_threshold_order": l5,
         "configurations_by_kind": kinds, "configurations": configs,
     }
     args.output.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")

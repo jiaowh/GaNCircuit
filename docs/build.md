@@ -1417,9 +1417,18 @@ and R625/C625/D625 delay networks, the pull-downs and the J630/J640 headers. Bot
 `devices/epc/epc90133-sources.json`. `scripts/epc90133_input_logic.py` (checks declared at fab26fd before the first
 run; [report](../results/gan/epc90133-input-logic.json); tests/test_epc90133_input_logic.py) evaluates the
 transcription as recorded: L1 BOM, L2 the gate function against all 16 rows of the 74LVC1G99 function table parsed
-from the PDF, L3 the QSG's documented settings, L5 power-up. All pass. Run 1's class label for two-input settings
-was wrong where a polarity jumper inverts one channel (its recorded states were right); it is kept as
-`results/gan/epc90133-input-logic-run1-label-defect.json`, and run 2 changed only the label.
+from the PDF, L3 the QSG's documented settings, L5 supply-threshold order. All pass. Run 1's class label for
+two-input settings was wrong where a polarity jumper inverts one channel (its recorded states were right); it is kept
+as `results/gan/epc90133-input-logic-run1-label-defect.json`, and run 2 changed only the label.
+
+*Corrected after the project audit at f4767b1* (revision 3, [report](../results/gan/epc90133-input-logic-rev3.json);
+the run-2 report is kept unchanged). Run 2's L5 described the commands at driver enable as the static idle state,
+which a supply-threshold comparison cannot show; L5 is now only that comparison, and power-up, power-down and
+transient overlap are open (E1). The dead-time bound is conditional and never reported as a guarantee while the
+discharge delay is unbounded (run 2's `worst > 0` rule could have reported one for a larger resistor; at 120 ohm
+it correctly reported none). Revision 3 binds an input manifest (evaluator, transcription, imported helper, both
+source records, the five vendor files read and the uP1966E datasheet behind the driver constants, with the
+repository revision as context). Its classifications and L1-L3 are identical to run 2.
 
 Each input channel is Y = (C ? B : A) XOR D: U610 gives InBufQup = PWM1 XOR PolQup; U611 gives InBufQlow = (Dual ?
 PWM2 : PWM1) XOR PolQlow. U612/U614 select the RC-delayed copy when UseDT is high and are disabled (3-state) when
@@ -1428,8 +1437,9 @@ SWbyp is high, when U615/U616 connect PWM1/PWM2 straight to HIN/LIN. J630 sets P
 
 Across all 64 horizontal jumper combinations:
 
-- **Safe as designed, 4 combinations**: J630 1-2 or 3-4 with J640 5-6 (and the same with an ineffective 3-4 on
-  J640). Gate commands are complementary from PWM1, with an RC delay on each turn-on. With open inputs only the
+- **Complementary static commands with the RC paths selected, 4 combinations**: J630 1-2 or 3-4 with J640 5-6
+  (and the same with an ineffective 3-4 on J640). In steady state the gate commands are complementary from PWM1,
+  and each turn-on passes through an RC delay; this does not exclude transient overlap. With open inputs only the
   synchronous-rectifier FET is commanded on.
 - **Both gates on at idle, 8**: J630 1-2 and 3-4 together (both polarity bits set) without full bypass. Both
   commands are high with PWM1 low or unplugged.
@@ -1440,17 +1450,20 @@ Across all 64 horizontal jumper combinations:
 - **Two-input, 40**: dual mode or full bypass. Both gates are on for one PWM1/PWM2 combination (usually both high;
   PWM1 low with PWM2 high for J630 3-4 with 5-6), which the PWM source must avoid.
 
-Power-up: the logic and U80 share the 5 V VCC from U100. U80 enables its outputs only above its POR (3.8 V minimum),
-where the 74LVC parts (1.65 V minimum) already give their static outputs, so the commands at enable are the idle
-state of the jumper setting.
+Supply-threshold order: the logic and U80 share the 5 V VCC from U100, and U80's minimum POR threshold (3.8 V) is
+above the 74LVC parts' 1.65 V minimum supply. (Run 2 concluded from this that the commands at enable are the idle
+state of the jumper setting; that is withdrawn. The ordering says nothing about when outputs, select inputs and RC
+nodes settle during the supply ramp, nor about power-down.)
 
 Dead time from datasheet limits (L4, arithmetic, informational): the RC delay R C ln((VOH - V0)/(VOH - VT+)) is 9.6 ns
 typical (EPC's Fig. 4 rule gives 9.9 ns for 120 Ω) and 6.3-12.9 ns over R ±1 %, C ±10 %, VT+ limits (interpolated to
 5.0 V) and an assumed 0-0.3 V residual voltage, or 5.3-14.8 ns with X7R temperature drift. The two channels'
-gate delays may differ by up to 7.3 ns and the uP1966E's delay matching by up to 6 ns, so stacked limits give
-about -7 ns at the gate commands (typical about 8 ns). The capacitor's discharge delay, which shortens the dead time,
-is not bounded by any datasheet used here. Stacked worst cases are pessimistic, but they mean the datasheets do not
-guarantee a positive dead time. The uP1966E datasheet recommends at least 30 ns; EPC recommends 5-15 ns for this
+gate delays may differ by up to 7.3 ns and the uP1966E's delay matching by up to 6 ns, so stacked limits give a
+conditional lower bound of about -7 ns at the gate commands (-8 ns with X7R drift; typical about 8 ns), conditional
+on the interpolated thresholds and assumed residual voltage. The capacitor's discharge delay, which shortens the dead
+time, is not bounded by any datasheet used here, so no guarantee can follow from these data whatever the bound's
+sign. Stacked worst cases are pessimistic; the result is only that the datasheets do not guarantee a positive dead
+time. The uP1966E datasheet recommends at least 30 ns; EPC recommends 5-15 ns for this
 board.
 
 Consequences (hardware plan): the first-power procedure gains a jumper-configuration entry, with the shoot-through
@@ -1477,6 +1490,380 @@ features, the system bandwidth is 0.89 GHz (set by the 264 MHz ring at 3 % ampli
 gate measurement needs at least 54 dB CMRR. Probe tip capacitance does not limit the choice (20 pF shifts the ring
 by 1 %). The first version computed the edge dv/dt from the largest step and the fastest edge of different cases.
 It was corrected to a per-case value before the result was recorded.
+
+### EPC90133 design round 1: owner targets on the stock board (5 October 2026)
+
+Owner targets, each relative to the EPC original (the stock BOM in the same simulation): T1 lower switch-node
+overshoot, T2 Q1 Eon + Eoff not higher, T3 estimated efficiency at 48 V -> 12 V not lower. Declared at 832a5e1 before
+any run (`scripts/epc90133_switching.py --study design`; assessment `scripts/assess_epc90133_design.py`, committed at
+b7af345 before the results). Operating point: continuous buck 48 V -> 12 V, 20 A, 250 kHz, 2.2 µH, as a double pulse at
+the converter's edge currents (28.2 A turn-off, 11.8 A turn-on). Network G-m1-mid, 100 ps step. Design space: parts
+that can be changed on the stock board: R80 (Q1 turn-on resistor) 1 (stock), 2.2 and 3.3 ohm, and R80 2.2 ohm with a
+7.5 ns dead time. The dead-time candidate is inadmissible until E1 measures the dead-time margin. Robust rule: a target
+counts only if it holds under all four unresolved alternatives ({ramp, step driver} x {package source inductance 0,
+50 pH}): T1 at least max(1 V, 10 %) lower, T2 and T3 at most 2 % higher. The efficiency estimate counts FET losses only
+(one off interval with both edges and dead times at the converter's currents, plus Q1's on-time conduction). It
+excludes inductor, copper, capacitor and gate-drive losses, so its absolute value (about 99.1-99.2 %) is optimistic.
+It serves only for ranking.
+
+Run ([report](../results/gan/epc90133-design-round1.json); fix runs
+[report](../results/gan/epc90133-design-round1-fix.json);
+[assessment](../results/gan/epc90133-design-round1-assessment.json)): 13 of 16 cases are usable. Three 100 ps timing
+runs stalled at the start of the transient (LTspice reduced Tseed to 1e-17 s) and hit the 1800 s limit: stock with
+the step driver and 50 pH, and R80 3.3 ohm under two alternatives. The declared 50 ps fix pair resolved the candidate
+(R80 2.2 ohm at 50 ps matches 100 ps within 0.011 % on every target metric: the numerical check passes). The stock
+case stalled again at 50 ps (3600 s), so that alternative's T1 comparison stays open. Assessment revision 1 reported
+'undetermined' wherever an alternative was missing, even when another had already failed. One failure already decides
+'not met', so revision 2 corrects the precedence; the v1 output is kept as
+`results/gan/epc90133-design-round1-assessment-v1-precedence-defect.json`.
+
+Result (change against stock under each alternative that ran):
+
+| Design | Overshoot | Q1 Eon + Eoff | FET loss | Q2 gate peak |
+|---|---|---|---|---|
+| R80 2.2 ohm | -16 to -60 % | +7.5 to +14 % | +1.5 to +18 % | -10 to -41 % |
+| R80 2.2 ohm, dead time 7.5 ns | -16 to -61 % | +7.4 to +13 % | -0.8 to +15 % | -9 to -41 % |
+| R80 3.3 ohm | -44 to -75 % | +14 to +17 % | +9 to +20 % | -23 to -47 % |
+
+*T3 and the efficiency figures in the table above are invalid (loss-estimator revision 2, see "layout round 2a"); the
+rerun is revision 2 below.*
+
+Verdicts: **no candidate meets all three targets.** T1 holds under every alternative that ran but stays undetermined
+(the stock step-driver, 50 pH case is missing). T2 and T3 are not met. A larger R80 slows Q1's turn-on: Eon rises
+while the overshoot falls. The shorter dead time recovers only about 0.05 W of the roughly 0.3 W extra loss. The
+overshoot benefit shrinks to about 16 % when an assumed 50 pH package source inductance already slows the edge, so
+the size of the trade depends on an unresolved device property. A side result, not a target: Q2's gate spike during
+Q1's turn-on falls by 10-47 %, a better false-turn-on margin.
+
+Reading, within this model: the gate-drive changes available on the stock board trade overshoot against switching
+energy; none lowers both. Meeting all three targets would need a change that lowers the loop or common-source
+inductance rather than slowing the edge, which means a layout change and a new board. The trade-off and its size are
+provisional simulation predictions, not a frozen prediction record and not validated values (EPC2302 Fig. 7
+exception, behavioural driver, exploratory extraction).
+
+**Revision 2 (loss-estimator revision 2; 5 October 2026).** The first rev-2 launch (PID 29988) ended at 16:52 with no
+error output after 7 of 16 cases, apparently when its launching session closed (Start-Process did not detach it from
+the session's process tree). Long runs are now started through WMI (`Win32_Process.Create`), outside any session.
+The 9 cases that never started ran unchanged as a continuation
+([report](../results/gan/epc90133-design-round1-rev2-cont.json)). The persistent stock step-driver, 50 pH stall is
+not a start-up stall: the partial raw file shows normal progress to 1.753 µs and then steps of about 1e-19 s, 0.76 ns
+after Q2's turn-on command. Further trapezoidal runs stalled the same way at other edges (20 ns, 1.82-1.94 µs,
+4.74-4.75 µs), and a smaller step makes it worse (75 ps stalls at 20 ns in profiling). Declared fallbacks: the Gear
+fallback and its extension were committed before the runs they cover (d5184f3, 55d9f7d); the cross-method rule
+(1b24989, 19:58) is a retrospective amendment, committed after R80-2.2-dt7.5@ramp-Ls50-gear, a result it affects,
+had finished (19:28; audit at 5d72e4e). Gear integration at the same 100 ps step, Gear
+pairs compared with each other only, valid if a declared Gear-versus-trapezoidal check passes
+([report](../results/gan/epc90133-design-round1-rev2-gear.json),
+[extension](../results/gan/epc90133-design-round1-rev2-gear2.json)). **The check passes by a wide margin**: on
+stock and R80 2.2 ohm (step-Ls0), R80 2.2 ohm (step-Ls50) and stock (ramp-Ls0), overshoot, FET loss and Q2 gate peak
+agree within 0.05 %, and the stock-to-candidate differences within 0.3 %. Gear stalls too, but rarely: stock ramp-Ls50
+with Gear stopped at 4.98 µs. Where only a trapezoidal stock case and a Gear candidate exist, a cross-method comparison
+is allowed, and it decides a constraint only outside a 0.1 % margin. The rev-2 timeouts are kept in the reports.
+Without this amendment the dead-time candidate's ramp-Ls50 comparison is undetermined; its verdict stays 'not met'
+either way, because its matched ramp-Ls0 comparison already fails C1.
+
+Rev-2 result, against stock under each alternative (all four alternatives now resolved for every candidate;
+[assessment, round-1 rule](../results/gan/epc90133-design-round1-rev2-assessment.json),
+[assessment, owner's round-3 rule](../results/gan/epc90133-design-round1-rev2-assessment-round3.json)):
+
+| Design | Overshoot (stock 25.1 / 16.6 / 11.2 / 10.9 V) | FET loss | Q2 gate peak |
+|---|---|---|---|
+| R80 2.2 ohm | 10.0 / 6.9 / 9.4 / 8.0 V (-16 to -60 %) | +5.5 to +9.0 % | -10 to -41 % |
+| R80 3.3 ohm | 5.0 / 4.2 / 6.3 / 5.0 V (-44 to -80 %) | +10.4 to +14.2 % | -23 to -57 % |
+| R80 2.2 ohm, dead time 7.5 ns | 9.9 / 6.8 / 9.4 / 8.0 V (-16 to -61 %) | +3.0 to +6.3 % | -9 to -41 % |
+
+(Alternatives in the order ramp-Ls0, step-Ls0, ramp-Ls50, step-Ls50.) Under the round-1 rule T1 is now met by every
+candidate, and T2 and T3 are not. Under the owner's rule (overshoot objective; FET loss at most +5 % and Q2 gate
+peak not above stock under all four), **every round-1 candidate fails the loss constraint**. The binding alternative
+is the ramp driver without package inductance, where the slower edge costs the most. The shorter dead time recovers
+about 2.5 points of loss and fails only there (+6.3 %), but it stays inadmissible until E1 measures the dead-time
+margin. A straight-line reading puts the largest admissible R80 at about 1.6-1.8 ohm, so round 3 tests 1.2, 1.5
+and 1.8 ohm.
+
+### EPC90133 design round 3: the largest admissible Q1 turn-on resistor (5 October 2026)
+
+Owner's rule (decision of 5 October; plans/layout-round-2-plan.md): overshoot is the single objective. Constraints
+under all four alternatives: C1 FET loss at most 5 % above stock's, C2 Q2 die gate peak during Q1's turn-on not
+above stock's. Candidates are ranked by their worst-case overshoot. Declared at 8b6cc4b before any run: R80 1.2, 1.5
+and 1.8 ohm (E12 parts; a resistor swap on the stock board), chosen from rev 2's straight-line reading. Same bench as
+rev 2. step-Ls50 runs directly with Gear, and stock is not rerun. A reproduction control, stock@ramp-Ls0-repro,
+**reproduces rev 2 exactly** (identical netlist hashes for the timing and main runs, zero metric difference), so
+round 3 is compared with rev 2's stock cases. Reports: [main](../results/gan/epc90133-design-round3.json), Gear
+fallbacks [a](../results/gan/epc90133-design-round3-gear-a.json) and
+[b](../results/gan/epc90133-design-round3-gear-b.json), [numerical check](../results/gan/epc90133-design-round3-check.json),
+[assessment](../results/gan/epc90133-design-round3-assessment.json). Trapezoidal stalls were frequent (6 of 13 cases;
+Gear stalled in 2 of 8). Each was handled by a fallback declared beforehand. The R80 1.2 ohm 50 ps ramp-Ls50 pair
+(results/gan/epc90133-design-round3-ms50-a.json) finished after the assessment: stock usable, R80 1.2 ohm unusable;
+no decision depends on it.
+
+| R80 | Overshoot ramp-Ls0 / step-Ls0 / ramp-Ls50 / step-Ls50 (stock 25.1 / 16.6 / 11.2 / 10.9 V) | FET loss | Q2 gate peak | Verdict |
+|---|---|---|---|---|
+| 1.2 ohm | 21.3 / 14.2 / - / - V (-15, -14 %) | +1.9, +1.4 % | lower | undetermined (Ls50 cases stalled with both methods) |
+| **1.5 ohm** | **16.8 / 11.4 / 10.8 / 9.7 V (-33, -31, -4, -11 %)** | **+4.3, +3.3, +2.4, +2.6 %** | **lower in all four** | **meets C1 and C2; worst case 16.8 V** |
+| 1.8 ohm | - / 9.2 / 10.2 / 9.0 V (-44, -9, -17 %) | +5.1 % (step-Ls0), +3.7, +3.9 % | lower | not met (C1, step-Ls0) |
+| 2.2 ohm (rev 2) | 10.0 / 6.9 / 9.4 / 8.0 V | +5.5 to +9.0 % | lower | not met |
+
+**Result: R80 1.5 ohm is the best tested candidate** (the tested grid does not exclude values between 1.5 and
+1.8 ohm or other parts; no further search is needed to justify E4). It is the only candidate that meets both
+constraints under every
+alternative, and it lowers the worst-case overshoot from 25.1 V to 16.8 V (-33 %). In absolute terms the loss cost
+is at most 0.09 W at 240 W, about 0.035 efficiency points under this FET-only estimate. R80 1.2 ohm cannot outrank
+it whatever its missing cases show, because its ramp-Ls0 overshoot alone (21.3 V) exceeds 16.8 V. R80 1.8 ohm misses
+C1 by 0.1 points under step-Ls0, a same-method comparison. Numerical check (declared at 8dfc08a): R80 1.5 ohm at
+50 ps matches 100 ps within 0.002 % on overshoot, FET loss and Q2 gate peak.
+
+Reading: the benefit depends on the unresolved package source inductance. Without it, R80 1.5 ohm cuts the overshoot
+by about a third. With an assumed 50 pH the edge is already slow, and the cut is only 4-11 %. The decision is robust
+to that unknown (C1 and C2 hold in all four alternatives), but the size of the improvement is not. Measuring the stock
+board's overshoot and Q2 gate waveform before the swap (E3/E4) can constrain the alternatives, but cannot by itself
+identify the package inductance: driver behaviour, model discrepancy and probe response are competing explanations.
+The before/after swap tests the predicted response. The largest predicted loss increase, +4.34 %, leaves 0.66 points
+to C1; that is a margin within the model, not a hardware margin or an uncertainty bound, and the half-step check
+covers step-Ls0 only. The shorter
+dead time would allow a larger R80 (rev 2: 2.2 ohm with 7.5 ns fails C1 only under ramp-Ls0, at +6.3 %), but it stays
+inadmissible until E1. A layout lever was not run (plan order step 3). Round 2a on A gives at most -11 to -23 %
+overshoot for +3.1-3.8 % loss at the 0.050 mm gap; adding that to R80 1.5 ohm's +4.3 % suggests, but does not show,
+that the combination would exceed C1 (percentages from two different models; the combination was not simulated).
+Combined with 1.2 ohm, the same addition (about -25 % at about +4-6 % loss) does not clearly beat 1.5 ohm alone. It
+needs a new board, and deferring it for that reason stands without a verdict. These are provisional simulation
+predictions for experiment E4 (R80 swap) on the purchased board, not yet a frozen prediction record (that needs the
+approved conditions, hardware plan 'Frozen prediction record') and not validated values (EPC2302 Fig. 7 exception,
+behavioural driver, exploratory extraction G).
+
+**Assessor revision 4 (6 October 2026; audit at 5d72e4e, docs/project-audit-5d72e4e.md).** The audit reproduced the
+round-3 assessment exactly and found the evaluator unsafe as an unattended gate: a missing alternative dropped out of
+the rule, the declared reproduction and half-step controls did not affect the selection, missing Gear-check cases were
+skipped, and incompatible inputs (estimator revision 1, unsettled loss, another extraction) were accepted.
+`scripts/assess_epc90133_design.py` revision 4 requires the four declared alternatives, checks every case's name
+against its parameters and the reports' conditions and extraction/library hashes (input rejected otherwise, exit 2),
+counts a loss only from estimator revision 2 with a settled window, requires the Gear check's whole case set, gates
+the selection on the reproduction control and the top candidate's half-step check, and emits each comparison as a
+resolved pair. It reports verdicts under the amended rule and under the original rule without the cross-method
+fallback. Fault tests: tests/test_design_assessment.py (every audit probe now yields no selection or a rejection).
+Rerun on the same inputs plus the finished ms50-a report, no simulation:
+[assessment rev 4](../results/gan/epc90133-design-round3-assessment-rev4.json); per-alternative verdicts and
+overshoots identical to the stored assessment (kept), and **R80 1.5 ohm is selected under both rules**, with all four
+of its comparisons same-method (two trapezoidal, two Gear).
+
+**Assessor revision 5 (6 October 2026; audit at 0f07a6a, docs/project-audit-0f07a6a.md finding 1).** Revision 4 still
+selected R80 1.5 ohm when one of its overshoot values was null (ranking `[["R80-1.5", null]]`), treated `usable:
+"false"` as true, and raised AttributeError on a null case or a list-valued manifest. Revision 5 checks types before
+use (objects where objects are expected, `usable` a literal boolean, absent only for a case with no metrics, every
+metric read a finite number or null) and rejects malformed input with exit 2 and reasons. A design whose overshoot is
+missing under any alternative has objective "undetermined" and is never ranked or selected. The audit's probes are
+fault tests in tests/test_design_assessment.py. Rerun on the stored inputs, no simulation:
+[assessment rev 5](../results/gan/epc90133-design-round3-assessment-rev5.json); verdicts, pairs, ranking and the
+**R80 1.5 ohm selection are identical to revision 4 under both rules**.
+
+### EPC90133 track R step 1: copper in KiCad (6 October 2026)
+
+Track R (plans/layout-round-2-plan.md) rebuilds an editable KiCad design from EPC's Gerbers, for our own board
+(G5). Step 1 converts the eight copper layers. `scripts/epc90133_reconstruct.py` applies each layer's drawing
+commands in order (copper added, cut-outs removed) with shapely. It splits polygons with holes into hole-free pieces,
+because KiCad graphic polygons have none, and writes a KiCad 10 board with the GM1 outline. kicad-cli then exports
+Gerbers for comparison. The board file is a derivative of EPC's layout and the repository is public, so it stays in
+the git-ignored vendor/epc/epc90133/reconstruction/. Only the script and the summary report are committed.
+
+Run 1 crashed (hole splitting exceeded the recursion limit; no report). Run 2 FAILED its declared pixel criteria on
+every layer (XOR 0.20-0.58 %, mismatch regions up to 0.73 mm^2) and is kept
+([report](../results/gan/epc90133-reconstruct-copper-run2-failed.json)). The diagnosis is that the mismatch exists
+before KiCad, and every mismatched pixel lies within 0.041 mm (1.6 pixels) of a true edge. The reader's raster
+fills every pixel an edge touches, so the revision-1 criteria tested the raster rather than the conversion.
+Revision 2, declared before run 3, compares geometry exactly and keeps a raster cross-check. **Run 3 passes**
+([report](../results/gan/epc90133-reconstruct-copper.json)): on every layer the symmetric difference is at most
+0.000004 % of the copper area (largest piece 2e-6 mm^2), every raster mismatch lies within 0.042 mm of an edge,
+and the outline is exact. Scope: copper shapes only, no parts, nets, vias, drills, mask or zones (steps 2-4). Arcs
+are 5-degree polygons, as in the reader. The raster reader used for the extractions has the same ~1-pixel
+(0.025-0.04 mm) edge uncertainty, which is far below the extraction meshes.
+
+**Step 2a: which side each part is on (6 October 2026).** EPC's layout PDF (an Altium export inside the Gerber
+package) carries hidden text tags for every pad (`PA<ref><pin>`, boxes about the pad's size, 0.2-0.5 mm off), a
+tag at each designator, and a bookmark tree with every part's pad names and EPC's full netlist (37 named nets, 301
+pads). The bookmarks list all 118 parts on every layer page, so they do not give the side. Four quick side tests
+each misplaced parts in the stacked power stage, where top Ci capacitors sit directly over bottom Cm capacitors.
+`scripts/epc90133_reconstruct_parts.py` therefore declares a rule: netlist consistency on our copper connectivity
+first, then mask-pad size, then openings already claimed by other parts, then earlier anchors, and silkscreen only
+for through-hole and mechanical parts, whose side changes no copper. Run 1 failed: a paste veto that was already
+known to be unreliable, plus independent pad snapping that let two pins share an opening. Run 2 failed: the
+switches' unnamed auxiliary pad, the inductor's large pads beyond a fixed snap radius, and the standoffs. Both are
+kept ([run 1](../results/gan/epc90133-reconstruct-sides-run1-failed.json),
+[run 2](../results/gan/epc90133-reconstruct-sides-run2-failed.json)), each with a revision declared before the
+next run. **Run 3 passes all five checks** ([report](../results/gan/epc90133-reconstruct-sides.json)): all 301 pads
+matched one-to-one to mask openings; 47 parts on top and 59 on the bottom; and every net with two or more pads on
+one copper island. The 26 parts whose side earlier scripts had established (Ci top, Cm bottom, Q1, Q2, U80 and
+R80-R83 top) were all placed correctly by the evidence; the anchor rule was not needed once. Per-part sides and
+pad positions are EPC-derived and stay in the git-ignored reconstruction folder. Next: footprints built from these
+pads (mask, paste, copper, drills), placed in the KiCad board, and a mask/paste round trip.
+
+**Step 2b: footprints from the board's own pads (6 October 2026).** `scripts/epc90133_reconstruct_footprints.py`
+places 106 footprints built from EPC's pads, not from libraries, because several parts have none and EPC's land
+patterns may differ. Each pad's copper is its mask opening cut to the existing copper, so pads add no copper.
+Each footprint carries its own mask and paste shapes, plated pads get drill-size holes, and the two standoffs get
+non-plated holes. All 299 named pads carry EPC's net names. Runs 1-4 failed and are kept:
+- run 1 crashed: our Gerber reader could not parse KiCad's parameterised macros (fixed, regression test added;
+  EPC's files are read unchanged);
+- run 2 failed on a coordinate bug, and run 3 was an accidental identical repeat;
+- run 4 failed only on mask openings wrongly given to the two standoff holes.
+**Run 5 passes all checks** ([report](../results/gan/epc90133-reconstruct-footprints.json)). Copper, mask and
+paste on every layer round-trip through KiCad with at most 0.000023 % difference, every named pad has copper and
+EPC's net, and every drill is accounted for. KiCad's DRC is reported, not checked: the copper is still unnetted
+graphics, so shorts and clearance hits against it are expected until step 3 gives it nets.
+
+**Steps 3-4: nets on the copper, vias, stackup (6 October 2026).** `scripts/epc90133_reconstruct_nets.py` turns
+each copper island into a KiCad zone. The zone takes the net of the EPC pads on its connected group (islands joined
+across layers through plated holes). Its fill is EPC's copper exactly, written as KiCad stores fills: one outline,
+with every hole joined by a zero-width slit; a known-answer test reproduces the area exactly. Every plated hole
+that is not a component pad becomes a drill-size via with its net. The stackup comes from EPC's stackup file
+(8 x 2.8 mil copper; dielectrics 5/5/7.2/5/7.2/5/5 mil FR370-HR; 63.2 mil total). Core/prepreg is not stated in
+the file, so all dielectrics are written as prepreg, an assumption with no effect on the Gerbers.
+
+Run 1 failed only the drill comparison, because our Excellon reader ignored KiCad's decimal points (fixed,
+regression test; EPC's file is read unchanged). It is kept
+([report](../results/gan/epc90133-reconstruct-nets-run1-failed.json)). **Run 2 passes all checks**
+([report](../results/gan/epc90133-reconstruct-nets.json)):
+- the Gerbers of all 12 copper, mask and paste layers round-trip exactly;
+- all 445 drill holes come back with the same position, size and plating;
+- no copper group carries two nets;
+- KiCad's own DRC finds zero shorts and zero unconnected items, so KiCad's connectivity matches EPC's netlist;
+- the stackup total is 63.2 mil.
+
+The result has 1206 zones and 394 vias; 29 islands carry no net, which KiCad also reports as isolated copper.
+Other DRC violations are reported, not checked, because KiCad's default rules are not EPC's: drill-size vias give
+annular-ring and via-diameter hits, and EPC's tighter clearances give clearance hits.
+
+Still open for track R:
+- the silkscreen layers are not yet reconstructed;
+- the DRC rules should be set to EPC's (from the .RUL file in the Gerber package) and every remaining violation
+  explained;
+- zone fills are EPC's copper frozen: a KiCad refill would regenerate them by KiCad's rules.
+
+**Step 5: rings, silkscreen, EPC's rules, explained DRC (6 October 2026). Track R complete.**
+`scripts/epc90133_reconstruct_final.py` writes the final board (vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb
+and .kicad_pro, git-ignored). Changes over steps 3-4:
+- vias and plated pads get real rings: the largest circle inside EPC's copper on every connected layer, capped
+  at the measured via pad (about 0.65 mm for both drill sizes) or the pad's mask opening;
+- zone priorities follow nesting;
+- netless pads follow KiCad's convention (unused pins get 'unconnected-(part-pin)'; the unnamed auxiliary pads
+  in Q1/Q2's gate pads take VGu/VGl);
+- the outline is one rectangle, the silkscreen is added, and back-side references are mirrored;
+- EPC's .RUL rules are applied: 5.91 mil clearance, the smallest of six (the export lost the named rules' net
+  scopes), 5 mil width and 2 mil mask expansion. Edge, hole and via minima are not in EPC's file and are not
+  enforced.
+
+Run 1 crashed (silkscreen file naming). Run 2 failed only on two undeclared DRC categories, and is kept
+([report](../results/gan/epc90133-reconstruct-final-run2-failed.json)). The run also showed that KiCad lists at
+most 499 items per DRC type. **Run 3 passes all five checks**
+([report](../results/gan/epc90133-reconstruct-final.json)):
+- all 14 Gerber layers (8 copper, mask, paste and silkscreen on both sides) and all 445 drills round-trip
+  exactly;
+- KiCad finds 0 shorts and 0 unconnected items, and no EPC net changed;
+- every remaining DRC item is in a declared category:
+  - 499+ clearance items at EPC's rule within 1 um, the arcs being 5-degree polygons. A second DRC at the rule
+    minus 1 um reports none, so no gap is below EPC's rule by more than the declared 1 um geometric tolerance;
+  - 8 edge items on a 0.25 mm ring centred on the outline. EPC's Altium export draws the outline into every
+    copper Gerber, and the fab trims it, so it is not real copper;
+  - SO3's 3 mm plated hole, which EPC's copper gives no ring;
+  - EPC's silkscreen near the edge, 13 isolated netless islands, and the footprints not being from a library.
+
+Limits:
+- the zones hold EPC's fills frozen. A KiCad refill does NOT reproduce them (audit at 0f07a6a, on a scratch copy:
+  0.98-1.85 % symmetric-difference area in G's power/gate window, 2.3-2.8 % over the board interior with drills
+  excluded; isolated-copper items 13 -> 43, two solder-mask bridges). This board reproduces the saved geometry; an
+  edit/refill workflow is not qualified, and zero shorts/unconnected does not show that extraction geometry is
+  preserved;
+- the named EPC clearance rules (gate drive, logic, PSU, FET) lost their scopes, so only the board minimum is
+  enforced;
+- this is EPC's published layout (B5253 Rev 2.0), not yet checked against the board we buy.
+
+**Audit at 0f07a6a: runner fixes and an independent readback (6 October 2026).** The audit found that both track R
+DRC steps ignored kicad-cli's exit status and read fixed report paths, so a failed command with a stale `{}` report
+passed R3 and R4; that the reports did not identify the board checked; and that R5 looked only at pads the script had
+itself assigned. `src/circuit_tools/kicad.py` `run_drc` now writes each report to a fresh path, requires exit status
+0, validates the drc.v1 structure and the report's source board, and checks that the board did not change
+(tests/test_kicad_drc.py with a fake kicad-cli). `scripts/epc90133_reconstruct_final.py` (revision 3) and
+`epc90133_reconstruct_nets.py` use it, and step 5 now binds board, project, input board, DRC reports, KiCad version
+and helpers by hash. The stored step 3-5 reports were made before this change and stand; nothing was rebuilt.
+`scripts/verify_epc90133_reconstruction.py` (declared at 4c69320 before its first run) checks the saved board
+without reusing the construction. Run 1 **passes V1-V4**
+([report](../results/gan/epc90133-reconstruct-verify.json)):
+- V1: KiCad's IPC-D-356 export of the saved board lists all 288 pads of EPC's netlist, read directly from the layout
+  PDF, each with EPC's net;
+- V2: the 13 other pad records are each explained by a declared rule: 10 numbered pads outside EPC's netlist carry
+  KiCad 'unconnected' nets, Q1/Q2's unnamed auxiliary gate pads coincide with gate pads and carry VGU/VGL, and SO1/SO2
+  are unplated N/C holes;
+- V3: all 443 vias and plated through-hole pads have rings larger than their drills or are listed as ringless;
+- V4: a fresh DRC of this exact board (SHA-256 79ba8e1e..., the hash the audit recorded) reports 0 shorts and 0
+  unconnected items, and 0 clearance items at EPC's rule minus 1 um.
+This binds the current local board to a passing check. It cannot show retroactively that run 3 checked the same file,
+and it does not address KiCad's refill (above).
+
+### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
+
+Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
+dielectric (the power loop's return gap; stock 0.127 mm) meet design round 1's three targets with the stock gate
+resistors? `scripts/epc90133_extract.py` gained an opt-in gap override (`A:m1:mid:d<mm>`). The default and
+stock-height decks are byte-identical to the previous version. Variant A extractions
+(results/gan/epc90133-extraction-layout/): loop L 0.502 nH (0.127 mm, stock), 0.469 (0.100), 0.436 (0.075), 0.401 nH
+(0.050). Halving the gap lowers this variant's loop inductance by 20 %: the rest of the loop is lateral. Run 1 of the
+extractions wrote the 0.100 mm report, then crashed printing a relative path (log kept in runs/). Switching:
+`--study layout`, the same operating point, alternatives, robust rule and assessment as round 1, variant A (ranking
+only: no gate loops, not a board prediction).
+
+**Loss-estimator revision 2.** The first run ([report](../results/gan/epc90133-layout-round2a.json), kept) gave FET
+losses that jumped from +59 % to -15 % between neighbouring cases. The loss window ended 40 ns after the valley turn-on,
+while the switch node was still ringing. FET terminal energy equals loss only if the energy stored in the device
+capacitances is the same at both ends of the window, and here it was not: Q2's turn-on segment read 0.77, 3.60 and
+0.66 µJ in three neighbouring cases. **Every T3 verdict and efficiency figure from round 1 and from round 2a's first
+run is invalid.** T1 and T2 use threshold-defined edge windows and are unaffected, so round 1's "no candidate meets all
+three" stands through T2. Revision 2, declared at 6031d30 before any rerun: Q1's second pulse lasts 600 ns, the window
+runs to 450 ns after the turn-on, and a settling check requires the window energy at 400 and 450 ns to agree within
+2 %. Round 2a rerun ([report](../results/gan/epc90133-layout-round2a-rev2.json),
+[assessment](../results/gan/epc90133-layout-round2a-rev2-assessment.json)): all 16 cases usable and settled (0.3-1.4 %).
+Round 1 reruns on G with revision 2 (launched 5 October, about 3 h; results/gan/epc90133-design-round1-rev2.json).
+
+Result (change against stock under the four alternatives):
+
+| Gap | Loop L | Overshoot | Eon + Eoff | FET loss |
+|---|---|---|---|---|
+| 0.100 mm | -6.6 % | -3 to -7 % | +1.3 to +2.9 % | +1.2 to +1.8 % |
+| 0.075 mm | -13 % | -6 to -15 % | +2.4 to +6.3 % | +1.2 to +2.5 % |
+| 0.050 mm | -20 % | -11 to -23 % | +3.7 to +11 % | +3.1 to +3.8 % |
+
+Verdicts: no gap meets all three. T1 is met only at 0.050 mm, T2 at none, and T3 only at 0.100 mm (within the 2 %
+tolerance), where T1 fails. **In this model, lowering the loop inductance raises Q1's turn-on energy.** The loop
+inductance takes up voltage while the current rises, and the earlier extraction variants show the same direction (loop
+L 0.50 / 0.30 / 0.28 nH / ideal copper: Eon 1.78 / 2.69 / 2.89 / 3.92 µJ, Eoff 1.6-1.8 µJ). The total FET loss rises
+too, by about 3 % at 0.050 mm. So, with these target definitions, overshoot and loss pull against each other for
+loop-inductance changes as they do for gate resistors. In absolute terms the loss changes are small (0.05 W, about
+0.02 efficiency points at 240 W), but the targets are strict "not higher". Plan update: the owner decides whether T2
+should become total loss and whether the tolerance should allow small increases. Variant A ranks only. Its gate loops
+and inner layers are missing, and its loop L (0.50 nH) is about twice G's, so the size of these changes on the board
+would differ.
+
+### EPC90133 layout round 2b: added return vias, and the geometry-edit layer (5 October 2026)
+
+`scripts/epc90133_board_edit.py` edits the rasterized layers in memory; the Gerber files are never touched.
+`scripts/read_epc90133_geometry.py` now has `derive(grids, holes)` split out of `load_board`, and its via bonds,
+probes, counts and labels were verified identical. An added plated via gets a pad where it sits on its own net's
+copper and an antipad where other copper is within the clearance. Rules: R1 drill at least 0.198 mm (the board's
+smallest); R2 at least 0.52 mm to any hole (the smallest via spacing in the power area); R3 no component pad (paste)
+nearby; R4 bonds on at least two layers; R5 no net merges and no split islands, re-derived after each edit; R6 no
+antipad in VIN or SW copper. The 0.125 mm annular ring and 0.2 mm clearance are assumptions (fab rules open).
+`scripts/epc90133_extract.py --edits <json>` applies a checked edit list and records it with hashes. Tests:
+tests/test_epc90133_board_edit.py (6).
+
+Declared at e07063a. The candidate: every GND via the rules accept on a 0.25 mm grid over the loop area, applied
+greedily. Revision 1 (before R6, kept as devices/epc/layout-edits/vias-gnd-greedy-r1-cuts-power-path.json) accepted
+22 vias. Most sat between the FETs, where their antipads perforated the top-layer switch-node copper, the main path
+from Q1's source to Q2's drain, and the A mesh lost Q1's source connection. R6 was added in response. Revision 2
+accepts only 4 vias, all about 3.5 mm left of Q2. Their extraction on A: loop L 0.5016 nH against 0.5017 nH for stock
+(-0.02 %). The declared switching runs were skipped because a 0.02 % network change cannot move any target beyond its
+tolerance (a deviation from the declaration, recorded here).
+
+Reading: **at the board's own via spacing, and without perforating the power path, the published layout leaves
+essentially no room for more return vias in the loop area.** EPC's layout is already saturated with vias there.
+Further loop-inductance reduction would have to come from capacitor placement (L3) or the stackup (round 2a), and in
+this model both raise the turn-on energy (round 2a).
 
 ### EPC9165 board files and probe access (deferred second-board candidate)
 
@@ -1625,7 +2012,7 @@ Reading: agents on a frontier model can execute this workflow and hand it off th
 stopped on an upstream change that the scripts accepted. Consistency with the reference checks execution, not
 engineering truth (same models, assumptions and helpers). The pilot does not show judgement on unseen material. A
 blind test needs a separate session in an isolated directory with only permitted inputs, a frozen reference method,
-and an independent review of geometry, ports, pinout, driver and benchmark applicability. Per the review, a second
+and an independent review of geometry, ports, pinout, driver and benchmark applicability. Owner decision, 5 October 2026: agents may read AGENTS.md and the docs. In real use the agent runs with this context and all tools, so workflow runs are tested that way and no isolated session is required. Judgement is tested on material whose answer is not written down anywhere: frozen predictions scored against new measurements (hardware plan, 'Frozen prediction record'). Per the review, a second
 target waits for the owner's assessment of value, interventions and cost. The agents took about 33 min of wall time
 and 347k tokens; the scripts alone took 22 min and no tokens.
 

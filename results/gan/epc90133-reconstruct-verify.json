@@ -1,0 +1,145 @@
+{
+ "schema": "epc90133-reconstruct-verify/1",
+ "passed": true,
+ "checks": {
+  "V1_epc_pad_nets": true,
+  "V2_other_pads_explained": true,
+  "V3_rings": true,
+  "V4_drc_this_board": true
+ },
+ "epc_netlist": {
+  "nets": 37,
+  "pads": 288
+ },
+ "readback_pad_records": 301,
+ "v1_problems": [],
+ "v2_problems": [],
+ "v2_explained": [
+  {
+   "pad": "FD1-0",
+   "net": "TED-(FD1-PAD0)",
+   "rule": "a"
+  },
+  {
+   "pad": "FD2-0",
+   "net": "TED-(FD2-PAD0)",
+   "rule": "a"
+  },
+  {
+   "pad": "FD3-0",
+   "net": "TED-(FD3-PAD0)",
+   "rule": "a"
+  },
+  {
+   "pad": "J640-3",
+   "net": "ED-(J640-PAD3)",
+   "rule": "a"
+  },
+  {
+   "pad": "Q1",
+   "net": "VGU",
+   "rule": "b"
+  },
+  {
+   "pad": "Q2",
+   "net": "VGL",
+   "rule": "b"
+  },
+  {
+   "pad": "SO1",
+   "net": "N/C",
+   "rule": "c"
+  },
+  {
+   "pad": "SO2",
+   "net": "N/C",
+   "rule": "c"
+  },
+  {
+   "pad": "U100-2",
+   "net": "ED-(U100-PAD2)",
+   "rule": "a"
+  },
+  {
+   "pad": "U100-3",
+   "net": "ED-(U100-PAD3)",
+   "rule": "a"
+  },
+  {
+   "pad": "U100-7",
+   "net": "ED-(U100-PAD7)",
+   "rule": "a"
+  },
+  {
+   "pad": "U100-5",
+   "net": "ED-(U100-PAD5)",
+   "rule": "a"
+  },
+  {
+   "pad": "U100-6",
+   "net": "ED-(U100-PAD6)",
+   "rule": "a"
+  }
+ ],
+ "rings_checked": 443,
+ "ring_problems": [],
+ "drc": {
+  "counts": {
+   "clearance": 499,
+   "copper_edge_clearance": 8,
+   "isolated_copper": 13,
+   "silk_edge_clearance": 4,
+   "padstack": 1,
+   "lib_footprint_issues": 106
+  },
+  "unconnected_items": 0,
+  "clearance_items_at_rule_minus_1um": 0
+ },
+ "identity": {
+  "board": {
+   "path": "vendor/epc/epc90133/reconstruction/epc90133.kicad_pcb",
+   "sha256": "79ba8e1e44fca735bf4fae516c5803054589077a1cfa07a115c767fe27f693b3"
+  },
+  "project": {
+   "path": "vendor/epc/epc90133/reconstruction/epc90133.kicad_pro",
+   "sha256": "0fc7864c6f416cfda8a2d15b8106ab9d694c57661311957e94b1b381d01751b1"
+  },
+  "step5_report": {
+   "path": "results/gan/epc90133-reconstruct-final.json",
+   "sha256": "6e4edd5a19b245e425ab02d8296bfbd45cfa1c3fcfddad0f09415abf00fd0e5a",
+   "script_sha256": "892f099f6fd9c809fa8b24fb6e8301c35165fcdf538ac7ac54da0106e2f1d617"
+  },
+  "layout_pdf": {
+   "path": "vendor/epc/epc90133/gerbers/Gerbers/EPC90133_B5253_Rev2_0_Layout.PDF",
+   "sha256": "1b1e78a41d28c1b5a2fc833212ec0eee63433b7e31afaa1f77ed86328bbd9f96"
+  },
+  "gerber_zip": {
+   "path": "vendor/epc/epc90133/EPC90133 Development Board Gerbers.zip",
+   "sha256": "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1"
+  },
+  "ipcd356": {
+   "path": "vendor/epc/epc90133/reconstruction/verify/epc90133.d356",
+   "sha256": "163deaf267264ddebba31bb37b35cf08ceb94a90fd4e278d4545313fd99ab356"
+  },
+  "drc_reports": {
+   "rule": {
+    "path": "vendor/epc/epc90133/reconstruction/verify/drc-46088d4fa522.json",
+    "sha256": "2ea8c1c83738a19ab021d19ffe5cc6f9e46e5f5bfced92b3b58d390f2ff2f333"
+   },
+   "rule_minus_1um": {
+    "path": "vendor/epc/epc90133/reconstruction/verify/tolerance/drc-886d7a146ff8.json",
+    "sha256": "050a6ecac90bcfdadabc383c1786a9d8ed4a465004b99d95a8ab70566b2d930a"
+   }
+  },
+  "kicad_version": "10.0.6",
+  "script_sha256": "db44c831b0841784f747106cae934e8343d9857dc44dbfa0b31030ac0fc6a407",
+  "helpers": {
+   "src/circuit_tools/kicad.py": "bb170ca524decbe74e664eebe7dfab718bf558cd32e2107d5ec25cdab71009cc",
+   "scripts/epc90133_reconstruct_parts.py": "4f0630a34793d7d84d69c2f164784df1c0626ca239803093c0b349968a07ac2a",
+   "scripts/epc90133_reconstruct.py": "d8727f5b31a148231575bda9bb361808501e355aae2b8ee6765fe56bcb5d961f",
+   "scripts/read_epc90133_geometry.py": "9dcfa7851b6fcfa6ebefa5ef2bb6b20fb2769936398b917e83df1871e4ab055d",
+   "src/circuit_tools/gerber.py": "c25269e552caa804cd13f2e14037c7e76eb36a62fa66457f30cabd7d07e7ddd0"
+  }
+ },
+ "scope": "the saved board as stored (EPC's frozen fills); not a qualification of KiCad refill or editing"
+}

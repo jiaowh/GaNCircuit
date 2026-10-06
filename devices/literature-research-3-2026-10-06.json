@@ -1,0 +1,140 @@
+{
+  "schema": "literature-supplement/1",
+  "retrieved": "2026-10-06",
+  "scope": "Third research round: own-board geometry, gate-resistor sizing, efficiency measurement, agent-driven EDA workflows; repeat search for EPC2302 package inductance",
+  "notes": "docs/gan-research-round-3-2026-10-06.md",
+  "files": [
+    {
+      "title": "Kozak et al., An Analytical Model for Predicting Turn-on Overshoot in Normally-off GaN HEMTs, IEEE JESTPE 2019, doi:10.1109/JESTPE.2019.2947152 (accepted manuscript)",
+      "url": "https://www.osti.gov/servlets/purl/2346019",
+      "local_path": "vendor/literature/2026-10-06-research-3/OSTI_2346019_GaN_turn_on_overshoot_model.pdf",
+      "sha256": "4d5842611b7fb20fe7248521671ae55333dbc1ed0d32209353fbc8f8a157685f",
+      "bytes": 1382600,
+      "pages": 12,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "OSTI public-access accepted manuscript; IEEE copyright. No open licence; keep outside git.",
+      "review_scope": "Abstract and device list: gate-voltage (not switch-node) overshoot; 2nd/4th-order models give the gate resistance for a chosen overshoot; double-pulse validation with EPC8010."
+    },
+    {
+      "title": "Infineon AN010933 v1.0 (2025-09-03), PCB design guidelines for MV GaN power transistors in high-reliability switch-mode applications",
+      "url": "https://www.infineon.com/assets/row/public/documents/24/42/infineon-pcb-design-guidelines-for-mv-gan-power-transistors-applicationnotes-en.pdf",
+      "local_path": "vendor/literature/2026-10-06-research-3/Infineon_PCB_design_guidelines_MV_GaN.pdf",
+      "sha256": "aabf0a93b515dac7d58aa68f2872d3af6f049b7f1d318d34779285aa1259cafd",
+      "bytes": 1110936,
+      "pages": 21,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "Infineon copyright application note, free download. No open licence; keep outside git.",
+      "review_scope": "Scope pages only: stackup, placement and layout rules for a 100 V rad-hard PowIR-SMD GaN part (different package from EPC2302)."
+    },
+    {
+      "title": "Infineon DG165832 v1.0 (2025-03-28), Designing an optimized half-bridge DC-DC converter with medium-voltage CoolGaN transistors",
+      "url": "https://www.infineon.com/assets/row/public/documents/24/42/infineon-designing-an-optimized-half-bridge-dc-dc-converter-with-medium-voltage-coolgan-transistors-applicationnotes-en.pdf",
+      "local_path": "vendor/literature/2026-10-06-research-3/Infineon_optimized_half_bridge_MV_CoolGaN.pdf",
+      "sha256": "7414fded8011ac0c215f354f1493108938848ff33440e0cc9c2256449b560f52",
+      "bytes": 1128790,
+      "pages": 30,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "Infineon copyright design guide, free download. No open licence; keep outside git.",
+      "review_scope": "Scope page only: 60-200 V half-bridge component selection, PCB architecture/layout and optimisation process."
+    },
+    {
+      "title": "Loss Measurement of Low RDS Devices Through Thermal Modelling - The Advantage of Not Turning it Fully On (arXiv:2308.12685)",
+      "url": "https://arxiv.org/pdf/2308.12685",
+      "local_path": "vendor/literature/2026-10-06-research-3/arXiv_2308.12685_loss_measurement_thermal.pdf",
+      "sha256": "856a62d7aaec917939d5fedaceeb780d14b81bfaf721a7e15375563e4ca48564",
+      "bytes": 8811034,
+      "pages": 7,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "arXiv distribution; licence of the record not checked. Keep outside git.",
+      "review_scope": "Abstract: thermal (calorimetric-type) loss measurement calibrated with low DC current at reduced gate voltage; Si, SiC and GaN."
+    },
+    {
+      "title": "IEA 4E (2023), Measurement of WBG-based power supplies (EEDAL-type full paper 593)",
+      "url": "https://www.iea-4e.org/wp-content/uploads/publications/2023/10/593_full_paper_pdf.pdf",
+      "local_path": "vendor/literature/2026-10-06-research-3/IEA4E_2023_measurement_WBG_power_supplies.pdf",
+      "sha256": "d33536afe4278e62b4452303f8a280e03e478cd363ff4247c0eac44e98022f2a",
+      "bytes": 711144,
+      "pages": 7,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "Publicly posted conference paper; copyright with authors/IEA 4E, licence not stated. Keep outside git.",
+      "review_scope": "Abstract: electrical efficiency measurement verified against calorimetry; Si vs GaN chargers."
+    },
+    {
+      "title": "Liu, Han, Lu, Zheng, Yan, Yu, Agentic Electronic Design Automation: A Handoff Perspective (arXiv:2606.19795v2, 6 Sep 2026)",
+      "url": "https://arxiv.org/pdf/2606.19795",
+      "local_path": "vendor/literature/2026-10-06-research-3/arXiv_2606.19795_agentic_EDA_handoff.pdf",
+      "sha256": "aa7e476ab8376fcc406682686bea1d781618df4599d1a475276708c1ec15f06a",
+      "bytes": 2215430,
+      "pages": 46,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "arXiv distribution, ACM copyright notice in the PDF. Keep outside git.",
+      "review_scope": "Abstract: survey of 115 LLM-agent EDA systems classified by handoff objects (intra-, inter-, extra-stage). No power electronics or PCB layout in the abstract."
+    },
+    {
+      "title": "Physics-Informed Autonomous LLM Agents for Explainable Power Electronics Modulation Design (PHIA, arXiv:2411.14214)",
+      "url": "https://arxiv.org/pdf/2411.14214",
+      "local_path": "vendor/literature/2026-10-06-research-3/arXiv_2411.14214_PHIA_power_electronics_agent.pdf",
+      "sha256": "be07dfe5ce839c85bc88cac32dc2c0fb0aa44e23f87066045e0037001ccfc6d1",
+      "bytes": 6979548,
+      "pages": 11,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "arXiv distribution; licence of the record not checked. Keep outside git.",
+      "review_scope": "Abstract: LLM agent for converter modulation design (not layout or device models); reported 63 % error reduction and 33x speed-up against the authors' benchmarks."
+    },
+    {
+      "title": "Chen, Xu, Zhang, D2S-FLOW: Automated Parameter Extraction from Datasheets for SPICE Model Generation Using Large Language Models (arXiv:2502.16540v2)",
+      "url": "https://arxiv.org/pdf/2502.16540",
+      "local_path": "vendor/literature/2026-10-06-research-3/arXiv_2502.16540_D2S_FLOW_datasheet_to_SPICE.pdf",
+      "sha256": "37b3f6ec99c96b6c3790aa67e2f4424216cd8168e0c42e089b159edde405f7d8",
+      "bytes": 1493451,
+      "pages": 14,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "arXiv distribution; licence of the record not checked. Keep outside git.",
+      "review_scope": "Abstract: LLM retrieval of datasheet parameters (EM 0.86, F1 0.92); not specific to power transistors; abstract reports no electrical validation of the generated models."
+    },
+    {
+      "title": "Singh, Tripathi, Paralleling of Gallium Nitride Power Semiconductor Devices: A Review and Future Perspectives, Electronics 2026, 15, 1607",
+      "url": "https://doi.org/10.3390/electronics15081607",
+      "local_path": "vendor/literature/2026-10-06-research-3/MDPI_Electronics_15_1607_paralleling_GaN_review.pdf",
+      "sha256": "7157d0e94bc386ba9334c3ad9b1d204756c3f045ae4abb1f5030a94b93af2538",
+      "bytes": 7359901,
+      "pages": 38,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "CC BY 4.0 (MDPI open access); copy supplied by the owner (publisher blocks automated download); kept outside git like the other PDFs.",
+      "review_scope": "Read in full: 0.2 nH repeats EPC's LGA estimate; 0.1 nH is a simulation setting and current-sharing mismatch, not a package inductance; no EPC2302 value."
+    },
+    {
+      "title": "Reali, Alemanno, Ronchi, Rossi, Florian, Development of GaN-Based, 6.6 kW, 450 V, Bi-Directional On-Board Charger with Integrated 1 kW, 12 V Auxiliary DC-DC Converter, Micromachines 2024, 15, 1470",
+      "url": "https://doi.org/10.3390/mi15121470",
+      "local_path": "vendor/literature/2026-10-06-research-3/MDPI_Micromachines_15_1470_GaN_OBC.pdf",
+      "sha256": "13762c44774479b6a7edbf5a3e777aa352d46a1c120aea292768701d6886871d",
+      "bytes": 21985025,
+      "pages": 35,
+      "retrieved": "2026-10-06",
+      "reuse_terms": "CC BY 4.0 (MDPI open access); copy supplied by the owner (publisher blocks automated download); kept outside git like the other PDFs.",
+      "review_scope": "Table 3 (p. 5) and p. 21: the Lg/Ld/Ls 4/0.2/0.3 nH 'from Pspice level 3 model' belong to the GaN Systems GS-065-060-5-T-A (650 V); EPC2302 appears once, as a secondary-side rectifier, with no parasitic values."
+    }
+  ],
+  "not_obtained": [
+    {
+      "title": "Analog Devices, How to Design a PCB Layout for Highest Half-Bridge GaN Driver Performance (Analog Dialogue)",
+      "url": "https://www.analog.com/en/resources/analog-dialogue/articles/how-to-design-pcb-layout.html",
+      "reason": "download timed out; web article, cite by link"
+    },
+    {
+      "title": "Wu et al., Prediction of overshoot and crosstalk of low-voltage GaN HEMT using analytical model, IET Power Electronics 2022",
+      "url": "https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/pel2.12305",
+      "reason": "not downloaded; access terms not checked"
+    },
+    {
+      "title": "Rouger, Lavado Villa, Dataset from switching loss measurement test bench by opposition method (Zenodo 22799087, CC BY-SA 4.0)",
+      "url": "https://zenodo.org/records/22799087",
+      "reason": "Si MOSFET (IRFP240), not GaN; not relevant enough"
+    },
+    {
+      "title": "EPC2302 package inductance",
+      "url": null,
+      "reason": "searched again; still not published. EPC's 3x5 mm QFN overview (Controllers_Gate_Drive_PCB_Layout.pdf, page 5) lists ratings and charges only"
+    }
+  ]
+}
