@@ -1666,6 +1666,25 @@ and the outline is exact. Scope: copper shapes only, no parts, nets, vias, drill
 are 5-degree polygons, as in the reader. The raster reader used for the extractions has the same ~1-pixel
 (0.025-0.04 mm) edge uncertainty, which is far below the extraction meshes.
 
+**Step 2a: which side each part is on (6 October 2026).** EPC's layout PDF (an Altium export inside the Gerber
+package) carries hidden text tags for every pad (`PA<ref><pin>`, boxes about the pad's size, 0.2-0.5 mm off), a
+tag at each designator, and a bookmark tree with every part's pad names and EPC's full netlist (37 named nets, 301
+pads). The bookmarks list all 118 parts on every layer page, so they do not give the side. Four quick side tests
+each misplaced parts in the stacked power stage, where top Ci capacitors sit directly over bottom Cm capacitors.
+`scripts/epc90133_reconstruct_parts.py` therefore declares a rule: netlist consistency on our copper connectivity
+first, then mask-pad size, then openings already claimed by other parts, then earlier anchors, and silkscreen only
+for through-hole and mechanical parts, whose side changes no copper. Run 1 failed: a paste veto that was already
+known to be unreliable, plus independent pad snapping that let two pins share an opening. Run 2 failed: the
+switches' unnamed auxiliary pad, the inductor's large pads beyond a fixed snap radius, and the standoffs. Both are
+kept ([run 1](../results/gan/epc90133-reconstruct-sides-run1-failed.json),
+[run 2](../results/gan/epc90133-reconstruct-sides-run2-failed.json)), each with a revision declared before the
+next run. **Run 3 passes all five checks** ([report](../results/gan/epc90133-reconstruct-sides.json)): all 301 pads
+matched one-to-one to mask openings; 47 parts on top and 59 on the bottom; and every net with two or more pads on
+one copper island. The 26 parts whose side earlier scripts had established (Ci top, Cm bottom, Q1, Q2, U80 and
+R80-R83 top) were all placed correctly by the evidence; the anchor rule was not needed once. Per-part sides and
+pad positions are EPC-derived and stay in the git-ignored reconstruction folder. Next: footprints built from these
+pads (mask, paste, copper, drills), placed in the KiCad board, and a mask/paste round trip.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
