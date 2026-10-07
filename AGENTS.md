@@ -62,6 +62,10 @@ Read the relevant report and build-note section before quoting numbers.
 - **Model:** EPC2302 runs unmodified with `reltol=1e-6`. The 24 curve passes and
   limited table checks do not resolve Fig. 7 gate charge or QGD/QG(TH). No tuning
   is justified; gate-charge-dependent switching times and losses are unvalidated.
+  EPC2302QG (`scripts/epc2302_qg_variant.py`, run 3) is a Fig. 7-following
+  SENSITIVITY revision, not a tuned or validated model; it puts CRSS 23 % outside
+  Fig. 5, so Figs. 5 and 7 cannot both be met in this structure (E7 decides).
+  The stored plateau width (2.19 nC) is sampling-dependent: 2.40 nC resampled.
 - **Extraction:** A/I/B/G are exploratory; no second full-board mesh has run.
   Fourth-mesh single-via inductance passes, resistance is unconverged; arrays,
   holes and Kelvin/multilayer connections are not qualified by that pass.
@@ -84,7 +88,9 @@ Read the relevant report and build-note section before quoting numbers.
   and Q2 gate peak not above stock are constraints. R80 1.5 ohm is the best tested
   candidate under four declared driver/package alternatives (assessor revision 5,
   `results/gan/epc90133-design-round3-assessment-rev5.json`). It is provisional,
-  not a frozen prediction or hardware margin. Use settled loss estimator revision 2;
+  not a frozen prediction or hardware margin. It also meets C1/C2 under all four
+  alternatives with EPC2302QG (`results/gan/epc90133-qgfit-assessment.json`); an E4
+  prediction carries both models' values. Use settled loss estimator revision 2;
   earlier round-1/2a efficiency figures are invalid. Stackup plus R80 is untested.
   E9 converter efficiency cannot alone resolve C1's 0.05–0.09 W FET-loss increment;
   a thermal method is a candidate without a board-specific uncertainty budget.

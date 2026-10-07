@@ -1655,6 +1655,51 @@ fault tests in tests/test_design_assessment.py. Rerun on the stored inputs, no s
 [assessment rev 5](../results/gan/epc90133-design-round3-assessment-rev5.json); verdicts, pairs, ranking and the
 **R80 1.5 ohm selection are identical to revision 4 under both rules**.
 
+### EPC2302 gate-charge sensitivity: does R80 1.5 ohm depend on Fig. 7? (7 October 2026)
+
+Question (owner): the vendor model fails datasheet Fig. 7, and R80 1.5 ohm acts by slowing the Miller plateau. Does the
+decision change if EPC's drawn curve, not EPC's model, describes the device? Two steps, each declared before its runs.
+
+**Step 1: a Fig. 7-following model revision** (`scripts/epc2302_qg_variant.py`, declared at a0123c5;
+[report](../results/gan/epc2302-qg-variant.json)). EPC2302QG is the vendor subcircuit, renamed, with three charge terms
+scaled: kgs on the linear gate-source capacitance ags1, kgd on the gate-drain terms agd1/agd2/agd5, and (declared
+fallback) kon on the on-state term ags2. The derived library is git-ignored in vendor/epc/derived/ (EPC model text);
+the report records factors and hashes. It is a sensitivity case, not tuning under the project's rule: nothing isolates
+the Fig. 7 discrepancy to the device. Run 1 crashed (the curve was thinned by sample index, and the variant's
+transient crowded 4.3 million points into a short stretch). Run 2 failed: a trapezoidal start-up stall at t = 0 (step
+about 7e-20 s, 45.6 million points in 3.3 ns of the quiescent state) timed out a fit run. Both are kept, and revisions 2
+and 3 are labelled retrospective: charge-resampled curve, V0 against a fresh vendor run, Newton fit, Gear integration
+with a Gear-vs-trapezoidal check (V0b). **Run 3 passes**: V0 exact, V0b within 4e-7, and V1, the comparator's own
+Fig. 7 checks (vertical 0.10 V, horizontal 5 % + 0.25 nC), which the vendor model fails. The kon fallback was needed:
+kgs 1.096, kgd 1.230, kon 0.718. The charge-equation check is within 1 %.
+
+Two findings. (1) **Figs. 5 and 7 cannot both be matched in this model structure.** The variant's CRSS is 23 % above
+the vendor model's at every VDS, outside the Fig. 5b tolerance (0.05 decade) everywhere; CISS +10 %, COSS +1 %. Which
+one the device follows needs a measurement (hardware plan E7: gate charge and C-V on the B1506A). (2) **The plateau-width
+feature depends on sampling.** On a curve resampled every 0.01 nC, the vendor model's plateau is 2.40 nC (start 7.79),
+not 2.19 nC (start 7.89) as on the stored, index-thinned curve. The stored '24 % narrow' is about 16 % on the resampled
+curve. The horizontal failure (1.25 nC low at 3.0 V) does not depend on sampling.
+
+**Step 2: the design comparison with both models** (`--study qgfit`, declared at 636ddd7 with
+`scripts/assess_epc90133_qgfit.py`; [report](../results/gan/epc90133-qgfit.json),
+[assessment](../results/gan/epc90133-qgfit-assessment.json)). Stock and R80 1.5 ohm, four alternatives, both models,
+all with Gear at 100 ps, extraction G-m1-mid. All 17 cases are usable. The 50 ps check on the variant passes (within
+6e-6). The vendor cases reproduce the stored round-1/round-3 values within 0.04 %.
+
+| Alternative | Vendor model: overshoot stock -> R80 1.5 | loss | Variant: overshoot stock -> R80 1.5 | loss |
+|---|---|---|---|---|
+| ramp, assumed 50 pH | 11.2 -> 10.8 V (-4 %) | +2.4 % | 10.4 -> 9.7 V (-7 %) | +2.5 % |
+| step, assumed 50 pH | 10.9 -> 9.7 V (-11 %) | +2.6 % | 9.7 -> 8.4 V (-14 %) | +2.6 % |
+| ramp, 0 pH | 25.1 -> 16.8 V (-33 %) | +4.3 % | 22.3 -> 14.6 V (-34 %) | +4.2 % |
+| step, 0 pH | 16.6 -> 11.4 V (-31 %) | +3.3 % | 14.4 -> 9.6 V (-33 %) | +3.3 % |
+
+Q2 gate peak is lower with R80 1.5 ohm in all eight comparisons. **Both models: R80 1.5 ohm meets C1 and C2 under all four
+alternatives.** Reading (fixed in the assessor): the decision does not depend on the Fig. 7 discrepancy within these
+models, and an E4 prediction should carry both models' values as the range over the unresolved gate charge. The
+variant itself moves the stock board: overshoot -7 to -14 %, rise time +2 to +6 %, Eon+Eoff +2 to +3 %, FET loss
++1.4 to +2 %. This is the size of the gate-charge uncertainty in the stock-board prediction (E3). Neither model is
+shown to describe the real EPC2302.
+
 ### EPC90133 track R step 1: copper in KiCad (6 October 2026)
 
 Track R (plans/layout-round-2-plan.md) rebuilds an editable KiCad design from EPC's Gerbers, for our own board
