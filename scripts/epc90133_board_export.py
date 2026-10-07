@@ -107,6 +107,9 @@ EPC_NAME = {"F.Cu": "GTL", "In1.Cu": "G1", "In2.Cu": "G2", "In3.Cu": "G3", "In4.
             "In6.Cu": "G6", "B.Cu": "GBL", "F.Mask": "GTS", "B.Mask": "GBS", "F.Paste": "GTP", "B.Paste": "GBP",
             "F.SilkS": "GTO", "B.SilkS": "GBO", "Edge.Cuts": "GM1"}
 TIMEOUT = 3600
+# B run 1 (7 October 2026) was killed at TIMEOUT for stock and V8 (the stored B profile is 6,588 s); B now gets
+# 14,400 s. Retrospective: the limit was set from the A profile and never derived for B.
+B_TIMEOUT = 14400
 STORED_LOOP = ROOT / "results/gan/epc90133-power-loop.json"
 STORED_A = ROOT / "results/gan/epc90133-extraction/A-m1-mid.json"
 L3A_VIAS = [(16.05, 33.5999), (16.05, 34.3004), (17.5293, 34.3004), (17.5387, 33.625), (19.21, 34.3004),
@@ -251,7 +254,8 @@ G_TIMEOUT = 21600  # s; stock G-m1-mid took 12,279 s (profile), x1.75 margin (ad
 
 def child(args, outdir, log_name):
     env = dict(os.environ, **{EXPORT_ENV: str(outdir), "PYTHONPATH": str(ROOT / "src")})
-    limit = G_TIMEOUT if any(str(a).startswith("G:") for a in args) else TIMEOUT
+    limit = (G_TIMEOUT if any(str(a).startswith("G:") for a in args) else
+             B_TIMEOUT if any(str(a).startswith("B:") for a in args) else TIMEOUT)
     r = subprocess.run([sys.executable, *args], capture_output=True, text=True, timeout=limit, env=env, cwd=ROOT)
     (outdir / f"{log_name}.log").write_text(r.stdout + "\n--- stderr ---\n" + r.stderr, encoding="utf-8")
     return r.returncode
