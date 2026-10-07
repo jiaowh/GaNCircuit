@@ -1,0 +1,81 @@
+{
+ "schema": "epc90133-board-export-x0/1",
+ "evaluator_sha256": "fe0dd5ec34a0c992c6af1eed061ad961c50013b51972f5012a6fe7bddbae971e",
+ "manifest_sha256": "1c68807a5c3c9688f9ce8b74f65491d39dfd8c7e6fde3af028eba25138a8e00f",
+ "export_dir": "vendor\\epc\\epc90133\\reconstruction\\export\\stock",
+ "inputs": {
+  "stored_power_loop": "f5a8652a4842bc88e2d361a10f8a7ec94932555d45fb3d11d04b576ba3ecdbe7",
+  "stored_A": "d9838e280221486ca39aec89baed863b0acdd6b0f39156011ec7a9feac4351e1"
+ },
+ "X0a_drills": {
+  "epc_holes": 445,
+  "export_holes": 445,
+  "pass": true
+ },
+ "X0b_power_loop": {
+  "differences": [],
+  "checks_stored": {
+   "C1_paste_on_mask_open_copper": false,
+   "C2_Q1_seven_contacts_unique_orientation": true,
+   "C3_Q1_pin_centres_within_0.03mm": true,
+   "C4_Q1_pin_nets": true,
+   "C2_Q2_seven_contacts_unique_orientation": true,
+   "C3_Q2_pin_centres_within_0.03mm": true,
+   "C4_Q2_pin_nets": true,
+   "C4_gates_on_different_nets": true,
+   "C5_Ci_pairs_one_vin_one_gnd": true,
+   "C5_Cm_pairs_one_vin_one_gnd": true
+  },
+  "checks_export": {
+   "C1_paste_on_mask_open_copper": false,
+   "C2_Q1_seven_contacts_unique_orientation": true,
+   "C3_Q1_pin_centres_within_0.03mm": true,
+   "C4_Q1_pin_nets": true,
+   "C2_Q2_seven_contacts_unique_orientation": true,
+   "C3_Q2_pin_centres_within_0.03mm": true,
+   "C4_Q2_pin_nets": true,
+   "C4_gates_on_different_nets": true,
+   "C5_Ci_pairs_one_vin_one_gnd": true,
+   "C5_Cm_pairs_one_vin_one_gnd": true
+  },
+  "pass": true
+ },
+ "X0c_extraction_A": {
+  "L_loop_nH": [
+   0.5017378907651558,
+   0.4924935073888023
+  ],
+  "L_rel": 0.018424726428884486,
+  "R_loop_mohm": [
+   4.091100756751459,
+   4.035428888666547
+  ],
+  "R_rel": 0.013608041306007346,
+  "max_share_diff": 0.013156724960384308,
+  "max_diag_L_rel": 0.08849869864548288,
+  "same_port_order": true,
+  "mesh_stats": {
+   "stored": {
+    "grid": [
+     42,
+     37
+    ],
+    "nodes": 2756,
+    "segments": 4560,
+    "filaments_before_refine": 14202
+   },
+   "export": {
+    "grid": [
+     42,
+     37
+    ],
+    "nodes": 2805,
+    "segments": 4663,
+    "filaments_before_refine": 14511
+   }
+  },
+  "pass": false
+ },
+ "pass": false,
+ "outcome": "not qualified"
+}

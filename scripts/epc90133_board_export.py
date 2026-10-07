@@ -27,6 +27,20 @@ The route is qualified for variant-A extractions of edited boards only if X0a-X0
 the route (rasterization of 10 um-level geometry differences at the 1 mil pitch), not the extraction's accuracy,
 which stays exploratory (unqualified vias and plane holes, one mesh).
 
+X0 run 1 (7 October 2026): NOT QUALIFIED as declared (results/gan/epc90133-board-export-x0.json). X0a drills and
+X0b power-loop contacts/checks pass; X0c fails: A:m1:mid loop L 0.4925 against 0.5017 nH (-1.8 %), R -1.4 %, one
+capacitor share 0.013, one port self-inductance 8.8 %; mesh 2,805 against 2,756 nodes. Rasters differ in 12,000-27,000
+pixels per layer outside holes (micrometre edge differences flip 1 mil pixels; the mesh is pin-aligned, so pad edges sit
+on grid lines) and, on the top layer only, 14 mm^2 of copper EPC draws over drill holes that KiCad leaves empty. A
+labelled diagnostic (stock EPC Gerbers with the top layer's hole disks cleared) crashed: Ci1's GND terminal lost every
+mesh node, so terminal contacts depend on copper drawn over via-in-pad holes. Reading: the export reproduces the
+geometry, not EPC's absolute extracted inductance; the extraction is sensitive at about 2 % to sub-10 um
+representation and the hole-copper convention (inside the 2-4 % via/mesh sensitivity already recorded).
+RETROSPECTIVE AMENDMENT (after X0 run 1): edited boards are compared only with 'stock' exported through this same
+route (matched control; the route offset cancels), and a change counts only beyond 4 % in loop inductance (the upper
+end of the recorded via/mesh representation sensitivity). Absolute values through this route are not compared with
+the stored EPC-Gerber extractions.
+
 Output: <outdir>/export.json, <outdir>/power-loop.json, <outdir>/extraction/A-m1-mid-<case>.json and, for 'stock',
 results/gan/epc90133-board-export-x0.json. Packages live in git-ignored vendor/epc/epc90133/reconstruction/export/
 (EPC-derived geometry). Time limit 3600 s per child process (power loop and A extraction each took minutes).
