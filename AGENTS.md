@@ -97,8 +97,10 @@ Read the relevant report and build-note section before quoting numbers.
 - **Reconstruction:** track R reproduces saved EPC geometry; independent readback
   passes (`results/gan/epc90133-reconstruct-verify.json`). Frozen fills are not
   refillable design intent: refill changes about 1–2% of power/gate-region copper.
-  Qualify a bounded edit/refill or defined geometry-edit workflow before G5 edits.
-  Saved-geometry checks are not fabrication approval. DRC shows no gap below EPC's
+  `scripts/epc90133_edit_workflow.py` run 2 QUALIFIES a geometry-edit workflow
+  (stock holes as fill keep-outs; edit lists on the base text) for move_footprint
+  and move_via only. Part moves across net boundaries (L3) need a zone-outline
+  primitive and its own check first. Saved-geometry checks are not fabrication approval. DRC shows no gap below EPC's
   rule by more than the declared 1 um tolerance.
 - **Agents:** milestones 1/2 and E2E-0 demonstrate non-blind execution/handoffs,
   not judgement or hardware closure. Milestone containment means 'no new git-status

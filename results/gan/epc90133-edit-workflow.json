@@ -1,0 +1,604 @@
+{
+ "schema": "epc90133-edit-workflow/1",
+ "evaluator_sha256": "181ab568792cb03bf6c51444cc1c727a007e1bdbd5fc94d723792e83ea5e3c58",
+ "input_manifest": {
+  "saved_board": "79ba8e1e44fca735bf4fae516c5803054589077a1cfa07a115c767fe27f693b3",
+  "project": "0fc7864c6f416cfda8a2d15b8106ab9d694c57661311957e94b1b381d01751b1",
+  "verify_report": "3c469ec0d48956d73bbc4e61df631afa2b620d028cd8e58da0bf4993c0d7103f",
+  "helpers": {
+   "src/circuit_tools/gerber.py": "c25269e552caa804cd13f2e14037c7e76eb36a62fa66457f30cabd7d07e7ddd0",
+   "src/circuit_tools/kicad.py": "bb170ca524decbe74e664eebe7dfab718bf558cd32e2107d5ec25cdab71009cc",
+   "scripts/read_epc90133_geometry.py": "9dcfa7851b6fcfa6ebefa5ef2bb6b20fb2769936398b917e83df1871e4ab055d",
+   "scripts/epc90133_reconstruct.py": "d8727f5b31a148231575bda9bb361808501e355aae2b8ee6765fe56bcb5d961f",
+   "scripts/epc90133_reconstruct_nets.py": "d65dc2173c133ea8028eb30730a3fb33ddcbe3fbdae2239fb25efd6d20bf3223",
+   "scripts/verify_epc90133_reconstruction.py": "db44c831b0841784f747106cae934e8343d9857dc44dbfa0b31030ac0fc6a407"
+  }
+ },
+ "tolerances_mm": {
+  "geometry": 0.01,
+  "outside_window": 0.001,
+  "area_eps_mm2": 0.0001
+ },
+ "edits": {
+  "W0": [],
+  "W1": [
+   [
+    "move_footprint",
+    "Ci7",
+    -0.3,
+    0.0
+   ]
+  ],
+  "W2": [
+   [
+    "move_via",
+    24.16,
+    36.4,
+    0.2,
+    0.0
+   ]
+  ]
+ },
+ "evidence_directory": "vendor\\epc\\epc90133\\reconstruction\\edit\\run-d7383a91f9",
+ "checks": {
+  "W0": {
+   "W0a_copper": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 3.976656349098761e-07,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "W0b_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "W0c_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true
+   },
+   "W0d_nets": {
+    "reference": "saved board's IPC-D-356 (verify report)",
+    "pass": true,
+    "differences": []
+   },
+   "board_sha256": "0d41a4282d6b5441fca035fdc3327ef01c5c92388f4423645f48838ccea64417",
+   "drc_report_sha256": "a7a9f4afcfc98630a381e032ca45084b36ae8ec3910a1eb23bacfa92e9f8ed9c",
+   "kicad_version": "10.0.6",
+   "pass": true
+  },
+  "W1": {
+   "edit_log": [
+    {
+     "op": [
+      "move_footprint",
+      "Ci7",
+      -0.3,
+      0.0
+     ],
+     "footprint_line": 416
+    }
+   ],
+   "reverse_log": [
+    {
+     "op": [
+      "move_footprint",
+      "Ci7",
+      -0.3,
+      0.0
+     ],
+     "footprint_line": 416
+    },
+    {
+     "op": [
+      "move_footprint",
+      "Ci7",
+      0.3,
+      0.0
+     ],
+     "footprint_line": 416
+    }
+   ],
+   "window_bounds": [
+    24.984174,
+    32.35540699999999,
+    28.424126,
+    36.745293
+   ],
+   "Wa_outside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Wb_inside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Wc_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true,
+    "new_types": []
+   },
+   "Wd_connectivity": {
+    "pad_nets_equal_W0": true,
+    "pass": true
+   },
+   "We_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Wf_reversibility": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "board_sha256": "4a17ccb3db7d3d19933f70b17e59fde276b33030e6c6ec19d783e3af3674ab07",
+   "reverse_board_sha256": "7debad81f398c240e3c41df6ddc600edc01ede35eacdbc5835825a9f28ea9690",
+   "inside_window_change_mm2": {
+    "F.Cu": 0.0,
+    "In1.Cu": 0.0,
+    "In2.Cu": 0.0,
+    "In3.Cu": 0.0,
+    "In4.Cu": 0.0,
+    "In5.Cu": 0.0,
+    "In6.Cu": 0.0,
+    "B.Cu": 0.0
+   },
+   "pass": true
+  },
+  "W2": {
+   "edit_log": [
+    {
+     "op": [
+      "move_via",
+      24.16,
+      36.4,
+      0.2,
+      0.0
+     ],
+     "via_epc_xy": [
+      24.156670000000005,
+      36.399978000000004
+     ],
+     "hole_layers": [
+      "In5.Cu",
+      "In6.Cu"
+     ],
+     "zones_and_keepouts_translated": {
+      "In5.Cu": 5,
+      "In6.Cu": 5
+     }
+    }
+   ],
+   "reverse_log": [
+    {
+     "op": [
+      "move_via",
+      24.16,
+      36.4,
+      0.2,
+      0.0
+     ],
+     "via_epc_xy": [
+      24.156670000000005,
+      36.399978000000004
+     ],
+     "hole_layers": [
+      "In5.Cu",
+      "In6.Cu"
+     ],
+     "zones_and_keepouts_translated": {
+      "In5.Cu": 5,
+      "In6.Cu": 5
+     }
+    },
+    {
+     "op": [
+      "move_via",
+      24.36,
+      36.4,
+      -0.2,
+      0.0
+     ],
+     "via_epc_xy": [
+      24.356669999999994,
+      36.399978000000004
+     ],
+     "hole_layers": [
+      "In5.Cu",
+      "In6.Cu"
+     ],
+     "zones_and_keepouts_translated": {
+      "In5.Cu": 5,
+      "In6.Cu": 5
+     }
+    }
+   ],
+   "window_bounds": [
+    22.824945999999997,
+    35.06825401856244,
+    25.688394,
+    37.73170198143755
+   ],
+   "Wa_outside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Wb_inside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Wc_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true,
+    "new_types": []
+   },
+   "Wd_connectivity": {
+    "pad_nets_equal_W0": true,
+    "via_at_new": true,
+    "via_at_old_absent": true,
+    "new_via_net": "GND",
+    "pass": true
+   },
+   "We_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Wf_reversibility": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "board_sha256": "139598152b999d0735f525971bcee18df742aa69b369c0c73c814d245b3cf101",
+   "reverse_board_sha256": "8f34260de12d045089ef5aba6efcd58cab973aa3c3bf49f2840b8d97ae18800f",
+   "inside_window_change_mm2": {
+    "F.Cu": 0.0,
+    "In1.Cu": 0.0,
+    "In2.Cu": 0.0,
+    "In3.Cu": 0.0,
+    "In4.Cu": 0.0,
+    "In5.Cu": 0.3107067955923173,
+    "In6.Cu": 0.3107098242333169,
+    "B.Cu": 0.0
+   },
+   "pass": true
+  }
+ },
+ "keepout_pieces": 5680,
+ "outcome": "qualified"
+}

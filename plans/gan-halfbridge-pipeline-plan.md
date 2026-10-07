@@ -462,10 +462,11 @@ in the scripts, saved reports and [build notes](../docs/build.md).
    in E4. It is the best tested simulation candidate, not a frozen or validated
    hardware improvement. Efficiency E9 and controlled temperature remain core work.
 4. Use the measurements to decide what model or layout change is justified. Keep
-   unidentified causes explicit. Qualify one bounded KiCad edit/refill or defined
-   geometry-edit workflow before G5 geometry changes; it may be prepared while the
-   inventory is pending. Require no-edit and one-edit checks of copper/mask/paste,
-   connectivity and DRC. A successful saved-fill reconstruction is not enough.
+   unidentified causes explicit. The geometry-edit workflow is qualified for moving
+   parts and vias (7 October 2026, `scripts/epc90133_edit_workflow.py` run 2: no-edit,
+   one part move and one via move checked for copper/mask/paste, connectivity, DRC
+   and reversibility). Edits needing new copper shapes (L3) need a zone-outline
+   primitive and its own check before use.
 5. Evaluate the agent's judgement against the frozen predictions and new
    measurements, with interventions, retries, time and cost recorded against a
    script or guided baseline. Agents may read normal project context. Milestones

@@ -1842,6 +1842,43 @@ without reusing the construction. Run 1 **passes V1-V4**
 This binds the current local board to a passing check. It cannot show retroactively that run 3 checked the same file,
 and it does not address KiCad's refill (above).
 
+### EPC90133 geometry-edit workflow qualified for two primitives (7 October 2026)
+
+The audit at 0f07a6a required one bounded edit workflow before any G5 geometry change. Cause of the refill problem:
+each EPC copper island is a KiCad zone outlined by its exterior, so a refill regenerates EPC's holes from KiCad's single
+0.150 mm clearance and fills the rest. A labelled feasibility probe (scratch only) confirmed it. A plain refill
+reproduced the audit's numbers exactly (window 1.06 %, 48 mm^2 of top-layer copper added against 0.6 removed,
+isolated copper 43). With one copper-fill keep-out per stock hole, nothing was added, and every difference vanished
+at a 10 um tolerance with drills excluded. The residue is KiCad's arc approximation (5 um default).
+
+Workflow (`scripts/epc90133_edit_workflow.py`, declared at 786cf18):
+- **Editable base:** the verified saved board (SHA-256 checked against the readback verifier) plus 5,680 fill keep-outs.
+  Each keep-out is an island's interior ring minus the islands inside it, split into hole-free pieces. Written to
+  git-ignored vendor/epc/epc90133/reconstruction/edit/.
+- **Edits:** ordered lists of primitives applied to the base text. KiCad-saved boards are outputs and are never
+  edited. `move_footprint(ref, dx, dy)`; `move_via(x, y, dx, dy)`, which also moves every zone and keep-out inside
+  the via's clearance holes, so EPC's hole shape travels with the via and the old hole fills.
+- **Each build:** KiCad refill, a fresh DRC, Gerbers, IPC-D-356, and a zone-free copy for pad-only copper.
+
+Run 1 crashed in W2's zone parser and is kept
+([report](../results/gan/epc90133-edit-workflow-run1-crashed.json)): three keep-outs are triangles, and the parser did
+not close their rings. W0 and W1 had passed. Revision 2 fixes only the parser. **Run 2 qualifies the workflow**
+([report](../results/gan/epc90133-edit-workflow.json)):
+- **W0, no edit:** copper on all eight layers equals EPC's Gerbers within 10 um (zero residual), mask and paste
+  equal, DRC 0 unconnected / no shorts / no mask bridges / isolated copper 13 / no clearance below the rule, and
+  IPC-D-356 pad nets equal the verified board's.
+- **W1, Ci7 moved -0.30 mm in x:** copper outside the edit window is unchanged within 1 um. Inside it, copper equals
+  W0 plus the new pad copper (no change: the pads stay on their own VIN/GND copper). DRC and nets are as W0. Ci7's mask
+  and paste openings equal EPC's translated by the move. Moving it back gives W0 exactly.
+- **W2, GND via (24.16, 36.40) moved +0.20 mm in x:** five zones and keep-outs moved on each of In5/In6 (the
+  via's clearance holes). 0.31 mm^2 of copper changed per layer, equal to the expected geometry (old hole filled,
+  translated hole cut, pad moved) with zero residual. Outside the window nothing changed. The via is at the new
+  position on GND, none at the old, the DRC is as W0, and moving it back gives W0 exactly.
+
+Scope: this qualifies these two primitives on this board. Edits that need new copper shapes, such as moving a part
+across a net boundary (L3: input capacitors toward the FETs), need a further primitive (declared zone-outline
+edits) and their own check. A saved-geometry or workflow pass is not fabrication approval.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
