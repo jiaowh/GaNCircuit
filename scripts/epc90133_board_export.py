@@ -41,6 +41,19 @@ route (matched control; the route offset cancels), and a change counts only beyo
 end of the recorded via/mesh representation sensitivity). Absolute values through this route are not compared with
 the stored EPC-Gerber extractions.
 
+Candidate L3a (declared 7 October 2026 before its build; layout plan option L3). The top input capacitors Ci1-Ci7
+move 0.40 mm toward Q1 (VIN pad bottom 33.36 -> 32.96 mm; the Q1 switch-node bars end at about 32.70, so about 0.26 mm
+remains); the 20 VIN stitching vias under their VIN pads (rows y = 33.63 and 34.30, x 16-31 mm, ten pairs sharing
+inner-layer clearance slots) move with them through move_vias (new group primitive: each shared hole translated
+once); the GND via row at y = 34.90 stays (it remains inside the moved GND pads) and the bottom capacitors stay (the
+bottom VIN pads would otherwise meet the bottom switch-node fingers); top GND copper is widened by
+reshape(F.Cu, GND, (15.4, 34.25)-(32.0, 34.70)), which cuts VIN back by the 0.150114 mm rule. Acceptance before any
+comparison: L1 DRC as stock-through-route (0 unconnected, no shorts, isolated copper 13, no clearance below the rule,
+no new DRC types); L2 IPC-D-356 pad nets equal stock's; L3 power-loop record checks C2-C5 pass (C1 as stock); L4
+A:m1:mid extraction complete. Comparison: loop inductance, resistance and capacitor current shares against
+'stock' through this route; the change counts only if |dL|/L > 4 %. Switching simulation follows only if it counts.
+Output: results/gan/epc90133-board-export-L3a.json.
+
 Output: <outdir>/export.json, <outdir>/power-loop.json, <outdir>/extraction/A-m1-mid-<case>.json and, for 'stock',
 results/gan/epc90133-board-export-x0.json. Packages live in git-ignored vendor/epc/epc90133/reconstruction/export/
 (EPC-derived geometry). Time limit 3600 s per child process (power loop and A extraction each took minutes).
@@ -70,7 +83,19 @@ EPC_NAME = {"F.Cu": "GTL", "In1.Cu": "G1", "In2.Cu": "G2", "In3.Cu": "G3", "In4.
 TIMEOUT = 3600
 STORED_LOOP = ROOT / "results/gan/epc90133-power-loop.json"
 STORED_A = ROOT / "results/gan/epc90133-extraction/A-m1-mid.json"
-CASES = {"stock": []}
+L3A_VIAS = [(16.05, 33.5999), (16.05, 34.3004), (17.5293, 34.3004), (17.5387, 33.625), (19.21, 34.3004),
+            (19.2192, 33.625), (20.8907, 34.3004), (20.9001, 33.625), (22.5715, 34.3004), (22.5806, 33.625),
+            (24.2522, 34.3004), (24.2613, 33.625), (25.9326, 34.3004), (25.942, 33.625), (27.6228, 33.625),
+            (27.6291, 34.3004), (29.3035, 33.625), (29.3098, 34.3004), (30.9999, 33.625), (30.9999, 34.275)]
+CASES = {
+    "stock": [],
+    # L3a (declared 7 October 2026 before its build): input capacitors 0.40 mm toward Q1 with their VIN via pairs;
+    # top GND copper widened 0.40 mm along the strip so the moved GND pads stay on ground (VIN cut back by the rule).
+    "L3a": [*[("move_footprint", f"Ci{k}", 0.0, -0.40) for k in range(1, 8)],
+            ("move_vias", L3A_VIAS, 0.0, -0.40),
+            ("reshape", "F.Cu", "GND", (15.4, 34.25, 32.0, 34.70), None)],
+}
+LOOP_L_THRESHOLD = 0.04  # retrospective amendment after X0 run 1
 
 
 def sha256(p):
@@ -143,7 +168,13 @@ def export_package(case, edits, outdir):
     drill = outdir / f"{PREFIX}NC Drill.TXT"
     write_excellon(pth, npth, drill)
     files[drill.name] = sha256(drill)
-    manifest = {"schema": "epc90133-board-export/1", "case": case, "edits": [list(e) for e in edits], "edit_log": log,
+    ipc = bdir / "board.d356"
+    r = subprocess.run([str(KICAD_CLI), "pcb", "export", "ipcd356", "-o", str(ipc), str(board)],
+                       capture_output=True, text=True, timeout=TIMEOUT)
+    if r.returncode:
+        raise KiCadError("ipcd356 export failed")
+    manifest = {"schema": "epc90133-board-export/1", "case": case,
+                "pad_nets": {x["key"]: x["net"] for x in ew.read_ipcd356(ipc)}, "edits": [list(e) for e in edits], "edit_log": log,
                 "board_sha256": sha256_file(board), "drc_summary": ew.drc_summary(drc["report"]),
                 "kicad_version": drc["kicad_version"], "files": files,
                 "frame": "EPC Gerber frame (aux origin at KiCad (100, 150); x right, y up, mm)"}
@@ -230,6 +261,44 @@ def main():
             print("extract", c, "exit", rc, out.exists(), flush=True)
             if out.exists():
                 cases_out[c] = out
+    if args.case != "stock":
+        st = EXPORT_ROOT / "stock"
+        sm = json.loads((st / "export.json").read_text(encoding="utf-8"))
+        cm = json.loads((outdir / "export.json").read_text(encoding="utf-8"))
+        res = {"schema": "epc90133-board-export-candidate/1", "case": args.case, "evaluator_sha256": sha256(__file__),
+               "edits": cm["edits"], "edit_log": cm["edit_log"], "manifest_sha256": sha256(outdir / "export.json"),
+               "stock_manifest_sha256": sha256(st / "export.json")}
+        d = cm["drc_summary"]
+        res["L1_drc"] = {**d, "new_types": sorted(set(d["types"]) - set(sm["drc_summary"]["types"]))}
+        res["L1_drc"]["pass"] = d["pass"] and not res["L1_drc"]["new_types"]
+        diff = sorted(k for k in set(sm["pad_nets"]) | set(cm["pad_nets"]) if sm["pad_nets"].get(k) != cm["pad_nets"].get(k))
+        res["L2_nets"] = {"differences": diff[:20], "pass": not diff}
+        loop_ok = (outdir / "power-loop.json").exists()
+        if loop_ok:
+            pc = json.loads((outdir / "power-loop.json").read_text(encoding="utf-8"))["checks"]
+            res["L3_power_loop"] = {"checks": pc, "pass": all(v for k, v in pc.items() if not k.startswith("C1"))}
+        else:
+            res["L3_power_loop"] = {"pass": False, "error": "no power-loop record"}
+        a = cases_out.get("A:m1:mid")
+        na = json.loads(a.read_text(encoding="utf-8")) if a else None
+        res["L4_extraction"] = {"pass": bool(na and na.get("outcome") == "complete")}
+        res["accepted"] = all(res[k]["pass"] for k in ("L1_drc", "L2_nets", "L3_power_loop", "L4_extraction"))
+        if res["accepted"]:
+            sa = json.loads((st / "extraction" / "A-m1-mid-stock.json").read_text(encoding="utf-8"))
+            ss, ns = sa["summary"], na["summary"]
+            dl = ns["L_loop_nH"] / ss["L_loop_nH"] - 1
+            res["comparison_vs_stock_route"] = {
+                "L_loop_nH": [ss["L_loop_nH"], ns["L_loop_nH"]], "relative_change": dl,
+                "R_loop_mohm": [ss["R_loop_mohm"], ns["R_loop_mohm"]],
+                "capacitor_current_share": {"stock": ss["capacitor_current_share"], "candidate": ns["capacitor_current_share"]},
+                "threshold": LOOP_L_THRESHOLD, "counts": abs(dl) > LOOP_L_THRESHOLD}
+        res["outcome"] = ("rejected (acceptance)" if not res["accepted"] else
+                          "counts" if res["comparison_vs_stock_route"]["counts"] else "below threshold")
+        (ROOT / f"results/gan/epc90133-board-export-{args.case}.json").write_text(json.dumps(res, indent=1, default=str) + "\n")
+        print(args.case, res["outcome"], json.dumps({k: res[k]["pass"] for k in ("L1_drc", "L2_nets", "L3_power_loop", "L4_extraction")}),
+              json.dumps(res.get("comparison_vs_stock_route", {}).get("L_loop_nH")), res.get("comparison_vs_stock_route", {}).get("relative_change"),
+              flush=True)
+        return 0 if res["accepted"] else 2
     if args.case == "stock":
         res = {"schema": "epc90133-board-export-x0/1", "evaluator_sha256": sha256(__file__),
                "manifest_sha256": sha256(outdir / "export.json"), "export_dir": str(outdir.relative_to(ROOT)),

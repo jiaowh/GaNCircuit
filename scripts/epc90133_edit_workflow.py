@@ -240,6 +240,59 @@ def apply_edits(text, edits, geo):
                 moved_holes[(e, k)] = translate(h, dx, dy)
             log.append({"op": op, "via_epc_xy": [vx, vy], "hole_layers": sorted(KICAD_LAYER[e] for e in holes),
                         "zones_and_keepouts_translated": dict(moved)})
+        elif op[0] == "move_vias":
+            # Group move (7 October 2026, for L3 candidates): vias whose clearance holes are shared (VIN pairs in one
+            # slot) move together; every hole touched by the group is translated once, with the zones inside it.
+            _, pts, dx, dy = op
+            idx, found = [], {}
+            for x, y in pts:
+                kx, ky = to_kicad(x, y)
+                vi = [i for i, ln in enumerate(lines) if ln.startswith("\t(via (at ")
+                      and (lambda m: abs(float(m.group(1)) - kx) < 0.02 and abs(float(m.group(2)) - ky) < 0.02)(
+                          re.match(r"\t\(via \(at ([-\d.]+) ([-\d.]+)\)", ln))]
+                if len(vi) != 1:
+                    raise SystemExit(f"move_vias ({x}, {y}): {len(vi)} matches")
+                idx.append(vi[0])
+                for e, (k, h) in via_holes(geo, x, y, moved_holes).items():
+                    found[(e, k)] = h
+            for i in idx:
+                m = re.match(r"\t\(via \(at ([-\d.]+) ([-\d.]+)\)", lines[i])
+                lines[i] = lines[i].replace(m.group(0), f"\t(via (at {float(m.group(1)) + dx:.6f} {float(m.group(2)) - dy:.6f})", 1)
+            moved = collections.Counter()
+            centres = [Point(x, y) for x, y in pts]
+            loose = []
+            for i, ln in enumerate(lines):
+                if ln.startswith("\t(zone "):
+                    lay, poly = zone_layer_and_poly(ln)
+                    e = next(k for k, v in KICAD_LAYER.items() if v == lay)
+                    in_hole = any(ee == e and h.buffer(1e-4).contains(poly) for (ee, _), h in found.items())
+                    # Pre-run fix (dry check of L3a): a via with no small hole on a layer (it sits in a large void)
+                    # still has its own pad island there; that island moves with the via.
+                    own_pad = (not is_keepout(ln) and poly.area < 0.5 and any(poly.contains(c) for c in centres))
+                    if in_hole or own_pad:
+                        lines[i] = shift_pts(ln, dx, dy)
+                        moved[lay] += 1
+                        if own_pad and not in_hole:
+                            loose.append((lay, poly))
+            # Each loose pad island leaves a keep-out at its old place (or the netless board-outline zone would pour
+            # there) and clears keep-outs at its new place (or it would not fill).
+            for lay, poly in loose:
+                new_poly = translate(poly, dx, dy)
+                for i, ln in enumerate(lines):
+                    if ln.startswith("\t(zone ") and is_keepout(ln) and f'(layer "{lay}")' in ln:
+                        q = zone_layer_and_poly(ln)[1]
+                        if q.intersects(new_poly):
+                            rest = q.difference(new_poly)
+                            lines[i] = "".join(keepout_line(lay, r) for part in polygons(rest) for r in split_holes(part)
+                                               if r.area >= 1e-6)
+                old_only = poly.difference(new_poly)
+                lines.insert(len(lines) - 1, "".join(keepout_line(lay, r) for part in polygons(old_only)
+                                                     for r in split_holes(part) if r.area >= 1e-6))
+                lines = "".join(lines).splitlines(keepends=True)
+            for key, h in found.items():
+                moved_holes[key] = translate(h, dx, dy)
+            log.append({"op": [op[0], len(pts), dx, dy], "vias": len(idx), "holes": len(found),
+                        "zones_and_keepouts_translated": dict(moved)})
         elif op[0] == "reshape":
             _, lay, net, add, cut = op
             lines, info = reshape(lines, lay, net, add and sbox(*add), cut and sbox(*cut))
