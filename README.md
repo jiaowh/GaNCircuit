@@ -10,7 +10,7 @@ GaN devices switch fast enough that small amounts of inductance in the board, pa
 
 **The simulation workflow runs, but the board predictions are not yet validated. Preparing for our own measurements is the priority.**
 
-As of 5 October 2026:
+As of 7 October 2026:
 
 | Area | What works | What remains open |
 |---|---|---|
@@ -18,7 +18,7 @@ As of 5 October 2026:
 | Board simulation | The published layout has been read, power and gate paths extracted, and switching cases compared with EPC's waveform. | No tested case passes every waveform criterion. Board extraction is still exploratory. |
 | Measurements | A draft test plan, proposed probe locations and preparation studies are available. | The exact lab equipment, actual board identity and approved first-power procedure are still needed. No project hardware measurements are reported. |
 | Software agents | Agents have reproduced script results, passed results between stages and stopped on deliberately changed inputs. | These are execution tests. They do not demonstrate independent engineering judgement or a validated automated measurement loop. |
-| New board design | KiCad and EPC's component library are installed. | A new layout has not been designed or fabricated. |
+| New board design | The KiCad reconstruction reproduces EPC's saved geometry and passes the independent net readback. | KiCad refill changes that geometry. An edit workflow must be qualified before designing and releasing a revised layout. |
 
 The simulation baseline is frozen. Broad parameter sweeps and further diagnosis of the ringing are on hold unless they answer a specific decision. The stock-board simulation checkpoint, **G3**, remains open.
 
@@ -142,13 +142,7 @@ Preparation completed so far includes:
 - **Driver supply and bootstrap simulation.** This bounded study shows that a bus-off gate measurement could distinguish the two driver models. A short pre-charge leaves the high-side gate supply below the switching bench's ideal 5 V. Its original charge-balance check failed because the declaration omitted a recharge path; that failure is kept. Start-up without a low-side pulse and dead-time overcharge remain unanswered. See the [assessment](results/gan/epc90133-driver-only-assessment.json).
 - **Input-logic review, 5 October.** The current [report](results/gan/epc90133-input-logic-rev3.json) checks the transcribed logic against the BOM, logic function table and guide settings. It identifies input and jumper combinations that can command both gates on. Its calculation from datasheet limits does not guarantee positive dead time. This is a static check, not a timing or start-up measurement, and does not qualify shoot-through protection.
 
-The next steps are:
-
-1. Confirm the equipment inventory and board identity with the lab's responsible person.
-2. Complete the probe-and-channel plan, including connection points, loading, bandwidth and uncertainty for voltage and current measurements.
-3. Complete and review the first-power procedure: numerical pulse, current, voltage and temperature limits; independent trips and interlocks; discharge verification; and operator stop criteria.
-4. After approval, characterize the measurement chain and driver, freeze predictions and reserved test conditions, then perform the approved energized tests.
-5. Measure efficiency with uncertainty and compare the evidence across conditions before deciding what to change in the model or layout.
+The next dependency is the equipment inventory and actual board identity. Those allow the draft to become a reviewed channel plan and first-power procedure, followed by characterization, frozen predictions and approved measurements. The [active work order](plans/gan-halfbridge-pipeline-plan.md#10-immediate-work-and-dependencies) is maintained in the plan. Further simulation needs a named decision it could change and a bounded stop rule; waiting for equipment alone does not justify another study.
 
 Hardware protection must remain independent of any language-model agent. The uP1966E has no input lockout, and simulated voltage peaks do not establish a safe operating envelope. No EPC inquiry is planned under the owner's current decision.
 
@@ -175,7 +169,7 @@ The pilot therefore demonstrates useful execution and handoff behaviour, while t
 | FastHenry 3.0.1, WSL | Resistance and inductance extraction. Qualified for specific simple geometries; board use remains exploratory. |
 | FasterCap 6.0.7, WSL | Capacitance extraction under investigation. Not qualified for 3D board use. |
 | PyMuPDF, openpyxl and xlrd | Read datasheets, digitize curves, and read BOM and stackup files. |
-| KiCad 10.0.6 | Installed with EPC's library. No new board design has started. |
+| KiCad 10.0.6 | Saved EPC geometry reconstructed and independently checked; edit/refill workflow remains unqualified. |
 
 | Location | Contents |
 |---|---|
