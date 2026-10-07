@@ -345,6 +345,10 @@ integration (round 3's declared fallback, Gear within 0.05 % of trapezoidal; tra
 long design runs), as <NAME>@<alternative>-gear. Assessment: scripts/assess_epc90133_search.py (owner rule).
 --with-r80 OHM (G extractions only; declared 7 October 2026 after the preliminary A run, before any G search run):
 each NAME also runs with R80 = OHM as <NAME>+R80-<OHM>@<alternative>-gear, compared with plain 'stock'.
+Second G run (declared 7 October 2026 while the G extractions were queued, before any G result): R80 1.2 ohm (round
+3's other passing value, smaller loss increment) for V8 only, '--with-r80 1.2 --only V8+R80-1.2@...', same
+extractions, written to its own report; the assessor merges it with the first report's stock cases. Reason: on
+stock, R80 1.5 adds about 2 % FET loss and V8 adds 2-3.5 % on A, so V8+R80-1.5 may exceed C1's 5 %.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
