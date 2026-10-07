@@ -65,29 +65,21 @@ def features(q, v, vth_levels):
                             "q_at_vgs_th": "first charge where VGS reaches the stated threshold"}}
 
 
-def main():
-    model = json.loads(MODEL.read_text())["curves"][CURVE_KEY]
-    base = json.loads(BASELINE.read_text())
-    vth_model = base["datasheet_table"]["vgs_th"]["model"]
-    qm = [x * 1e9 for x in model["qg_C"]]
-    vm = model["vgs_V"]
-    # The bench starts at VGS = v0 (gate hold-down), the datasheet at 0 V. Shift the model
-    # charge by the model's own charge from VGS = 0 to the simulated start state. The first
-    # run used EPC2204's initial-slope estimate; on the downsampled curve it gave 0.34 nC
-    # against 0.47 nC from the equations, so it was replaced after the declared checks failed.
-    k = next(i for i in range(len(qm)) if vm[i] - vm[0] > 0.05)
-    slope_offset = vm[0] * (qm[k] - qm[0]) / (vm[k] - vm[0])
-    start = base["checks_and_definitions"]["gate_charge_checks"]["starting_bias"]
-    P = subckt_params(LIBRARY.read_text(encoding="utf-8", errors="replace"), "EPC2302")
-    offset = 1e9 * equation_gate_charge(P, (0.0, start["vds_V"], 0.0, 0.0),
-                                        (start["vgs_V"], start["vds_V"], start["fet_drain_current_A"], 0.0))
-    qm = [x + offset for x in qm]
+def datasheet_curve():
+    """Digitized Fig. 7 trace (charge nC, VGS V)."""
     fig7 = next(f for f in json.loads(DIGITIZED.read_text(encoding="utf-8"))["figures"]
                 if f["caption"].startswith("Figure 7:"))
     if len(fig7["curves"]) != 1:
         raise SystemExit(f"expected one Fig. 7 curve, found {len(fig7['curves'])}")
     trace = fig7["curves"][0]["points_by_axis"]["y_left"]
-    qd, vd = [p[0] for p in trace], [p[1] for p in trace]
+    return [p[0] for p in trace], [p[1] for p in trace]
+
+
+def evaluate(qm, vm, vth_model):
+    """The declared vertical and horizontal checks and the features, for a model curve already offset to VGS = 0.
+
+    Also used by scripts/epc2302_qg_variant.py, so a model revision is judged by the same checks."""
+    qd, vd = datasheet_curve()
 
     rows = []
     for q, v in zip(qd, vd):
@@ -118,6 +110,27 @@ def main():
 
     levels = {"datasheet VGS(th)": TABLE["vgs_th_V"], "model VGS(th)": vth_model}
     fm, fd = features(qm, vm, levels), features(qd, vd, levels)
+    return vertical, horizontal, fm, fd, rows
+
+
+def main():
+    model = json.loads(MODEL.read_text())["curves"][CURVE_KEY]
+    base = json.loads(BASELINE.read_text())
+    vth_model = base["datasheet_table"]["vgs_th"]["model"]
+    qm = [x * 1e9 for x in model["qg_C"]]
+    vm = model["vgs_V"]
+    # The bench starts at VGS = v0 (gate hold-down), the datasheet at 0 V. Shift the model
+    # charge by the model's own charge from VGS = 0 to the simulated start state. The first
+    # run used EPC2204's initial-slope estimate; on the downsampled curve it gave 0.34 nC
+    # against 0.47 nC from the equations, so it was replaced after the declared checks failed.
+    k = next(i for i in range(len(qm)) if vm[i] - vm[0] > 0.05)
+    slope_offset = vm[0] * (qm[k] - qm[0]) / (vm[k] - vm[0])
+    start = base["checks_and_definitions"]["gate_charge_checks"]["starting_bias"]
+    P = subckt_params(LIBRARY.read_text(encoding="utf-8", errors="replace"), "EPC2302")
+    offset = 1e9 * equation_gate_charge(P, (0.0, start["vds_V"], 0.0, 0.0),
+                                        (start["vgs_V"], start["vds_V"], start["fet_drain_current_A"], 0.0))
+    qm = [x + offset for x in qm]
+    vertical, horizontal, fm, fd, rows = evaluate(qm, vm, vth_model)
     report = {
         "schema": "epc2302-fig7-comparison/1",
         "scope": ("Unmodified EPC2302 model (LTspice, reltol 1e-6) against the vendor-drawn typical gate-charge "
@@ -147,7 +160,7 @@ def main():
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"vertical": {k: vertical[k] for k in ("outcome", "fraction_within", "worst")},
                       "horizontal": [{k: r.get(k) for k in ("vgs_V", "q_datasheet_nC", "q_model_nC", "outcome")}
-                                     for r in hrows],
+                                     for r in horizontal["rows"]],
                       "model": {k: v for k, v in fm.items() if k != "definitions"},
                       "datasheet_curve": {k: v for k, v in fd.items() if k != "definitions"},
                       "offset_nC": offset}, indent=2))
