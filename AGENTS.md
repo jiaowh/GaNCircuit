@@ -78,6 +78,11 @@ Read the relevant report and build-note section before quoting numbers.
   label it 'assumed 50 pH' and report a 0 pH alternative alongside. Existing
   reports keep their settings; do not rerun only to change the default. Probe
   filters do not bound loading/location errors. PHASE-ball stress remains unresolved.
+  Damping study (7 October): vendor capacitor data (devices/capacitor-sources.json;
+  bench CAP_MODEL values are assumptions, Ci 2x and ESR 5-7x off) and the tested loss
+  forms close neither the overshoot nor the damping gap; only an unrealistic 1 ohm ESR
+  matches the damping. Earlier G runs omit the board's switch-node capacitance (C_SW).
+  Check vendor data for the BOM part before calling a component value realistic.
 - **Mechanisms:** test 11's driver forms meet selected resistance/edge constraints,
   not every datasheet limit. Test 9 bounds positive Q2 channel current only in
   sampled rise windows. Test 12's shares describe a ring-deviation metric, not

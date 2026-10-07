@@ -1943,6 +1943,57 @@ so moving the capacitor pads without that row does not shorten the vertical loop
 capacitors. A worthwhile L3 needs the return vias and the bottom capacitor bank moved together, a larger redesign.
 `move_footprint` gained the silk rule after W1 was qualified; L3a's DRC is its check.
 
+### EPC90133 Fig. 9 damping study and sourced capacitors (7 October 2026)
+
+Owner question: with the assumed 50 pH, can missing losses explain why the simulation overshoots about twice Fig. 9
+and rings about three times longer? Declared in `scripts/epc90133_switching.py` (`--study damping`) before any run;
+a sensitivity test, no value adopted. G-m1-mid with 50 pH source inductance, Fig. 9 operating point, scored by the
+unchanged Fig. 9 criteria (`results/gan/epc90133-fig9-damping*.json`, `-summary.md`).
+
+Sourced data (devices/capacitor-sources.json, files in git-ignored `vendor/capacitors/`): the board's Ci
+(HMK107C7224KAHTE, renamed by Taiyo Yuden; replacement MCASH168SC7224KTCA01) and Cm (KYOCERA AVX 08051C105K4Z2A,
+chart data and S-parameters downloaded by the owner from SpiCAT). The bench's capacitor values were assumptions, and
+the vendor data differ:
+
+| Per capacitor | Ci: Taiyo Yuden | Ci: assumed | Cm: AVX | Cm: assumed |
+|---|---|---|---|---|
+| C at 48 V | 56.5 nF | 110 nF | 0.254 uF | 0.5 uF |
+| ESR at 262 MHz | 68 mohm | 10 mohm | 48 mohm | 10 mohm |
+| L (effective) | 0.33 nH | 0.25 nH | 0.70 nH | 0.35 nH |
+
+An earlier note in the declaration called 10-30 mohm "plausible" without a source; the vendor data superseded it.
+
+Results (ideal probe; Fig. 9: overshoot 5.7 V, 264 MHz, damping ratio 0.077):
+
+| Case | Overshoot | Ring | Damping |
+|---|---|---|---|
+| control (assumed capacitors; reproduces the stored case) | 11.3 V | 262 MHz | 0.025 |
+| all ESR 0.1 / 0.3 / 1 ohm | 11.3 / 11.4 / 11.4 V | 262-260 MHz | 0.030 / 0.042 / 0.079 |
+| Coss-loss proxy 30 / 60 pF (series R at the ring frequency) | 11.1 / 11.0 V | 260 / 258 MHz | 0.033 / 0.041 |
+| EPC2302QG (Gear, against a Gear control of 11.3 V) | 10.5 V | 262 MHz | 0.025 |
+| switch-node capacitance C_SW (135 pF estimate) | 12.1 V | 249 MHz | 0.024 |
+| vendor capacitor values (run 2) | 11.4 V | 258 MHz | 0.028 |
+| vendor values + C_SW | 12.2 V | 245 MHz | 0.027 |
+| vendor values + C_SW + EPC2302QG | 11.4 V | 245 MHz | 0.027 |
+
+Reading:
+- Losses can reproduce Fig. 9's damping only at unrealistic size (1 ohm per capacitor), and no loss tested lowers
+  the first overshoot: it is set during the edge, before damping acts.
+- The vendors' capacitor values change almost nothing (their ESR is 7 and 10 in parallel).
+- The board's switch-node capacitance moves the result further from Fig. 9.
+- So neither gap is explained by the capacitors or by the tested loss forms. The remaining candidates are untested:
+  the turn-on edge (driver and gate charge), a larger package inductance, the device model, and Fig. 9's
+  undocumented setup. EPC's AN023 practice (about 1 GHz, spring ground) makes the probe an unlikely main cause, by
+  inference only.
+- Taiyo Yuden's encrypted DC-bias model failed to start in every bench (time step too small at 2e-17 s) and is
+  recorded as failed. Run 2 uses the values that model gives at 48 V as a fixed R-L-C instead.
+
+**Audit finding (owner-requested, 7 October).** Every G bench refused C_SW, so the Fig. 9 G cases, the design rounds
+and the first layout-search run omit the board's switch-node capacitance (material on B). The G bench now accepts
+it. The layout search adds a declared sourced-parts check (`--sourced`: vendor capacitor values and C_SW); a
+candidate counts only if the owner rule holds under both the assumed and the sourced parts. Unbounded omissions
+without data: the user-fitted inductor's winding capacitance (BOM L1 'TBD'), optional D1/D2 diodes, and the probe.
+
 ### EPC90133 layout search (7 October 2026; plans/layout-search-2026-10-07.md)
 
 Owner instruction: keep searching until a layout candidate is found; substantial rebuilds are accepted. The plan
