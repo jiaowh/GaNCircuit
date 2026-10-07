@@ -398,6 +398,14 @@ and shunt S-parameters, downloaded by the owner from SpiCAT (devices/capacitor-s
 256 MHz). The vendor's ESL is measured on its fixture and may include some mounting inductance that the extraction
 also holds (possible double count of up to a few tenths of a nH). Cases with Taiyo Yuden Ci and these Cm values: -tyci-avxcm (against the control), -tyci-avxcm-gear and
 -tyci-avxcm-qg-gear (against G-m1-mid-Ls50-gear).
+Switch-node capacitance (found in the owner-requested audit of 7 October 2026, before the batch started): the board's
+SW copper capacitance (C_SW, 135 pF to GND and 2 pF to VIN, parallel-plate estimate without fringing, test 3-4) was
+tested only on B (ringing -6 %, material by the 5 % rule) and every G bench refused it, so all G-based runs (Fig. 9
+G cases, design rounds, layout search, this study) omit it. The G bench now accepts c_sw (same placement: Q2 drain
+terminal to circuit ground, Q2 drain to Q1 drain). Cases: -csw (vendor model, assumed capacitors), -tyci-avxcm-csw,
+-tyci-avxcm-csw-gear, -tyci-avxcm-csw-qg-gear. Still omitted, with no source to bound them: the user-fitted
+inductor's winding and pad capacitance (BOM L1 'TBD'; QSG gives only 2.2 uH), the optional D1/D2 Schottky diodes
+(empty on the stock BOM; whether Fig. 9's board had them is not stated), the probe's loading and location.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -673,8 +681,8 @@ Rbret bn {node(at + '.GND')} 1u"""
     die = {"g1": "gu", "d1": "q1dd", "s1": "q1_s", "g2": "gl", "d2": q2dd, "s2": "0"}
     if g_ext:
         # Test 7: die source q1_s / q2_s joins the split pins; optional package source inductance l_s.
-        if ld or l_g or c_gd or c_sw:
-            raise ValueError("variant G bench supports only l_s (package common-source) among the options")
+        if ld or l_g or c_gd:
+            raise ValueError("variant G bench supports only l_s (package common-source) and c_sw among the options")
         fet1, fet2 = [], []
         for n_, pins, gate_node, d_node in ((1, ("q1_s2", "q1_s46"), "gu", "q1dd"), (2, ("q2_s2", "0"), "gl", q2dd)):
             junction = f"q{n_}_s"
@@ -1261,6 +1269,10 @@ def damping_cases(exts):
     cases[f"{base}-tyci-avxcm"] = {**common, **av, "base": base}
     cases[f"{base}-tyci-avxcm-gear"] = {**gear, **av, "base": f"{base}-gear"}
     cases[f"{base}-tyci-avxcm-qg-gear"] = {**gear, **av, "model": QG_MODEL, "base": f"{base}-gear"}
+    cases[f"{base}-csw"] = {**common, "c_sw": True, "base": base}
+    cases[f"{base}-tyci-avxcm-csw"] = {**common, **av, "c_sw": True, "base": base}
+    cases[f"{base}-tyci-avxcm-csw-gear"] = {**gear, **av, "c_sw": True, "base": f"{base}-gear"}
+    cases[f"{base}-tyci-avxcm-csw-qg-gear"] = {**gear, **av, "c_sw": True, "model": QG_MODEL, "base": f"{base}-gear"}
     return cases
 
 
