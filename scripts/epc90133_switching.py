@@ -337,6 +337,13 @@ inductance is the default, so the Ls50 alternatives are reported first; the C1/C
 applies to all four alternatives. Results are sensitivity statements within these models, not
 predictions of the real device's gate charge.
 
+Layout search (--study search; plans/layout-search-2026-10-07.md; declared 7 October 2026 before any search run).
+Extractions are passed as --ext-file NAME=PATH (export packages of scripts/epc90133_board_export.py, all through the
+same KiCad route; NAME 'stock' is the matched control). Every NAME runs under the four round-3 alternatives with the
+layout-study settings (100 ps, design operating point, settled loss estimator revision 2, Q2 sense) and Gear
+integration (round 3's declared fallback, Gear within 0.05 % of trapezoidal; trapezoidal stalled in about half the
+long design runs), as <NAME>@<alternative>-gear. Assessment: scripts/assess_epc90133_search.py (owner rule).
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -1139,6 +1146,14 @@ def layout_cases(exts):
     return cases
 
 
+def search_cases(names):
+    """Layout search (see the module docstring): every --ext-file extraction under every alternative, Gear."""
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
+              "long_pulse": True, "method": "gear"}
+    return {f"{n}@{a}-gear": {"ext": n, **common, **ap_, "design": n, "alternative": a}
+            for n in names for a, ap_ in ALTERNATIVES.items()}
+
+
 def set_operating_point(vout, iout):
     """Design study: move the module's operating point (the double pulse reads these at call time)."""
     global VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
@@ -1158,15 +1173,16 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
+    ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
     ap.add_argument("--timeout", type=float, default=600.0,
                     help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
-    if args.study in ("design", "layout", "qgfit"):
+    if args.study in ("design", "layout", "qgfit", "search"):
         set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
@@ -1190,7 +1206,7 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
-    if args.study in ("driver", "design", "layout", "qgfit"):
+    if args.study in ("driver", "design", "layout", "qgfit", "search"):
         rs, fs = [], []
         for name, text in driver_step_bench().items():
             raw = run(name, text)
@@ -1212,6 +1228,12 @@ def main():
     ext_files = {Path(f).stem: Path(f) for f in files}
     exts = {Path(f).stem: json.loads(Path(f).read_text(encoding="utf-8")) for f in files}
     exts = {k: v for k, v in exts.items() if v.get("outcome") == "complete" and (args.cases is None or k in args.cases)}
+    for spec in args.ext_file:
+        name, path = spec.split("=", 1)
+        rep_ = json.loads(Path(path).read_text(encoding="utf-8"))
+        if rep_.get("outcome") != "complete":
+            raise SystemExit(f"--ext-file {name}: extraction outcome {rep_.get('outcome')!r}")
+        ext_files[name], exts[name] = Path(path).resolve(), rep_
     if args.study == "periodic":
         pe, pm = args.periodic_ext, args.periodic_maxstep
         tag = pe + ("" if pm == MAXSTEP else f"-ms{pm * 1e12:.0f}")
@@ -1232,6 +1254,10 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "search":
+        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file])
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "qgfit":
         cases = qgfit_cases(exts)
         if args.only:
@@ -1403,7 +1429,7 @@ def main():
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
                                "dead_time_note": "per-case 'dead' overrides it (design study)",
-                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout", "qgfit")
+                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout", "qgfit", "search")
                                           else "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)")},
                 "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
