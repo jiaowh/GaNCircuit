@@ -73,6 +73,12 @@ predates (KeyError). Revision 2 (RETROSPECTIVE): silk pieces wholly within a mov
 0.5 mm move with it; netted zones in edited builds drop isolated fill islands (KiCad's default; stock has no netted
 isolated islands, so stock is unaffected); the power-loop Ci window follows the move (CAP_WINDOWS); the stock pad nets
 are read from the stock board when missing. Acceptance and comparison rules are unchanged.
+Candidate V9 (layout search F1, declared 7 October 2026 before its build, after the screens were found invalid and
+V6-V8 became this family's evidence): the same columns as V8 with only every third via kept (the 1st and 4th from the
+lowest y; 26 vias removed, 14 kept, against V8's 20 and 20), slots to EPC-size per-via antipads. Same acceptance
+L1-L4, A comparison with stock through the route and the 4 % rule; it is extracted on A as soon as a solver slot is
+free, and on B/G only if it beats V8 on A by more than 4 % of stock (otherwise V8 stays the family's candidate).
+Practical limit, not modelled: fewer vias carry the switch-node current to the inner and bottom layers (heating).
 
 Output: <outdir>/export.json, <outdir>/power-loop.json, <outdir>/extraction/A-m1-mid-<case>.json and, for 'stock',
 results/gan/epc90133-board-export-x0.json. Packages live in git-ignored vendor/epc/epc90133/reconstruction/export/
@@ -121,13 +127,23 @@ NETTED_ISLAND = re.compile(r'^(\t\(zone \(net [1-9]\d*\) .*?)\(island_removal_mo
 LOOP_L_THRESHOLD = 0.04
 
 
-def thin_list(regions):
-    """Vias removed by the layout-search screens S6/S7 (scripts/epc90133_layout_screen.py THIN rule)."""
+def thin_list(regions, keep_every=2):
+    """Vias removed by the layout-search screens S6/S7 (scripts/epc90133_layout_screen.py THIN rule); keep_every=3
+    (V9) keeps only every third via of each column instead of every other."""
     import epc90133_layout_screen as ls
     drills = parse_excellon((GERBERS / f"{PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
-    kept, _ = ls.thinned(drills, regions)
-    ids = {id(d) for d in kept}
-    return [(round(d.x, 4), round(d.y, 4)) for d in drills if id(d) not in ids]
+    if keep_every == 2:
+        kept, _ = ls.thinned(drills, regions)
+        ids = {id(d) for d in kept}
+        return [(round(d.x, 4), round(d.y, 4)) for d in drills if id(d) not in ids]
+    gone = []
+    for r in regions:
+        w = ls.WINDOWS[r]
+        for cx in ls.THIN[r]:
+            col = sorted((d for d in drills if abs(d.x - cx) < 0.06 and w[0] < d.x < w[2] and w[1] < d.y < w[3]),
+                         key=lambda d: d.y)
+            gone += [d for k, d in enumerate(col) if k % keep_every]
+    return [(round(d.x, 4), round(d.y, 4)) for d in gone]
 
 
 EPC_ANTIPAD_R = 0.3275
@@ -138,6 +154,7 @@ CASES.update({
     "V6": [("remove_vias", thin_list(["Q1"]), EPC_ANTIPAD_R)],
     "V7": [("remove_vias", thin_list(["Q2"]), EPC_ANTIPAD_R)],
     "V8": [("remove_vias", thin_list(["Q1", "Q2"]), EPC_ANTIPAD_R)],
+    "V9": [("remove_vias", thin_list(["Q1", "Q2"], keep_every=3), EPC_ANTIPAD_R)],
 })  # retrospective amendment after X0 run 1
 
 
