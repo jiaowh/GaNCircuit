@@ -388,6 +388,12 @@ KYOCERA AVX model is available only through an interactive tool and was not obta
 G-m1-mid-Ls50-tyci, -tyci-oss60 (trapezoidal, against the control), -tyci-gear and -tyci-qg-gear (against
 G-m1-mid-Ls50-gear). Sources and hashes: devices/capacitor-sources.json. A failed run of the encrypted model
 is recorded, not worked around.
+Cm addition (owner supplied the KYOCERA AVX datasheet for 08051C105K4Z2A, updated 18.02.2022, on 7 October 2026, before
+the batch started): values READ BY EYE from its log-scale plots (about +-20 %), not a vendor model: capacitance
+change at 48 V about -75 % (0.25 uF), ESR near 262 MHz about 60 mohm, ESL plateau about 0.7 nH (plots at 0 V, 25 C;
+ESR is frequency dependent and a constant 60 mohm overstates it below about 10 MHz, which the ring does not use).
+Cases with Taiyo Yuden Ci and these Cm values: -tyci-avxcm (against the control), -tyci-avxcm-gear and
+-tyci-avxcm-qg-gear (against G-m1-mid-Ls50-gear).
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -576,7 +582,7 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
           pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None,
-          model="EPC2302", oss_rc=None, ci_vendor=False):
+          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
@@ -587,7 +593,9 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
         if ci_vendor and c.startswith("Ci"):  # damping study stage 3: Taiyo Yuden DC-bias model
             lines.append(f"X{c} {node(c + '.VIN')} {node(c + '.GND')} {TY_CI_MODEL} Temperature=25")
             continue
-        lines.append(capacitor(c, node(f"{c}.VIN"), node(f"{c}.GND"), CAP_MODEL[c[:2]], esl_scale, esr))
+        cm_ = cm_model if (cm_model and c.startswith("Cm")) else CAP_MODEL[c[:2]]
+        lines.append(capacitor(c, node(f"{c}.VIN"), node(f"{c}.GND"), cm_, esl_scale,
+                               None if cm_ is not CAP_MODEL[c[:2]] else esr))
     m = CAP_MODEL["Cm"]
     if any(c.startswith("Cm") for c in caps):
         at = "Cm10"
@@ -1216,6 +1224,7 @@ def search_cases(names, r80=None, qg=False):
 
 TY_CI_MODEL = "MCASH168SC7224_TCA01"
 TY_CI_LIB = ROOT / "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01_LT.cir"  # extracted from the vendor zip
+AVX_CM_READ = {"C": 0.25e-6, "ESL": 0.7e-9, "ESR": 0.06}  # read by eye from the AVX datasheet plots (damping study)
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
@@ -1244,6 +1253,10 @@ def damping_cases(exts):
     cases[f"{base}-tyci-oss60"] = {**common, **ty, "oss_rc": oss[60], "base": base}
     cases[f"{base}-tyci-gear"] = {**gear, **ty, "base": f"{base}-gear"}
     cases[f"{base}-tyci-qg-gear"] = {**gear, **ty, "model": QG_MODEL, "base": f"{base}-gear"}
+    av = {"ci_vendor": True, "cm_model": AVX_CM_READ}
+    cases[f"{base}-tyci-avxcm"] = {**common, **av, "base": base}
+    cases[f"{base}-tyci-avxcm-gear"] = {**gear, **av, "base": f"{base}-gear"}
+    cases[f"{base}-tyci-avxcm-qg-gear"] = {**gear, **av, "model": QG_MODEL, "base": f"{base}-gear"}
     return cases
 
 
@@ -1428,7 +1441,7 @@ def main():
                   full_r=c.get("full_r", False), internal=c.get("internal", False),
                   gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
                   method=c.get("method"), model=c.get("model", "EPC2302"), oss_rc=c.get("oss_rc"),
-                  ci_vendor=c.get("ci_vendor", False))
+                  ci_vendor=c.get("ci_vendor", False), cm_model=c.get("cm_model"))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])

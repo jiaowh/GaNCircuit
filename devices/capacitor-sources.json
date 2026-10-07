@@ -6,7 +6,7 @@
  "part_mapping": "Taiyo Yuden's TY-COMPAS page for HMK107C7224KAHTE says the part is renamed and lists MCASH168SC7224KTCA01, MBASH168SC7224KTCA01, MCASH168SC7224KTCA1J and MMASH168SC7224KTCA01; MCASH168SC7224KTCA01 is used. Equivalence is the vendor's statement, not checked here.",
  "terms": "Taiyo Yuden copyright, all rights reserved; the encrypted LTspice file grants use for simulation and forbids reverse engineering. No redistribution permission established; files stay in git-ignored vendor/.",
  "derived_values": "standard model at 262 MHz: ESR 68 mohm, effective L 0.33 nH; LTspice DC-bias model at 25 C, 1 MHz: 213 nF at 0 V, 57 nF at 48 V (smoke test, 7 October 2026)",
- "not_obtained": "Cm1-Cm10 (KYOCERA AVX 08051C105K4Z2A): models only through the interactive SpiCAT/SpiMLCC tool (https://spicat.kyocera-avx.com); not downloaded.",
+ "not_obtained": "Cm1-Cm10 (KYOCERA AVX 08051C105K4Z2A): no simulation model (SpiCAT/SpiMLCC is interactive). The owner supplied the datasheet PDF (DataSheet_08051C105K4Z2A-KYOCERA_AVX-MLCC.pdf, updated 18.02.2022) in the session on 2026-10-07; values read by eye from its plots: about -75 % capacitance at 48 V (0.25 uF), ESR about 60 mohm near 262 MHz, ESL about 0.7 nH (0 V, 25 C; about +-20 %). The PDF is not yet stored locally, so it has no checksum here.",
  "files": [
   {
    "name": "MCASH168SC7224_TCA01.cir",
