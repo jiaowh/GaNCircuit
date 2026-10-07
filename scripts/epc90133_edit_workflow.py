@@ -82,6 +82,13 @@ smallest VIN-to-other-copper distance in the window is at least CLEARANCE_MM - 0
 W0 and every case pass. Output: results/gan/epc90133-edit-reshape.json. Scope if it passes: reshape qualified for
 rectangular regions on one layer; a new-board candidate built with it still needs its own DRC, net and
 extraction checks, and nothing here is fabrication approval.
+Reshape run 1 (7 October 2026) FAILED and is kept (results/gan/epc90133-edit-reshape-run1-failed.json): W0 passed;
+Z1, Z1R and Z2 failed (DRC 'invalid_outline: no edges found on Edge.Cuts', 184-203 unconnected, copper changed on
+every layer). Cause: rebuild_zone's two substitutions each left one extra ')', so every rebuilt zone line closed two
+levels too many and KiCad stopped reading before the board outline, without an error. Revision 2 (retrospective,
+code fix only): both patterns corrected, and apply_edits refuses a board whose zone or via lines, or whole text,
+do not balance. move_footprint and move_via never used these substitutions; the workflow run 2 result stands.
+Cases, checks and tolerances are unchanged.
 """
 import argparse
 import collections
@@ -239,7 +246,12 @@ def apply_edits(text, edits, geo):
             log.append({"op": op, **info})
         else:
             raise SystemExit(f"unknown edit {op}")
-    return "".join(lines), log
+    # Revision 2 guard (after reshape run 1): every zone and via line, and the whole board, must balance.
+    text = "".join(lines)
+    bad = [i for i, ln in enumerate(lines) if ln.startswith(("\t(zone ", "\t(via ")) and ln.count("(") != ln.count(")")]
+    if bad or text.count("(") != text.count(")"):
+        raise SystemExit(f"edited board is not balanced: lines {bad[:5]}, total {text.count('(') - text.count(')')}")
+    return text, log
 
 
 def keepout_line(layer, q):
@@ -261,10 +273,12 @@ def rebuild_zone(line, poly, layer, others):
     """Zone lines for poly: one zone per piece (outline = exterior, frozen fill dropped for the refill), and a
     keep-out for each interior ring minus the other zones' outlines inside it. others: other zones' outlines."""
     out = []
-    base = re.sub(r' \(filled_polygon \(layer "[^"]+"\) \(pts .*?\)\)', "", line.rstrip("\n"))
+    # Revision 2 (reshape run 1 failed): both substitutions left one extra ')' each, so KiCad stopped reading the
+    # file before the board outline. The patterns match through the last (xy ...) and the closing of pts only.
+    base = re.sub(r' \(filled_polygon \(layer "[^"]+"\) \(pts .*?\)\)\)', "", line.rstrip("\n"))
     for k, piece in enumerate(p for p in polygons(poly) if p.area >= 1e-6):
         ext = list(orient(Polygon(piece.exterior), 1.0).exterior.coords)[:-1]
-        ln = re.sub(r"\(polygon \(pts .*?\)\)", lambda m: f"(polygon (pts {xy(ext)}))", base, count=1)
+        ln = re.sub(r"\(polygon \(pts .*?\)\)", lambda m: f"(polygon (pts {xy(ext)})", base, count=1)
         if k:
             ln = re.sub(r'\(uuid "[^"]+"\)', f'(uuid "{uuid.uuid4()}")', ln, count=1)
         out.append(ln + "\n")
