@@ -349,6 +349,10 @@ Second G run (declared 7 October 2026 while the G extractions were queued, befor
 3's other passing value, smaller loss increment) for V8 only, '--with-r80 1.2 --only V8+R80-1.2@...', same
 extractions, written to its own report; the assessor merges it with the first report's stock cases. Reason: on
 stock, R80 1.5 adds about 2 % FET loss and V8 adds 2-3.5 % on A, so V8+R80-1.5 may exceed C1's 5 %.
+Gate-charge check (owner request, declared 7 October 2026 before any G search result): a candidate that meets the rule
+with the vendor model is rerun, with stock, under the gate-charge sensitivity revision EPC2302QG for all four
+alternatives (Gear, as --study qgfit), cases <NAME>@<alternative>-gear-qg via --qg; C1 and C2 must also hold there
+for the candidate to be reported without a gate-charge caveat (R80 1.5 ohm met both under both models).
 
 Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
 50 pH package source inductance, can missing losses explain why the simulation overshoots about twice Fig. 9 and
@@ -367,6 +371,12 @@ All eight run in one batch (one LTspice run at a time); stage 2 is interpreted o
 (ESR at most 0.1 ohm) meets the Fig. 9 overshoot and damping criteria. Scoring: scripts/compare_epc90133_fig9.py
 (unchanged criteria) into results/gan/epc90133-fig9-damping.json and -damping-summary.md; the main Fig. 9 summary is
 not replaced.
+Gate-charge addition (owner request, 7 October 2026, before the batch started): the same question with the
+Fig. 7-following sensitivity revision EPC2302QG (scripts/epc2302_qg_variant.py; not tuned, not validated; it puts
+CRSS 23 % outside Fig. 5). Its runs use Gear (trapezoidal stalled at its start in the variant's own checks), so a
+vendor-model Gear control is added and QG cases are compared with it, never with a trapezoidal case:
+G-m1-mid-Ls50-gear (vendor), -qg-gear, -esr0.03-qg-gear, -esr0.03-oss60-qg-gear. The variant is used only if its
+report passes and its library hash matches (as --study qgfit).
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -1174,7 +1184,7 @@ def layout_cases(exts):
     return cases
 
 
-def search_cases(names, r80=None):
+def search_cases(names, r80=None, qg=False):
     """Layout search (see the module docstring): every --ext-file extraction under every alternative, Gear."""
     common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
               "long_pulse": True, "method": "gear"}
@@ -1184,6 +1194,8 @@ def search_cases(names, r80=None):
         cases.update({f"{n}+R80-{r80:g}@{a}-gear": {"ext": n, **common, **ap_, "gate_r": {"R80": r80},
                                                     "design": f"{n}+R80-{r80:g}", "alternative": a}
                       for n in names for a, ap_ in ALTERNATIVES.items()})
+    if qg:  # gate-charge check: the same cases under EPC2302QG, named <case>-qg
+        cases = {f"{k}-qg": {**c, "model": QG_MODEL} for k, c in cases.items()}
     return cases
 
 
@@ -1204,6 +1216,12 @@ def damping_cases(exts):
     for k, rc in oss.items():
         cases[f"{base}-oss{k}"] = {**common, "oss_rc": rc, "base": base}
     cases[f"{base}-esr0.03-oss60"] = {**common, "esr": 0.03, "oss_rc": oss[60], "base": base}
+    gear = {**common, "method": "gear"}
+    cases[f"{base}-gear"] = {**gear, "base": base}
+    cases[f"{base}-qg-gear"] = {**gear, "model": QG_MODEL, "base": f"{base}-gear"}
+    cases[f"{base}-esr0.03-qg-gear"] = {**gear, "model": QG_MODEL, "esr": 0.03, "base": f"{base}-qg-gear"}
+    cases[f"{base}-esr0.03-oss60-qg-gear"] = {**gear, "model": QG_MODEL, "esr": 0.03, "oss_rc": oss[60],
+                                              "base": f"{base}-qg-gear"}
     return cases
 
 
@@ -1231,6 +1249,7 @@ def main():
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
     ap.add_argument("--with-r80", type=float, default=None, help="search study (G only): also run every NAME with R80")
+    ap.add_argument("--qg", action="store_true", help="search study: run every case with EPC2302QG (gate-charge check)")
     ap.add_argument("--timeout", type=float, default=600.0,
                     help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
@@ -1240,7 +1259,7 @@ def main():
         set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
-    qg_lib = qg_variant_library() if args.study == "qgfit" else None
+    qg_lib = qg_variant_library() if args.study in ("qgfit", "damping") or args.qg else None
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
     runs = {}
 
@@ -1309,7 +1328,7 @@ def main():
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "search":
-        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80)
+        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80, args.qg)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "damping":

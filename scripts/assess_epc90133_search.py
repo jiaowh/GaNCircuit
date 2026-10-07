@@ -31,6 +31,7 @@ KEYS = ("overshoot_V", "fet_loss_W", "q2_gate_peak_V")
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("reports", nargs="+", type=Path)
+    ap.add_argument("--suffix", default="-gear", help="case suffix; '-gear-qg' for the gate-charge check (7 October 2026)")
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-search-assessment.json")
     args = ap.parse_args()
     cases = {}
@@ -45,7 +46,7 @@ def main():
     for n in names:
         rows, ok = {}, True
         for a in ALTS:
-            s, c = m.get(f"stock@{a}-gear"), m.get(f"{n}@{a}-gear")
+            s, c = m.get(f"stock@{a}{args.suffix}"), m.get(f"{n}@{a}{args.suffix}")
             if not s or not c or any(s[k] is None or c[k] is None for k in KEYS):
                 rows[a] = None
                 ok = None if ok is not False else False
@@ -66,7 +67,7 @@ def main():
             res.update({"worst_case_stock_V": ws, "worst_case_candidate_V": wc, "worst_alternative": wa,
                         "C0": wc < ws and all(rows[a]["C0_not_higher"] for a in ALTS),
                         "C1": all(rows[a]["C1"] for a in ALTS), "C2": all(rows[a]["C2"] for a in ALTS)})
-            h, f = m.get(f"{n}@{wa}-gear"), m.get(f"{n}@{wa}-gear-ms50")
+            h, f = m.get(f"{n}@{wa}{args.suffix}"), m.get(f"{n}@{wa}{args.suffix}-ms50")
             res["N"] = None if not f else all(abs(f[k] / h[k] - 1) <= 0.02 for k in KEYS)
             rule = res["C0"] and res["C1"] and res["C2"]
             res["verdict"] = ("not met" if not rule else "found" if res["N"] else
