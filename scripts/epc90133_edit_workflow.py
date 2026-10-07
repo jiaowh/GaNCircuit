@@ -52,6 +52,11 @@ this board; it is not fabrication approval, and edits that need new copper shape
 boundary, L3) need a further primitive and check.
 
 Output: results/gan/epc90133-edit-workflow.json; exit 0 if qualified, 2 otherwise.
+
+Run 1 (7 October 2026) CRASHED in W2's edit step and is kept (results/gan/epc90133-edit-workflow-run1-crashed.json,
+written before the crash): W0 and W1 passed every check; the zone parser built a polygon from three of the 5,680
+keep-outs (triangles, 3 points) without closing the ring, which shapely rejects. Revision 2 (retrospective, a
+parser fix only): the ring is closed. Checks, edits and tolerances are unchanged; run 2 reruns every case.
 """
 import argparse
 import collections
@@ -160,7 +165,7 @@ def zone_layer_and_poly(line):
     lay = re.search(r'\(layer "([^"]+)"\)', line).group(1)
     pts = re.search(r"\(polygon \(pts (.*?)\)\)", line).group(1)
     xs = [(float(a) - 100.0, 150.0 - float(b)) for a, b in re.findall(r"\(xy ([-\d.]+) ([-\d.]+)\)", pts)]
-    return lay, Polygon(xs)
+    return lay, Polygon(xs + xs[:1])  # revision 2: closed ring (run 1 crashed on 3-point keep-outs)
 
 
 def apply_edits(text, edits, geo):
