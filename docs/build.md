@@ -1943,6 +1943,43 @@ so moving the capacitor pads without that row does not shorten the vertical loop
 capacitors. A worthwhile L3 needs the return vias and the bottom capacitor bank moved together, a larger redesign.
 `move_footprint` gained the silk rule after W1 was qualified; L3a's DRC is its check.
 
+### EPC90133 layout search (7 October 2026; plans/layout-search-2026-10-07.md)
+
+Owner instruction: keep searching until a layout candidate is found; substantial rebuilds are accepted. The plan
+fixes what counts before any run: a legal board (DRC as stock, pad nets equal, power-loop checks pass), loop
+inductance more than 4 % below stock through the same route in the variant judged, and the owner rule (worst-case
+overshoot lower, FET loss at most +5 %, Q2 gate peak not higher) under the four driver/package alternatives, plus a
+50 ps numerical check.
+
+**Screens (`scripts/epc90133_layout_screen.py`) are invalid.** They filled the return-plane slots on mid-layer 1
+(In1) under Q1 and Q2 on EPC's raster: S1 -19 %, S2 -9 %, S4 -54 %, S6 -13.9 %, S7 -8.9 %, S8 -50.7 %. After V8's
+legal build gave -12.5 % against S8's -50.7 %, a check found why (recorded retrospectively; `--check-bonding`): inside
+each EPC slot the column's vias are joined by a strip of their own net's copper (switch node or VIN), and the fills
+touched those strips. 9-54 non-GND vias per screen were bonded to the GND plane, a partial short like S5. No screen
+number is an upper bound; the legal builds are this family's evidence.
+
+**Via thinning V6-V8 (`scripts/epc90133_board_export.py`, primitive `remove_vias`).** Every other via is removed in
+the slotted non-GND columns under Q1 (x = 18.0, 20.1, 21.9, 23.0 mm; V6), Q2 (x = 19.2, 20.9, 22.7; V7) or both
+(V8, 20 of 40 vias). The slots on every inner layer become EPC-size per-via antipads (r = 0.3275 mm), so the
+return plane runs between the remaining vias. Run 1 left a thin slit per slot (a keep-out piece cut a chord across
+the curved slot outline) and is kept; revision 2 tests containment by area. Run 2: all three are legal (DRC, nets,
+power-loop checks as stock); variant A loop inductance against stock through the route:
+
+| Case | Loop L (nH) | Change |
+|---|---|---|
+| stock (route) | 0.4925 | |
+| V6 (Q1) | 0.4717 | -4.2 % |
+| V7 (Q2) | 0.4502 | -8.6 % |
+| V8 (both) | 0.4311 | -12.5 % |
+
+Loop resistance is unchanged within 0.4 %. A preliminary switching run on A (V8 against stock, four alternatives)
+gave overshoot -6 to -14 % and FET loss +1.9 to +3.5 %; the Q2 gate peak rose by 2 mV at 0 pH, failing C2, but A
+has no gate loops (its Q2 peak is only about 0.25 V), so the rule is judged on G. Because lower loop inductance
+raises Q1's turn-on energy in this model (round 2a), the decisive G run also tries V8 with R80 1.5 ohm and, declared
+before any G result, 1.2 ohm (smaller loss increment). V9 (every third via kept) is declared and built; it goes to
+B/G only if it beats V8 on A by more than 4 % of stock. Fewer vias also carry the switch-node current to the inner
+and bottom layers; that heating is not modelled.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
