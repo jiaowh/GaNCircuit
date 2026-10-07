@@ -2041,7 +2041,11 @@ for more than seven hours and filled WSL's 8 GB, so the stock G extraction hit i
 extraction failed (FastHenry job aborted during GMRES, most likely out of memory); the G search switching then found
 no inputs. Logs kept as runs/*-run1-failed.*. Run 2 (queued 8 October, 00:36): G stock, G V8, then B stock, B V8 in
 WSL one at a time; the switching runs (assumed and sourced parts, R80 1.5 and 1.2) on Windows once both G
-extractions exist.
+extractions exist. Run 2 failed too: the WSL virtual machine stopped abruptly at 00:39:46, two minutes after the G
+jobs started and after the kernel's out-of-memory killer had stopped run 1's FastHenry at 00:35 and 00:37 (journal of
+the previous boot; no shutdown sequence logged, cause not identified). Logs kept as runs/*-run2-failed.*. Run 3 started
+at 00:45 on the restarted VM with the same jobs; ten minutes in, the two G jobs held 2.4 GB each with 2.7 GB free and
+no swap.
 
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
