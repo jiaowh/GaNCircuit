@@ -344,10 +344,14 @@ def apply_edits(text, edits, geo):
                         h = Polygon(ring)
                         if h.area >= REWORK_MAX_HOLE or not any(h.contains(p) for _, p in removed):
                             continue
-                        hb = h.buffer(1e-4)
+                        # Revision 2 (after V6 run 1): containment by area. A split keep-out piece whose corners lie on
+                        # the hole outline can still cut a chord across a curved stretch of it (0.00008 mm^2 outside),
+                        # so the strict test kept it and left a slit in the plane.
                         for i, ln in enumerate(lines):
-                            if ln.startswith("\t(zone ") and f'(layer "{lay}")' in ln and hb.contains(zone_layer_and_poly(ln)[1]):
-                                lines[i] = ""
+                            if ln.startswith("\t(zone ") and f'(layer "{lay}")' in ln:
+                                zp = zone_layer_and_poly(ln)[1]
+                                if zp.intersects(h) and zp.difference(h).area <= 1e-3 * zp.area:
+                                    lines[i] = ""
                         keep = [p for p in remaining if h.contains(p)]
                         lines.insert(len(lines) - 1, "".join(keepout_line(lay, p.buffer(r_ap, 16)) for p in keep))
                         reworked[lay] += 1

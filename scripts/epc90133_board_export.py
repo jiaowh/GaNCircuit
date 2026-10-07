@@ -58,6 +58,12 @@ Candidates V6/V7/V8 (layout search F1, declared 7 October 2026 before their buil
 with stock through the route (4 % rule). Because the removed vias also feed the bottom loop that A omits, every
 candidate that counts on A is then extracted on B (B:m1:mid, with stock through the route as control) and counts only
 if it also beats B by more than 4 %.
+V6/V7/V8 run 1 (7 October 2026; kept as export/<case>-run1-slit and results/gan/epc90133-board-export-<case>-run1-slit.json):
+all legal (L1-L4 pass); A loop L -2.8 / -4.3 / -7.1 %. Defect: remove_vias kept one split keep-out piece per slot
+whose straight edge cuts a chord 0.00008 mm^2 outside the curved slot outline, so a thin slit stayed in the plane
+(seen on In1 under Q1 at x = 22.2). Revision 2 (RETROSPECTIVE, edit primitive only): containment by area (at most
+0.1 % of the piece outside the hole). --reuse (new): an existing package gets further extractions (manifest checked)
+and B/G comparisons with stock through the route.
 L3a run 1 (7 October 2026) REJECTED (package kept as export/L3a-run1-rejected; no report, the driver crashed): DRC 14
 isolated-copper items (a 0.011 mm^2 GND sliver on In1 at x 15.8-16.0, y 32.9, pinched off where the moved x = 16.05 VIN
 pair approaches the plane edge) and 14 silk_over_copper (EPC's frozen silk ticks now on the moved GND pads); the
@@ -283,21 +289,36 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("case", choices=sorted(CASES))
     ap.add_argument("--extract", nargs="*", default=["A:m1:mid"])
+    ap.add_argument("--reuse", action="store_true",
+                    help="existing package: verify its manifest, keep its board and power-loop record, run only the "
+                         "extractions not yet present (7 October 2026, layout search confirmation)")
     args = ap.parse_args()
     outdir = EXPORT_ROOT / args.case
-    if outdir.exists() and any(outdir.iterdir()):
-        raise SystemExit(f"{outdir} exists; packages are never overwritten (remove it deliberately)")
-    outdir.mkdir(parents=True, exist_ok=True)
-    manifest = export_package(args.case, CASES[args.case], outdir)
-    print("exported", args.case, manifest["drc_summary"], flush=True)
-    rc = child(["scripts/epc90133_power_loop.py", "--output", str(outdir / "power-loop.json"),
-                "--renders", str(outdir / "power-loop"),
-                *(["--cap-windows", json.dumps(CAP_WINDOWS[args.case])] if args.case in CAP_WINDOWS else [])],
-               outdir, "power-loop")
-    print("power loop exit", rc, flush=True)
+    if args.reuse:
+        if not (outdir / "export.json").exists() or not (outdir / "power-loop.json").exists():
+            raise SystemExit(f"--reuse: {outdir} has no complete package")
+        man = json.loads((outdir / "export.json").read_text(encoding="utf-8"))
+        bad = [f for f, h in man["files"].items() if sha256(outdir / f) != h]
+        if bad:
+            raise SystemExit(f"--reuse: package files differ from the manifest: {bad}")
+    else:
+        if outdir.exists() and any(outdir.iterdir()):
+            raise SystemExit(f"{outdir} exists; packages are never overwritten (remove it deliberately)")
+        outdir.mkdir(parents=True, exist_ok=True)
+        manifest = export_package(args.case, CASES[args.case], outdir)
+        print("exported", args.case, manifest["drc_summary"], flush=True)
+        rc = child(["scripts/epc90133_power_loop.py", "--output", str(outdir / "power-loop.json"),
+                    "--renders", str(outdir / "power-loop"),
+                    *(["--cap-windows", json.dumps(CAP_WINDOWS[args.case])] if args.case in CAP_WINDOWS else [])],
+                   outdir, "power-loop")
+        print("power loop exit", rc, flush=True)
     cases_out = {}
+    for c in ("A:m1:mid", "B:m1:mid", "G:m1:mid"):
+        prior = outdir / "extraction" / ("-".join(c.split(":")[:3]) + f"-{args.case}.json")
+        if prior.exists():
+            cases_out[c] = prior
     if (outdir / "power-loop.json").exists():
-        for c in args.extract:
+        for c in [c for c in args.extract if c not in cases_out]:
             rc = child(["scripts/epc90133_extract.py", c, "--loop", str(outdir / "power-loop.json"),
                         "--outdir", str(outdir / "extraction"), "--tag", args.case], outdir, "extract-" + c.replace(":", "_"))
             out = outdir / "extraction" / ("-".join(c.split(":")[:3]) + f"-{args.case}.json")
@@ -341,6 +362,17 @@ def main():
                 "R_loop_mohm": [ss["R_loop_mohm"], ns["R_loop_mohm"]],
                 "capacitor_current_share": {"stock": ss["capacitor_current_share"], "candidate": ns["capacitor_current_share"]},
                 "threshold": LOOP_L_THRESHOLD, "counts": abs(dl) > LOOP_L_THRESHOLD}
+            # Confirmation variants (B, G) against stock through the route, when both exist.
+            for c in ("B:m1:mid", "G:m1:mid"):
+                stem = "-".join(c.split(":")[:3])
+                sp, cp = st / "extraction" / f"{stem}-stock.json", cases_out.get(c)
+                if sp.exists() and cp:
+                    sx, cx = json.loads(sp.read_text(encoding="utf-8")), json.loads(cp.read_text(encoding="utf-8"))
+                    if sx.get("outcome") == "complete" and cx.get("outcome") == "complete":
+                        a_, b_ = sx["summary"]["L_loop_nH"], cx["summary"]["L_loop_nH"]
+                        res[f"comparison_vs_stock_route_{stem}"] = {
+                            "L_loop_nH": [a_, b_], "relative_change": b_ / a_ - 1,
+                            "threshold": LOOP_L_THRESHOLD, "counts": abs(b_ / a_ - 1) > LOOP_L_THRESHOLD}
         res["outcome"] = ("rejected (acceptance)" if not res["accepted"] else
                           "counts" if res["comparison_vs_stock_route"]["counts"] else "below threshold")
         (ROOT / f"results/gan/epc90133-board-export-{args.case}.json").write_text(json.dumps(res, indent=1, default=str) + "\n")
