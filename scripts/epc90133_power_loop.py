@@ -520,7 +520,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-power-loop.json")
     ap.add_argument("--renders", type=Path, default=ROOT / "results/gan/epc90133-power-loop")
+    ap.add_argument("--cap-windows", default=None,
+                    help='JSON {"Ci": [x0, y0, x1, y1]}: capacitor windows for edited boards (7 October 2026)')
     args = ap.parse_args()
+    if args.cap_windows:
+        for k, w in json.loads(args.cap_windows).items():
+            CAPS[k] = (CAPS[k][0], tuple(w), CAPS[k][2])
     b = load_board()
     fets = {q: footprint(b, q, w) for q, w in FETS.items()}
     caps = {k: capacitors(b, k, side, w, n) for k, (side, w, n) in CAPS.items()}

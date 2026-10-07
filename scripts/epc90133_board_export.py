@@ -53,6 +53,15 @@ no new DRC types); L2 IPC-D-356 pad nets equal stock's; L3 power-loop record che
 A:m1:mid extraction complete. Comparison: loop inductance, resistance and capacitor current shares against
 'stock' through this route; the change counts only if |dL|/L > 4 %. Switching simulation follows only if it counts.
 Output: results/gan/epc90133-board-export-L3a.json.
+L3a run 1 (7 October 2026) REJECTED (package kept as export/L3a-run1-rejected; no report, the driver crashed): DRC 14
+isolated-copper items (a 0.011 mm^2 GND sliver on In1 at x 15.8-16.0, y 32.9, pinched off where the moved x = 16.05 VIN
+pair approaches the plane edge) and 14 silk_over_copper (EPC's frozen silk ticks now on the moved GND pads); the
+power-loop record lost every Ci VIN contact (its Ci window starts at y = 33.0, so the moved pads were dropped as cut by
+the window edge: C5 fails, extraction KeyError 'Ci1.VIN'); and the driver expected a pad-net list the stock package
+predates (KeyError). Revision 2 (RETROSPECTIVE): silk pieces wholly within a moved part's pad-centre box grown by
+0.5 mm move with it; netted zones in edited builds drop isolated fill islands (KiCad's default; stock has no netted
+isolated islands, so stock is unaffected); the power-loop Ci window follows the move (CAP_WINDOWS); the stock pad nets
+are read from the stock board when missing. Acceptance and comparison rules are unchanged.
 
 Output: <outdir>/export.json, <outdir>/power-loop.json, <outdir>/extraction/A-m1-mid-<case>.json and, for 'stock',
 results/gan/epc90133-board-export-x0.json. Packages live in git-ignored vendor/epc/epc90133/reconstruction/export/
@@ -95,6 +104,9 @@ CASES = {
             ("move_vias", L3A_VIAS, 0.0, -0.40),
             ("reshape", "F.Cu", "GND", (15.4, 34.25, 32.0, 34.70), None)],
 }
+# Revision 2 (retrospective after L3a run 1): capacitor windows of the power-loop record follow the moved parts.
+CAP_WINDOWS = {"L3a": {"Ci": [15.0, 32.6, 28.0, 35.8]}}
+NETTED_ISLAND = re.compile(r'^(\t\(zone \(net [1-9]\d*\) .*?)\(island_removal_mode 1\)', re.M)
 LOOP_L_THRESHOLD = 0.04  # retrospective amendment after X0 run 1
 
 
@@ -138,6 +150,10 @@ def export_package(case, edits, outdir):
     base = base[:-1] + "".join(ew.keepouts(geo)) + ")\n"
     text, log = ew.apply_edits(base, edits, geo)
     text = with_aux_origin(text)
+    if edits:
+        # Revision 2: netted zones drop isolated fill islands (KiCad's default). Stock has none (its 13 isolated
+        # islands are all netless and keep mode 1), so only islands created by an edit are removed.
+        text = NETTED_ISLAND.sub(lambda m: m.group(1) + "(island_removal_mode 0)", text)
     bdir = outdir / "board"
     bdir.mkdir(parents=True, exist_ok=True)
     board = bdir / "epc90133.kicad_pcb"
@@ -250,7 +266,9 @@ def main():
     manifest = export_package(args.case, CASES[args.case], outdir)
     print("exported", args.case, manifest["drc_summary"], flush=True)
     rc = child(["scripts/epc90133_power_loop.py", "--output", str(outdir / "power-loop.json"),
-                "--renders", str(outdir / "power-loop")], outdir, "power-loop")
+                "--renders", str(outdir / "power-loop"),
+                *(["--cap-windows", json.dumps(CAP_WINDOWS[args.case])] if args.case in CAP_WINDOWS else [])],
+               outdir, "power-loop")
     print("power loop exit", rc, flush=True)
     cases_out = {}
     if (outdir / "power-loop.json").exists():
@@ -271,6 +289,12 @@ def main():
         d = cm["drc_summary"]
         res["L1_drc"] = {**d, "new_types": sorted(set(d["types"]) - set(sm["drc_summary"]["types"]))}
         res["L1_drc"]["pass"] = d["pass"] and not res["L1_drc"]["new_types"]
+        if "pad_nets" not in sm:  # revision 2: the stock package predates the pad-net list; read its board
+            ipc = st / "board" / "board-pad-nets.d356"
+            if not ipc.exists():
+                subprocess.run([str(KICAD_CLI), "pcb", "export", "ipcd356", "-o", str(ipc), str(st / "board" / "epc90133.kicad_pcb")],
+                               capture_output=True, text=True, timeout=TIMEOUT, check=True)
+            sm["pad_nets"] = {x["key"]: x["net"] for x in ew.read_ipcd356(ipc)}
         diff = sorted(k for k in set(sm["pad_nets"]) | set(cm["pad_nets"]) if sm["pad_nets"].get(k) != cm["pad_nets"].get(k))
         res["L2_nets"] = {"differences": diff[:20], "pass": not diff}
         loop_ok = (outdir / "power-loop.json").exists()

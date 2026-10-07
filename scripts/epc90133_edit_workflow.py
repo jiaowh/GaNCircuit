@@ -122,6 +122,7 @@ TOL, TIGHT, AREA_EPS = 0.010, 0.001, 1e-4
 EDGE = 1.0
 WINDOW_PAD = 1.0
 TIMEOUT = 1800
+SILK_MARGIN = 0.5  # mm, silk that moves with a part (added after L3a run 1)
 CLEARANCE_MM = 0.150114  # EPC's board-wide minimum clearance (5.91 mil), the reconstruction's rule
 RULE_MIN = CLEARANCE_MM - 0.001
 STOCK_ISOLATED = 13
@@ -214,8 +215,26 @@ def apply_edits(text, edits, geo):
             if len(hits) != 1:
                 raise SystemExit(f"move_footprint {ref}: {len(hits)} matches")
             i = hits[0]
+            m0 = pat.match(lines[i])
+            fx, fy = float(m0.group(2)), float(m0.group(3))
             lines[i] = pat.sub(lambda m: f"{m.group(1)}{float(m.group(2)) + dx:.6f} {float(m.group(3)) - dy:.6f}", lines[i], 1)
-            log.append({"op": op, "footprint_line": i})
+            # Silkscreen (7 October 2026, after L3a run 1): EPC's silk is frozen board graphics, not footprint
+            # graphics, so a piece lying wholly within the part's pad-centre box grown by SILK_MARGIN moves with it.
+            end = next(j for j in range(i, len(lines)) if lines[j] == "\t)\n")
+            side = "F.SilkS" if '(layer "F.Cu")' in lines[i] else "B.SilkS"
+            cs = [(fx + float(a) - 100.0, 150.0 - (fy + float(b))) for a, b in
+                  re.findall(r'\(pad "[^"]*" \w+ \w+ \(at ([-\d.]+) ([-\d.]+)', "".join(lines[i:end]))]
+            nsilk = 0
+            if cs:
+                region = sbox(min(c[0] for c in cs) - SILK_MARGIN, min(c[1] for c in cs) - SILK_MARGIN,
+                              max(c[0] for c in cs) + SILK_MARGIN, max(c[1] for c in cs) + SILK_MARGIN)
+                for j, ln in enumerate(lines):
+                    if ln.startswith("\t(gr_poly") and f'(layer "{side}")' in ln:
+                        xs = [(float(a) - 100.0, 150.0 - float(b)) for a, b in re.findall(r"\(xy ([-\d.]+) ([-\d.]+)\)", ln)]
+                        if len(xs) >= 3 and region.contains(Polygon(xs)):
+                            lines[j] = shift_pts(ln, dx, dy)
+                            nsilk += 1
+            log.append({"op": op, "footprint_line": i, "silk_moved": nsilk})
         elif op[0] == "move_via":
             _, x, y, dx, dy = op
             kx, ky = to_kicad(x, y)
