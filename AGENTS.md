@@ -99,8 +99,9 @@ Read the relevant report and build-note section before quoting numbers.
   refillable design intent: refill changes about 1–2% of power/gate-region copper.
   `scripts/epc90133_edit_workflow.py` run 2 QUALIFIES a geometry-edit workflow
   (stock holes as fill keep-outs; edit lists on the base text) for move_footprint
-  and move_via only. Part moves across net boundaries (L3) need a zone-outline
-  primitive and its own check first. Saved-geometry checks are not fabrication approval. DRC shows no gap below EPC's
+  and move_via; `--suite reshape` run 2 qualifies reshape (rectangular add/cut on
+  one layer, clearance cut-back). Candidates built with them still need their own
+  DRC/net/extraction checks. Saved-geometry checks are not fabrication approval. DRC shows no gap below EPC's
   rule by more than the declared 1 um tolerance.
 - **Agents:** milestones 1/2 and E2E-0 demonstrate non-blind execution/handoffs,
   not judgement or hardware closure. Milestone containment means 'no new git-status

@@ -465,8 +465,8 @@ in the scripts, saved reports and [build notes](../docs/build.md).
    unidentified causes explicit. The geometry-edit workflow is qualified for moving
    parts and vias (7 October 2026, `scripts/epc90133_edit_workflow.py` run 2: no-edit,
    one part move and one via move checked for copper/mask/paste, connectivity, DRC
-   and reversibility). Edits needing new copper shapes (L3) need a zone-outline
-   primitive and its own check before use.
+   and reversibility), and for reshaping copper (`--suite reshape` run 2). Next:
+   check the edited-board-to-extraction route on stock, then the first L3 candidate.
 5. Evaluate the agent's judgement against the frozen predictions and new
    measurements, with interventions, retries, time and cost recorded against a
    script or guided baseline. Agents may read normal project context. Milestones

@@ -1875,9 +1875,36 @@ not close their rings. W0 and W1 had passed. Revision 2 fixes only the parser. *
   translated hole cut, pad moved) with zero residual. Outside the window nothing changed. The via is at the new
   position on GND, none at the old, the DRC is as W0, and moving it back gives W0 exactly.
 
-Scope: this qualifies these two primitives on this board. Edits that need new copper shapes, such as moving a part
-across a net boundary (L3: input capacitors toward the FETs), need a further primitive (declared zone-outline
-edits) and their own check. A saved-geometry or workflow pass is not fabrication approval.
+Scope: this qualifies these two primitives on this board. A saved-geometry or workflow pass is not fabrication
+approval.
+
+**Reshape primitive qualified (7 October 2026; suite `--suite reshape`, declared at f1182f6).** Layout improvements
+need new copper shapes (owner), so a zone-outline primitive was added. `reshape(layer, net, add, cut)` works on
+rectangles in EPC millimetres:
+- **cut:** every zone on the layer loses the region, and the region becomes a keep-out. That is needed because the
+  board-outline ring is a netless zone covering the whole board, kept empty inside by keep-outs.
+- **add:** the region merges into the net's zone it touches; other nets' zones lose the region grown by EPC's 0.150114 mm
+  clearance; keep-outs lose the region.
+- Zones split into pieces become one zone each; holes become keep-outs computed against the edited outlines.
+
+Test site: the straight SW/VIN boundary on F.Cu right of Q1 (gap 0.163 mm, no pads, nearest via 0.8 mm away). A dry
+text check before any run found the ring-zone problem; the fix is recorded in the code. Run 1 failed and is kept
+([report](../results/gan/epc90133-edit-reshape-run1-failed.json)): the zone rebuild left two extra ')' per rebuilt line,
+so KiCad stopped reading before the board outline without an error (DRC: no Edge.Cuts edges, 184-203 unconnected).
+Revision 2 fixes the substitutions and refuses an unbalanced board before any refill. **Run 2 qualifies the
+primitive** ([report](../results/gan/epc90133-edit-reshape.json)), with W0 passing again:
+- **Z1, cut a 2.0 x 0.3 mm notch from VIN:** exactly 0.600 mm^2 removed, equal to W0 minus the notch with zero
+  residual;
+- **Z1R, cut then add back:** equals W0 exactly;
+- **Z2, VIN edge moved 0.20 mm toward SW over 2 mm:** 0.684 mm^2 changed, equal to the expected geometry (VIN plus
+  the region, SW cut back by the clearance) with zero residual; smallest VIN-to-SW gap 0.153 mm (rule 0.150).
+
+In every case nothing changed outside the edit window on any layer, the DRC is as stock (0 unconnected, isolated copper
+13, no new types), the pad nets are unchanged, and mask and paste equal EPC's.
+
+Scope: rectangular regions on one layer, qualified at one site. A board candidate built with these primitives still
+needs its own DRC, net and extraction checks. Nothing here is fabrication approval. The next step is feeding a
+KiCad-exported board into the extraction, checked first on stock.
 
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 

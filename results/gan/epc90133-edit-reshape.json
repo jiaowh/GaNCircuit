@@ -1,0 +1,692 @@
+{
+ "schema": "epc90133-edit-workflow/1",
+ "evaluator_sha256": "f7d2c66e970a2229573889865b5146c73fec7d5986d3038c183d287a471e4833",
+ "input_manifest": {
+  "saved_board": "79ba8e1e44fca735bf4fae516c5803054589077a1cfa07a115c767fe27f693b3",
+  "project": "0fc7864c6f416cfda8a2d15b8106ab9d694c57661311957e94b1b381d01751b1",
+  "verify_report": "3c469ec0d48956d73bbc4e61df631afa2b620d028cd8e58da0bf4993c0d7103f",
+  "helpers": {
+   "src/circuit_tools/gerber.py": "c25269e552caa804cd13f2e14037c7e76eb36a62fa66457f30cabd7d07e7ddd0",
+   "src/circuit_tools/kicad.py": "bb170ca524decbe74e664eebe7dfab718bf558cd32e2107d5ec25cdab71009cc",
+   "scripts/read_epc90133_geometry.py": "9dcfa7851b6fcfa6ebefa5ef2bb6b20fb2769936398b917e83df1871e4ab055d",
+   "scripts/epc90133_reconstruct.py": "d8727f5b31a148231575bda9bb361808501e355aae2b8ee6765fe56bcb5d961f",
+   "scripts/epc90133_reconstruct_nets.py": "d65dc2173c133ea8028eb30730a3fb33ddcbe3fbdae2239fb25efd6d20bf3223",
+   "scripts/verify_epc90133_reconstruction.py": "db44c831b0841784f747106cae934e8343d9857dc44dbfa0b31030ac0fc6a407"
+  }
+ },
+ "tolerances_mm": {
+  "geometry": 0.01,
+  "outside_window": 0.001,
+  "area_eps_mm2": 0.0001
+ },
+ "edits": {
+  "W0": [],
+  "W1": [
+   [
+    "move_footprint",
+    "Ci7",
+    -0.3,
+    0.0
+   ]
+  ],
+  "W2": [
+   [
+    "move_via",
+    24.16,
+    36.4,
+    0.2,
+    0.0
+   ]
+  ]
+ },
+ "evidence_directory": "vendor\\epc\\epc90133\\reconstruction\\edit\\run-cc9ad9a092",
+ "checks": {
+  "W0": {
+   "W0a_copper": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 3.976656349098761e-07,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "W0b_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "W0c_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true
+   },
+   "W0d_nets": {
+    "reference": "saved board's IPC-D-356 (verify report)",
+    "pass": true,
+    "differences": []
+   },
+   "board_sha256": "63b267adefddac5ca352f389697d3624a773c3f3a2698dcf0b71e17d22682b0f",
+   "drc_report_sha256": "f15c651d0c4a63fe42f51cd2a2c01a4eb194da323558a6df6baa9556829048c7",
+   "kicad_version": "10.0.6",
+   "pass": true
+  },
+  "Z1": {
+   "edit_log": [
+    {
+     "op": [
+      "reshape",
+      "F.Cu",
+      null,
+      null,
+      [
+       28.0,
+       32.05,
+       30.0,
+       32.35
+      ]
+     ],
+     "zones_cut": 2,
+     "keepouts_added": 1
+    }
+   ],
+   "window_bounds": [
+    26.849886,
+    30.899886,
+    31.150114,
+    33.500114
+   ],
+   "Za_outside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 4.8197654252443433e-05,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Zb_inside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Zc_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true,
+    "new_types": []
+   },
+   "Zd_nets": {
+    "pass": true
+   },
+   "Ze_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "board_sha256": "0b30dabcf88ff8813f05e20f930b64f132bcec41a895cf0cd8c088bd2d6a91ee",
+   "inside_window_change_mm2": {
+    "F.Cu": 0.5999999999999943,
+    "In1.Cu": 0.0,
+    "In2.Cu": 0.0,
+    "In3.Cu": 0.0,
+    "In4.Cu": 0.0,
+    "In5.Cu": 0.0,
+    "In6.Cu": 0.0,
+    "B.Cu": 0.0
+   },
+   "pass": true
+  },
+  "Z1R": {
+   "edit_log": [
+    {
+     "op": [
+      "reshape",
+      "F.Cu",
+      null,
+      null,
+      [
+       28.0,
+       32.05,
+       30.0,
+       32.35
+      ]
+     ],
+     "zones_cut": 2,
+     "keepouts_added": 1
+    },
+    {
+     "op": [
+      "reshape",
+      "F.Cu",
+      "VIN",
+      [
+       28.0,
+       32.05,
+       30.0,
+       32.35
+      ],
+      null
+     ],
+     "target_zones_merged": 1,
+     "other_net_zones_cut": 1,
+     "keepouts_trimmed": 3,
+     "keepouts_added": 0
+    }
+   ],
+   "window_bounds": [
+    26.849886,
+    30.899886,
+    31.150114,
+    33.500114
+   ],
+   "Za_outside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 4.820552824035441e-05,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Zb_inside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Zc_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true,
+    "new_types": []
+   },
+   "Zd_nets": {
+    "pass": true
+   },
+   "Ze_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "board_sha256": "1646ed12807c7685001a59fa9a1ddaaebe4a01d7e04e9694524c856e7febc8b9",
+   "inside_window_change_mm2": {
+    "F.Cu": 0.0,
+    "In1.Cu": 0.0,
+    "In2.Cu": 0.0,
+    "In3.Cu": 0.0,
+    "In4.Cu": 0.0,
+    "In5.Cu": 0.0,
+    "In6.Cu": 0.0,
+    "B.Cu": 0.0
+   },
+   "pass": true
+  },
+  "Z2": {
+   "edit_log": [
+    {
+     "op": [
+      "reshape",
+      "F.Cu",
+      "VIN",
+      [
+       28.0,
+       31.73,
+       30.0,
+       31.95
+      ],
+      null
+     ],
+     "target_zones_merged": 1,
+     "other_net_zones_cut": 2,
+     "keepouts_trimmed": 1,
+     "keepouts_added": 0
+    }
+   ],
+   "window_bounds": [
+    26.849885999999998,
+    30.579886000000002,
+    31.150114000000002,
+    33.100114
+   ],
+   "Za_outside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 4.8197654252443433e-05,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Zb_inside_window": {
+    "F.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In1.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In2.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In3.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In4.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In5.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "In6.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Cu": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "Zc_drc": {
+    "types": {
+     "isolated_copper": 13,
+     "silk_edge_clearance": 4,
+     "padstack": 1,
+     "lib_footprint_issues": 106
+    },
+    "unconnected": 0,
+    "clearance_below_rule": 0,
+    "pass": true,
+    "new_types": []
+   },
+   "Zd_nets": {
+    "pass": true
+   },
+   "Ze_mask_paste": {
+    "F.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Mask": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "F.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    },
+    "B.Paste": {
+     "a_not_in_b_mm2": 0.0,
+     "b_not_in_a_mm2": 0.0,
+     "pass": true
+    }
+   },
+   "board_sha256": "64a9e3daf6dbf4a638795ce9ad3eff6f642b02cb7fa21f5c284027a5f0bb07a2",
+   "inside_window_change_mm2": {
+    "F.Cu": 0.6841987378245029,
+    "In1.Cu": 0.0,
+    "In2.Cu": 0.0,
+    "In3.Cu": 0.0,
+    "In4.Cu": 0.0,
+    "In5.Cu": 0.0,
+    "In6.Cu": 0.0,
+    "B.Cu": 0.0
+   },
+   "Zg_min_gap_mm": {
+    "value": 0.15261292546841876,
+    "limit": 0.149114,
+    "pass": true
+   },
+   "pass": true
+  }
+ },
+ "keepout_pieces": 5680,
+ "outcome": "qualified",
+ "suite": "reshape",
+ "reshape_cases": {
+  "Z1": [
+   [
+    "reshape",
+    "F.Cu",
+    null,
+    null,
+    [
+     28.0,
+     32.05,
+     30.0,
+     32.35
+    ]
+   ]
+  ],
+  "Z1R": [
+   [
+    "reshape",
+    "F.Cu",
+    null,
+    null,
+    [
+     28.0,
+     32.05,
+     30.0,
+     32.35
+    ]
+   ],
+   [
+    "reshape",
+    "F.Cu",
+    "VIN",
+    [
+     28.0,
+     32.05,
+     30.0,
+     32.35
+    ],
+    null
+   ]
+  ],
+  "Z2": [
+   [
+    "reshape",
+    "F.Cu",
+    "VIN",
+    [
+     28.0,
+     31.73,
+     30.0,
+     31.95
+    ],
+    null
+   ]
+  ]
+ }
+}
