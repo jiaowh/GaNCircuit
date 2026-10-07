@@ -57,6 +57,31 @@ Run 1 (7 October 2026) CRASHED in W2's edit step and is kept (results/gan/epc901
 written before the crash): W0 and W1 passed every check; the zone parser built a polygon from three of the 5,680
 keep-outs (triangles, 3 points) without closing the ring, which shapely rejects. Revision 2 (retrospective, a
 parser fix only): the ring is closed. Checks, edits and tolerances are unchanged; run 2 reruns every case.
+Run 2 QUALIFIED the workflow for move_footprint and move_via (results/gan/epc90133-edit-workflow.json).
+
+Suite 'reshape' (--suite reshape; declared 7 October 2026 after run 2, before any reshape run; owner request:
+reshaping copper is needed for layout improvements). Primitive reshape(layer, net, add, cut), regions as
+rectangles in EPC millimetres:
+* cut: every zone outline on the layer loses the region;
+* add: the region joins net's zone(s) on the layer that it touches (merged into one outline); every other net's
+  zone on the layer loses the region buffered by CLEARANCE_MM = 0.150114 mm (EPC's board-wide minimum, round
+  joins); keep-outs on the layer lose the region;
+* a zone split into pieces becomes one zone per piece; a hole created in an outline becomes keep-outs (the hole
+  minus other zones inside it). Frozen fills of rebuilt zones are dropped and the refill regenerates them.
+Test site: the straight SW/VIN boundary on F.Cu right of Q1 (SW copper up to y = 31.767, VIN from y = 31.93, gap
+0.163 mm, x 27.5-30.5), with no pads or mask openings and the nearest drills (VIN vias at y = 32.77) 0.8 mm away.
+Cases (each against a fresh W0 build in the same run):
+* Z1 cut a notch N = (28.0, 32.05)-(30.0, 32.35) out of the VIN copper.
+* Z1R the list [Z1, add VIN N]: the region is restored.
+* Z2 add VIN A = (28.0, 31.73)-(30.0, 31.95): the VIN edge moves 0.20 mm toward SW over 2 mm, SW is cut back.
+Checks: Za outside the window (the regions buffered by 1 mm) copper equals W0 within 0.001 mm on every layer;
+Zb inside the window, F.Cu equals the expected geometry within TOL (Z1: W0 - N; Z1R: W0; Z2: (W0 * V) + A +
+((W0 - V) - A buffered by CLEARANCE_MM), V the VIN zone outline) and the other layers equal W0 within 0.001 mm;
+Zc DRC as W0c with no new types; Zd IPC-D-356 pad nets equal W0's; Ze mask and paste equal EPC's; Zg (Z2) the
+smallest VIN-to-other-copper distance in the window is at least CLEARANCE_MM - 0.001 mm. The suite passes only if
+W0 and every case pass. Output: results/gan/epc90133-edit-reshape.json. Scope if it passes: reshape qualified for
+rectangular regions on one layer; a new-board candidate built with it still needs its own DRC, net and
+extraction checks, and nothing here is fabrication approval.
 """
 import argparse
 import collections
@@ -70,6 +95,7 @@ from pathlib import Path
 
 from shapely.affinity import affine_transform, translate
 from shapely.geometry import Point, Polygon, box as sbox
+from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
 from shapely.strtree import STRtree
 
@@ -89,7 +115,8 @@ TOL, TIGHT, AREA_EPS = 0.010, 0.001, 1e-4
 EDGE = 1.0
 WINDOW_PAD = 1.0
 TIMEOUT = 1800
-RULE_MIN = 0.150114 - 0.001
+CLEARANCE_MM = 0.150114  # EPC's board-wide minimum clearance (5.91 mil), the reconstruction's rule
+RULE_MIN = CLEARANCE_MM - 0.001
 STOCK_ISOLATED = 13
 VERIFY = ROOT / "results/gan/epc90133-reconstruct-verify.json"
 WORK = OUT / "edit"
@@ -206,9 +233,106 @@ def apply_edits(text, edits, geo):
                 moved_holes[(e, k)] = translate(h, dx, dy)
             log.append({"op": op, "via_epc_xy": [vx, vy], "hole_layers": sorted(KICAD_LAYER[e] for e in holes),
                         "zones_and_keepouts_translated": dict(moved)})
+        elif op[0] == "reshape":
+            _, lay, net, add, cut = op
+            lines, info = reshape(lines, lay, net, add and sbox(*add), cut and sbox(*cut))
+            log.append({"op": op, **info})
         else:
             raise SystemExit(f"unknown edit {op}")
     return "".join(lines), log
+
+
+def keepout_line(layer, q):
+    return (f'\t(zone (net 0) (net_name "") (layer "{layer}") (uuid "{uuid.uuid4()}") (name "stock-hole") '
+            f'(hatch edge 0.5) (connect_pads (clearance 0)) (min_thickness 0.01) (filled_areas_thickness no) '
+            f'(keepout (tracks allowed) (vias allowed) (pads allowed) (copperpour not_allowed) (footprints allowed)) '
+            f'(fill (thermal_gap 0.5) (thermal_bridge_width 0.5)) (polygon (pts {xy(list(q.exterior.coords)[:-1])})))\n')
+
+
+def is_keepout(line):
+    return "(keepout " in line
+
+
+def zone_net(line):
+    return re.search(r'\(net_name "([^"]*)"\)', line).group(1)
+
+
+def rebuild_zone(line, poly, layer, others):
+    """Zone lines for poly: one zone per piece (outline = exterior, frozen fill dropped for the refill), and a
+    keep-out for each interior ring minus the other zones' outlines inside it. others: other zones' outlines."""
+    out = []
+    base = re.sub(r' \(filled_polygon \(layer "[^"]+"\) \(pts .*?\)\)', "", line.rstrip("\n"))
+    for k, piece in enumerate(p for p in polygons(poly) if p.area >= 1e-6):
+        ext = list(orient(Polygon(piece.exterior), 1.0).exterior.coords)[:-1]
+        ln = re.sub(r"\(polygon \(pts .*?\)\)", lambda m: f"(polygon (pts {xy(ext)}))", base, count=1)
+        if k:
+            ln = re.sub(r'\(uuid "[^"]+"\)', f'(uuid "{uuid.uuid4()}")', ln, count=1)
+        out.append(ln + "\n")
+        for ring in piece.interiors:
+            h = Polygon(ring)
+            inside = [o for o in others if h.intersects(o)]
+            h = h.difference(unary_union(inside)) if inside else h
+            out += [keepout_line(layer, q) for part in polygons(h) for q in split_holes(part) if q.area >= 1e-6]
+    return out
+
+
+def reshape(lines, layer, net, add, cut):
+    """Zone-outline primitive (suite 'reshape', declared in the module docstring).
+
+    cut: every zone outline on the layer loses the region. add: the region joins net's zone(s) on the layer that it
+    touches (merged into one outline); other nets' zones on the layer lose add buffered by CLEARANCE_MM; keep-outs
+    on the layer lose add. Holes created become keep-outs."""
+    zones = [(i, ln, zone_layer_and_poly(ln)[1]) for i, ln in enumerate(lines)
+             if ln.startswith("\t(zone ") and f'(layer "{layer}")' in ln]
+    outlines = {i: p for i, ln, p in zones if not is_keepout(ln)}
+    new = {}
+    info = collections.Counter()
+    # Pre-run fix (dry text check, before any reshape run): the board-outline ring is a netless zone whose outline
+    # is the whole board, kept empty inside by keep-outs, so a cut region must itself become a keep-out or the
+    # refill pours netless copper into it; and hole keep-outs are computed against the EDITED outlines.
+    updated, changed, extra = dict(outlines), set(), []
+    if cut is not None:
+        for i, p in outlines.items():
+            if p.intersects(cut):
+                updated[i] = p.difference(cut)
+                changed.add(i)
+                info["zones_cut"] += 1
+        extra += [keepout_line(layer, q) for q in split_holes(cut)]
+    if add is not None:
+        grow = add.buffer(CLEARANCE_MM, 16)
+        targets = [i for i, ln, p in zones if not is_keepout(ln) and zone_net(ln) == net and updated[i].intersects(add)]
+        if not targets:
+            raise SystemExit(f"reshape add: no {net} zone on {layer} touches the region")
+        updated[targets[0]] = unary_union([updated[i] for i in targets] + [add])
+        for i in targets[1:]:
+            updated[i] = None
+        changed |= set(targets)
+        info["target_zones_merged"] += len(targets)
+        for i, p in list(updated.items()):
+            if p is not None and i not in targets and p.intersects(grow):
+                updated[i] = p.difference(grow)
+                changed.add(i)
+                info["other_net_zones_cut"] += 1
+        for i, ln, p in zones:
+            if is_keepout(ln) and p.intersects(add):
+                rest = p.difference(add)
+                new[i] = [keepout_line(layer, q) for part in polygons(rest) for q in split_holes(part) if q.area >= 1e-6]
+                info["keepouts_trimmed"] += 1
+        kept = []
+        for ln in extra:  # keep-outs added by an earlier cut in this same call lose the added region too
+            q = zone_layer_and_poly(ln)[1].difference(add)
+            kept += [keepout_line(layer, r) for part in polygons(q) for r in split_holes(part) if r.area >= 1e-6]
+        extra = kept
+    for i in changed:
+        ln = lines[i]
+        others = [q for j, q in updated.items() if j != i and q is not None]
+        new[i] = [] if updated[i] is None else rebuild_zone(ln, updated[i], layer, others)
+    out = []
+    for i, ln in enumerate(lines):
+        out += new.get(i, [ln])
+    out[-1:-1] = extra  # before the board's closing parenthesis line
+    info["keepouts_added"] = len(extra)
+    return out, dict(info)
 
 
 def strip_zones(text):
@@ -273,10 +397,85 @@ def drc_summary(d):
             "pass": ok}
 
 
+NOTCH = (28.0, 32.05, 30.0, 32.35)
+ADD_VIN = (28.0, 31.73, 30.0, 31.95)
+RESHAPE_CASES = {
+    "Z1": [("reshape", "F.Cu", None, None, NOTCH)],
+    "Z1R": [("reshape", "F.Cu", None, None, NOTCH), ("reshape", "F.Cu", "VIN", NOTCH, None)],
+    "Z2": [("reshape", "F.Cu", "VIN", ADD_VIN, None)],
+}
+
+
+def run_reshape(report, save, base_text, geo, b0, epc_masks, interior, drills, run_dir):
+    """Suite 'reshape' (declared in the module docstring)."""
+    report["reshape_cases"] = {k: [list(o) for o in v] for k, v in RESHAPE_CASES.items()}
+    vin = unary_union([zone_layer_and_poly(ln)[1] for ln in base_text.splitlines()
+                       if ln.startswith("\t(zone ") and not is_keepout(ln) and '(layer "F.Cu")' in ln
+                       and zone_net(ln) == "VIN"])
+    reg = interior.difference(drills)
+    ok_all = True
+    for case, edits in RESHAPE_CASES.items():
+        try:
+            text, log = apply_edits(base_text, edits, geo)
+            b1 = build(case, text, run_dir)
+        except (KiCadError, SystemExit) as exc:
+            report["checks"][case] = {"error": str(exc)}
+            ok_all = False
+            save("running")
+            continue
+        regions = [sbox(*NOTCH)] if case.startswith("Z1") else [sbox(*ADD_VIN)]
+        window = unary_union(regions).buffer(CLEARANCE_MM + WINDOW_PAD)
+        outside, inside = reg.difference(window), reg.intersection(window)
+        za = {L: match(b0["copper"][L].intersection(outside), b1["copper"][L].intersection(outside), TIGHT)
+              for L in KICAD_LAYER.values()}
+        w0f = b0["copper"]["F.Cu"]
+        if case == "Z1":
+            expect = w0f.difference(sbox(*NOTCH))
+        elif case == "Z1R":
+            expect = w0f
+        else:
+            a = sbox(*ADD_VIN)
+            expect = w0f.intersection(vin).union(a).union(w0f.difference(vin).difference(a.buffer(CLEARANCE_MM, 16)))
+        zb = {"F.Cu": match(expect.intersection(inside), b1["copper"]["F.Cu"].intersection(inside), TOL)}
+        for L in KICAD_LAYER.values():
+            if L != "F.Cu":
+                zb[L] = match(b0["copper"][L].intersection(inside), b1["copper"][L].intersection(inside), TIGHT)
+        zc = drc_summary(b1["drc"])
+        zc["new_types"] = sorted(set(zc["types"]) - set(report["checks"]["W0"]["W0c_drc"]["types"]))
+        zc["pass"] = zc["pass"] and not zc["new_types"]
+        zd = {"pass": b1["nets"] == b0["nets"]}
+        ze = {L: match(epc_masks[L].intersection(interior), b1["masks"][L].intersection(interior), TOL) for L in MASKS}
+        rec = {"edit_log": log, "window_bounds": list(window.bounds), "Za_outside_window": za, "Zb_inside_window": zb,
+               "Zc_drc": zc, "Zd_nets": zd, "Ze_mask_paste": ze, "board_sha256": b1["board_sha256"],
+               "inside_window_change_mm2": {L: b0["copper"][L].symmetric_difference(b1["copper"][L]).intersection(inside).area
+                                            for L in KICAD_LAYER.values()}}
+        ok = (all(v["pass"] for v in za.values()) and all(v["pass"] for v in zb.values()) and zc["pass"] and zd["pass"]
+              and all(v["pass"] for v in ze.values()))
+        if case == "Z2":
+            newf = b1["copper"]["F.Cu"].intersection(window)
+            own = newf.intersection(vin.union(sbox(*ADD_VIN)))
+            other = newf.difference(vin.union(sbox(*ADD_VIN)).buffer(1e-4))
+            gap = own.distance(other) if not other.is_empty else None
+            rec["Zg_min_gap_mm"] = {"value": gap, "limit": RULE_MIN, "pass": gap is not None and gap >= RULE_MIN}
+            ok = ok and rec["Zg_min_gap_mm"]["pass"]
+        rec["pass"] = ok
+        ok_all = ok_all and ok
+        report["checks"][case] = rec
+        save("running")
+        print(case, ok, "Za", all(v["pass"] for v in za.values()), "Zb", {L: v["pass"] for L, v in zb.items()},
+              "Zc", zc, "Zd", zd["pass"], "Ze", all(v["pass"] for v in ze.values()),
+              "Zg", rec.get("Zg_min_gap_mm"), "log", log, flush=True)
+    return ok_all
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-edit-workflow.json")
+    ap.add_argument("--output", type=Path, default=None)
+    ap.add_argument("--suite", choices=("workflow", "reshape"), default="workflow")
     args = ap.parse_args()
+    if args.output is None:
+        args.output = ROOT / ("results/gan/epc90133-edit-workflow.json" if args.suite == "workflow"
+                              else "results/gan/epc90133-edit-reshape.json")
     saved = OUT / "epc90133.kicad_pcb"
     ident = json.loads(VERIFY.read_text(encoding="utf-8"))["identity"]
     if sha256_file(saved) != ident["board"]["sha256"]:
@@ -336,6 +535,12 @@ def main():
           w0["W0c_drc"], flush=True)
 
     all_pass = w0["pass"]
+    if args.suite == "reshape":
+        report["suite"] = "reshape"
+        all_pass = run_reshape(report, save, base_text, geo, b0, epc_masks, interior, drills, run_dir) and all_pass
+        save("qualified" if all_pass else "not qualified")
+        print("outcome", report["outcome"])
+        return 0 if all_pass else 2
     for case, edits in EDITS.items():
         if case == "W0":
             continue
