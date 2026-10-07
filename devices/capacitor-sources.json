@@ -1,0 +1,61 @@
+{
+ "schema": "vendor-target-sources/1",
+ "target": "EPC90133 input capacitors Ci1-Ci7 (BOM HMK107C7224KAHTE, Taiyo Yuden)",
+ "requested_by": "owner, 2026-10-07",
+ "checked": "2026-10-07",
+ "part_mapping": "Taiyo Yuden's TY-COMPAS page for HMK107C7224KAHTE says the part is renamed and lists MCASH168SC7224KTCA01, MBASH168SC7224KTCA01, MCASH168SC7224KTCA1J and MMASH168SC7224KTCA01; MCASH168SC7224KTCA01 is used. Equivalence is the vendor's statement, not checked here.",
+ "terms": "Taiyo Yuden copyright, all rights reserved; the encrypted LTspice file grants use for simulation and forbids reverse engineering. No redistribution permission established; files stay in git-ignored vendor/.",
+ "derived_values": "standard model at 262 MHz: ESR 68 mohm, effective L 0.33 nH; LTspice DC-bias model at 25 C, 1 MHz: 213 nF at 0 V, 57 nF at 48 V (smoke test, 7 October 2026)",
+ "not_obtained": "Cm1-Cm10 (KYOCERA AVX 08051C105K4Z2A): models only through the interactive SpiCAT/SpiMLCC tool (https://spicat.kyocera-avx.com); not downloaded.",
+ "files": [
+  {
+   "name": "MCASH168SC7224_TCA01.cir",
+   "url": "https://ds.yuden.co.jp/TYCOMPAS/ut/download?pn=MCASH168SC7224KTCA01&fileType=cir_file",
+   "local_path": "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01.cir",
+   "sha256": "f042a63b40ed730cd34a74e93075e2231a90ab16c41a1b4bb3fa476db7fbe40f",
+   "description": "standard SPICE model, 0 V, 25 C, 10 kHz-3 GHz"
+  },
+  {
+   "name": "MCASH168SC7224_TCA01.s2p",
+   "url": "https://ds.yuden.co.jp/TYCOMPAS/ut/download?pn=MCASH168SC7224KTCA01&fileType=Spara_file",
+   "local_path": "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01.s2p",
+   "sha256": "f943b212dae1514f9d7239b5e5dd27ff02d35ed9cbd8fa7645219d1d29d88280",
+   "description": "S-parameters, 0 V, 25 C"
+  },
+  {
+   "name": "MCASH168SC7224_TCA01_LT.zip",
+   "url": "https://ds.yuden.co.jp/TYCOMPAS/ut/download?pn=MCASH168SC7224KTCA01&fileType=LTspice_file",
+   "local_path": "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01_LT.zip",
+   "sha256": "b796c416b94a4bcd8b47a9662cb9e7d37c272aabb9e8d001b0a9453f7f7b6aab",
+   "description": "encrypted LTspice temperature/DC-bias model with .asy"
+  },
+  {
+   "name": "MCASH168SC7224_TCA01_LT.cir",
+   "url": null,
+   "local_path": "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01_LT.cir",
+   "sha256": "5735778c222ca1e93b4b606f08e903bef6aa6a14fb51121ca8987c0e8c42ae21",
+   "description": "extracted from the zip; used by scripts/epc90133_switching.py --study damping"
+  },
+  {
+   "name": "MCASH168SC7224_TCA01.asy",
+   "url": null,
+   "local_path": "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01.asy",
+   "sha256": "73d92eaeaf3ae7f0198705b54261b095547edf1c4ee86dd43428dadbd04712d3",
+   "description": "extracted from the zip"
+  },
+  {
+   "name": "MCASH168SC7224KTCA01.pdf",
+   "url": "https://ds.yuden.co.jp/TYCOMPAS/ut/download?pn=MCASH168SC7224KTCA01&fileType=Datasheet",
+   "local_path": "vendor/capacitors/taiyo-yuden/MCASH168SC7224KTCA01.pdf",
+   "sha256": "faf97ee258242495d54a0c7d38097ad77db57ca1ebf9759829ea3131bde1c04e",
+   "description": "characteristics data"
+  },
+  {
+   "name": "HMK107C7224KAHTE_detail.html",
+   "url": "https://ds.yuden.co.jp/TYCOMPAS/ut/detail?pn=HMK107C7224KAHTE&u=M",
+   "local_path": "vendor/capacitors/taiyo-yuden/HMK107C7224KAHTE_detail.html",
+   "sha256": "79b9bbd1edbc87fa9605b24a3c512bd739102f64059fa568497e70cc0b7abf9f",
+   "description": "TY-COMPAS page for the BOM part: renamed, replacements listed"
+  }
+ ]
+}
