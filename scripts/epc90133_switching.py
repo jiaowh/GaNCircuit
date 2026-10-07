@@ -392,7 +392,11 @@ Cm addition (owner supplied the KYOCERA AVX datasheet for 08051C105K4Z2A, update
 the batch started): values READ BY EYE from its log-scale plots (about +-20 %), not a vendor model: capacitance
 change at 48 V about -75 % (0.25 uF), ESR near 262 MHz about 60 mohm, ESL plateau about 0.7 nH (plots at 0 V, 25 C;
 ESR is frequency dependent and a constant 60 mohm overstates it below about 10 MHz, which the ring does not use).
-Cases with Taiyo Yuden Ci and these Cm values: -tyci-avxcm (against the control), -tyci-avxcm-gear and
+Superseded the same day, before the batch started, by KYOCERA AVX's CSV chart data (impedance/ESR, DC bias)
+and shunt S-parameters, downloaded by the owner from SpiCAT (devices/capacitor-sources.json): 1.02 uF at 0 V,
+-75.2 % at 48 V (0.254 uF), ESR 47.8 mohm at 262 MHz, ESL 0.703 nH; the S-parameters agree (47.3 mohm, 0.703 nH at
+256 MHz). The vendor's ESL is measured on its fixture and may include some mounting inductance that the extraction
+also holds (possible double count of up to a few tenths of a nH). Cases with Taiyo Yuden Ci and these Cm values: -tyci-avxcm (against the control), -tyci-avxcm-gear and
 -tyci-avxcm-qg-gear (against G-m1-mid-Ls50-gear).
 
 Every report carries an input manifest (extraction files, vendor library and
@@ -1224,7 +1228,7 @@ def search_cases(names, r80=None, qg=False):
 
 TY_CI_MODEL = "MCASH168SC7224_TCA01"
 TY_CI_LIB = ROOT / "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01_LT.cir"  # extracted from the vendor zip
-AVX_CM_READ = {"C": 0.25e-6, "ESL": 0.7e-9, "ESR": 0.06}  # read by eye from the AVX datasheet plots (damping study)
+AVX_CM = {"C": 0.254e-6, "ESL": 0.703e-9, "ESR": 0.048}  # KYOCERA AVX chart data / S-parameters (damping study)
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
@@ -1253,7 +1257,7 @@ def damping_cases(exts):
     cases[f"{base}-tyci-oss60"] = {**common, **ty, "oss_rc": oss[60], "base": base}
     cases[f"{base}-tyci-gear"] = {**gear, **ty, "base": f"{base}-gear"}
     cases[f"{base}-tyci-qg-gear"] = {**gear, **ty, "model": QG_MODEL, "base": f"{base}-gear"}
-    av = {"ci_vendor": True, "cm_model": AVX_CM_READ}
+    av = {"ci_vendor": True, "cm_model": AVX_CM}
     cases[f"{base}-tyci-avxcm"] = {**common, **av, "base": base}
     cases[f"{base}-tyci-avxcm-gear"] = {**gear, **av, "base": f"{base}-gear"}
     cases[f"{base}-tyci-avxcm-qg-gear"] = {**gear, **av, "model": QG_MODEL, "base": f"{base}-gear"}

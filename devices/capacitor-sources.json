@@ -6,7 +6,7 @@
  "part_mapping": "Taiyo Yuden's TY-COMPAS page for HMK107C7224KAHTE says the part is renamed and lists MCASH168SC7224KTCA01, MBASH168SC7224KTCA01, MCASH168SC7224KTCA1J and MMASH168SC7224KTCA01; MCASH168SC7224KTCA01 is used. Equivalence is the vendor's statement, not checked here.",
  "terms": "Taiyo Yuden copyright, all rights reserved; the encrypted LTspice file grants use for simulation and forbids reverse engineering. No redistribution permission established; files stay in git-ignored vendor/.",
  "derived_values": "standard model at 262 MHz: ESR 68 mohm, effective L 0.33 nH; LTspice DC-bias model at 25 C, 1 MHz: 213 nF at 0 V, 57 nF at 48 V (smoke test, 7 October 2026)",
- "not_obtained": "Cm1-Cm10 (KYOCERA AVX 08051C105K4Z2A): no simulation model (SpiCAT/SpiMLCC is interactive). The owner supplied the datasheet PDF (DataSheet_08051C105K4Z2A-KYOCERA_AVX-MLCC.pdf, updated 18.02.2022) in the session on 2026-10-07; values read by eye from its plots: about -75 % capacitance at 48 V (0.25 uF), ESR about 60 mohm near 262 MHz, ESL about 0.7 nH (0 V, 25 C; about +-20 %). The PDF is not yet stored locally, so it has no checksum here.",
+ "not_obtained": "No SPICE model for Cm1-Cm10 (KYOCERA AVX 08051C105K4Z2A). The datasheet PDF (updated 18.02.2022) was shown in the session on 2026-10-07 but is not stored locally (no checksum).",
  "files": [
   {
    "name": "MCASH168SC7224_TCA01.cir",
@@ -57,5 +57,28 @@
    "sha256": "79b9bbd1edbc87fa9605b24a3c512bd739102f64059fa568497e70cc0b7abf9f",
    "description": "TY-COMPAS page for the BOM part: renamed, replacements listed"
   }
- ]
+ ],
+ "kyocera_avx_cm": {
+  "target": "Cm1-Cm10 (BOM 08051C105K4Z2A)",
+  "downloaded_by": "owner, 2026-10-07, from https://spicat.kyocera-avx.com/product/08051C105K4Z2A",
+  "terms": "KYOCERA AVX copyright, all rights reserved; no redistribution permission established; files stay in git-ignored vendor/.",
+  "derived_values": "1.02 uF at 0 V; -75.2 % at 48 V (0.254 uF); ESR 47.8 mohm at 262 MHz; ESL 0.703 nH (25 C; impedance at 0 V)",
+  "files": [
+   {
+    "name": "08051C105K4Z2A-SHUNT-KYOCERA_AVX-MLCC.s2p",
+    "local_path": "vendor/capacitors/kyocera-avx/08051C105K4Z2A-SHUNT-KYOCERA_AVX-MLCC.s2p",
+    "sha256": "1d71f625abd4301a79a1674ef887afe848e2c8976f9153566d2ade6a08f38cd6"
+   },
+   {
+    "name": "08051C105K4Z2A_Bias-CHART-KYOCERA_AVX-MLCC.csv",
+    "local_path": "vendor/capacitors/kyocera-avx/08051C105K4Z2A_Bias-CHART-KYOCERA_AVX-MLCC.csv",
+    "sha256": "b65723dec3e21aa0fc7e4f06539e98a2299e10ac8b566bc225bcddc8b42fa9ad"
+   },
+   {
+    "name": "08051C105K4Z2A_Impedance_And_Esr-CHART-KYOCERA_AVX-MLCC.csv",
+    "local_path": "vendor/capacitors/kyocera-avx/08051C105K4Z2A_Impedance_And_Esr-CHART-KYOCERA_AVX-MLCC.csv",
+    "sha256": "9bfe2b348303d62476155d8c138a968bca9a746873efacac5fcdd43737dea462"
+   }
+  ]
+ }
 }
