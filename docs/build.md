@@ -2031,6 +2031,18 @@ before any G result, 1.2 ohm (smaller loss increment). V9 (every third via kept)
 B/G only if it beats V8 on A by more than 4 % of stock. Fewer vias also carry the switch-node current to the inner
 and bottom layers; that heating is not modelled.
 
+V9 result (8 October): legal (L1-L4 pass), loop L 0.4247 nH, -13.8 % against stock through the route; it beats V8 by
+1.3 % of stock, below the declared 4 %, so it does not go to B/G and V8 stays the family's candidate. Thinning
+saturates: going from every other via to every third via adds little.
+
+**Run 1 of the B and G confirmations failed (7-8 October).** The first B runs (stock, V8) were killed at a 3,600 s
+child limit that had never been derived for B (profile 6,588 s; now 14,400 s). Their FastHenry processes kept running
+for more than seven hours and filled WSL's 8 GB, so the stock G extraction hit its 21,600 s limit and V8's G
+extraction failed (FastHenry job aborted during GMRES, most likely out of memory); the G search switching then found
+no inputs. Logs kept as runs/*-run1-failed.*. Run 2 (queued 8 October, 00:36): G stock, G V8, then B stock, B V8 in
+WSL one at a time; the switching runs (assumed and sourced parts, R80 1.5 and 1.2) on Windows once both G
+extractions exist.
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1
