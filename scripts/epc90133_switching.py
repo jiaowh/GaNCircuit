@@ -320,6 +320,23 @@ Round 3 numerical check (declared 5 October 2026, 21:30, after the interim verdi
 leading candidate R80-1.5 at half the step, R80-1.5@step-Ls0-ms50 against R80-1.5@step-Ls0 (both trapezoidal):
 overshoot, FET loss and Q2 gate peak each within 2 %. Report results/gan/epc90133-design-round3-check.json.
 
+Gate-charge sensitivity (--study qgfit; declared 7 October 2026 at the owner's request, before any
+qgfit run; the variant model is built and checked by scripts/epc2302_qg_variant.py). Question: does
+the R80 1.5 ohm decision survive if EPC's drawn Fig. 7 curve, rather than EPC's model, describes the
+device? Cases: designs stock and R80-1.5 under the four round-3 alternatives, each with the vendor
+model (<d>@<a>-gear) and with the variant EPC2302QG (<d>@<a>-gear-qg), all with Gear integration at
+100 ps (round 3's declared fallback; its check put Gear within 0.05 % of trapezoidal on the vendor
+model, and trapezoidal runs stalled in about half of the round-3 cases). Rerunning the vendor cases
+here keeps every comparison within one method and one run. The variant is used only if its report
+(results/gan/epc2302-qg-variant.json) has outcome 'pass' and its derived library's sha256 matches.
+Numerical check: R80-1.5@step-Ls50-gear-qg at 50 ps within 2 % of 100 ps on overshoot, FET loss and
+Q2 gate peak. Time limit 2400 s per LTspice run (round 3's Gear runs took 60-120 s; 2400 s is the
+limit at which earlier stalls were declared). Assessment: scripts/assess_epc90133_qgfit.py (rules in
+its docstring, fixed with this declaration). Owner decision of 7 October: the assumed 50 pH package
+inductance is the default, so the Ls50 alternatives are reported first; the C1/C2 rule still
+applies to all four alternatives. Results are sensitivity statements within these models, not
+predictions of the real device's gate charge.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -1068,6 +1085,40 @@ def design_cases(exts):
     return cases
 
 
+QG_VARIANT_REPORT = ROOT / "results/gan/epc2302-qg-variant.json"
+QG_MODEL = "EPC2302QG"
+
+
+def qg_variant_library():
+    """The checked gate-charge variant library (scripts/epc2302_qg_variant.py), or exit."""
+    rep_ = json.loads(QG_VARIANT_REPORT.read_text(encoding="utf-8"))
+    if rep_.get("outcome") != "pass":
+        raise SystemExit(f"qgfit: the variant report's outcome is {rep_.get('outcome')!r}, not 'pass'")
+    lib_ = ROOT / rep_["derived_library"]["file"]
+    if sha256(lib_) != rep_["derived_library"]["sha256"]:
+        raise SystemExit("qgfit: the derived library does not match the variant report's hash")
+    return lib_
+
+
+def qgfit_cases(exts):
+    """Gate-charge sensitivity (see the module docstring): stock and R80-1.5, vendor model and variant, Gear."""
+    if "G-m1-mid" not in exts:
+        raise SystemExit("the qgfit study needs extraction G-m1-mid")
+    common = {"ext": "G-m1-mid", "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True,
+              "period_loss": True, "long_pulse": True, "method": "gear"}
+    designs = {"stock": {}, "R80-1.5": ROUND3_DESIGNS["R80-1.5"]}
+    order = ("ramp-Ls50", "step-Ls50", "ramp-Ls0", "step-Ls0")  # owner default (50 pH) first
+    cases = {}
+    for a in order:
+        for d, dp in designs.items():
+            base = {**common, **ALTERNATIVES[a], **dp, "design": d, "alternative": a}
+            cases[f"{d}@{a}-gear"] = {**base, "model": "EPC2302"}
+            cases[f"{d}@{a}-gear-qg"] = {**base, "model": QG_MODEL}
+    cases["R80-1.5@step-Ls50-gear-qg-ms50"] = {**cases["R80-1.5@step-Ls50-gear-qg"], "maxstep": MAXSTEP_PKG / 2,
+                                               "base": "R80-1.5@step-Ls50-gear-qg"}
+    return cases
+
+
 LAYOUTS = {"stock": "A-m1-mid", "gap0.100": "A-m1-mid-d0.100", "gap0.075": "A-m1-mid-d0.075",
            "gap0.050": "A-m1-mid-d0.050", "vias-gnd-greedy": "A-m1-mid-vias-gnd-greedy"}
 
@@ -1107,7 +1158,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -1115,15 +1166,17 @@ def main():
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     args = ap.parse_args()
     REFERENCE = args.reference
-    if args.study in ("design", "layout"):
+    if args.study in ("design", "layout", "qgfit"):
         set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
+    qg_lib = qg_variant_library() if args.study == "qgfit" else None
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
     runs = {}
 
     def run(name, text):  # limit per LTspice run: --timeout (the adapter allows up to MAX_TIMEOUT_S)
-        r = run_ltspice(text, run_root / name, libraries=[lib], timeout_s=args.timeout)
+        libs = [lib] + ([qg_lib] if f" {QG_MODEL}" in text else [])
+        r = run_ltspice(text, run_root / name, libraries=libs, timeout_s=args.timeout)
         runs[name] = {"status": r.status, "message": r.message, "duration_s": r.duration_s,
                       "warnings": r.provenance.get("log_warnings"), "netlist_sha256": r.provenance.get("netlist_sha256")}
         return parse_raw(r.result_path) if r.status == "completed" and r.result_path else None
@@ -1137,7 +1190,7 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
-    if args.study in ("driver", "design", "layout"):
+    if args.study in ("driver", "design", "layout", "qgfit"):
         rs, fs = [], []
         for name, text in driver_step_bench().items():
             raw = run(name, text)
@@ -1179,6 +1232,10 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
+    elif args.study == "qgfit":
+        cases = qgfit_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "design":
         cases = design_cases(exts)
         if args.only:
@@ -1224,6 +1281,9 @@ def main():
         "extractions": {ext_files[e].relative_to(ROOT).as_posix(): sha256(ext_files[e])
                         for e in sorted({c["ext"] for c in cases.values()})},
         "vendor_library": {"file": Path(lib).name, "sha256": sha256(lib)},
+        **({"variant_library": {"file": qg_lib.relative_to(ROOT).as_posix(), "sha256": sha256(qg_lib),
+                                "report": QG_VARIANT_REPORT.relative_to(ROOT).as_posix(),
+                                "report_sha256": sha256(QG_VARIANT_REPORT)}} if qg_lib else {}),
         "modules": {m: sha256(ROOT / m) for m in ("scripts/epc9097_switching.py", "scripts/epc2302_baseline.py",
                                                   "src/circuit_tools/ltspice.py")}}
     results, slopes = {}, {}
@@ -1343,7 +1403,7 @@ def main():
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
                                "dead_time_note": "per-case 'dead' overrides it (design study)",
-                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout")
+                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout", "qgfit")
                                           else "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)")},
                 "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,
