@@ -355,7 +355,8 @@ alternatives (Gear, as --study qgfit), cases <NAME>@<alternative>-gear-qg via --
 for the candidate to be reported without a gate-charge caveat (R80 1.5 ohm met both under both models).
 Sourced-parts check (declared 7 October 2026 after the capacitor data and the C_SW audit, before any G search
 result): the first G search keeps the assumed capacitors and no C_SW, so it stays comparable with the design rounds.
-Its stock and every V8 variant are then rerun with --sourced: Taiyo Yuden's DC-bias model for Ci, KYOCERA AVX's
+Its stock and every V8 variant are then rerun with --sourced: Taiyo Yuden's data for Ci (TY_CI_RLC, see damping
+run 2; the encrypted model does not start in these benches), KYOCERA AVX's
 data for Cm (AVX_CM) and C_SW, all four alternatives, Gear, cases <case>-src; assessed with --suffix -gear-src. A
 candidate is reported as found only if the owner rule holds under both the assumed and the sourced parts. The run
 waits for the damping study to show that the vendor-capacitor cases complete and pass their checks; if they do
@@ -413,6 +414,18 @@ terminal to circuit ground, Q2 drain to Q1 drain). Cases: -csw (vendor model, as
 -tyci-avxcm-csw-gear, -tyci-avxcm-csw-qg-gear. Still omitted, with no source to bound them: the user-fitted
 inductor's winding and pad capacitance (BOM L1 'TBD'; QSG gives only 2.2 uH), the optional D1/D2 Schottky diodes
 (empty on the stock BOM; whether Fig. 9's board had them is not stated), the probe's loading and location.
+Run 1 (7 October 2026, results/gan/epc90133-switching-damping.json, scored in epc90133-fig9-damping*.json): the
+control reproduces the stored case (11.3 V, zeta 0.025). ESR up to 1 ohm raises the damping to 0.079 (Fig. 9: 0.077)
+but leaves the first overshoot at 11.4 V; the Coss proxy gives 11.0 V and zeta 0.041; EPC2302QG 10.5 V; C_SW 12.1 V
+at 249 MHz. Every case with Taiyo Yuden's encrypted model failed to start (LTspice: time step too small at
+2e-17 s, node xci1:vsc0#branch); recorded, not worked around.
+Run 2 (declared after run 1, before its runs): Ci as a fixed R-L-C taken from Taiyo Yuden's own DC-bias model at
+48 V and 25 C (the smoke test of 7 October: 56.5 nF at 1 MHz, ESR 68 mohm and effective L 0.326 nH at 262 MHz;
+TY_CI_RLC), i.e. the vendor's values at the operating bias and ring frequency, with the frequency dependence of ESR
+dropped (30 mohm at 1 MHz). Cases -tyrlc-avxcm, -tyrlc-avxcm-csw (trapezoidal, against the control),
+-tyrlc-avxcm-csw-gear and -tyrlc-avxcm-csw-qg-gear (against G-m1-mid-Ls50-gear); run with --only into
+results/gan/epc90133-switching-damping-2.json. The layout search's --sourced check uses TY_CI_RLC in place of the
+encrypted model for the same reason.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -601,7 +614,7 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
           pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None,
-          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None):
+          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None, ci_model=None):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
@@ -612,7 +625,8 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
         if ci_vendor and c.startswith("Ci"):  # damping study stage 3: Taiyo Yuden DC-bias model
             lines.append(f"X{c} {node(c + '.VIN')} {node(c + '.GND')} {TY_CI_MODEL} Temperature=25")
             continue
-        cm_ = cm_model if (cm_model and c.startswith("Cm")) else CAP_MODEL[c[:2]]
+        cm_ = (cm_model if (cm_model and c.startswith("Cm")) else ci_model if (ci_model and c.startswith("Ci"))
+               else CAP_MODEL[c[:2]])
         lines.append(capacitor(c, node(f"{c}.VIN"), node(f"{c}.GND"), cm_, esl_scale,
                                None if cm_ is not CAP_MODEL[c[:2]] else esr))
     m = CAP_MODEL["Cm"]
@@ -1239,13 +1253,14 @@ def search_cases(names, r80=None, qg=False, sourced=False):
     if qg:  # gate-charge check: the same cases under EPC2302QG, named <case>-qg
         cases = {f"{k}-qg": {**c, "model": QG_MODEL} for k, c in cases.items()}
     if sourced:  # sourced-parts check: vendor capacitor data and board switch-node capacitance
-        cases = {f"{k}-src": {**c, "ci_vendor": True, "cm_model": AVX_CM, "c_sw": True} for k, c in cases.items()}
+        cases = {f"{k}-src": {**c, "ci_model": TY_CI_RLC, "cm_model": AVX_CM, "c_sw": True} for k, c in cases.items()}
     return cases
 
 
 TY_CI_MODEL = "MCASH168SC7224_TCA01"
 TY_CI_LIB = ROOT / "vendor/capacitors/taiyo-yuden/MCASH168SC7224_TCA01_LT.cir"  # extracted from the vendor zip
 AVX_CM = {"C": 0.254e-6, "ESL": 0.703e-9, "ESR": 0.048}  # KYOCERA AVX chart data / S-parameters (damping study)
+TY_CI_RLC = {"C": 56.5e-9, "ESL": 0.326e-9, "ESR": 0.068}  # Taiyo Yuden DC-bias model at 48 V (damping run 2)
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
@@ -1282,6 +1297,11 @@ def damping_cases(exts):
     cases[f"{base}-tyci-avxcm-csw"] = {**common, **av, "c_sw": True, "base": base}
     cases[f"{base}-tyci-avxcm-csw-gear"] = {**gear, **av, "c_sw": True, "base": f"{base}-gear"}
     cases[f"{base}-tyci-avxcm-csw-qg-gear"] = {**gear, **av, "c_sw": True, "model": QG_MODEL, "base": f"{base}-gear"}
+    rl = {"ci_model": TY_CI_RLC, "cm_model": AVX_CM}  # run 2
+    cases[f"{base}-tyrlc-avxcm"] = {**common, **rl, "base": base}
+    cases[f"{base}-tyrlc-avxcm-csw"] = {**common, **rl, "c_sw": True, "base": base}
+    cases[f"{base}-tyrlc-avxcm-csw-gear"] = {**gear, **rl, "c_sw": True, "base": f"{base}-gear"}
+    cases[f"{base}-tyrlc-avxcm-csw-qg-gear"] = {**gear, **rl, "c_sw": True, "model": QG_MODEL, "base": f"{base}-gear"}
     return cases
 
 
@@ -1467,7 +1487,7 @@ def main():
                   full_r=c.get("full_r", False), internal=c.get("internal", False),
                   gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
                   method=c.get("method"), model=c.get("model", "EPC2302"), oss_rc=c.get("oss_rc"),
-                  ci_vendor=c.get("ci_vendor", False), cm_model=c.get("cm_model"))
+                  ci_vendor=c.get("ci_vendor", False), cm_model=c.get("cm_model"), ci_model=c.get("ci_model"))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
