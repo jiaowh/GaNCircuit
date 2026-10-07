@@ -60,8 +60,42 @@
    "relative_change": -0.879410870290282,
    "outcome": "complete",
    "worth_building": true
+  },
+  "S6": {
+   "regions": [
+    "thin:Q1"
+   ],
+   "vias_removed": 11,
+   "pixels_added": 3215,
+   "L_loop_nH": 0.43214414796157363,
+   "relative_change": -0.13870537602302868,
+   "outcome": "complete",
+   "worth_building": true
+  },
+  "S7": {
+   "regions": [
+    "thin:Q2"
+   ],
+   "vias_removed": 9,
+   "pixels_added": 3214,
+   "L_loop_nH": 0.4572823624023351,
+   "relative_change": -0.08860309173585745,
+   "outcome": "complete",
+   "worth_building": true
+  },
+  "S8": {
+   "regions": [
+    "thin:Q1",
+    "thin:Q2"
+   ],
+   "vias_removed": 20,
+   "pixels_added": 6429,
+   "L_loop_nH": 0.24736449137399166,
+   "relative_change": -0.5069846309658653,
+   "outcome": "complete",
+   "worth_building": true
   }
  },
- "evaluator_sha256": "e8030f71013ddaf6b427cb9bd16e8eb38cfdf4bceee4fc941555b68ba4acaaa7",
+ "evaluator_sha256": "b7a21e499fb54a1fccf2460a8b9541f1f564dc074e327149942a67adce298495",
  "S0_control_pass": true
 }
