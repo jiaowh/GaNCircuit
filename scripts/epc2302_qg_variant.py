@@ -76,6 +76,26 @@ Revision 2 (RETROSPECTIVE amendment after run 1's crash, before any variant resu
   5 V, so a proportional update corrects about a sixth of the error per iteration, and kgs moves the
   charge at 5 V as much as the plateau start.
 Targets, tolerances, iteration limit, fallback and checks are unchanged.
+
+Run 2 (7 October 2026, 09:2x) FAILED and is kept (runs/epc2302-qg-variant-e938c7483e47): V0 passed
+exactly (vendor 15,036 points, identical features); fit iteration 1 gave plateau 8.42/2.89 nC but
+5 V at 24.43 nC, vertical failing; the finite-difference run fit-1-dkgs then timed out at 600 s. Its
+partial output (45.6 million points, 2.4 GB, deleted after inspection) ended at t = 3.3 ns, all in
+the quiescent start state (VGS 0.146 V, VDS 50.05 V, 50 A in the clamp): the trapezoidal step
+shrank to about 7e-20 s at the start and never grew. A start-up artefact, not circuit behaviour;
+run 1's 4.3 million points were the same effect, escaped.
+Side finding of run 2's V0: the plateau-width feature depends on curve sampling. On the
+charge-resampled curve the vendor model's plateau is 2.40 nC (start 7.79), against 2.19 nC (start
+7.89) on the stored index-thinned curve; the stored '24 % narrow' is about 16 % on the resampled
+curve. The horizontal-check failure at 3.0-3.5 V does not depend on sampling.
+
+Revision 3 (RETROSPECTIVE amendment after run 2, before any variant result was used): every fit and
+V0 run uses Gear integration (method=gear, reltol 1e-6 unchanged), the fallback the project already
+uses for trapezoidal stalls. New check V0b: the vendor model's features with Gear against
+trapezoidal, both through this pipeline, within 0.1 %. Probe before declaring (not a result):
+vendor Gear 1.3 s, 15,097 points, features equal to trapezoidal within 4e-7, charge-equation check
+0.08 %; the run-2 timeout factors ran in 1.1 s. A run that does not complete is now a recorded fit
+failure instead of an exit.
 """
 import argparse
 import hashlib
@@ -150,7 +170,7 @@ def resampled(g, t_g5):
     return qs, vs
 
 
-def gate_charge_run(k, vendor_text, run_root, tag, vth_model, vendor_lib=None):
+def gate_charge_run(k, vendor_text, run_root, tag, vth_model, vendor_lib=None, trap=False):
     """One Fig. 7 bench run on the variant (factors k), or on the vendor model when vendor_lib is given."""
     lib = run_root / f"{tag}-{NAME}.lib"
     lib.parent.mkdir(parents=True, exist_ok=True)
@@ -161,10 +181,11 @@ def gate_charge_run(k, vendor_text, run_root, tag, vth_model, vendor_lib=None):
         model_lib, model_name = lib, NAME
     else:
         model_lib, model_name = vendor_lib, "EPC2302"
-    text = text.replace("\n.end\n", f"\n.options reltol={bl.RELTOL:g}\n.end\n")
+    method = "" if trap else " method=gear"
+    text = text.replace("\n.end\n", f"\n.options reltol={bl.RELTOL:g}{method}\n.end\n")
     r = run_ltspice(text, run_root / tag, libraries=[model_lib], timeout_s=600)
     if r.status != "completed":
-        raise SystemExit(f"{tag}: gate-charge run {r.status}: {r.message}")
+        raise FitFailure(f"{tag}: gate-charge run {r.status}: {r.message}")
     values, checks, _, states = bl.gate_charge(r.measurements, vth_model)
     P = subckt_params(model_lib.read_text(encoding="utf-8", errors="replace"), model_name)
     start = checks["starting_bias"]
@@ -303,19 +324,23 @@ def main():
     # V0 (revision 2): the variant with all factors 1 against the vendor model, both through this pipeline.
     k = {"kgs": 1.0, "kgd": 1.0, "kon": 1.0}
     rv = gate_charge_run(k, vendor_text, run_root, "v0-vendor", vth, vendor_lib=vendor_lib)
+    rt = gate_charge_run(k, vendor_text, run_root, "v0b-vendor-trap", vth, vendor_lib=vendor_lib, trap=True)
     r0 = gate_charge_run(k, vendor_text, run_root, "v0", vth)
     keys = ("plateau_start_nC", "plateau_width_nC", "q_at_vgs_5V_nC")
     rel = {f: abs(r0["features"][f] / rv["features"][f] - 1) for f in keys}
+    relb = {f: abs(rv["features"][f] / rt["features"][f] - 1) for f in keys}
     ref = stored["features"]["model"]
     report["V0_reproduction"] = {
         "relative_difference_variant_vs_vendor": rel, "tolerance": REPRO_TOL,
-        "outcome": "pass" if max(rel.values()) <= REPRO_TOL else "fail",
+        "outcome": "pass" if max(rel.values()) <= REPRO_TOL and max(relb.values()) <= REPRO_TOL else "fail",
+        "V0b_gear_vs_trap_vendor": relb,
         "vendor_features_resampled": {f: rv["features"][f] for f in keys},
         "vendor_features_stored_index_thinned": {f: ref[f] for f in keys},
         "sampling_sensitivity_note": "stored comparison thins by sample index; revision 2 resamples every "
                                      f"{CURVE_DQ_NC} nC (reported, no pass/fail)",
         "vendor_fig7_checks_resampled": {"vertical": rv["vertical"]["outcome"], "horizontal": rv["horizontal"]["outcome"]},
-        "time_points": {"vendor": rv["time_points"], "variant": r0["time_points"]}}
+        "time_points": {"vendor": rv["time_points"], "vendor_trap": rt["time_points"], "variant": r0["time_points"]},
+        "integration": "Gear for every fit and V0 run (revision 3); trapezoidal only for V0b"}
     ref = rv["features"]
     print("V0", report["V0_reproduction"], flush=True)
     if report["V0_reproduction"]["outcome"] != "pass":
