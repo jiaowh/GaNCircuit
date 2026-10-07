@@ -69,8 +69,11 @@ Read the relevant report and build-note section before quoting numbers.
 - **Waveform:** Fig. 9 time-scale check passes, voltage-scale check fails. Use
   `results/gan/epc90133-fig9-summary.md`, not old by-eye readings. No case meets all
   criteria. Package L is assumed, not identified by a waveform match or stock E3
-  measurements. Probe filters do not bound loading/location errors. PHASE-ball
-  stress remains unresolved.
+  measurements. Owner decision (7 October 2026): new simulations default to an
+  assumed package source inductance of 50 pH (within EPC's < 0.2 nH LGA estimate);
+  label it 'assumed 50 pH' and report a 0 pH alternative alongside. Existing
+  reports keep their settings; do not rerun only to change the default. Probe
+  filters do not bound loading/location errors. PHASE-ball stress remains unresolved.
 - **Mechanisms:** test 11's driver forms meet selected resistance/edge constraints,
   not every datasheet limit. Test 9 bounds positive Q2 channel current only in
   sampled rise windows. Test 12's shares describe a ring-deviation metric, not
