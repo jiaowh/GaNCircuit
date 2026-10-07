@@ -1,0 +1,72 @@
+V0 {'relative_difference_variant_vs_vendor': {'plateau_start_nC': 0.0, 'plateau_width_nC': 0.0, 'q_at_vgs_5V_nC': 0.0}, 'tolerance': 0.001, 'outcome': 'pass', 'V0b_gear_vs_trap_vendor': {'plateau_start_nC': 0.0, 'plateau_width_nC': 0.0, 'q_at_vgs_5V_nC': 3.516947917336921e-07}, 'vendor_features_resampled': {'plateau_start_nC': 7.793513327105392, 'plateau_width_nC': 2.3999999999999426, 'q_at_vgs_5V_nC': 22.40697417914354}, 'vendor_features_stored_index_thinned': {'plateau_start_nC': 7.889186139642377, 'plateau_width_nC': 2.1866745504212632, 'q_at_vgs_5V_nC': 22.40700452388161}, 'sampling_sensitivity_note': 'stored comparison thins by sample index; revision 2 resamples every 0.01 nC (reported, no pass/fail)', 'vendor_fig7_checks_resampled': {'vertical': 'fail', 'horizontal': 'fail'}, 'time_points': {'vendor': 15097, 'vendor_trap': 15036, 'variant': 15097}, 'integration': 'Gear for every fit and V0 run (revision 3); trapezoidal only for V0b'}
+fit 0 {"factors": {"kgs": 1.0, "kgd": 1.0, "kon": 1.0}, "plateau_start_nC": 7.793513327105392, "plateau_width_nC": 2.3999999999999426, "q_at_vgs_5V_nC": 22.40697417914354, "vertical": "fail", "horizontal": "fail"}
+fit 1 {"factors": {"kgs": 1.0856483823899334, "kgd": 1.2335431693081, "kon": 1.0}, "plateau_start_nC": 8.424230323849006, "plateau_width_nC": 2.8899999999999295, "q_at_vgs_5V_nC": 24.428435811316742, "vertical": "fail", "horizontal": "pass"}
+fit 2 {"factors": {"kgs": 1.086866435589897, "kgd": 1.2222371731145647, "kon": 1.0}, "plateau_start_nC": 8.434793331181845, "plateau_width_nC": 2.86999999999993, "q_at_vgs_5V_nC": 24.416469727740655, "vertical": "fail", "horizontal": "pass"}
+fallback 0 {"factors": {"kgs": 1.086866435589897, "kgd": 1.2222371731145647, "kon": 1.0}, "plateau_start_nC": 8.434793331181845, "plateau_width_nC": 2.86999999999993, "q_at_vgs_5V_nC": 24.416469727740655, "vertical": "fail", "horizontal": "pass"}
+fallback 1 {"factors": {"kgs": 1.103345418471099, "kgd": 1.1410035448413516, "kon": 0.7551369849653349}, "plateau_start_nC": 8.502486104559074, "plateau_width_nC": 2.6899999999999338, "q_at_vgs_5V_nC": 23.57009382503988, "vertical": "pass", "horizontal": "pass"}
+fallback 2 {"factors": {"kgs": 1.098582918172109, "kgd": 1.2190009566051971, "kon": 0.7161246898924695}, "plateau_start_nC": 8.450321441853857, "plateau_width_nC": 2.849999999999932, "q_at_vgs_5V_nC": 23.570032512427378, "vertical": "pass", "horizontal": "pass"}
+fallback 3 {"factors": {"kgs": 1.0963136052905453, "kgd": 1.2300446024520426, "kon": 0.717676144949335}, "plateau_start_nC": 8.429261549338696, "plateau_width_nC": 2.8699999999999317, "q_at_vgs_5V_nC": 23.570027122954443, "vertical": "pass", "horizontal": "pass"}
+{
+ "outcome": "pass",
+ "factors": {
+  "kgs": 1.0963136052905453,
+  "kgd": 1.2300446024520426,
+  "kon": 0.717676144949335
+ },
+ "features": {
+  "plateau_start_nC": 8.429261549338696,
+  "plateau_width_nC": 2.8699999999999317,
+  "q_at_vgs_5V_nC": 23.570027122954443
+ },
+ "C5": {
+  "ciss": {
+   "ratio_at_vds_V": {
+    "0.0": 1.1032074168692736,
+    "1.0": 1.1031033032530047,
+    "10.0": 1.0985854250856026,
+    "25.0": 1.096832087427575,
+    "50.0": 1.0965941939245891,
+    "100.0": 1.0965062877911145
+   },
+   "max_ratio": 1.1032074168692736,
+   "min_ratio": 1.0965062877911145,
+   "vds_outside_fig5b_tolerance_V": null,
+   "points_outside": 0,
+   "points": 101
+  },
+  "crss": {
+   "ratio_at_vds_V": {
+    "0.0": 1.229858789187577,
+    "1.0": 1.2300129455599416,
+    "10.0": 1.2300174436953946,
+    "25.0": 1.2300187983265378,
+    "50.0": 1.2300191291061657,
+    "100.0": 1.2300193206359957
+   },
+   "max_ratio": 1.2300193206359957,
+   "min_ratio": 1.229858789187577,
+   "vds_outside_fig5b_tolerance_V": [
+    0.0,
+    100.0
+   ],
+   "points_outside": 101,
+   "points": 101
+  },
+  "coss": {
+   "ratio_at_vds_V": {
+    "0.0": 1.0116439253132699,
+    "1.0": 1.0114686536928126,
+    "10.0": 1.0049341058272891,
+    "25.0": 1.0022861456958327,
+    "50.0": 1.0017361677546073,
+    "100.0": 1.0012552760743865
+   },
+   "max_ratio": 1.0116439253132699,
+   "min_ratio": 1.0012552760743865,
+   "vds_outside_fig5b_tolerance_V": null,
+   "points_outside": 0,
+   "points": 101
+  }
+ }
+}
+exit 0
