@@ -229,9 +229,13 @@ def export_package(case, edits, outdir):
     return manifest
 
 
+G_TIMEOUT = 21600  # s; stock G-m1-mid took 12,279 s (profile), x1.75 margin (added 7 October 2026 for the search)
+
+
 def child(args, outdir, log_name):
     env = dict(os.environ, **{EXPORT_ENV: str(outdir), "PYTHONPATH": str(ROOT / "src")})
-    r = subprocess.run([sys.executable, *args], capture_output=True, text=True, timeout=TIMEOUT, env=env, cwd=ROOT)
+    limit = G_TIMEOUT if any(str(a).startswith("G:") for a in args) else TIMEOUT
+    r = subprocess.run([sys.executable, *args], capture_output=True, text=True, timeout=limit, env=env, cwd=ROOT)
     (outdir / f"{log_name}.log").write_text(r.stdout + "\n--- stderr ---\n" + r.stderr, encoding="utf-8")
     return r.returncode
 
