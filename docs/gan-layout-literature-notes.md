@@ -17,6 +17,7 @@ The four IEEE papers found in the search were not available and are not used.
 | Chen et al., *Energies* 2026, 19, 383 (CC BY) | Ansys Q3D 2023 extraction of a 650 V GaN double-pulse board. The inductance changes little with frequency (8.50 → 8.43 nH, 10 MHz → 1 GHz), while the AC resistance rises about threefold per decade (5.9 → 17.2 → 53 mΩ). Spreading the vias lowers the loop inductance by about 12–26%. The loop inductance is inferred from the ringing frequency (26–29 nH, with a 250 MHz probe). | The loop is 30–100 times ours. |
 | Mistri et al., *Electronics* 2026, 15, 3079 (CC BY review) | Probes below about 500 MHz underestimate overshoot by 5–15%. Recommended system bandwidth is 3–5 times the signal content. Voltage-current synchronization should be within 5% of the transition (200–500 ps for 1–5 ns edges). Coaxial shunts add loop inductance, which matters on 48–100 V boards. It tabulates typical ranges of loop, gate-loop and common-source inductance. | Secondary review; its typical ranges (3–10 nH for "optimized multilayer PCBs") do not describe EPC-class layouts. |
 | Nexperia, *Switching evaluation of fast GaN devices* (2021) | System bandwidth combines scope and probe (for example, a 350 MHz scope with a 200 MHz probe gives a 174 MHz system and 18% amplitude error). Switch-node and inductor-winding capacitance are listed as main parasitics. | Vendor tutorial. |
+| EPC AN023, *Accurately Measuring High Speed GaN Transistors* (Biswas, Reusch, de Rooij, Neville; 2017, rev. 2022; added 7 October 2026, cited by the EPC90133 QSG) | EPC's own practice: 2 GHz scope (MSO5204) with a TPP1000 passive probe (1 GHz, 3.9 pF) on a spring ground clip, giving about 1 GHz system bandwidth. On EPC9080 (EPC2045/EPC2022, 50 V, 10 A, 438 MHz ring), 500 MHz and 1 GHz systems capture overshoot and ringing accurately; 250-350 MHz underestimate overshoot. Probe ground resonance: TPP1000 with a 6-inch lead (150 nH) rings at 208 MHz, with the half-inch spring (10 nH) at 806 MHz. Near-point and far-point probing differ marginally; the grounding method dominates. | It does not say how QSG Fig. 9 was measured. Different boards and devices. |
 
 ## Implications for our work
 
@@ -52,3 +53,13 @@ The four IEEE papers found in the search were not available and are not used.
 6. **Tool choice.** The papers use Ansys Q3D and Maxwell (FEA) for board extraction, and one power-module paper uses
    FastHenry as its reference. That supports FastHenry as a reasonable open choice, not our unqualified
    via-array and plane-hole cases. The plan's declared EM cross-check (G5) remains to be chosen.
+
+## Added 7 October 2026: EPC AN023 and the Fig. 9 probe question
+
+The EPC90133 QSG names no probe for Fig. 9 but points to AN023 and to IsoVu or TPP1000 probing. If Fig. 9 was taken
+with EPC's documented practice (about 1 GHz system bandwidth, spring ground), the probe would attenuate a 264 MHz
+ring by only about 2 % (Gaussian response) and its 3.9 pF load is small against the switch node's several hundred
+pF, so the probe would explain little of the simulated overshoot being about twice the measured one. A long ground
+lead would not fit either: it rings near 208 MHz on its own, and Fig. 9 rings at 264 MHz. This is an inference
+from EPC's general practice, not a statement about Fig. 9's actual setup, which remains unknown; the probe stays an
+open cause, but a less likely one than missing losses (see the damping study, docs/build.md).

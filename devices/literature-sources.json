@@ -70,6 +70,15 @@
    "pages": 20,
    "retrieved": "2026-09-29 (browser download by the user)",
    "licence": "CC BY 4.0 (stated on the article)"
+  },
+  {
+   "file": "EPC_AN023_Accurately_Measuring_High_Speed_GaN.pdf",
+   "title": "Biswas, Reusch, de Rooij (EPC) and Neville (Tektronix), AN023 Accurately Measuring High Speed GaN Transistors (2017, modified 2022-03-30)",
+   "url": "https://epc-co.com/epc/Portals/0/epc/documents/application-notes/AN023%20Accurately%20Measuring%20High%20Speed%20GaN%20Transistors.pdf",
+   "sha256": "32ad015ac538945e652a66dd30477e48510bcb9d07ed4d288c7863074316c854",
+   "pages": 6,
+   "retrieved": "2026-10-07",
+   "requested_by": "owner, 2026-10-07 (cited by the EPC90133 QSG's measurement section)"
   }
  ],
  "not_downloaded": [
