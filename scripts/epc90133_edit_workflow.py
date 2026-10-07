@@ -122,6 +122,7 @@ TOL, TIGHT, AREA_EPS = 0.010, 0.001, 1e-4
 EDGE = 1.0
 WINDOW_PAD = 1.0
 TIMEOUT = 1800
+REWORK_MAX_HOLE = 3.0  # mm^2, holes reworked by remove_vias (slots are 2.3 mm^2)
 SILK_MARGIN = 0.5  # mm, silk that moves with a part (added after L3a run 1)
 CLEARANCE_MM = 0.150114  # EPC's board-wide minimum clearance (5.91 mil), the reconstruction's rule
 RULE_MIN = CLEARANCE_MM - 0.001
@@ -312,6 +313,46 @@ def apply_edits(text, edits, geo):
                 moved_holes[key] = translate(h, dx, dy)
             log.append({"op": [op[0], len(pts), dx, dy], "vias": len(idx), "holes": len(found),
                         "zones_and_keepouts_translated": dict(moved)})
+        elif op[0] == "remove_vias":
+            # Layout search F1 (7 October 2026): remove vias; every small clearance hole (interior ring of an island
+            # > 1 mm^2, area < REWORK_MAX_HOLE) that held a removed via loses its keep-outs and unused pad copper, and
+            # each remaining drill inside it gets a round keep-out of radius r (EPC's inner antipad 0.3275 mm), so the
+            # plane fills the rest. Without that keep-out KiCad would keep the plane only the hole clearance (0 in
+            # this project) from a padless via barrel.
+            _, pts, r_ap = op
+            removed = []
+            for x, y in pts:
+                kx, ky = to_kicad(x, y)
+                vi = [i for i, ln in enumerate(lines) if ln.startswith("\t(via (at ")
+                      and (lambda m: abs(float(m.group(1)) - kx) < 0.02 and abs(float(m.group(2)) - ky) < 0.02)(
+                          re.match(r"\t\(via \(at ([-\d.]+) ([-\d.]+)\)", ln))]
+                if len(vi) != 1:
+                    raise SystemExit(f"remove_vias ({x}, {y}): {len(vi)} matches")
+                removed.append((vi[0], Point(x, y)))
+            for i, _ in removed:
+                lines[i] = ""
+            remaining = [Point(float(m.group(1)) - 100.0, 150.0 - float(m.group(2)))
+                         for ln in lines if (m := re.match(r"\t\(via \(at ([-\d.]+) ([-\d.]+)\)", ln))]
+            remaining += [Point(px, py) for px, py in pad_drill_centres(lines)]
+            reworked = collections.Counter()
+            for e in LAYERS:
+                lay = KICAD_LAYER[e]
+                for q in geo[e]:
+                    if q.area <= 1.0:
+                        continue
+                    for ring in q.interiors:
+                        h = Polygon(ring)
+                        if h.area >= REWORK_MAX_HOLE or not any(h.contains(p) for _, p in removed):
+                            continue
+                        hb = h.buffer(1e-4)
+                        for i, ln in enumerate(lines):
+                            if ln.startswith("\t(zone ") and f'(layer "{lay}")' in ln and hb.contains(zone_layer_and_poly(ln)[1]):
+                                lines[i] = ""
+                        keep = [p for p in remaining if h.contains(p)]
+                        lines.insert(len(lines) - 1, "".join(keepout_line(lay, p.buffer(r_ap, 16)) for p in keep))
+                        reworked[lay] += 1
+            lines = "".join(lines).splitlines(keepends=True)
+            log.append({"op": [op[0], len(pts), r_ap], "vias_removed": len(removed), "holes_reworked": dict(reworked)})
         elif op[0] == "reshape":
             _, lay, net, add, cut = op
             lines, info = reshape(lines, lay, net, add and sbox(*add), cut and sbox(*cut))
@@ -324,6 +365,18 @@ def apply_edits(text, edits, geo):
     if bad or text.count("(") != text.count(")"):
         raise SystemExit(f"edited board is not balanced: lines {bad[:5]}, total {text.count('(') - text.count(')')}")
     return text, log
+
+
+def pad_drill_centres(lines):
+    """Board positions of plated through-hole footprint pads (they keep their clearance like vias)."""
+    out, fx, fy = [], None, None
+    for ln in lines:
+        m = re.match(r'\t\(footprint "[^"]+" \(layer "[FB]\.Cu"\) \(uuid "[^"]+"\) \(at ([-\d.]+) ([-\d.]+)', ln)
+        if m:
+            fx, fy = float(m.group(1)), float(m.group(2))
+        for pm in re.finditer(r'\(pad "[^"]*" thru_hole \w+ \(at ([-\d.]+) ([-\d.]+)', ln):
+            out.append((fx + float(pm.group(1)) - 100.0, 150.0 - (fy + float(pm.group(2)))))
+    return out
 
 
 def keepout_line(layer, q):

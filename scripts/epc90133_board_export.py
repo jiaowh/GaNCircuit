@@ -53,6 +53,11 @@ no new DRC types); L2 IPC-D-356 pad nets equal stock's; L3 power-loop record che
 A:m1:mid extraction complete. Comparison: loop inductance, resistance and capacitor current shares against
 'stock' through this route; the change counts only if |dL|/L > 4 %. Switching simulation follows only if it counts.
 Output: results/gan/epc90133-board-export-L3a.json.
+Candidates V6/V7/V8 (layout search F1, declared 7 October 2026 before their builds; screens S6-S8 gave A -13.9 /
+-8.9 / -50.7 %): the S6/S7 via-thinning rule built legally with remove_vias. Same acceptance L1-L4 and A comparison
+with stock through the route (4 % rule). Because the removed vias also feed the bottom loop that A omits, every
+candidate that counts on A is then extracted on B (B:m1:mid, with stock through the route as control) and counts only
+if it also beats B by more than 4 %.
 L3a run 1 (7 October 2026) REJECTED (package kept as export/L3a-run1-rejected; no report, the driver crashed): DRC 14
 isolated-copper items (a 0.011 mm^2 GND sliver on In1 at x 15.8-16.0, y 32.9, pinched off where the moved x = 16.05 VIN
 pair approaches the plane edge) and 14 silk_over_copper (EPC's frozen silk ticks now on the moved GND pads); the
@@ -107,7 +112,27 @@ CASES = {
 # Revision 2 (retrospective after L3a run 1): capacitor windows of the power-loop record follow the moved parts.
 CAP_WINDOWS = {"L3a": {"Ci": [15.0, 32.6, 28.0, 35.8]}}
 NETTED_ISLAND = re.compile(r'^(\t\(zone \(net [1-9]\d*\) .*?)\(island_removal_mode 1\)', re.M)
-LOOP_L_THRESHOLD = 0.04  # retrospective amendment after X0 run 1
+LOOP_L_THRESHOLD = 0.04
+
+
+def thin_list(regions):
+    """Vias removed by the layout-search screens S6/S7 (scripts/epc90133_layout_screen.py THIN rule)."""
+    import epc90133_layout_screen as ls
+    drills = parse_excellon((GERBERS / f"{PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
+    kept, _ = ls.thinned(drills, regions)
+    ids = {id(d) for d in kept}
+    return [(round(d.x, 4), round(d.y, 4)) for d in drills if id(d) not in ids]
+
+
+EPC_ANTIPAD_R = 0.3275
+CASES.update({
+    # Layout search F1 (plans/layout-search-2026-10-07.md; declared 7 October 2026 before their builds): every other
+    # via removed in the slotted non-GND columns under Q1 (V6), Q2 (V7) or both (V8); the slots on every layer become
+    # EPC-size per-via antipads (remove_vias).
+    "V6": [("remove_vias", thin_list(["Q1"]), EPC_ANTIPAD_R)],
+    "V7": [("remove_vias", thin_list(["Q2"]), EPC_ANTIPAD_R)],
+    "V8": [("remove_vias", thin_list(["Q1", "Q2"]), EPC_ANTIPAD_R)],
+})  # retrospective amendment after X0 run 1
 
 
 def sha256(p):
