@@ -61,7 +61,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from circuit_tools.gerber import load_layer, rasterize
-from read_epc90133_geometry import GERBERS, LAYERS, PITCH, PREFIX, load_board
+from read_epc90133_geometry import GERBERS, LAYERS, PITCH, PREFIX, geometry_source, load_board
 
 FINE = 0.005  # mm, component windows
 LOOP_WINDOW = (14.0, 22.0, 34.0, 38.0)  # mm; holds Q1, Q2, Ci1-Ci7, Cm1-Cm10 and their vias
@@ -627,6 +627,7 @@ def main():
         "schema": "epc90133-power-loop/1",
         "scope": "Geometry identification for exploratory extraction; no inductance is extracted here.",
         "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "geometry_source": geometry_source(),
         "sources": {"gerbers": "EPC90133 B5253 Rev 2.0 (zip checked by load_board)", "land_pattern": "EPC2302 datasheet p. 11",
                     "layout_description": "EPC2302 datasheet p. 6", "fab_notes": "EPC90133_B5253_Rev2_0_Fab Notes.PDF"},
         "fabrication_facts": {

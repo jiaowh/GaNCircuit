@@ -23,6 +23,7 @@ import argparse
 import collections
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -35,9 +36,27 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from circuit_tools.gerber import load_layer, parse_excellon, rasterize
 
-GERBERS = ROOT / "vendor/epc/epc90133/gerbers/Gerbers"
 PREFIX = "EPC90133_B5253_Rev2_0_"
 ZIP_SHA = "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1"
+# Edited boards (7 October 2026; scripts/epc90133_board_export.py): when EXPORT_ENV names a directory, every
+# script that imports GERBERS reads that KiCad export instead, in EPC's frame and with EPC's file names. Set it only
+# in the child processes the export driver starts. load_board then checks the export's manifest, not EPC's zip.
+EXPORT_ENV = "EPC90133_GERBER_EXPORT"
+EXPORT_DIR = os.environ.get(EXPORT_ENV)
+GERBERS = Path(EXPORT_DIR) if EXPORT_DIR else ROOT / "vendor/epc/epc90133/gerbers/Gerbers"
+
+
+def geometry_source():
+    """Identity of the geometry being read: EPC's Gerber zip, or a KiCad export with its manifest hash."""
+    if not EXPORT_DIR:
+        return {"kind": "epc_gerbers", "zip_sha256": ZIP_SHA}
+    man = Path(EXPORT_DIR) / "export.json"
+    m = json.loads(man.read_text(encoding="utf-8"))
+    bad = [f for f, h in m["files"].items() if hashlib.sha256((Path(EXPORT_DIR) / f).read_bytes()).hexdigest() != h]
+    if bad:
+        raise SystemExit(f"export files differ from their manifest: {bad}")
+    return {"kind": "kicad_export", "dir": str(Path(EXPORT_DIR)), "manifest_sha256": hashlib.sha256(man.read_bytes()).hexdigest(),
+            "case": m.get("case"), "board_sha256": m.get("board_sha256")}
 LAYERS = ("GTL", "G1", "G2", "G3", "G4", "G5", "G6", "GBL")  # physical order, top to bottom
 BOARD = (0.0, 0.0, 50.8, 50.8)  # mm, from the GM1 outline
 PITCH = 0.0254  # mm (1 mil)
@@ -52,9 +71,12 @@ POWER_STAGE = (14.0, 20.0, 34.0, 40.0)  # mm window holding Q1, Q2, Ci1-Ci7 and 
 
 def load_board():
     """Rasterized layers, drills and copper connectivity, with VIN/GND/SW named from the probes."""
-    zip_path = ROOT / "vendor/epc/epc90133/EPC90133 Development Board Gerbers.zip"
-    if hashlib.sha256(zip_path.read_bytes()).hexdigest() != ZIP_SHA:
-        raise SystemExit("Gerber zip checksum differs from devices/epc/epc90133-sources.json")
+    if EXPORT_DIR:
+        geometry_source()  # manifest check of the KiCad export
+    else:
+        zip_path = ROOT / "vendor/epc/epc90133/EPC90133 Development Board Gerbers.zip"
+        if hashlib.sha256(zip_path.read_bytes()).hexdigest() != ZIP_SHA:
+            raise SystemExit("Gerber zip checksum differs from devices/epc/epc90133-sources.json")
     grids = {e: rasterize(load_layer(GERBERS / f"{PREFIX}Gerbers.{e}"), BOARD, PITCH) for e in LAYERS + ("GTO",)}
     holes = parse_excellon((GERBERS / f"{PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
     return derive(grids, holes)

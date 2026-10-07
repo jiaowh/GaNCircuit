@@ -102,7 +102,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from epc90133_power_loop import DIELECTRICS, T_CU, via_layers, z_mid
 from fasthenry_known_answer import FH_BIN, SIGMA_CU_PER_MM, skin_depth, wsl_path
-from read_epc90133_geometry import LAYERS, PITCH, load_board
+from read_epc90133_geometry import LAYERS, PITCH, geometry_source, load_board
 
 LOOP = ROOT / "results/gan/epc90133-power-loop.json"
 WINDOW = (15.0, 22.0, 33.0, 37.5)
@@ -539,9 +539,12 @@ def main():
                     help="layout round 2: JSON list of checked geometry edits (scripts/epc90133_board_edit.py)")
     ap.add_argument("--build-only", action="store_true", help="write decks and report mesh statistics only")
     ap.add_argument("--outdir", type=Path, default=ROOT / "results/gan/epc90133-extraction")
+    ap.add_argument("--loop", type=Path, default=LOOP,
+                    help="power-loop record (default the stock one; an edited board needs its own, 7 October 2026)")
+    ap.add_argument("--tag", default=None, help="suffix for the report name (edited-board exports)")
     args = ap.parse_args()
     args.outdir = args.outdir.resolve()  # reports print their path relative to the repository
-    loop = json.loads(LOOP.read_text(encoding="utf-8"))
+    loop = json.loads(args.loop.read_text(encoding="utf-8"))
     gate = json.loads(GATE_LOOP.read_text(encoding="utf-8")) if GATE_LOOP.is_file() else None
     b = load_board()
     edit_records, edit_name = None, None
@@ -568,7 +571,9 @@ def main():
                                                              **({"gap1_mm": gap1} if gap1 is not None else {}),
                                                              **({"edits": edit_name} if edit_name else {})},
                   "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                  "power_loop_sha256": hashlib.sha256(LOOP.read_bytes()).hexdigest(),
+                  "power_loop_sha256": hashlib.sha256(args.loop.read_bytes()).hexdigest(),
+                  **({"power_loop_file": str(args.loop), "geometry_source": geometry_source()}
+                     if args.loop != LOOP or geometry_source()["kind"] != "epc_gerbers" else {}),
                   **({"gate_loop_sha256": hashlib.sha256(GATE_LOOP.read_bytes()).hexdigest()} if is_g else {}),
                   "fasthenry_binary_sha256": hashlib.sha256(FH_BIN.read_bytes()).hexdigest(),
                   "window_mm": G_WINDOW if is_g else WINDOW, "frequency_Hz": FREQ, "skin_depth_um": skin_depth(FREQ) * 1e6,
@@ -613,7 +618,7 @@ def main():
         })
         report["outcome"] = "complete" if all(report["checks"].values()) else "check failed"
         out = args.outdir / (f"{variant}-{mesh}-{junction}" + (f"-d{gap1:.3f}" if gap1 is not None else "")
-                             + (f"-{edit_name}" if edit_name else "") + ".json")
+                             + (f"-{edit_name}" if edit_name else "") + (f"-{args.tag}" if args.tag else "") + ".json")
         out.write_text(json.dumps(report, indent=1) + "\n")
         print(f"  {report['outcome']}; {report['wall_time_s']:.0f} s; filaments {filaments}; "
               f"L_loop {report['summary']['L_loop_nH']:.4f} nH; asym {asym:.2e}; -> {out.relative_to(ROOT)}")
