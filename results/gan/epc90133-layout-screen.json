@@ -1,0 +1,67 @@
+{
+ "schema": "epc90133-layout-screen/1",
+ "stock_A_L_loop_nH": 0.5017378907651558,
+ "screens": {
+  "S0": {
+   "regions": [],
+   "L_loop_nH": 0.5017378907651558,
+   "relative_change": 0.0,
+   "outcome": "complete",
+   "worth_building": false
+  },
+  "S1": {
+   "regions": [
+    "Q1"
+   ],
+   "pixels_added": 5149,
+   "L_loop_nH": 0.40624800905552544,
+   "relative_change": -0.19031825873068364,
+   "outcome": "complete",
+   "worth_building": true
+  },
+  "S2": {
+   "regions": [
+    "Q2"
+   ],
+   "pixels_added": 3895,
+   "L_loop_nH": 0.45580815690955373,
+   "relative_change": -0.09154129018551649,
+   "outcome": "complete",
+   "worth_building": true
+  },
+  "S3": {
+   "regions": [
+    "Ci"
+   ],
+   "pixels_added": 4764,
+   "L_loop_nH": 0.49844695165462305,
+   "relative_change": -0.006559080290934549,
+   "outcome": "complete",
+   "worth_building": false
+  },
+  "S4": {
+   "regions": [
+    "Q1",
+    "Q2",
+    "Ci"
+   ],
+   "pixels_added": 13808,
+   "L_loop_nH": 0.23000737716868225,
+   "relative_change": -0.5415786182344761,
+   "outcome": "complete",
+   "worth_building": true
+  },
+  "S5": {
+   "regions": [
+    "ceiling"
+   ],
+   "pixels_added": 301799,
+   "L_loop_nH": 0.06050413558975971,
+   "relative_change": -0.879410870290282,
+   "outcome": "complete",
+   "worth_building": true
+  }
+ },
+ "evaluator_sha256": "e8030f71013ddaf6b427cb9bd16e8eb38cfdf4bceee4fc941555b68ba4acaaa7",
+ "S0_control_pass": true
+}

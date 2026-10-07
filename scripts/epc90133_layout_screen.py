@@ -14,6 +14,18 @@ GND plane; "per-via antipad" = a disk of radius drill/2 + 0.150114 mm, EPC's cle
 * S3 the same in the input-capacitor strip (15.5, 33.0)-(31.6, 34.7) (the VIN pair slots).
 * S4 S1 + S2 + S3.
 * S5 ceiling: every hole in the loop window (14, 22)-(34, 38) becomes bare drill disks (radius drill/2, no clearance).
+Run 1 (7 October 2026): S0 reproduces stock exactly; S1 -19.0 %, S2 -9.2 %, S3 -0.7 %, S4 -54 %. S5 is INVALID
+(recorded retrospectively): with holes shrunk to the bare drill, the plane reaches the VIN/SW via barrels, the
+extraction's rim sampling bonds those vias to GND, and the loop is shorted (-88 %); it is not a ceiling.
+Realistic screens (declared after run 1, before their runs; EPC's single-via inner-layer antipad has area 0.337 mm^2,
+radius 0.3275 mm, so per-via antipads at the 0.6 mm row pitch merge into the existing slots, which is why EPC slots):
+* S6 under Q1: in the slotted non-GND columns (x = 18.0 SW, 20.1 SW, 21.9 SW, 23.0 VIN) every other via is removed
+  (kept: the 1st, 3rd, 5th from the lowest y), and each Q1-window hole becomes EPC-size per-via antipads (r = 0.3275)
+  around the remaining drills;
+* S7 the same under Q2 (columns x = 19.2, 20.9, 22.7, all SW); Q2's GND columns are the return path and stay;
+* S8 S6 + S7.
+These are legal-like (EPC's own antipad size, webs of 0.54 mm) but variant A omits the bottom loop that the removed
+vias also feed, so a passing screen needs confirmation on B.
 Drop rule: an idea whose screen does not lower loop L by more than 4 % is not built. Output:
 results/gan/epc90133-layout-screen.json (and the extraction reports under results/gan/epc90133-layout-screen/).
 """
@@ -37,7 +49,10 @@ from epc90133_reconstruct import layer_geometry, polygons
 CLEAR = 0.150114
 WINDOWS = {"Q1": (17.2, 28.7, 23.8, 33.3), "Q2": (17.2, 23.7, 23.8, 28.3), "Ci": (15.5, 33.0, 31.6, 34.7)}
 LOOP = (14.0, 22.0, 34.0, 38.0)
-SCREENS = {"S0": [], "S1": ["Q1"], "S2": ["Q2"], "S3": ["Ci"], "S4": ["Q1", "Q2", "Ci"], "S5": ["ceiling"]}
+SCREENS = {"S0": [], "S1": ["Q1"], "S2": ["Q2"], "S3": ["Ci"], "S4": ["Q1", "Q2", "Ci"], "S5": ["ceiling"],
+           "S6": ["thin:Q1"], "S7": ["thin:Q2"], "S8": ["thin:Q1", "thin:Q2"]}
+THIN = {"Q1": (18.0, 20.1, 21.9, 23.0), "Q2": (19.2, 20.9, 22.7)}
+EPC_ANTIPAD_R = 0.3275  # mm, from the 0.337 mm^2 single-via antipads on mid-layers 1-4
 OUTDIR = ROOT / "results/gan/epc90133-layout-screen"
 STOCK = ROOT / "results/gan/epc90133-extraction/A-m1-mid.json"
 
@@ -73,6 +88,38 @@ def edit_grid(grid, holes, drills, regions, ceiling):
     return changed
 
 
+def thinned(drills, regions):
+    """Drills kept after removing every other via in the declared columns (S6-S8), and the removed ones."""
+    gone = set()
+    for r in regions:
+        w = WINDOWS[r]
+        for cx in THIN[r]:
+            col = sorted((d for d in drills if abs(d.x - cx) < 0.06 and w[0] < d.x < w[2] and w[1] < d.y < w[3]),
+                         key=lambda d: d.y)
+            gone |= {id(d) for d in col[1::2]}
+    return [d for d in drills if id(d) not in gone], len(gone)
+
+
+def edit_thin(grid, holes, drills, regions):
+    ys = g.BOARD[1] + np.arange(grid.shape[0]) * g.PITCH
+    xs = g.BOARD[0] + np.arange(grid.shape[1]) * g.PITCH
+    changed = 0
+    for h in holes:
+        if not any(box(*WINDOWS[r]).contains(h.centroid) for r in regions):
+            continue
+        i0, i1 = np.searchsorted(ys, [h.bounds[1] - g.PITCH, h.bounds[3] + g.PITCH])
+        j0, j1 = np.searchsorted(xs, [h.bounds[0] - g.PITCH, h.bounds[2] + g.PITCH])
+        X, Y = np.meshgrid(xs[j0:j1], ys[i0:i1])
+        fill = shapely.contains_xy(h, X, Y)
+        for d in drills:
+            if h.contains(shapely.Point(d.x, d.y)):
+                fill &= (X - d.x) ** 2 + (Y - d.y) ** 2 > EPC_ANTIPAD_R ** 2
+        sub = grid[i0:i1, j0:j1]
+        changed += int((fill & ~sub).sum())
+        sub[fill] = True
+    return changed
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("screens", nargs="*", default=list(SCREENS))
@@ -94,7 +141,11 @@ def main():
                      for e in g.LAYERS + ("GTO",)}
             hs = parse_excellon((g.GERBERS / f"{g.PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
             regs = SCREENS[s]
-            if regs:
+            if regs and regs[0].startswith("thin:"):
+                tr = [r.split(":")[1] for r in regs]
+                hs, info["vias_removed"] = thinned(hs, tr)
+                info["pixels_added"] = edit_thin(grids["G1"].grid, holes, hs, tr)
+            elif regs:
                 info["pixels_added"] = edit_grid(grids["G1"].grid, holes, hs, [r for r in regs if r != "ceiling"],
                                                  "ceiling" in regs)
             return g.derive(grids, hs)
