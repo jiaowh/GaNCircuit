@@ -26,6 +26,13 @@ radius 0.3275 mm, so per-via antipads at the 0.6 mm row pitch merge into the exi
 * S8 S6 + S7.
 These are legal-like (EPC's own antipad size, webs of 0.54 mm) but variant A omits the bottom loop that the removed
 vias also feed, so a passing screen needs confirmation on B.
+RETROSPECTIVE (7 October 2026, after V8's legal build gave -12.5 % against S8's -50.7 %): S1-S4 and S6-S8 are
+INVALID as well. Inside each EPC slot, the column's vias are joined by a strip of their own net's copper (SW or VIN
+on mid-layer 1). The fills here add GND copper everywhere in the slot except the per-via disks, so the fill touches
+those strips and bonds the column's remaining vias to the GND plane (9-54 newly bonded vias per screen; stock 0):
+the loop is partly shorted, as in S5. `--check-bonding` records the count per screen in the report without running
+extractions. The legal builds (scripts/epc90133_board_export.py V6-V8), which remove the strips with the slot, are
+the evidence for this family; no screen number may be quoted as an upper bound.
 Drop rule: an idea whose screen does not lower loop L by more than 4 % is not built. Output:
 results/gan/epc90133-layout-screen.json (and the extraction reports under results/gan/epc90133-layout-screen/).
 """
@@ -120,10 +127,54 @@ def edit_thin(grid, holes, drills, regions):
     return changed
 
 
+def bonded_vias(grid, drills):
+    """Drills whose rim (drill radius + 0.03 mm) touches the largest G1 copper island (the GND plane)."""
+    from scipy import ndimage
+    lab, _ = ndimage.label(grid)
+    plane = np.bincount(lab.ravel())[1:].argmax() + 1
+    out = set()
+    for d in drills:
+        i, j = round((d.y - g.BOARD[1]) / g.PITCH), round((d.x - g.BOARD[0]) / g.PITCH)
+        r = round((d.diameter / 2 + 0.03) / g.PITCH)
+        if (lab[i - r:i + r + 1, j - r:j + r + 1] == plane).any():
+            out.add((round(d.x, 3), round(d.y, 3)))
+    return out
+
+
+def check_bonding(report):
+    """Retrospective check (see the docstring): vias newly bonded to the GND plane by each screen's edit."""
+    base = rasterize(load_layer(g.GERBERS / f"{g.PREFIX}Gerbers.G1"), g.BOARD, g.PITCH).grid
+    drills = parse_excellon((g.GERBERS / f"{g.PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))
+    holes, b0 = g1_holes(), bonded_vias(base, drills)
+    for s, regs in SCREENS.items():
+        if not regs or regs == ["ceiling"]:
+            continue
+        a, hs = base.copy(), drills
+        if regs[0].startswith("thin:"):
+            tr = [r.split(":")[1] for r in regs]
+            hs, _ = thinned(drills, tr)
+            edit_thin(a, holes, hs, tr)
+        else:
+            edit_grid(a, holes, drills, regs, False)
+        n = len(bonded_vias(a, hs) - b0)
+        report["screens"][s]["retrospective_newly_bonded_vias"] = n
+        report["screens"][s]["valid"] = n == 0
+        print(s, "newly bonded vias", n)
+    report["screens"]["S5"]["valid"] = False
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("screens", nargs="*", default=list(SCREENS))
+    ap.add_argument("--check-bonding", action="store_true", help="retrospective short check only (no extraction)")
     args = ap.parse_args()
+    if args.check_bonding:
+        out = OUTDIR.parent / "epc90133-layout-screen.json"
+        report = json.loads(out.read_text(encoding="utf-8"))
+        check_bonding(report)
+        report["bonding_check_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+        out.write_text(json.dumps(report, indent=1) + "\n")
+        return
     OUTDIR.mkdir(parents=True, exist_ok=True)
     holes = g1_holes()
     drills = parse_excellon((g.GERBERS / f"{g.PREFIX}NC Drill.TXT").read_text(encoding="latin-1"))

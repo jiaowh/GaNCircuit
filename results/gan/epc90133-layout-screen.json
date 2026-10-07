@@ -17,7 +17,9 @@
    "L_loop_nH": 0.40624800905552544,
    "relative_change": -0.19031825873068364,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "retrospective_newly_bonded_vias": 18,
+   "valid": false
   },
   "S2": {
    "regions": [
@@ -27,7 +29,9 @@
    "L_loop_nH": 0.45580815690955373,
    "relative_change": -0.09154129018551649,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "retrospective_newly_bonded_vias": 18,
+   "valid": false
   },
   "S3": {
    "regions": [
@@ -37,7 +41,9 @@
    "L_loop_nH": 0.49844695165462305,
    "relative_change": -0.006559080290934549,
    "outcome": "complete",
-   "worth_building": false
+   "worth_building": false,
+   "retrospective_newly_bonded_vias": 18,
+   "valid": false
   },
   "S4": {
    "regions": [
@@ -49,7 +55,9 @@
    "L_loop_nH": 0.23000737716868225,
    "relative_change": -0.5415786182344761,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "retrospective_newly_bonded_vias": 54,
+   "valid": false
   },
   "S5": {
    "regions": [
@@ -59,7 +67,8 @@
    "L_loop_nH": 0.06050413558975971,
    "relative_change": -0.879410870290282,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "valid": false
   },
   "S6": {
    "regions": [
@@ -70,7 +79,9 @@
    "L_loop_nH": 0.43214414796157363,
    "relative_change": -0.13870537602302868,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "retrospective_newly_bonded_vias": 9,
+   "valid": false
   },
   "S7": {
    "regions": [
@@ -81,7 +92,9 @@
    "L_loop_nH": 0.4572823624023351,
    "relative_change": -0.08860309173585745,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "retrospective_newly_bonded_vias": 9,
+   "valid": false
   },
   "S8": {
    "regions": [
@@ -93,9 +106,12 @@
    "L_loop_nH": 0.24736449137399166,
    "relative_change": -0.5069846309658653,
    "outcome": "complete",
-   "worth_building": true
+   "worth_building": true,
+   "retrospective_newly_bonded_vias": 18,
+   "valid": false
   }
  },
  "evaluator_sha256": "b7a21e499fb54a1fccf2460a8b9541f1f564dc074e327149942a67adce298495",
- "S0_control_pass": true
+ "S0_control_pass": true,
+ "bonding_check_sha256": "5874f954e1eeedbf9cb016d33a1050f9ce728b16c2627da38fc142c52db644d6"
 }
