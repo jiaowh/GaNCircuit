@@ -465,8 +465,10 @@ in the scripts, saved reports and [build notes](../docs/build.md).
    unidentified causes explicit. The geometry-edit workflow is qualified for moving
    parts and vias (7 October 2026, `scripts/epc90133_edit_workflow.py` run 2: no-edit,
    one part move and one via move checked for copper/mask/paste, connectivity, DRC
-   and reversibility), and for reshaping copper (`--suite reshape` run 2). Next:
-   check the edited-board-to-extraction route on stock, then the first L3 candidate.
+   and reversibility), and for reshaping copper (`--suite reshape` run 2). Edited
+   boards reach the extraction (`scripts/epc90133_board_export.py`; compare only with
+   stock through the same route, 4 % threshold). L3a (capacitors 0.40 mm closer) is
+   below threshold (+0.75 %); a useful L3 must move the return vias and bottom bank.
 5. Evaluate the agent's judgement against the frozen predictions and new
    measurements, with interventions, retries, time and cost recorded against a
    script or guided baseline. Agents may read normal project context. Milestones

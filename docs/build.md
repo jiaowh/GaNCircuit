@@ -1903,8 +1903,45 @@ In every case nothing changed outside the edit window on any layer, the DRC is a
 13, no new types), the pad nets are unchanged, and mask and paste equal EPC's.
 
 Scope: rectangular regions on one layer, qualified at one site. A board candidate built with these primitives still
-needs its own DRC, net and extraction checks. Nothing here is fabrication approval. The next step is feeding a
-KiCad-exported board into the extraction, checked first on stock.
+needs its own DRC, net and extraction checks. Nothing here is fabrication approval.
+
+**Edited board -> extraction route, and the first layout candidate L3a (7 October 2026;
+`scripts/epc90133_board_export.py`, declared at 77ac049).** The driver writes an edited board as an EPC-style Gerber
+package: KiCad's aux origin at EPC's origin, so coordinates are EPC's, with EPC file names and plated and non-plated
+drills in one Excellon file. `read_epc90133_geometry.EXPORT_ENV`, set only in the child processes, makes the
+power-loop contact finder and the extraction read it, with a manifest hash check. **X0 run 1 (stock through the
+route) is not qualified as declared** ([report](../results/gan/epc90133-board-export-x0.json)):
+- drills are identical, and the power-loop contacts and check outcomes are identical;
+- but A:m1:mid gives 0.4925 against 0.5017 nH (-1.8 %; one port self-inductance 8.8 %; 2,805 against 2,756 mesh
+  nodes). The rasters differ by 12,000-27,000 pixels per layer outside holes, because micrometre edge differences flip
+  1 mil pixels and the pin-aligned mesh puts pad edges on grid lines. On the top layer, EPC also draws 14 mm^2 of copper
+  over drill holes that KiCad leaves empty. A diagnostic that cleared the top hole disks of EPC's own Gerbers crashed
+  because Ci1's GND terminal lost all its mesh nodes.
+
+So the extraction is sensitive at about 2 % to sub-10 um representation and to the hole-copper convention, inside
+the 2-4 % via/mesh sensitivity already recorded. **Retrospective amendment:** edited boards are compared only with
+stock exported through the same route, and a loop-inductance change counts only beyond 4 %.
+
+Candidate **L3a** (layout plan L3): Ci1-Ci7 move 0.40 mm toward Q1, about 0.26 mm short of the Q1 switch-node bars.
+The 20 VIN stitching vias under their pads move with them through a new group primitive `move_vias`; the shared
+inner-layer slots move once. Top GND copper is widened 0.40 mm by `reshape`. The GND via row at y = 34.90 and the bottom
+capacitors stay: moving the row would put it against the bottom Cm VIN pads, which cannot follow because of the bottom
+switch-node fingers.
+- **Run 1 was rejected and kept** (package export/L3a-run1-rejected): a 0.011 mm^2 GND sliver isolated on In1 where the
+  x = 16.05 via pair nears the plane edge; EPC's frozen silk ticks on the moved pads (14 silk_over_copper); the
+  power-loop Ci window (fixed at y >= 33.0) dropped the moved VIN pads; and a driver key error.
+- **Revision 2** (retrospective): silk wholly within a moved part's pad box grown by 0.5 mm moves with it;
+  net-carrying zones in edited builds drop isolated fill islands (KiCad's default; stock's 13 isolated islands are all
+  netless and unaffected); the Ci window follows the move.
+- **Run 2 passes acceptance L1-L4** ([report](../results/gan/epc90133-board-export-L3a.json)): DRC identical in kind
+  and count to stock, pad nets equal, power-loop checks C2-C5 pass, extraction complete.
+
+**Result: below threshold.** Loop L 0.4925 -> 0.4962 nH (+0.75 %), R 4.04 -> 4.02 mohm, capacitor current shares
+redistributed (Ci3 and Ci6 up, Ci2, Ci4 and Ci5 down). As declared, no switching run follows. Reading (a hypothesis,
+not isolated): in this stacked loop the return current rises to the top through the GND via row under the capacitors,
+so moving the capacitor pads without that row does not shorten the vertical loop. The row is blocked by the bottom
+capacitors. A worthwhile L3 needs the return vias and the bottom capacitor bank moved together, a larger redesign.
+`move_footprint` gained the silk rule after W1 was qualified; L3a's DRC is its check.
 
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 

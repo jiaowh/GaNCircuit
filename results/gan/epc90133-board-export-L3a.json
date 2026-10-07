@@ -1,0 +1,325 @@
+{
+ "schema": "epc90133-board-export-candidate/1",
+ "case": "L3a",
+ "evaluator_sha256": "05ce5aff8b1f47893e37e88da9be7924b00ab9e089c257f8ebb7c0baa13dc810",
+ "edits": [
+  [
+   "move_footprint",
+   "Ci1",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_footprint",
+   "Ci2",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_footprint",
+   "Ci3",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_footprint",
+   "Ci4",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_footprint",
+   "Ci5",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_footprint",
+   "Ci6",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_footprint",
+   "Ci7",
+   0.0,
+   -0.4
+  ],
+  [
+   "move_vias",
+   [
+    [
+     16.05,
+     33.5999
+    ],
+    [
+     16.05,
+     34.3004
+    ],
+    [
+     17.5293,
+     34.3004
+    ],
+    [
+     17.5387,
+     33.625
+    ],
+    [
+     19.21,
+     34.3004
+    ],
+    [
+     19.2192,
+     33.625
+    ],
+    [
+     20.8907,
+     34.3004
+    ],
+    [
+     20.9001,
+     33.625
+    ],
+    [
+     22.5715,
+     34.3004
+    ],
+    [
+     22.5806,
+     33.625
+    ],
+    [
+     24.2522,
+     34.3004
+    ],
+    [
+     24.2613,
+     33.625
+    ],
+    [
+     25.9326,
+     34.3004
+    ],
+    [
+     25.942,
+     33.625
+    ],
+    [
+     27.6228,
+     33.625
+    ],
+    [
+     27.6291,
+     34.3004
+    ],
+    [
+     29.3035,
+     33.625
+    ],
+    [
+     29.3098,
+     34.3004
+    ],
+    [
+     30.9999,
+     33.625
+    ],
+    [
+     30.9999,
+     34.275
+    ]
+   ],
+   0.0,
+   -0.4
+  ],
+  [
+   "reshape",
+   "F.Cu",
+   "GND",
+   [
+    15.4,
+    34.25,
+    32.0,
+    34.7
+   ],
+   null
+  ]
+ ],
+ "edit_log": [
+  {
+   "op": [
+    "move_footprint",
+    "Ci1",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 356,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_footprint",
+    "Ci2",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 366,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_footprint",
+    "Ci3",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 376,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_footprint",
+    "Ci4",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 386,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_footprint",
+    "Ci5",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 396,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_footprint",
+    "Ci6",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 406,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_footprint",
+    "Ci7",
+    0.0,
+    -0.4
+   ],
+   "footprint_line": 416,
+   "silk_moved": 2
+  },
+  {
+   "op": [
+    "move_vias",
+    20,
+    0.0,
+    -0.4
+   ],
+   "vias": 20,
+   "holes": 39,
+   "zones_and_keepouts_translated": {
+    "In1.Cu": 46,
+    "In2.Cu": 50,
+    "In3.Cu": 50,
+    "In4.Cu": 50
+   }
+  },
+  {
+   "op": [
+    "reshape",
+    "F.Cu",
+    "GND",
+    [
+     15.4,
+     34.25,
+     32.0,
+     34.7
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 4,
+   "keepouts_added": 0
+  }
+ ],
+ "manifest_sha256": "2d802c359bd07f09c565f78c0b14b7db5d580ffc0ea06333b53e78160987b99d",
+ "stock_manifest_sha256": "1c68807a5c3c9688f9ce8b74f65491d39dfd8c7e6fde3af028eba25138a8e00f",
+ "L1_drc": {
+  "types": {
+   "isolated_copper": 13,
+   "silk_edge_clearance": 4,
+   "padstack": 1,
+   "lib_footprint_issues": 106
+  },
+  "unconnected": 0,
+  "clearance_below_rule": 0,
+  "pass": true,
+  "new_types": []
+ },
+ "L2_nets": {
+  "differences": [],
+  "pass": true
+ },
+ "L3_power_loop": {
+  "checks": {
+   "C1_paste_on_mask_open_copper": false,
+   "C2_Q1_seven_contacts_unique_orientation": true,
+   "C3_Q1_pin_centres_within_0.03mm": true,
+   "C4_Q1_pin_nets": true,
+   "C2_Q2_seven_contacts_unique_orientation": true,
+   "C3_Q2_pin_centres_within_0.03mm": true,
+   "C4_Q2_pin_nets": true,
+   "C4_gates_on_different_nets": true,
+   "C5_Ci_pairs_one_vin_one_gnd": true,
+   "C5_Cm_pairs_one_vin_one_gnd": true
+  },
+  "pass": true
+ },
+ "L4_extraction": {
+  "pass": true
+ },
+ "accepted": true,
+ "comparison_vs_stock_route": {
+  "L_loop_nH": [
+   0.4924935073888023,
+   0.49619929781778
+  ],
+  "relative_change": 0.0075245467673792366,
+  "R_loop_mohm": [
+   4.035428888666547,
+   4.022670456773489
+  ],
+  "capacitor_current_share": {
+   "stock": {
+    "Ci1": 0.03919755984568635,
+    "Ci2": 0.08379313782414244,
+    "Ci3": 0.1766472931267366,
+    "Ci4": 0.15647321820554647,
+    "Ci5": 0.15235301018678712,
+    "Ci6": 0.23145009339997233,
+    "Ci7": 0.16008568741112877
+   },
+   "candidate": {
+    "Ci1": 0.041138371634098524,
+    "Ci2": 0.06246391151786707,
+    "Ci3": 0.22303327804114229,
+    "Ci4": 0.12730105195573174,
+    "Ci5": 0.12700198435213417,
+    "Ci6": 0.26881336678221285,
+    "Ci7": 0.15024803571681336
+   }
+  },
+  "threshold": 0.04,
+  "counts": false
+ },
+ "outcome": "below threshold"
+}
