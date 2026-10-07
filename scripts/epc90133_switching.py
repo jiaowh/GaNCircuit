@@ -353,6 +353,13 @@ Gate-charge check (owner request, declared 7 October 2026 before any G search re
 with the vendor model is rerun, with stock, under the gate-charge sensitivity revision EPC2302QG for all four
 alternatives (Gear, as --study qgfit), cases <NAME>@<alternative>-gear-qg via --qg; C1 and C2 must also hold there
 for the candidate to be reported without a gate-charge caveat (R80 1.5 ohm met both under both models).
+Sourced-parts check (declared 7 October 2026 after the capacitor data and the C_SW audit, before any G search
+result): the first G search keeps the assumed capacitors and no C_SW, so it stays comparable with the design rounds.
+Its stock and every V8 variant are then rerun with --sourced: Taiyo Yuden's DC-bias model for Ci, KYOCERA AVX's
+data for Cm (AVX_CM) and C_SW, all four alternatives, Gear, cases <case>-src; assessed with --suffix -gear-src. A
+candidate is reported as found only if the owner rule holds under both the assumed and the sourced parts. The run
+waits for the damping study to show that the vendor-capacitor cases complete and pass their checks; if they do
+not, it is not run and the candidate carries a 'sourced parts unchecked' caveat.
 
 Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
 50 pH package source inductance, can missing losses explain why the simulation overshoots about twice Fig. 9 and
@@ -1219,7 +1226,7 @@ def layout_cases(exts):
     return cases
 
 
-def search_cases(names, r80=None, qg=False):
+def search_cases(names, r80=None, qg=False, sourced=False):
     """Layout search (see the module docstring): every --ext-file extraction under every alternative, Gear."""
     common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
               "long_pulse": True, "method": "gear"}
@@ -1231,6 +1238,8 @@ def search_cases(names, r80=None, qg=False):
                       for n in names for a, ap_ in ALTERNATIVES.items()})
     if qg:  # gate-charge check: the same cases under EPC2302QG, named <case>-qg
         cases = {f"{k}-qg": {**c, "model": QG_MODEL} for k, c in cases.items()}
+    if sourced:  # sourced-parts check: vendor capacitor data and board switch-node capacitance
+        cases = {f"{k}-src": {**c, "ci_vendor": True, "cm_model": AVX_CM, "c_sw": True} for k, c in cases.items()}
     return cases
 
 
@@ -1301,6 +1310,7 @@ def main():
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
     ap.add_argument("--with-r80", type=float, default=None, help="search study (G only): also run every NAME with R80")
     ap.add_argument("--qg", action="store_true", help="search study: run every case with EPC2302QG (gate-charge check)")
+    ap.add_argument("--sourced", action="store_true", help="search study: vendor capacitor data and C_SW (sourced-parts check)")
     ap.add_argument("--timeout", type=float, default=600.0,
                     help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
@@ -1379,7 +1389,7 @@ def main():
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "search":
-        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80, args.qg)
+        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80, args.qg, args.sourced)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "damping":
