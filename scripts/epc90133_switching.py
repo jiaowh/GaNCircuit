@@ -343,6 +343,8 @@ same KiCad route; NAME 'stock' is the matched control). Every NAME runs under th
 layout-study settings (100 ps, design operating point, settled loss estimator revision 2, Q2 sense) and Gear
 integration (round 3's declared fallback, Gear within 0.05 % of trapezoidal; trapezoidal stalled in about half the
 long design runs), as <NAME>@<alternative>-gear. Assessment: scripts/assess_epc90133_search.py (owner rule).
+--with-r80 OHM (G extractions only; declared 7 October 2026 after the preliminary A run, before any G search run):
+each NAME also runs with R80 = OHM as <NAME>+R80-<OHM>@<alternative>-gear, compared with plain 'stock'.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -1146,12 +1148,17 @@ def layout_cases(exts):
     return cases
 
 
-def search_cases(names):
+def search_cases(names, r80=None):
     """Layout search (see the module docstring): every --ext-file extraction under every alternative, Gear."""
     common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
               "long_pulse": True, "method": "gear"}
-    return {f"{n}@{a}-gear": {"ext": n, **common, **ap_, "design": n, "alternative": a}
-            for n in names for a, ap_ in ALTERNATIVES.items()}
+    cases = {f"{n}@{a}-gear": {"ext": n, **common, **ap_, "design": n, "alternative": a}
+             for n in names for a, ap_ in ALTERNATIVES.items()}
+    if r80 is not None:
+        cases.update({f"{n}+R80-{r80:g}@{a}-gear": {"ext": n, **common, **ap_, "gate_r": {"R80": r80},
+                                                    "design": f"{n}+R80-{r80:g}", "alternative": a}
+                      for n in names for a, ap_ in ALTERNATIVES.items()})
+    return cases
 
 
 def set_operating_point(vout, iout):
@@ -1177,6 +1184,7 @@ def main():
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
+    ap.add_argument("--with-r80", type=float, default=None, help="search study (G only): also run every NAME with R80")
     ap.add_argument("--timeout", type=float, default=600.0,
                     help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
@@ -1255,7 +1263,7 @@ def main():
         else:
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "search":
-        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file])
+        cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "qgfit":

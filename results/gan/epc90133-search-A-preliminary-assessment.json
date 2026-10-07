@@ -1,0 +1,93 @@
+{
+ "schema": "epc90133-search-assessment/1",
+ "evaluator_sha256": "a8576ff054421f6db2b4e810c0640ed9c9f57dff4b6a3d6e6d7be67e0a40c265",
+ "inputs": {
+  "results\\gan\\epc90133-search-A-preliminary.json": "934f182a7cbf0c13ee06d8202faa8ab8faf78d49e2d67461701badb038f94907"
+ },
+ "candidates": {
+  "V8": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 54.48448633391374,
+      "fet_loss_W": 1.6784064150345805,
+      "q2_gate_peak_V": 0.2505858242511749
+     },
+     "candidate": {
+      "overshoot_V": 51.14564368771115,
+      "fet_loss_W": 1.7362184609556561,
+      "q2_gate_peak_V": 0.2525051236152649
+     },
+     "overshoot_change_pct": -6.128061161740894,
+     "loss_change_pct": 3.444460495575763,
+     "q2_change_V": 0.0019192993640899658,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": false
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 47.19737993180377,
+      "fet_loss_W": 1.7388260975702172,
+      "q2_gate_peak_V": 0.34169578552246094
+     },
+     "candidate": {
+      "overshoot_V": 43.22655212875025,
+      "fet_loss_W": 1.8000014334462775,
+      "q2_gate_peak_V": 0.3432530164718628
+     },
+     "overshoot_change_pct": -8.413237787332761,
+     "loss_change_pct": 3.5181974759606494,
+     "q2_change_V": 0.0015572309494018555,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": false
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 31.828325919667108,
+      "fet_loss_W": 1.9067520480173237,
+      "q2_gate_peak_V": 1.8919340372085571
+     },
+     "candidate": {
+      "overshoot_V": 27.51215245528919,
+      "fet_loss_W": 1.9496362088912538,
+      "q2_gate_peak_V": 1.8289960622787476
+     },
+     "overshoot_change_pct": -13.560793223217882,
+     "loss_change_pct": 2.249068562350409,
+     "q2_change_V": -0.06293797492980957,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 27.019243948140208,
+      "fet_loss_W": 1.9305814524187055,
+      "q2_gate_peak_V": 1.4484375715255737
+     },
+     "candidate": {
+      "overshoot_V": 23.295613376386214,
+      "fet_loss_W": 1.9663930185141532,
+      "q2_gate_peak_V": 1.4023337364196777
+     },
+     "overshoot_change_pct": -13.781401799772786,
+     "loss_change_pct": 1.8549627134655022,
+     "q2_change_V": -0.046103835105895996,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 54.48448633391374,
+   "worst_case_candidate_V": 51.14564368771115,
+   "worst_alternative": "ramp-Ls0",
+   "C0": true,
+   "C1": true,
+   "C2": false,
+   "N": null,
+   "verdict": "not met"
+  }
+ }
+}
