@@ -350,7 +350,10 @@ def apply_edits(text, edits, geo):
                         for i, ln in enumerate(lines):
                             if ln.startswith("\t(zone ") and f'(layer "{lay}")' in ln:
                                 zp = zone_layer_and_poly(ln)[1]
-                                if zp.intersects(h) and zp.difference(h).area <= 1e-3 * zp.area:
+                                b0, b1 = zp.bounds, h.bounds
+                                inside_box = (b0[0] >= b1[0] - 1e-3 and b0[1] >= b1[1] - 1e-3 and
+                                              b0[2] <= b1[2] + 1e-3 and b0[3] <= b1[3] + 1e-3)
+                                if inside_box and zp.is_valid and zp.difference(h).area <= 1e-3 * zp.area:
                                     lines[i] = ""
                         keep = [p for p in remaining if h.contains(p)]
                         lines.insert(len(lines) - 1, "".join(keepout_line(lay, p.buffer(r_ap, 16)) for p in keep))
