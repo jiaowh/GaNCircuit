@@ -350,6 +350,24 @@ Second G run (declared 7 October 2026 while the G extractions were queued, befor
 extractions, written to its own report; the assessor merges it with the first report's stock cases. Reason: on
 stock, R80 1.5 adds about 2 % FET loss and V8 adds 2-3.5 % on A, so V8+R80-1.5 may exceed C1's 5 %.
 
+Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
+50 pH package source inductance, can missing losses explain why the simulation overshoots about twice Fig. 9 and
+rings about three times longer (G-m1-mid-Ls50: 11.3 V, zeta 0.025, against 5.7 V, zeta 0.077) while its timing
+matches? This is a SENSITIVITY test, not tuning: no value is adopted, and a match would show only that the loss is a
+sufficient explanation, not the identified one (probe response and location remain open). Cases on G-m1-mid with
+l_s = 50 pH and test 7's settings (100 ps, Q2 sense, Fig. 9 operating point), trapezoidal as test 7:
+* stage 1, capacitor ESR (every Ci and Cm; stock value 10 mohm): G-m1-mid-Ls50 (control; must reproduce the stored
+  gateloop case within 1 % on overshoot and damping), -esr0.03, -esr0.1, -esr0.3, -esr1. MLCC ESR near 260 MHz is
+  of order 10-30 mohm, so 0.3 and 1 ohm are brackets, not plausible values;
+* stage 2, transistor (Coss) loss proxy: EPC's model has no output-capacitance loss. Proxy: a series R-C across each
+  FET's die drain-source, C = 10 % or 20 % of COSS at 50 V (304.8 pF -> 30 and 60 pF), R = 1 / (2 pi 262 MHz C)
+  (20 and 10 ohm, the R that dissipates most at the ring frequency for that C). Cases -oss30, -oss60 (stock ESR),
+  and -esr0.03-oss60 (plausible ESR with the larger proxy). The added C also lowers the ring frequency a little.
+All eight run in one batch (one LTspice run at a time); stage 2 is interpreted only if no plausible stage-1 case
+(ESR at most 0.1 ohm) meets the Fig. 9 overshoot and damping criteria. Scoring: scripts/compare_epc90133_fig9.py
+(unchanged criteria) into results/gan/epc90133-fig9-damping.json and -damping-summary.md; the main Fig. 9 summary is
+not replaced.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -537,7 +555,7 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
           pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None,
-          model="EPC2302"):
+          model="EPC2302", oss_rc=None):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
@@ -651,6 +669,10 @@ Rbret bn {node(at + '.GND')} 1u"""
         die.update(g1="p1g" if l_g else "gu", d1="p1d" if ld else "q1dd", s1=s1_die,
                    g2="p2g" if l_g else "gl", d2="p2d" if ld else q2dd, s2=s2_die)
     times["die_nodes"] = die
+    if oss_rc:  # damping study: Coss-loss proxy, series R-C across each die's drain-source
+        c_x, r_x = oss_rc
+        for k in ("1", "2"):
+            lines += [f"Cox{k} {die['d' + k]} ox{k} {c_x:g}", f"Rox{k} ox{k} {die['s' + k]} {r_x:g}"]
     lines += [
         "Vq1d q1_d q1dd 0",
         *(["Vq2d q2_d q2dd 0"] if sense_q2 else []),
@@ -1165,6 +1187,26 @@ def search_cases(names, r80=None):
     return cases
 
 
+F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
+
+
+def damping_cases(exts):
+    """Damping study (see the module docstring)."""
+    g = "G-m1-mid"
+    if g not in exts:
+        raise SystemExit("the damping study needs extraction G-m1-mid")
+    base = f"{g}-Ls50"
+    common = {"ext": g, "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "l_s": 50e-12}
+    oss = {k: (k * 1e-12, 1 / (2 * math.pi * F_RING * k * 1e-12)) for k in (30, 60)}
+    cases = {base: dict(common)}
+    for e in (0.03, 0.1, 0.3, 1.0):
+        cases[f"{base}-esr{e:g}"] = {**common, "esr": e, "base": base}
+    for k, rc in oss.items():
+        cases[f"{base}-oss{k}"] = {**common, "oss_rc": rc, "base": base}
+    cases[f"{base}-esr0.03-oss60"] = {**common, "esr": 0.03, "oss_rc": oss[60], "base": base}
+    return cases
+
+
 def set_operating_point(vout, iout):
     """Design study: move the module's operating point (the double pulse reads these at call time)."""
     global VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
@@ -1184,7 +1226,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search", "damping"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
@@ -1270,6 +1312,10 @@ def main():
         cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "damping":
+        cases = damping_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "qgfit":
         cases = qgfit_cases(exts)
         if args.only:
@@ -1340,7 +1386,7 @@ def main():
                   no_gate_power_k=c.get("no_gate_power_k", False), pin_c=c.get("pin_c"),
                   full_r=c.get("full_r", False), internal=c.get("internal", False),
                   gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
-                  method=c.get("method"), model=c.get("model", "EPC2302"))
+                  method=c.get("method"), model=c.get("model", "EPC2302"), oss_rc=c.get("oss_rc"))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
