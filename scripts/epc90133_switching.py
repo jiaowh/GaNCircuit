@@ -349,6 +349,13 @@ Second G run (declared 7 October 2026 while the G extractions were queued, befor
 3's other passing value, smaller loss increment) for V8 only, '--with-r80 1.2 --only V8+R80-1.2@...', same
 extractions, written to its own report; the assessor merges it with the first report's stock cases. Reason: on
 stock, R80 1.5 adds about 2 % FET loss and V8 adds 2-3.5 % on A, so V8+R80-1.5 may exceed C1's 5 %.
+G search run 3 (8 October 2026, assumed parts; results/gan/epc90133-search-G-assessment.json): no candidate meets
+the rule. V8 fails C0 at ramp-Ls50 (+1.8 %), V8+R80-1.2 at ramp-Ls50 (+0.7 %), V8+R80-1.5 fails C1 at ramp-Ls0
+(+5.34 %); stock+R80-1.5 meets C0-C2 (provisional). Candidates declared AFTER these results (selection informed by
+them, so they are not held-out tests): V8+R80-1.3 and V8+R80-1.4 (E24/E96 values between the two bracketing
+results), run with --with-r80 <value> --only V8+R80-<value>@... under assumed and sourced parts, assessed with stock
+from the run-3 reports by the same rule; reported against stock+R80-1.5 as well, since the layout adds value only if
+the worst case beats it.
 Gate-charge check (owner request, declared 7 October 2026 before any G search result): a candidate that meets the rule
 with the vendor model is rerun, with stock, under the gate-charge sensitivity revision EPC2302QG for all four
 alternatives (Gear, as --study qgfit), cases <NAME>@<alternative>-gear-qg via --qg; C1 and C2 must also hold there
