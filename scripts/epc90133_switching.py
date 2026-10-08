@@ -1470,6 +1470,8 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "probe":
         cases = probe_cases(exts)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "damping":
         cases = damping_cases(exts)
         if args.only:
