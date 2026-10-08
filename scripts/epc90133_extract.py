@@ -115,6 +115,14 @@ VARIANTS = {"A": {"layers": ("GTL", "G1"), "caps": ("Ci",)},
             "B": {"layers": LAYERS, "caps": ("Ci", "Cm")},
             "G": {"layers": LAYERS, "caps": ("Ci", "Cm"), "gate": True}}
 GATE_LOOP = ROOT / "results/gan/epc90133-gate-loop.json"
+# Probe terminals (option 'j33', G only; declared 8 October 2026 for the Fig. 9 probe-reference test): EPC's QSG Fig. 8
+# puts the switch-node probe and its ground in J33, two plated 1.016 mm holes at (27.55, 25.48) GND and
+# (27.55, 28.02) SW, both connected on all eight layers. Each gets a top-layer contact (the probe enters from the
+# top) of the pad's 1.6 mm box and a port to its net's reference (J33.GND to Q2.S46, J33.SW to Q2.D). In the
+# switching bench these ports carry no current; their node voltages give V(J33.SW) - V(J33.GND) along the board
+# copper (the probe's own loop and its mutual coupling to the board are not modelled).
+J33_TERMINALS = {"J33.GND": ("GND", (27.55, 25.48)), "J33.SW": ("SW", (27.55, 28.02))}
+J33_HALF = 0.8
 G_WINDOW = (14.0, 22.0, 33.0, 37.5)
 G_FINE = (14.4, 24.2, 18.8, 32.8)
 FINE_DIV = 4
@@ -138,7 +146,7 @@ class UF:
         self.p[self.find(a)] = self.find(b)
 
 
-def build(b, loop, variant, mesh, junction, per_layer, gate=None, gap1_mm=None):
+def build(b, loop, variant, mesh, junction, per_layer, gate=None, gap1_mm=None, probe=False):
     """FastHenry deck for one case. Grid nodes are keyed by fine indices (I, J) = FINE_DIV x coarse index;
     without a fine box only coarse points exist, which reproduces the uniform grid of tests 1-4.
 
@@ -284,6 +292,11 @@ def build(b, loop, variant, mesh, junction, per_layer, gate=None, gap1_mm=None):
     if is_g:
         terms = {t: [(c["layer"], c["bbox_mm"], c["centre_mm"]) for c in cs] for t, cs in gate["terminals"].items()}
         scheme = gate["scheme"]
+        if probe:
+            scheme = {k: {**v, "branches": list(v["branches"])} for k, v in scheme.items()}
+            for t, (net, (cx, cy)) in J33_TERMINALS.items():
+                terms[t] = [("GTL", (cx - J33_HALF, cy - J33_HALF, cx + J33_HALF, cy + J33_HALF), (cx, cy))]
+                scheme[net]["branches"].append(t)
     else:
         caps = [c for k in spec["caps"] for c in loop["capacitors"][k]["caps"]]
         terms = {}
@@ -476,7 +489,7 @@ def g_summary(order, Z, ports):
     of loop current: L_cs(Q1) from U80.PH to Q1.S46, L_cs(Q2) from U80.GND to Q2.S46.
     """
     br = {name: (b_, ref) for name, b_, ref in ports}
-    power = [k for k, name in enumerate(order) if not br[name][0].startswith(("R8", "U80.U", "U80.L"))
+    power = [k for k, name in enumerate(order) if not br[name][0].startswith(("R8", "U80.U", "U80.L", "J33"))
              and not br[name][1].startswith(("Q1.G", "Q2.G", "R8"))]
     names = [order[k] for k in power]
     Zp = Z[np.ix_(power, power)]
@@ -558,17 +571,22 @@ def main():
     args.outdir.mkdir(parents=True, exist_ok=True)
     for case in args.cases:
         variant, mesh, junction, *opt = case.split(":")
+        probe = "j33" in opt
+        opt = [o for o in opt if o != "j33"]
         gap1 = float(opt[0][1:]) if opt else None
         if opt and not opt[0].startswith("d"):
-            raise SystemExit(f"{case}: the optional fourth field is d<mm>")
+            raise SystemExit(f"{case}: the optional fields are d<mm> and j33")
+        if probe and not VARIANTS[variant].get("gate"):
+            raise SystemExit(f"{case}: the j33 probe terminals need a G variant")
         is_g = bool(VARIANTS[variant].get("gate"))
         if is_g and (gate is None or gate.get("outcome") != "pass"):
             raise SystemExit("variant G needs a passing results/gan/epc90133-gate-loop.json")
-        deck, ports, connected, stats = build(b, loop, variant, mesh, junction, per_layer, gate, gap1)
+        deck, ports, connected, stats = build(b, loop, variant, mesh, junction, per_layer, gate, gap1, probe)
         print(case, json.dumps({k: stats[k] for k in ("grid", "nodes", "segments", "filaments_before_refine", "via",
                                                        "nodes_dropped_unconnected", "terminal_contacts_without_nodes")}))
         report = {"schema": "epc90133-extraction/1", "case": {"variant": variant, "mesh": mesh, "junction": junction,
                                                              **({"gap1_mm": gap1} if gap1 is not None else {}),
+                                                             **({"probe_terminals": "j33"} if probe else {}),
                                                              **({"edits": edit_name} if edit_name else {})},
                   "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   "power_loop_sha256": hashlib.sha256(args.loop.read_bytes()).hexdigest(),
@@ -618,6 +636,7 @@ def main():
         })
         report["outcome"] = "complete" if all(report["checks"].values()) else "check failed"
         out = args.outdir / (f"{variant}-{mesh}-{junction}" + (f"-d{gap1:.3f}" if gap1 is not None else "")
+                             + ("-j33" if probe else "")
                              + (f"-{edit_name}" if edit_name else "") + (f"-{args.tag}" if args.tag else "") + ".json")
         out.write_text(json.dumps(report, indent=1) + "\n")
         print(f"  {report['outcome']}; {report['wall_time_s']:.0f} s; filaments {filaments}; "

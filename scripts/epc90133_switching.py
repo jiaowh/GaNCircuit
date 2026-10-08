@@ -446,6 +446,16 @@ Q1.S2, Q1.S46 against every GND-net terminal (Q2.S46 = the present observable, Q
 the unchanged Fig. 9 metric definitions. Reading rule: if no pair moves the rising overshoot toward 5.7 V while
 producing a falling dip, the location hypothesis is not supported by the bracket; if some pairs do, the decisive
 test is an extraction with J33 terminals (declared separately). Neither result identifies EPC's actual probe.
+Bracket result (8 October): against the capacitor grounds, 50 pH gives 4.7-5.4 V rising overshoot and a 4.1-4.3 V
+falling dip (Fig. 9: 5.7 / 4.6 V) but a pre-edge shelf (rise 2.6-2.7 ns against 1.68) and unchanged damping.
+Decisive test (declared 8 October 2026 after the bracket, before its runs): extraction G:m1:mid:j33
+(scripts/epc90133_extract.py; J33 terminals, otherwise the identical deck) with cases G-m1-mid-j33-Ls50-probe,
+-Ls25-probe and -probe (0 pH). Control: through Q2's pins, the j33 extraction's 50 pH case must reproduce
+G-m1-mid-Ls50 (overshoot and ring within 1 %) and its loop L must agree with G-m1-mid within 0.5 %. Scored pair:
+V(J33.SW) - V(J33.GND). Reading: the location hypothesis is supported if, at some package inductance in the
+0-50 pH bracket, that pair comes within the Fig. 9 criteria for overshoot (3 V / 0.05 of swing), rise time
+(25 %) and ring frequency (10 %) and shows the falling dip; it is weakened if the J33 pair stays near the Q2-pin
+result. Damping is not expected to change with location. The probe's own loop is not modelled.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -1301,7 +1311,13 @@ def probe_cases(exts):
     if g not in exts:
         raise SystemExit("the probe study needs extraction G-m1-mid")
     common = {"ext": g, "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "save_terminals": True}
-    return {f"{g}-Ls50-probe": {**common, "l_s": 50e-12}, f"{g}-probe": dict(common)}
+    cases = {f"{g}-Ls50-probe": {**common, "l_s": 50e-12}, f"{g}-probe": dict(common)}
+    gj = f"{g}-j33"  # decisive test (declared 8 October 2026): the same extraction plus J33 probe terminals
+    if gj in exts:
+        cj = {**common, "ext": gj}
+        cases.update({f"{gj}-Ls50-probe": {**cj, "l_s": 50e-12}, f"{gj}-Ls25-probe": {**cj, "l_s": 25e-12},
+                      f"{gj}-probe": dict(cj)})
+    return cases
 
 
 def damping_cases(exts):

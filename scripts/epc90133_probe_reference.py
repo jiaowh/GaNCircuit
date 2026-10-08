@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import compare_epc90133_fig9 as cmp
 
-TIPS = ("q2_d", "q1_s2", "q1_s46")
+TIPS = ("q2_d", "q1_s2", "q1_s46", "j33_sw")
 
 
 def main():
@@ -42,13 +42,14 @@ def main():
         sig = {nd: {ev: np.array(v[ev]) for ev in ("rising", "falling")} for nd, v in term.items()}
         sig["q2_d"] = {ev: np.array(tr[f"{ev}_V"]) for ev in ("rising", "falling")}
         sig["0"] = {ev: np.zeros(n) for ev in ("rising", "falling")}
-        grounds = ["0", "q2_s2", "u80_gnd"] + sorted(k for k in sig if k.endswith("_gnd") and k[:2] in ("ci", "cm"))
+        grounds = (["0", "q2_s2", "u80_gnd"] + (["j33_gnd"] if "j33_gnd" in sig else [])
+                   + sorted(k for k in sig if k.endswith("_gnd") and k[:2] in ("ci", "cm")))
         for grp in ("ci", "cm"):
             ks = [k for k in sig if k.startswith(grp) and k.endswith("_gnd")]
             sig[f"mean_{grp}_gnd"] = {ev: np.mean([sig[k][ev] for k in ks], axis=0) for ev in ("rising", "falling")}
             grounds.append(f"mean_{grp}_gnd")
         rows = {}
-        for tip in TIPS:
+        for tip in [t_ for t_ in TIPS if t_ in sig]:
             for g in grounds:
                 pseudo = {"traces": {"step_s": tr["step_s"], "start_s": tr["start_s"],
                                      **{f"{ev}_V": list(sig[tip][ev] - sig[g][ev]) for ev in ("rising", "falling")}},
