@@ -400,13 +400,20 @@ def parse_matrix_file(text):
     return [rows[i] for i in sorted(rows)], cols, kind, np.array(vals).reshape(nr, nc)
 
 
-def run_case(deck, ports, workdir, jobs):
-    workdir.mkdir(parents=True, exist_ok=False)
-    (workdir / "case.inp").write_text(deck, encoding="ascii")
+def run_case(deck, ports, workdir, jobs, reparse=False):
+    if reparse:  # 8 October 2026: rebuild a report from a finished FastHenry run without re-solving
+        if (workdir / "case.inp").read_text(encoding="ascii") != deck:
+            raise SystemExit(f"--reparse: {workdir / 'case.inp'} differs from the deck built now")
+        jobs = len(list(workdir.glob("Zc_j*.mat")))
+    else:
+        workdir.mkdir(parents=True, exist_ok=False)
+        (workdir / "case.inp").write_text(deck, encoding="ascii")
     names = [p[0] for p in ports]
     chunks = [names[k::jobs] for k in range(jobs) if names[k::jobs]]
 
     def one(k, chunk):
+        if reparse:
+            return None, parse_matrix_file((workdir / f"Zc_j{k}.mat").read_text(errors="replace"))
         opts = " ".join(f"-x {c}" for c in chunk)
         cmd = ["wsl", "-e", "bash", "-lc", f"cd '{wsl_path(workdir)}' && '{wsl_path(FH_BIN)}' case.inp -p diag {opts} -S _j{k}"]
         t0 = time.time()
@@ -422,14 +429,22 @@ def run_case(deck, ports, workdir, jobs):
         results = list(pool.map(lambda a: one(*a), enumerate(chunks)))
     order = results[0][1][0]
     Y = np.zeros((len(order), len(order)), complex)
+    # One job excites every port and FastHenry writes the full impedance matrix instead of admittance columns
+    # (first met by the J33 extraction with --jobs 1, 8 October 2026); its inverse is the admittance matrix.
+    if len(results) == 1 and results[0][1][2] == "Impedance":
+        return order, np.linalg.inv(results[0][1][3]), [results[0][0]], filaments_of(workdir)
     for _, (rows, cols, kind, mat) in results:
         if kind != "ADMITTANCE" or rows != order:
             raise RuntimeError("unexpected FastHenry output layout")
         for c, name in enumerate(cols):
             Y[:, order.index(name)] = mat[:, c]
+    return order, Y, [r[0] for r in results], filaments_of(workdir)
+
+
+def filaments_of(workdir):
     stdout = (workdir / "stdout_j0.log").read_text(encoding="utf-8")
     fil = re.search(r"filaments after multipole refine:\s*(\d+)", stdout)
-    return order, Y, [r[0] for r in results], int(fil.group(1)) if fil else None
+    return int(fil.group(1)) if fil else None
 
 
 def loop_summary(order, Z, ports):
@@ -555,6 +570,8 @@ def main():
     ap.add_argument("--loop", type=Path, default=LOOP,
                     help="power-loop record (default the stock one; an edited board needs its own, 7 October 2026)")
     ap.add_argument("--tag", default=None, help="suffix for the report name (edited-board exports)")
+    ap.add_argument("--reparse", type=Path, default=None,
+                    help="one case: rebuild its report from this finished FastHenry run directory (no solve)")
     args = ap.parse_args()
     args.outdir = args.outdir.resolve()  # reports print their path relative to the repository
     loop = json.loads(args.loop.read_text(encoding="utf-8"))
@@ -605,7 +622,7 @@ def main():
                 and not stats["scheme_branches_without_port"]
         if not all(connected.values()):
             report["unconnected_ports"] = [k for k, ok in connected.items() if not ok]
-        wd = run_root / case.replace(":", "_")
+        wd = args.reparse.resolve() if args.reparse else run_root / case.replace(":", "_")
         if args.build_only or not all(report["checks"].values()):
             wd.mkdir(parents=True, exist_ok=True)
             (wd / "case.inp").write_text(deck, encoding="ascii")
@@ -618,7 +635,10 @@ def main():
         jobs = args.jobs if avail is None else max(1, min(args.jobs, int(0.85 * avail // need)))
         report["parallel_jobs"] = {"requested": args.jobs, "used": jobs, "estimated_bytes_per_job": need, "available_bytes": avail}
         t0 = time.time()
-        order, Y, job_s, filaments = run_case(deck, ports, wd, jobs)
+        order, Y, job_s, filaments = run_case(deck, ports, wd, jobs, reparse=bool(args.reparse))
+        if args.reparse:
+            report["reparsed_from_finished_run"] = {"directory": str(wd), "date": "2026-10-08",
+                                                    "reason": "single-job impedance output was unparsed before the fix"}
         Z = np.linalg.inv(Y)
         w = 2 * math.pi * FREQ
         L = Z.imag / w

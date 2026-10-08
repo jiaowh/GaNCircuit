@@ -3547,3 +3547,15 @@ against the vendor model: S6 fails (step di/dt 30.9 against 29.9 A/ns) and S3 fa
 S2 alone is met at x0.5 (the vendor model needed below x0.5); S10 (5.13 / 5.35 uJ) at no scale, so no scale meets
 both and the declared conclusion stands under EPC2302DS. The best legal combination (about x0.72 on variant A) is
 in the flat region near 11 V.
+
+**J33 extraction, run 3 (8 October 2026).** FastHenry solved G:m1:mid:j33 with one job in 21,755 s (6.0 h; GMRES
+14,140 s), then `epc90133_extract.py` failed: with one job FastHenry writes the full impedance matrix, and the parser
+only handled the multi-job admittance columns ("unexpected FastHenry output layout"; never met before). Fixed:
+a single impedance block is inverted to the admittance matrix; new `--reparse DIR` rebuilds a report from a finished
+run after checking that its saved deck equals the deck built now (it did). Report:
+`results/gan/epc90133-extraction/G-m1-mid-j33.json`, complete, all checks pass. **Declared control fails:** loop
+inductance 0.2544 nH against G-m1-mid's 0.2574 nH (-1.2 %, tolerance 0.5 %); shared ports' self inductances move by
+up to 6 %; Q2 board common-source 45.3 against 47.7 pH. The added J33 terminals change the mesh (two meshes show
+sensitivity, not convergence). The J33 test therefore cannot be read as the declared decisive test. Its two probe
+cases are still run (cheap), and the J33-against-Q2-pin comparison within the j33 extraction's own transient is
+reported as RETROSPECTIVE and indicative only.
