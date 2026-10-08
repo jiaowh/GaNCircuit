@@ -176,5 +176,14 @@
   "threshold": 0.04,
   "counts": true
  },
+ "comparison_vs_stock_route_G-m1-mid": {
+  "L_loop_nH": [
+   0.25273804560281526,
+   0.24022573699582303
+  ],
+  "relative_change": -0.04950702446538524,
+  "threshold": 0.04,
+  "counts": true
+ },
  "outcome": "counts"
 }
