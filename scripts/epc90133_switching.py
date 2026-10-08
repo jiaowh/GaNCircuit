@@ -524,6 +524,13 @@ J33 observation are consistent with the selected Fig. 9 features; it would not e
 revision, or the 50 pH value (choosing it to match this waveform is model selection, not validation), and it would
 not make the layout-search rankings physically validated. Disagreement weakens only this location-only explanation.
 The J33 and Q2-pin observations come from the same extraction and transient.
+J33 run 3 (owner decision of 8 October 2026, declared before the run; the earlier J33 runs 1-2 never started their
+extraction, stopped by the PC restart): EPC2302DS and 50 pH only (--study probe --ds), Gear for both cases, as the
+EPC2302DS Fig. 9 run. Cases G-m1-mid-Ls50-probe-ds (control on the original G extraction) and
+G-m1-mid-j33-Ls50-probe-ds. Control: the j33 case's Q2-pin pair must reproduce the control within 1 % on overshoot
+and ring frequency. The 25 pH and 0 pH cases are dropped, so the 0-50 pH bracket in the reading becomes 50 pH only.
+The EPC2302DS Fig. 9 result it starts from (results/gan/epc90133-fig9-ds-summary.md): 11.3 V overshoot, zeta 0.025,
+settling beyond 45 ns at 2 % of swing, against 5.7 V, 0.077 and 18.3 ns.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
@@ -1599,6 +1606,9 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "probe":
         cases = probe_cases(exts)
+        if args.ds:  # J33 test with EPC2302DS, 50 pH only, Gear (owner, 8 October 2026)
+            keep = [k for k in ("G-m1-mid-Ls50-probe", "G-m1-mid-j33-Ls50-probe") if k in cases]
+            cases = {f"{k}-ds": {**cases[k], "model": DS_MODEL, "method": "gear"} for k in keep}
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "damping":
