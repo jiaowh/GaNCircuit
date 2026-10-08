@@ -388,6 +388,24 @@ candidate is reported as found only if the owner rule holds under both the assum
 waits for the damping study to show that the vendor-capacitor cases complete and pass their checks; if they do
 not, it is not run and the candidate carries a 'sourced parts unchecked' caveat.
 
+Goals study (--study goals; owner's execution template, plans/goal-targets-2026-10-08.md; declared 8 October 2026
+before any goals run). Every --ext-file NAME (stock = the matched control through the KiCad route) runs at the
+template's operating point (VIN 48 V, VOUT 12 V, IOUT 20 A, 250 kHz, 2.2 uH, dead time 10 ns) with the search
+settings (100 ps, Gear, Q2 sense, settled loss estimator revision 2):
+* nominal: <NAME>@<alternative>-gear for the four round-3 alternatives (assumed 50 pH is the primary condition,
+  0 pH reported alongside, as the owner's 7 October default);
+* parasitics +/-10 % (S13): <NAME>@<ramp|step>-Ls50-gear-l0.9 / -l1.1, every extracted branch self and mutual
+  inductance scaled by the factor (l_scale; couplings unchanged), package source inductance unscaled;
+* dead time (S11): <NAME>@ramp-Ls50-gear-dt<ns> for 2.5, 5, 7.5, 12.5, 15, 20 ns (10 ns is nominal);
+* input voltage and load (S13), separate processes because the operating point is module state: --vin 40 / 60
+  gives <NAME>@<ramp|step>-Ls50-gear-v40 / -v60; --iout 0 gives -i0 (0 % load: the valley current is negative,
+  so the valley turn-on is soft; if the bench's edge-current checks reject it the corner is undetermined, and the
+  declared fallback is IOUT 2 A, -i2, the template's lowest efficiency-test current);
+* screen (upper bound, not a design): <NAME>@<ramp|step>-Ls0-gear-ctlls, the low-side gate stage ideal at Q2's
+  pads (test 7's ctl-ls; the bench allows it only without package inductance). It shows how far any low-side
+  gate-loop layout could move S8.
+Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed with this declaration).
+
 Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
 50 pH package source inductance, can missing losses explain why the simulation overshoots about twice Fig. 9 and
 rings about three times longer (G-m1-mid-Ls50: 11.3 V, zeta 0.025, against 5.7 V, zeta 0.077) while its timing
@@ -560,7 +578,7 @@ def is_gate_extraction(ext):
     return any(p["terminal"] == "U80.PH" for p in ext["ports"])
 
 
-def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False, full_r=False):
+def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False, full_r=False, l_scale=1.0):
     """Branch inductors, resistances and couplings from an extraction report.
 
     Baseline (full_r False, unchanged): each branch carries its diagonal resistance R[k, k]; the off-diagonal
@@ -580,7 +598,7 @@ def network(ext, ideal=False, r_scale=1.0, no_gate_power_k=False, full_r=False):
     if full_r and ideal:
         raise ValueError("full_r applies to the extracted network, not to ideal copper")
     for k, p in enumerate(ext["ports"]):
-        lk, rk = (1e-12, 1e-4) if ideal else (L[k, k], R[k, k] * r_scale)
+        lk, rk = (1e-12, 1e-4) if ideal else (L[k, k] * l_scale, R[k, k] * r_scale)
         lines.append(f"Lb{k} {node(p['terminal'])} xb{k} {lk:.6g}")
         terms = "+".join(f"({R[k, j] * r_scale:.9g})*I(Lb{j})" for j in range(len(ext["ports"]))
                          if j != k and R[k, j] != 0) if full_r else ""
@@ -674,11 +692,12 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
           pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None,
-          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None, ci_model=None, save_terminals=False):
+          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None, ci_model=None, save_terminals=False,
+          l_scale=1.0):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
-    net, terms = network(ext, ideal, r_scale, no_gate_power_k, full_r)
+    net, terms = network(ext, ideal, r_scale, no_gate_power_k, full_r, l_scale)
     caps = sorted({t.rsplit(".", 1)[0] for t in terms if t.startswith("C")})
     lines = [net]
     for c in caps:
@@ -970,6 +989,10 @@ def edge_traces(s, times):
            "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
            "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
            "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
+    if times.get("settle_window"):  # goals study (S3 settling): V(SW) for 500 ns after the valley turn-on command
+        rl = np.arange(0.0, 500e-9 + 1.25e-10, 2.5e-10)
+        out["rising_long"] = {"step_s": 2.5e-10, "start_s": 0.0,
+                              "V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rl, t, v)]}
     if times.get("probe_nodes"):  # probe-reference study: every saved terminal around both events
         out["terminals"] = {nd: {ev: [round(float(x), 4) for x in np.interp(times[tk] + rel, t, np.array(s[f"v({nd})"]))]
                                  for ev, tk in (("falling", "t_off1"), ("rising", "t_on2"))}
@@ -1337,6 +1360,26 @@ TY_CI_RLC = {"C": 56.5e-9, "ESL": 0.326e-9, "ESR": 0.068}  # Taiyo Yuden DC-bias
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
+def goals_cases(names, vin=None, iout=None):
+    """Goals study (see the module docstring)."""
+    common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
+              "long_pulse": True, "method": "gear", "settle_trace": True}
+    cases = {}
+    for n in names:
+        alt = lambda a, **kw: {"ext": n, **common, **ALTERNATIVES[a], "design": n, "alternative": a, **kw}
+        if vin is not None or iout is not None:
+            tag = f"-v{vin:g}" if vin is not None else f"-i{iout:g}"
+            cases.update({f"{n}@{a}-gear{tag}": alt(a) for a in ("ramp-Ls50", "step-Ls50")})
+            continue
+        cases.update({f"{n}@{a}-gear": alt(a) for a in ALTERNATIVES})
+        for f in (0.9, 1.1):
+            cases.update({f"{n}@{a}-gear-l{f:g}": alt(a, l_scale=f) for a in ("ramp-Ls50", "step-Ls50")})
+        for dt in (2.5, 5, 7.5, 12.5, 15, 20):
+            cases[f"{n}@ramp-Ls50-gear-dt{dt:g}"] = alt("ramp-Ls50", dead=dt * 1e-9)
+        cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l") for a in ("ramp-Ls0", "step-Ls0")})
+    return cases
+
+
 def probe_cases(exts):
     """Probe-reference study (see the module docstring)."""
     g = "G-m1-mid"
@@ -1393,10 +1436,11 @@ def damping_cases(exts):
     return cases
 
 
-def set_operating_point(vout, iout):
+def set_operating_point(vout, iout, vin=None):
     """Design study: move the module's operating point (the double pulse reads these at call time)."""
-    global VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
+    global VIN, VOUT, IOUT, DUTY, T_OFF, RIPPLE, I_PEAK, I_VALLEY
     VOUT, IOUT = vout, iout
+    VIN = VIN if vin is None else vin
     DUTY = VOUT / VIN
     T_OFF = (1 - DUTY) / F_SW
     RIPPLE = (VIN - VOUT) * DUTY / (F_SW * L_OUT)
@@ -1412,7 +1456,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search", "damping", "probe"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search", "damping", "probe", "goals"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
@@ -1422,10 +1466,16 @@ def main():
     ap.add_argument("--timeout", type=float, default=600.0,
                     help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
+    ap.add_argument("--vin", type=float, default=None, help="goals study: input-voltage corner (V)")
+    ap.add_argument("--iout", type=float, default=None, help="goals study: load corner (A)")
     args = ap.parse_args()
     REFERENCE = args.reference
     if args.study in ("design", "layout", "qgfit", "search"):
         set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"])
+    if args.study == "goals":
+        if args.vin is not None and args.iout is not None:
+            raise SystemExit("goals study: one corner (--vin or --iout) per run")
+        set_operating_point(DESIGN_POINT["VOUT"], DESIGN_POINT["IOUT"] if args.iout is None else args.iout, args.vin)
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
     qg_lib = qg_variant_library() if args.study in ("qgfit", "damping") or args.qg else None
@@ -1448,7 +1498,7 @@ def main():
     te_rise, te_fall = solve_edge(EDGE_GRID, rises, DRIVER_RISE), solve_edge(EDGE_GRID, falls, DRIVER_FALL)
     if te_rise is None or te_fall is None:
         raise SystemExit("driver calibration did not bracket the datasheet edge times")
-    if args.study in ("driver", "design", "layout", "qgfit", "search"):
+    if args.study in ("driver", "design", "layout", "qgfit", "search", "goals"):
         rs, fs = [], []
         for name, text in driver_step_bench().items():
             raw = run(name, text)
@@ -1498,6 +1548,10 @@ def main():
             cases = {k: c for k, c in cases.items() if not c.get("on_request")}
     elif args.study == "search":
         cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80, args.qg, args.sourced)
+        if args.only:
+            cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "goals":
+        cases = goals_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.vin, args.iout)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "probe":
@@ -1580,7 +1634,7 @@ def main():
                   gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
                   method=c.get("method"), model=c.get("model", "EPC2302"), oss_rc=c.get("oss_rc"),
                   ci_vendor=c.get("ci_vendor", False), cm_model=c.get("cm_model"), ci_model=c.get("ci_model"),
-                  save_terminals=c.get("save_terminals", False))
+                  save_terminals=c.get("save_terminals", False), l_scale=c.get("l_scale", 1.0))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
@@ -1620,6 +1674,8 @@ def main():
             timing = {"t1": I_PEAK / s_on, "t_off": (I_PEAK - I_VALLEY) / s_off}
             first = {"edge_currents_A": [ia, ib], "slopes_A_per_s": [s_on, s_off], "corrected_timing_s": timing}
             text, times, at = bench(ext, ter, tef, timing=timing, **kw)
+        if c.get("settle_trace"):
+            times["settle_window"] = True
         raw = run(name, text)
         s = raw.step(0) if raw else None
         m = metrics(s, times, at) if raw else None
@@ -1681,7 +1737,8 @@ def main():
                 "conditions": {"VIN": VIN, "VOUT": VOUT, "IOUT": IOUT, "f_sw_Hz": F_SW, "L_out_H": L_OUT, "duty": DUTY,
                                "ripple_A": RIPPLE, "I_peak_A": I_PEAK, "I_valley_A": I_VALLEY, "dead_time_s": DEAD,
                                "dead_time_note": "per-case 'dead' overrides it (design study)",
-                               "source": ("design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout", "qgfit", "search")
+                               "source": ("owner's execution template (8 October 2026), corner per --vin/--iout" if args.study == "goals" else
+                                          "design round operating point (owner targets, 5 October 2026)" if args.study in ("design", "layout", "qgfit", "search")
                                           else "EPC90133 QSG Fig. 9 (continuous buck; measured tf 3.7 ns, tr 1.7 ns)")},
                 "fixed_assumptions": {"capacitors": CAP_MODEL, "bus": BUS, "N_cm_lumped": N_CM, "gate_resistors_ohm": [R_GON, R_GOFF],
                                       "driver_supplies_V": [VCC, VBOOT], "temperature_C": 25, "maxstep_s": MAXSTEP, "reltol": RELTOL,

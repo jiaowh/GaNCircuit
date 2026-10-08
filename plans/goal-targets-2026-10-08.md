@@ -75,3 +75,17 @@ unvalidated):
 2. Geometry families aimed at the failing goals: gate-loop / Kelvin return (F4) for S8; power-loop return vias (F2)
    with V8 for S2. Every candidate is legal, keeps the BOM, and goes through the same KiCad route as stock.
 3. The J33 probe-reference test (running) continues: it bears on D3's probe point and on any later back-fit.
+
+## Evaluation protocol (declared 8 October 2026, before any goals run)
+
+Owner instruction (8 October 2026): no approval stop; validate, evaluate and continue until a final acceptable
+result is found. Runs: `scripts/epc90133_switching.py --study goals` (conditions in its docstring); scoring:
+`scripts/assess_epc90133_goals.py` (definitions in its docstring). Primary conditions are ramp-Ls50 and step-Ls50
+with the bench's assumed capacitor values (comparable with the earlier rounds); 0 pH is reported. A final candidate
+is also rerun with the sourced capacitor data and C_SW (`--sourced` equivalent) and must keep its verdicts there.
+The four nominal stock cases repeat the G search's stock cases and must reproduce them (overshoot, losses within
+0.1 %), which checks that the goals cases are the search cases plus the stored settling trace.
+
+Acceptable final result: a legal geometry-only candidate (BOM unchanged) that meets every goal, or, if no such
+candidate is found, the best candidate with each unmet goal shown unreachable within the model by a bound (for
+example an idealized screen that also fails it), not merely untried.
