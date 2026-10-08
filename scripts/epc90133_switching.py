@@ -415,6 +415,16 @@ settings (100 ps, Gear, Q2 sense, settled loss estimator revision 2):
   reported alongside, not judged. The owner's 7 October request to include the gate-charge curve in the
   verifications had been omitted from the first goals declaration; this supersedes it.
 Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed with this declaration).
+* model and package inductance (owner decision, 8 October 2026, after EPC2302DS passed its datasheet checks and
+  after the vendor-model goals results and bound sweep were read): new runs use EPC2302DS (scripts/
+  epc2302_ds_variant.py; Figs. 5 and 7 and every existing datasheet check pass) and the assumed 50 pH only; the
+  original model and 0 pH are no longer run or reported in new work (existing reports keep their settings). --ds
+  gives cases <case>-ds; the 0 pH alternatives and the 0 pH-only ideal low-side screen (ctlls) are dropped, so S8's
+  layout bound needs another method. Same scoring definitions (--model-suffix -ds).
+Fig. 9 with EPC2302DS (--study damping --ds; same owner decision, declared before its runs): G-m1-mid-Ls50-gear-ds
+(the bench's assumed capacitors) and G-m1-mid-Ls50-tyrlc-avxcm-csw-gear-ds (vendor-sourced Ci/Cm values and the
+switch-node copper capacitance, as damping run 2), scored by scripts/compare_epc90133_fig9.py with its unchanged
+criteria plus the settling metric added there on the same day.
 
 Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
 50 pH package source inductance, can missing losses explain why the simulation overshoots about twice Fig. 9 and
@@ -1305,6 +1315,21 @@ def qg_variant_library():
     return lib_
 
 
+DS_VARIANT_REPORT = ROOT / "results/gan/epc2302-ds-variant.json"
+DS_MODEL = "EPC2302DS"
+
+
+def ds_variant_library():
+    """The checked datasheet-calibrated library (scripts/epc2302_ds_variant.py), or exit."""
+    rep_ = json.loads(DS_VARIANT_REPORT.read_text(encoding="utf-8"))
+    if rep_.get("outcome") != "pass":
+        raise SystemExit(f"--ds: the EPC2302DS report's outcome is {rep_.get('outcome')!r}, not 'pass'")
+    lib_ = ROOT / rep_["standalone_library"]["file"]
+    if sha256(lib_) != rep_["standalone_library"]["sha256"]:
+        raise SystemExit("--ds: the EPC2302DS library does not match its report's hash")
+    return lib_
+
+
 def qgfit_cases(exts):
     """Gate-charge sensitivity (see the module docstring): stock and R80-1.5, vendor model and variant, Gear."""
     if "G-m1-mid" not in exts:
@@ -1370,7 +1395,7 @@ TY_CI_RLC = {"C": 56.5e-9, "ESL": 0.326e-9, "ESR": 0.068}  # Taiyo Yuden DC-bias
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
-def goals_cases(names, vin=None, iout=None, qg=False):
+def goals_cases(names, vin=None, iout=None, qg=False, ds=False):
     """Goals study (see the module docstring)."""
     common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
               "long_pulse": True, "method": "gear", "settle_trace": True}
@@ -1381,12 +1406,15 @@ def goals_cases(names, vin=None, iout=None, qg=False):
             tag = f"-v{vin:g}" if vin is not None else f"-i{iout:g}"
             cases.update({f"{n}@{a}-gear{tag}": alt(a) for a in ("ramp-Ls50", "step-Ls50")})
             continue
-        cases.update({f"{n}@{a}-gear": alt(a) for a in ALTERNATIVES})
+        cases.update({f"{n}@{a}-gear": alt(a) for a in ALTERNATIVES if not (ds and a.endswith("Ls0"))})
         for f in (0.9, 1.1, 0.25, 0.5, 0.75, 1.25, 1.5):
             cases.update({f"{n}@{a}-gear-l{f:g}": alt(a, l_scale=f) for a in ("ramp-Ls50", "step-Ls50")})
         for dt in (2.5, 5, 7.5, 12.5, 15, 20):
             cases[f"{n}@ramp-Ls50-gear-dt{dt:g}"] = alt("ramp-Ls50", dead=dt * 1e-9)
-        cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l") for a in ("ramp-Ls0", "step-Ls0")})
+        if not ds:  # the ideal low-side screen is allowed only at 0 pH, which the owner dropped for EPC2302DS runs
+            cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l") for a in ("ramp-Ls0", "step-Ls0")})
+    if ds:
+        cases = {f"{k}-ds": {**c, "model": DS_MODEL} for k, c in cases.items()}
     if qg:
         cases = {f"{k}-qg": {**c, "model": QG_MODEL} for k, c in cases.items()}
     return cases
@@ -1473,6 +1501,7 @@ def main():
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
     ap.add_argument("--with-r80", type=float, default=None, help="search study (G only): also run every NAME with R80")
+    ap.add_argument("--ds", action="store_true", help="goals/damping: run with EPC2302DS, assumed 50 pH only (cases <case>-ds)")
     ap.add_argument("--qg", action="store_true", help="search study: run every case with EPC2302QG (gate-charge check)")
     ap.add_argument("--sourced", action="store_true", help="search study: vendor capacitor data and C_SW (sourced-parts check)")
     ap.add_argument("--timeout", type=float, default=600.0,
@@ -1491,11 +1520,13 @@ def main():
     lib, _ = bl.library_path()
     bl.verify_target_sources(lib)
     qg_lib = qg_variant_library() if args.study in ("qgfit", "damping") or args.qg else None
+    ds_lib = ds_variant_library() if args.ds else None
     run_root = ROOT / "runs" / ("epc90133-switching-" + uuid.uuid4().hex[:12])
     runs = {}
 
     def run(name, text):  # limit per LTspice run: --timeout (the adapter allows up to MAX_TIMEOUT_S)
-        libs = [lib] + ([qg_lib] if f" {QG_MODEL}" in text else []) + ([TY_CI_LIB] if f" {TY_CI_MODEL} " in text else [])
+        libs = ([lib] + ([qg_lib] if f" {QG_MODEL}" in text else []) + ([ds_lib] if f" {DS_MODEL}" in text else [])
+                + ([TY_CI_LIB] if f" {TY_CI_MODEL} " in text else []))
         r = run_ltspice(text, run_root / name, libraries=libs, timeout_s=args.timeout)
         runs[name] = {"status": r.status, "message": r.message, "duration_s": r.duration_s,
                       "warnings": r.provenance.get("log_warnings"), "netlist_sha256": r.provenance.get("netlist_sha256")}
@@ -1563,7 +1594,7 @@ def main():
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "goals":
-        cases = goals_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.vin, args.iout, args.qg)
+        cases = goals_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.vin, args.iout, args.qg, args.ds)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "probe":
@@ -1572,6 +1603,9 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "damping":
         cases = damping_cases(exts)
+        if args.ds:  # Fig. 9 with EPC2302DS, 50 pH only (owner, 8 October 2026)
+            keep = ("G-m1-mid-Ls50-gear", "G-m1-mid-Ls50-tyrlc-avxcm-csw-gear")
+            cases = {f"{k}-ds": {**{x: y for x, y in cases[k].items() if x != "base"}, "model": DS_MODEL} for k in keep}
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "qgfit":
@@ -1626,6 +1660,9 @@ def main():
         **({"variant_library": {"file": qg_lib.relative_to(ROOT).as_posix(), "sha256": sha256(qg_lib),
                                 "report": QG_VARIANT_REPORT.relative_to(ROOT).as_posix(),
                                 "report_sha256": sha256(QG_VARIANT_REPORT)}} if qg_lib else {}),
+        **({"ds_library": {"file": ds_lib.relative_to(ROOT).as_posix(), "sha256": sha256(ds_lib),
+                           "report": DS_VARIANT_REPORT.relative_to(ROOT).as_posix(),
+                           "report_sha256": sha256(DS_VARIANT_REPORT)}} if ds_lib else {}),
         "modules": {m: sha256(ROOT / m) for m in ("scripts/epc9097_switching.py", "scripts/epc2302_baseline.py",
                                                   "src/circuit_tools/ltspice.py")}}
     results, slopes = {}, {}
