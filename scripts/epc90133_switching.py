@@ -369,6 +369,10 @@ before any of the runs below), in this order, one report each, --jobs 2 on Windo
    assessor's 2 % rule on overshoot, FET loss and Q2 gate peak): V8+R80-1.3@ramp-Ls0-gear-ms50 and, if the sourced
    worst alternative is also ramp-Ls0 after rerun 1, V8+R80-1.3@ramp-Ls0-gear-src-ms50 (else that alternative's);
 3. the gate-charge check (above) for V8+R80-1.3 and stock, all four alternatives, assumed parts (--qg).
+Amendment (8 October 2026, before any simulation of these runs): the first chain asked for --timeout 7200 and every
+command stopped at argument validation (the LTspice adapter's maximum is 3600 s), so nothing ran (logs
+*-run1-failed). Rerun with --timeout 3600; recorded run times: step-Ls0-gear-src cases take about 2380 s (V8+R80-1.4)
+while other cases take about 40 s. Quick checks (2, 3) now go first. A case that still times out stays undetermined.
 V8+R80-1.3 is reported as found only if C0-C2 hold under both part sets, N passes under both, and the B extraction
 confirms V8's loop-L reduction beyond 4 %; the gate-charge check decides only whether a gate-charge caveat is attached.
 Gate-charge check (owner request, declared 7 October 2026 before any G search result): a candidate that meets the rule
