@@ -93,3 +93,10 @@ example an idealized screen that also fails it), not merely untried.
 Model (owner decision, 8 October 2026, before any goals result was read): the datasheet's gate-charge curve (Fig. 7)
 is the truth. EPC2302QG is the primary model (goals cases `<case>-qg`); its Crss about 23 % outside Fig. 5 is listed
 as a model inconsistency (template M1). The vendor model's goals runs (started first) are reported alongside.
+
+Later owner clarification (8 October 2026): both Figures 5 and 7 are trusted
+as required datasheet targets. The earlier primary-model designation identifies
+the model used in those runs; it does not waive the Figure 5 failure. A replacement
+model must meet both figures and retain the other passing datasheet checks before
+being accepted as datasheet-consistent. Existing results retain their model identity
+and M1 limitation. No board result is reclassified or overwritten by this decision.

@@ -3304,3 +3304,163 @@ What this shows:
   the report is checkpointed after each case and records the requested cases and whether all of them ran. Checked
   by a forced 3 s timeout on case C (its process was stopped, the report shows `complete: true, all_pass: false`)
   and by rejected `--only nosuch` and empty `--only`. The recorded eight-case results are unaffected.
+
+
+### EPC2302 gate-charge cause assessment (8 October 2026)
+
+Owner request: evaluate what causes the EPC2302 gate-charge curve mismatch.
+Decision: whether existing evidence justifies changing the baseline model, or instead
+identifies a discriminating measurement. Scope was a bounded review of saved results,
+bench code and vendor charge equations; no simulator or parameter sweep was launched.
+The arithmetic below is retrospective interpretation, not a new acceptance test.
+
+Evidence reviewed: `epc2302-baseline.json`, `epc2302-fig7-comparison.json` and
+`epc2302-qg-variant.json` in `results/gan/`, with the baseline/curve and 7 October
+sensitivity build notes above. SHA-256 checks matched the local library and datasheet
+to the target source record, the comparison's three input artifacts, and the sensitivity
+report's baseline, comparison, vendor library, four imported modules and evaluator.
+The baseline evaluator and EPC2204 helper also matched their recorded hashes.
+The saved baseline reports completed execution with no failed benches; sensitivity
+run 3 reports V0/V1/V2 passes. Those statuses retain the limitations above.
+
+**Assessment:** the corrected simulation demonstrably disagrees with the vendor's
+Figure 7; a physical device-model error is not yet isolated. Most of the horizontal
+charge deficit accumulates before and through the Miller interval, not after it.
+From the existing comparison's horizontal rows:
+
+| VGS interval | Model charge increment | Figure 7 increment | Model relative difference |
+|---|---:|---:|---:|
+| 1 to 2 V | 3.346226 nC | 3.641812 nC | -8.116% |
+| 3 to 4.5 V | 6.994482 nC | 6.921032 nC | +1.061% |
+
+Thus the approximately 1.2 nC post-plateau offset largely carries forward an earlier
+shortfall; it is not evidence that the post-plateau incremental capacitance is too
+small. Replay: subtract `q_model_nC` and `q_datasheet_nC` between those voltage rows
+in `epc2302-fig7-comparison.json`, then compute `100*(model_increment/drawing_increment-1)`.
+Plateau width remains definition/sampling dependent: 2.40 nC resampled versus 2.87 nC
+on the drawing; the old 2.19 nC stored feature overstates that particular discrepancy.
+
+The model uses voltage-dependent gate-source and gate-drain charge terms. Increasing
+the latter lengthens the Miller interval, but those same terms set reverse-transfer
+capacitance. Run 3's Figure 7 sensitivity revision scales the linear gate-source term
+by 1.096, the gate-drain terms by 1.230, and the on-state term by 0.718. It passes the
+Figure 7 checks but raises CRSS about 23% relative to the Figure 5-following baseline,
+outside the Figure 5 tolerance. This demonstrates the conflict for the tested scaling
+of the existing model. It does not prove that every possible charge-model structure
+cannot fit both figures. Missing dependence on the combination of gate and drain bias,
+or different source data/conditions behind the drawing and model, remain hypotheses.
+
+Alternatives constrained by existing evidence:
+
+- Numerical under-integration was real at default reltol, but the corrected 1e-6
+  result agrees with the charge equations within 0.1%; tightening to 1e-7 changes
+  total charge by about 4e-8 relative. Gear/trapezoidal agreement is also recorded.
+- Start-charge correction, drive-current/leakage sensitivity and sampling affect
+  reported values but do not remove the declared Figure 7 failure. Axis-fit residual
+  alone is not a complete digitization uncertainty.
+- Table sub-charge definitions remain a separate issue: Figure 7 itself does not
+  reproduce the table QG(TH) at either tested threshold. Changing a QGD endpoint can
+  change its reported number without repairing the full plotted curve.
+- The device bench contains no EPC90133 PCB extraction or uP1966 driver, so those
+  board-model errors cannot cause this isolated comparison failure.
+
+Recommendation: retain the unmodified provisional baseline and the separate
+sensitivity revision. E7 should compare gate charge and capacitance on the same
+spare devices with fixture effects characterized, initially at the published
+50 V/50 A charge condition; reserve other conditions for validation. Fixture capability
+and the approved procedure remain prerequisites. Current evidence cannot choose
+between a deficient model, a nonrepresentative drawing, or unreported test/source
+conditions. Gate-charge-dependent switching times and losses remain unvalidated.
+
+
+### EPC2302 joint datasheet target: owner clarification (8 October 2026)
+
+Following the cause assessment above, the owner explicitly chose to trust both
+Figure 5 capacitance and Figure 7 gate charge. Both are now required calibration
+targets, with the existing comparison tolerances retained. Passing the gate-charge
+figure does not excuse a capacitance failure. Datasheet calibration is permitted
+as a separate revision; physical validation and unique identification remain open.
+
+This corrects the overly broad interpretation in the 7 October sensitivity note:
+its three-factor scaling failed to match both figures, but did not prove that all
+parameter choices or charge representations must fail. The original vendor model
+and EPC2302QG remain preserved. Neither presently meets the joint requirement.
+The earlier Figure 7-primary goals runs retain their model identity, numerical
+results and Figure 5 inconsistency; no recorded prediction is changed.
+
+Updated README, AGENTS and the two active plans to carry the joint requirement.
+The next device-level feasibility check must declare a representation, numerical
+checks and a compute budget before execution; it must not fit board overshoot.
+This turn changed documentation only: no new model, fit or solver run was made.
+
+
+### Whole-datasheet model scope (8 October 2026)
+
+The owner clarified that acceptance must cover the whole EPC2302 datasheet, not
+just Figures 5 and 7. Created `plans/epc2302-full-datasheet-model-plan.md` with a
+coverage inventory and proposed bounded sequence: missing table checks, joint
+charge fitting, full electrical regression, thermal/rating coverage, then matched
+board comparison. Reviewed the existing baseline and curve benches against the
+pinned datasheet revision; this is a scope review, not new numerical qualification.
+The public EPC PDF was also consulted; no vendor file was replaced or downloaded
+into the repository. Original local source records remain authoritative for runs.
+No model fit or simulator execution occurred. Unsupported and unresolved items
+remain open; neither existing model is accepted as covering the whole datasheet.
+
+
+### EPC2302DS: joint Figures 5 and 7 calibration, existing-check regression (8 October 2026)
+
+Script: `scripts/epc2302_ds_variant.py` (representation, frozen parameters, checks D0-D5 and budget declared in
+its docstring and committed in `202d5c9` before any LTspice run of the candidate). Report:
+`results/gan/epc2302-ds-variant.json`; per-check reports `results/gan/epc2302ds-*.json`; standalone library
+`vendor/epc/derived/EPC2302DS.lib` (git-ignored, SHA-256 2ce90d2b...aeea).
+
+Representation: the vendor subcircuit unchanged plus two charge-defined capacitors, each a smooth charge step in
+one branch voltage: gate-source 1.087 nC centred at VGS 1.843 V (width 0.377 V) and gate-drain 0.344 nC centred at
+VGD +0.620 V (width 0.077 V). Every datasheet capacitance is taken at VGS = 0 and VGD <= 0, where both steps are
+negligible (at most 0.67 % of CISS and 0.79 % of CRSS over 0-100 V); Fig. 7 passes through both windows. Parameters
+were chosen on a quasi-static Python replica of the Fig. 7 bench (reproduces the stored LTspice vendor curve within
+about 0.01 nC; `--design` replays the fit) before the declaration. The first replica fit was rejected because its
+capacitance guard omitted the gate-drain term and it placed that step at VGD -3.1 V, inside the Fig. 5 domain.
+
+Run 1 crashed in post-processing (reading `bench.op.raw` for the resampled curve); every bench had completed and
+the printed checks passed. File name fixed only; run 2 is the result (log `runs/epc2302-ds-variant-run2.log`):
+
+| Check | Result |
+|---|---|
+| D0 machinery (additions zeroed reproduce the stored vendor table) | pass, identical values |
+| D1 Fig. 7, stored pipeline | pass; worst vertical -0.056 V (tolerance 0.10); all 7 horizontal rows pass |
+| D1 Fig. 7, 0.01 nC resampled | pass; worst vertical -0.056 V; plateau start 8.63 / width 2.79 / Q(5 V) 23.83 nC (drawn 8.43 / 2.87 / 23.57) |
+| D2 all 24 curves, Figs. 1-6, 8-10, tolerances unchanged | pass (Fig. 5b CRSS worst ratio 0.03 decade) |
+| D3 table: no limit violation, no new flag, four bench self-checks | pass; reltol 1e-6 -> 1e-7 changes QG by 4e-8 |
+| D4 closed 0 -> 5 -> 0 V gate cycle, net charge minus leakage | 1e-8 of peak charge (vendor control the same) |
+| D5 added-term capacitance in the Fig. 5 domain | pass, <= 0.8 % |
+
+Table effect: QG 22.0 -> 23.4 nC (typ 23), QGS 7.42 -> 8.27 nC (typ 8.9), QG(TH) 4.35 -> 4.65 nC (typ 6.3, still
+flagged), QGD 1.53 -> 1.54 nC (typ 2.3, still flagged), CISS 3.24 -> 3.26 nF; DC rows and output capacitance rows
+unchanged. QGD/QG(TH) remain the bench-definition conflict recorded above: EPC's own Fig. 7 gives 4.44 nC at 1.3 V.
+
+What this establishes: one charge-conserving representation meets Figs. 5 and 7 together and keeps every existing
+electrical check passing; the 7 October uniform-scaling conflict is not a conflict between the figures. What it
+does not: the whole-datasheet coverage of `plans/epc2302-full-datasheet-model-plan.md` (BVDSS, IDSS, IGSS at
+three conditions and QRR have no check for either model; DC equations are identical to the vendor model's, so
+those rows behave as the vendor model does; thermal, SOA and ratings are outside an electrical subcircuit). The
+steps are a calibration, not identified physics: the gate-drain step is also crossed in reverse conduction near
+VDS -0.6 V and at the end of every hard turn-on, which no datasheet figure tests. No board run uses EPC2302DS yet.
+
+
+### Goals study: vendor-model scoring and bound sweep (8 October 2026)
+
+The four vendor-model goals reports (`results/gan/epc90133-goals-G{,-v40,-v60,-i0}.json`, stock and V8, all
+cases complete) were scored with `--model-suffix ''` into `results/gan/epc90133-goals-assessment-vendor.json`.
+The first scoring attempt crashed: at 0 % load the valley turn-on is soft and has no 10-90 % rise time. Retrospective
+fix in the assessor (no definition changed): dv/dt and S4 are undetermined for such a case; S13 uses only S1, S2,
+S7 and S8. These are the reported (vendor) model's verdicts, not the primary model's.
+
+Stock and V8 both fail S2, S8, S10, S11, S12 and S13 (V8 also S3). Observations: x0.9/x1.1 parasitics move stock
+overshoot only 11.26 -> 11.07 V (ramp-Ls50); the ideal low-side gate screen gives a Q2 gate peak of 0.25-0.33 V
+(0 pH), below S8's 0.5 V, so S8 is not excluded for gate-loop layouts; FET loss falls monotonically to the shortest
+tested dead time (2.5 ns), so S11's 5-15 ns window fails for both designs independent of layout.
+
+The declared bound sweep (stock, x0.25-1.5, ramp/step-Ls50, vendor model) was launched through WMI:
+`runs/goals-G-bound.launch.json`, output `results/gan/epc90133-goals-G-bound.json`.

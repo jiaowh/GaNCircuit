@@ -60,15 +60,29 @@ recommend a course of action rather than offering unexplained technical choices.
 Read the relevant report and build-note section before quoting numbers.
 
 - **Model:** EPC2302 runs unmodified with `reltol=1e-6`. The 24 curve passes and
-  limited table checks do not resolve Fig. 7 gate charge or QGD/QG(TH). No tuning
-  is justified; gate-charge-dependent switching times and losses are unvalidated.
+  limited table checks do not resolve Fig. 7 gate charge or QGD/QG(TH).
+  Gate-charge-dependent switching times and losses are unvalidated.
   EPC2302QG (`scripts/epc2302_qg_variant.py`, run 3) is a Fig. 7-following
   SENSITIVITY revision, not a tuned or validated model; it puts CRSS 23 % outside
-  Fig. 5, so Figs. 5 and 7 cannot both be met in this structure (E7 decides).
+  Fig. 5. That scaling fails the joint target; it does not establish that the two
+  figures are physically inconsistent or cannot be matched with another charge representation.
   The stored plateau width (2.19 nC) is sampling-dependent: 2.40 nC resampled.
   Owner decision (8 October 2026): treat the datasheet's Fig. 7 gate charge as the truth; EPC2302QG is the
   primary model of the goals study (template S1-S13), its Crss deviation from Fig. 5 is listed as a model
   inconsistency, and the vendor model is reported alongside.
+  Later owner clarification (8 October 2026): trust BOTH Figs. 5 and 7 as required
+  datasheet targets. Separate datasheet calibration is permitted; acceptance requires
+  both figures and preservation of the other passing checks. Neither current model
+  meets that joint target. Keep existing results tied to their actual model; no
+  hardware-validation claim follows from fitting published typical curves.
+  Further clarification: the target is whole-datasheet coverage, including every
+  electrical curve/table condition and explicit thermal/rating/structural coverage.
+  See plans/epc2302-full-datasheet-model-plan.md; untested or unsupported items are
+  not passes and prevent a claim that the whole datasheet is satisfied.
+  EPC2302DS (`scripts/epc2302_ds_variant.py` run 2): vendor model plus two charge steps
+  outside the VGS=0/VGD<=0 capacitance domain; passes Figs. 5 AND 7, all 24 curves, the 13 table
+  rows' limits/flags and numerical checks. Calibration, not physics; QGD/QG(TH) still flagged;
+  BVDSS/IDSS/IGSS/QRR, thermal and ratings unchecked, so not whole-datasheet. No board run uses it yet.
 - **Extraction:** A/I/B/G are exploratory; no second full-board mesh has run.
   Fourth-mesh single-via inductance passes, resistance is unconverged; arrays,
   holes and Kelvin/multilayer connections are not qualified by that pass.

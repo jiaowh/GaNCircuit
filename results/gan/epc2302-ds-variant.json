@@ -1,0 +1,540 @@
+{
+ "schema": "epc2302-ds-variant/1",
+ "evaluator_sha256": "60862291be6e5a2f96d7b352f3fa85f74e2b6f76f26748ea4972383ecc5fe63d",
+ "candidate": "EPC2302DS",
+ "params": {
+  "xqs": 1.087e-09,
+  "xvs": 1.843,
+  "xws": 0.3767,
+  "xqd": 3.435e-10,
+  "xvd": 0.6203,
+  "xwd": 0.07692
+ },
+ "evidence_directory": "runs\\epc2302-ds-variant-92080ab0cc62",
+ "scope": "Datasheet-calibrated revision of the EPC2302 vendor model: vendor subcircuit unchanged plus two declared charge steps. Calibration to EPC's typical curves; not physically identified, not validated against hardware. The vendor model stays the baseline.",
+ "input_manifest": {
+  "vendor_library": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+  "vendor_baseline": "a6546383969a312e96e7ff401899d0130ba75255af9192c24f0578954d00abc6",
+  "modules": {
+   "scripts/epc2302_baseline.py": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+   "scripts/epc2302_curve_benches.py": "c9fa38cfebe1515063a68b381996a90e57e475b7ae43a963c46c585e5b0a9bc6",
+   "scripts/compare_epc2302_curves.py": "e741ae45e277b69a9955f730ef8b92962ab141e59a5c78f53774119663ec4d6c",
+   "scripts/compare_epc2302_gate_charge.py": "c42c820cc72c0d3b4ad09a7414885867a523155124cfbc18c602140f9cd2a3e8",
+   "scripts/epc2302_qg_variant.py": "f65f9b20350c0a49841cd8e5eb1783da14a0ef7671bf8a3e15f3130ddb1c3a27",
+   "scripts/epc2204_baseline.py": "d11c193b89a9756700acb73a01cf0ef457a95a2a8581e83f4ae2a20d06cd02f9",
+   "scripts/compare_epc2204_curves.py": "0e8d2d02f50b2d496b16c4abc8ee63f10d38f0a24b8e66e0ec212cab72154162",
+   "scripts/compare_epc2204_gate_charge.py": "8e28bddabaa4b491dc1630850b9d342a457e3a9d14342da3a4b018dad3d8781f",
+   "src/circuit_tools/ltspice.py": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+  }
+ },
+ "D0_machinery": {
+  "max_relative_difference": 0.0,
+  "per_row": {
+   "rds_on": 0.0,
+   "vgs_th": 0.0,
+   "vsd": 0.0,
+   "ciss": 0.0,
+   "crss": 0.0,
+   "coss": 0.0,
+   "coss_er": 0.0,
+   "coss_tr": 0.0,
+   "qg": 0.0,
+   "qgs": 0.0,
+   "qgd": 0.0,
+   "qg_th": 0.0,
+   "qoss": 0.0
+  },
+  "tolerance": 0.001,
+  "outcome": "pass"
+ },
+ "candidate_suite_library_sha256": "db50a4f7e5fcb04ba541c387bb713c1e37bdf9c6b0e715c086714883f9fae34e",
+ "D1_fig7": {
+  "stored_pipeline": {
+   "vertical": "pass",
+   "vertical_worst": {
+    "q_nC": 23.663914936161447,
+    "vgs_datasheet_V": 5.000384651115164,
+    "vgs_model_V": 4.944577219951339,
+    "difference_V": -0.05580743116382525
+   },
+   "horizontal": "pass",
+   "features": {
+    "plateau_vgs_V": 2.400609016418457,
+    "plateau_start_nC": 8.644713488677798,
+    "plateau_end_nC": 11.303598778757115,
+    "plateau_width_nC": 2.6588852900793167,
+    "q_at_vgs_5V_nC": 23.82918992532839,
+    "q_at_vgs_th_nC": {
+     "datasheet VGS(th) (1.300 V)": 4.342388775075851,
+     "model VGS(th) (1.506 V)": 5.122534432446647
+    },
+    "definitions": {
+     "plateau": "VGS within 0.05 V of the flattest 0.8 nC stretch",
+     "q_at_vgs_5V": "first charge where VGS reaches 4.98 V",
+     "q_at_vgs_th": "first charge where VGS reaches the stated threshold"
+    }
+   }
+  },
+  "resampled": {
+   "vertical": {
+    "definition": "|VGS_model(Q) - VGS_datasheet(Q)| at every datasheet vertex",
+    "tolerance_V": 0.1,
+    "vertices_compared": 25,
+    "vertices_total": 26,
+    "fraction_within": 1.0,
+    "worst": {
+     "q_nC": 23.663914936161447,
+     "vgs_datasheet_V": 5.000384651115164,
+     "vgs_model_V": 4.94458141046616,
+     "difference_V": -0.05580324064900388
+    },
+    "outcome": "pass"
+   },
+   "horizontal": {
+    "definition": "charge at which each curve first reaches VGS, off the plateau",
+    "tolerance": {
+     "relative": 0.05,
+     "absolute_nC": 0.25
+    },
+    "rows": [
+     {
+      "vgs_V": 1.0,
+      "q_datasheet_nC": 3.4076194505107154,
+      "q_model_nC": 3.2669890077210773,
+      "difference_nC": -0.1406304427896381,
+      "allowed_nC": 0.42038097252553575,
+      "outcome": "pass"
+     },
+     {
+      "vgs_V": 1.5,
+      "q_datasheet_nC": 5.1408386835831985,
+      "q_model_nC": 5.1000449268536645,
+      "difference_nC": -0.040793756729534,
+      "allowed_nC": 0.5070419341791599,
+      "outcome": "pass"
+     },
+     {
+      "vgs_V": 2.0,
+      "q_datasheet_nC": 7.049431488911035,
+      "q_model_nC": 7.15412536982219,
+      "difference_nC": 0.10469388091115484,
+      "allowed_nC": 0.6024715744455518,
+      "outcome": "pass"
+     },
+     {
+      "vgs_V": 3.0,
+      "q_datasheet_nC": 14.43829727577425,
+      "q_model_nC": 14.554210845458025,
+      "difference_nC": 0.11591356968377475,
+      "allowed_nC": 0.9719148637887125,
+      "outcome": "pass"
+     },
+     {
+      "vgs_V": 3.5,
+      "q_datasheet_nC": 16.749868942237196,
+      "q_model_nC": 16.946860481773157,
+      "difference_nC": 0.19699153953596138,
+      "allowed_nC": 1.0874934471118598,
+      "outcome": "pass"
+     },
+     {
+      "vgs_V": 4.0,
+      "q_datasheet_nC": 19.05651429902142,
+      "q_model_nC": 19.280705931129816,
+      "difference_nC": 0.224191632108397,
+      "allowed_nC": 1.202825714951071,
+      "outcome": "pass"
+     },
+     {
+      "vgs_V": 4.5,
+      "q_datasheet_nC": 21.359328837411226,
+      "q_model_nC": 21.59950048583432,
+      "difference_nC": 0.24017164842309313,
+      "allowed_nC": 1.3179664418705614,
+      "outcome": "pass"
+     }
+    ],
+    "outcome": "pass"
+   },
+   "features": {
+    "plateau_vgs_V": 2.3995453842911973,
+    "plateau_start_nC": 8.627309566906268,
+    "plateau_end_nC": 11.417309566906201,
+    "plateau_width_nC": 2.7899999999999334,
+    "q_at_vgs_5V_nC": 23.829171981599384,
+    "q_at_vgs_th_nC": {
+     "datasheet VGS(th) (1.300 V)": 4.342337587938549,
+     "model VGS(th) (1.506 V)": 5.122426791712652
+    },
+    "definitions": {
+     "plateau": "VGS within 0.05 V of the flattest 0.8 nC stretch",
+     "q_at_vgs_5V": "first charge where VGS reaches 4.98 V",
+     "q_at_vgs_th": "first charge where VGS reaches the stated threshold"
+    }
+   },
+   "datasheet_features": {
+    "plateau_vgs_V": 2.3651996187057356,
+    "plateau_start_nC": 8.433769001706786,
+    "plateau_end_nC": 11.300855340322904,
+    "plateau_width_nC": 2.8670863386161187,
+    "q_at_vgs_5V_nC": 23.570030794265442,
+    "q_at_vgs_th_nC": {
+     "datasheet VGS(th) (1.300 V)": 4.439649658223839,
+     "model VGS(th) (1.506 V)": 5.1613786144788545
+    },
+    "definitions": {
+     "plateau": "VGS within 0.05 V of the flattest 0.8 nC stretch",
+     "q_at_vgs_5V": "first charge where VGS reaches 4.98 V",
+     "q_at_vgs_th": "first charge where VGS reaches the stated threshold"
+    }
+   },
+   "offset_nC": 0.47730956690634824,
+   "time_points": 15137,
+   "outcome": "pass"
+  },
+  "outcome": "pass"
+ },
+ "D2_curves": {
+  "summary": {
+   "Figure 1 VGS=5V": {
+    "outcome": "pass",
+    "points": 36,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.006025376565893897,
+    "worst_at_x": 0.00017620743465596167
+   },
+   "Figure 1 VGS=4V": {
+    "outcome": "pass",
+    "points": 100,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.005115814863582142,
+    "worst_at_x": 0.1501653004264143
+   },
+   "Figure 1 VGS=3V": {
+    "outcome": "pass",
+    "points": 100,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.012061598334986715,
+    "worst_at_x": 0.00017620743465596167
+   },
+   "Figure 1 VGS=2V": {
+    "outcome": "pass",
+    "points": 100,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.04433162106139618,
+    "worst_at_x": 2.911552309272276
+   },
+   "Figure 2 25C": {
+    "outcome": "pass",
+    "points": 26,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.03481637680514895,
+    "worst_at_x": 2.2484171808116926
+   },
+   "Figure 2 125C": {
+    "outcome": "pass",
+    "points": 22,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.024580652109471916,
+    "worst_at_x": 2.2484171808116926
+   },
+   "Figure 3 ID=25A": {
+    "outcome": "pass",
+    "points": 35,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.024225543595607177,
+    "worst_at_x": 2.9998940269390575
+   },
+   "Figure 3 ID=50A": {
+    "outcome": "pass",
+    "points": 39,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.029876982348664458,
+    "worst_at_x": 4.099830494675623
+   },
+   "Figure 3 ID=75A": {
+    "outcome": "pass",
+    "points": 43,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.03813803080247611,
+    "worst_at_x": 3.1798862220989936
+   },
+   "Figure 3 ID=100A": {
+    "outcome": "pass",
+    "points": 53,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.1145046512491376,
+    "worst_at_x": 3.0398980644645266
+   },
+   "Figure 4 25C": {
+    "outcome": "pass",
+    "points": 49,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.017230779324859877,
+    "worst_at_x": 4.026559725187767
+   },
+   "Figure 4 125C": {
+    "outcome": "pass",
+    "points": 97,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.046694783342124936,
+    "worst_at_x": 3.289825343479522
+   },
+   "Figure 5a CISS": {
+    "outcome": "pass",
+    "points": 18,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.10075132840299332,
+    "worst_at_x": 99.98796002059709
+   },
+   "Figure 5a COSS": {
+    "outcome": "pass",
+    "points": 61,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.010864723743432272,
+    "worst_at_x": 99.98796002059709
+   },
+   "Figure 5a CRSS": {
+    "outcome": "pass",
+    "points": 18,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.019537683431825933,
+    "worst_at_x": 67.8906814417538
+   },
+   "Figure 5b CISS": {
+    "outcome": "pass",
+    "points": 7,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.019052676607413013,
+    "worst_at_x": 61.9837617836377
+   },
+   "Figure 5b COSS": {
+    "outcome": "pass",
+    "points": 37,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.03797087401388925,
+    "worst_at_x": 3.1839571721333755
+   },
+   "Figure 5b CRSS": {
+    "outcome": "pass",
+    "points": 51,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.03467857924657368,
+    "worst_at_x": 1.0839898840741284
+   },
+   "Figure 6 QOSS": {
+    "outcome": "pass",
+    "points": 26,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.014845108001784483,
+    "worst_at_x": 5.0928769696377145
+   },
+   "Figure 6 EOSS": {
+    "outcome": "pass",
+    "points": 44,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.02635264135352845,
+    "worst_at_x": 33.19335040307214
+   },
+   "Figure 8 25C": {
+    "outcome": "pass",
+    "points": 96,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.16136798635772717,
+    "worst_at_x": 2.3892332423153166
+   },
+   "Figure 8 125C": {
+    "outcome": "pass",
+    "points": 96,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.10255527453432278,
+    "worst_at_x": 1.7422646669815887
+   },
+   "Figure 9 normalized": {
+    "outcome": "pass",
+    "points": 26,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.06304394765315932,
+    "worst_at_x": 117.94926875192289
+   },
+   "Figure 10 normalized": {
+    "outcome": "pass",
+    "points": 116,
+    "fraction_within": 1.0,
+    "worst_ratio": 0.053848199870609736,
+    "worst_at_x": 123.95739016165933
+   }
+  },
+  "outcome": "pass"
+ },
+ "D3_table": {
+  "run_outcome": "completed",
+  "failed_benches": {},
+  "rows": {
+   "rds_on": {
+    "model": 0.0013804270327091217,
+    "typ": 0.0014,
+    "limit_check": "inside-limits",
+    "deviation_from_typ": -0.013980690922055894,
+    "review": false,
+    "vendor_model": 0.0013804270327091217,
+    "vendor_review": false
+   },
+   "vgs_th": {
+    "model": 1.5057595668144053,
+    "typ": 1.3,
+    "limit_check": "inside-limits",
+    "deviation_from_typ": 0.1582765898572347,
+    "review": false,
+    "vendor_model": 1.5057595668144053,
+    "vendor_review": false
+   },
+   "vsd": {
+    "model": 1.8254916316082612,
+    "typ": 1.5,
+    "limit_check": "no-limits",
+    "deviation_from_typ": 0.21699442107217415,
+    "review": false,
+    "vendor_model": 1.8254916316082612,
+    "vendor_review": false
+   },
+   "ciss": {
+    "model": 3.2599040387647183e-09,
+    "typ": 3.2e-09,
+    "limit_check": "inside-limits",
+    "deviation_from_typ": 0.018720012113974338,
+    "review": false,
+    "vendor_model": 3.2385821315830624e-09,
+    "vendor_review": false
+   },
+   "crss": {
+    "model": 7.504022943352359e-12,
+    "typ": 7e-12,
+    "limit_check": "no-limits",
+    "deviation_from_typ": 0.07200327762176562,
+    "review": false,
+    "vendor_model": 7.504032911827826e-12,
+    "vendor_review": false
+   },
+   "coss": {
+    "model": 9.943958042248077e-10,
+    "typ": 1e-09,
+    "limit_check": "inside-limits",
+    "deviation_from_typ": -0.005604195775192333,
+    "review": false,
+    "vendor_model": 9.943958042355846e-10,
+    "vendor_review": false
+   },
+   "coss_er": {
+    "model": 1.2672757543226845e-09,
+    "typ": 1.3e-09,
+    "limit_check": "no-limits",
+    "deviation_from_typ": -0.025172496674858102,
+    "review": false,
+    "vendor_model": 1.2672757448110353e-09,
+    "vendor_review": false
+   },
+   "coss_tr": {
+    "model": 1.7040959450389438e-09,
+    "typ": 1.7e-09,
+    "limit_check": "no-limits",
+    "deviation_from_typ": 0.002409379434672898,
+    "review": false,
+    "vendor_model": 1.7040937825997072e-09,
+    "vendor_review": false
+   },
+   "qg": {
+    "model": 2.344527731981298e-08,
+    "typ": 2.3e-08,
+    "limit_check": "inside-limits",
+    "deviation_from_typ": 0.019359883470129624,
+    "review": false,
+    "vendor_model": 2.202686890114305e-08,
+    "vendor_review": false
+   },
+   "qgs": {
+    "model": 8.272793968243154e-09,
+    "typ": 8.9e-09,
+    "limit_check": "no-limits",
+    "deviation_from_typ": -0.07047258783784782,
+    "review": false,
+    "vendor_model": 7.42187188083466e-09,
+    "vendor_review": false
+   },
+   "qgd": {
+    "model": 1.5396458057388373e-09,
+    "typ": 2.3e-09,
+    "limit_check": "no-limits",
+    "deviation_from_typ": -0.330588780113549,
+    "review": true,
+    "vendor_model": 1.5280144458228903e-09,
+    "vendor_review": true
+   },
+   "qg_th": {
+    "model": 4.64511613627246e-09,
+    "typ": 6.3e-09,
+    "limit_check": "no-limits",
+    "deviation_from_typ": -0.2626799783694509,
+    "review": true,
+    "vendor_model": 4.353505368549281e-09,
+    "vendor_review": true
+   },
+   "qoss": {
+    "model": 8.520479725194719e-08,
+    "typ": 8.5e-08,
+    "limit_check": "inside-limits",
+    "deviation_from_typ": 0.002409379434672898,
+    "review": false,
+    "vendor_model": 8.520468912998536e-08,
+    "vendor_review": false
+   }
+  },
+  "outside_limits": [],
+  "newly_flagged": [],
+  "self_checks": {
+   "ac_vs_transient": "pass",
+   "gate_charge_equation_check": "pass",
+   "gate_charge_numerical_convergence": "pass",
+   "gate_charge_drive_current_sensitivity": "pass"
+  },
+  "outcome": "pass"
+ },
+ "D4_charge_cycle": {
+  "candidate": {
+   "net_cycle_charge_C": 5.595131394535474e-10,
+   "leakage_charge_C": 5.595134447427776e-10,
+   "peak_charge_C": 2.450850682628647e-08,
+   "relative_to_peak": 1.2456459807755295e-08,
+   "tolerance": 0.01,
+   "time_points": 40416,
+   "vgs_end_V": 1.497107064096781e-06,
+   "vds_end_V": 50.04999923706055,
+   "outcome": "pass"
+  },
+  "vendor_control": {
+   "net_cycle_charge_C": 5.595156740220238e-10,
+   "leakage_charge_C": 5.59515937659323e-10,
+   "peak_charge_C": 2.308637348154953e-08,
+   "relative_to_peak": 1.1419606440161448e-08,
+   "tolerance": 0.01,
+   "time_points": 40115,
+   "vgs_end_V": 1.497107064096781e-06,
+   "vds_end_V": 50.04999923706055,
+   "outcome": "pass"
+  },
+  "outcome": "pass"
+ },
+ "D5_domain": {
+  "max_relative_ciss_change": 0.00667079942380498,
+  "max_relative_crss_change": 0.007944458605694673,
+  "tolerance": 0.01,
+  "outcome": "pass"
+ },
+ "standalone_library": {
+  "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+  "sha256": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+  "subckt": "EPC2302DS",
+  "location_note": "git-ignored (EPC model text)"
+ },
+ "outcome": "pass"
+}

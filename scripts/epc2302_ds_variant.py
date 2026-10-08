@@ -59,7 +59,12 @@ also crossed in reverse conduction (VGS = 0, VDS about -0.6 V) and near the end 
 
 Outputs: results/gan/epc2302ds-{baseline,model-curves,model-curves-extra,curve-comparison,fig7-comparison}.json and
 results/gan/epc2302-ds-variant.json; standalone vendor/epc/derived/EPC2302DS.lib (subckt EPC2302DS) only on pass.
-Exit 0 when D0-D5 pass, 2 otherwise. `--design` reruns the replica fit and prints its parameters (no LTspice).
+Exit 0 when D0-D5 pass, 2 otherwise.
+
+Run 1 (8 October 2026) CRASHED in post-processing (log kept: runs/epc2302-ds-variant-run1.log): D0 passed, every
+bench completed, all 24 curves and the stored-pipeline Fig. 7 checks printed 'pass', then the D1 resampling read
+the operating-point file bench.op.raw instead of the transient bench.raw (KeyError 'time'). Fixed that file name
+only (no parameter, check or tolerance changed) and reran the whole declared suite as run 2. `--design` reruns the replica fit and prints its parameters (no LTspice).
 """
 import argparse
 import hashlib
@@ -181,7 +186,7 @@ def d5_domain(P):
 def d1_resampled(baseline_report, vth):
     """Fig. 7 checks on a 0.01 nC resampled curve from the table run's own gate-charge transient."""
     raw_dir = ROOT / baseline_report["evidence_directory"] / "gate_charge_tran"
-    raw = parse_raw(next(raw_dir.glob("*.raw")))
+    raw = parse_raw(raw_dir / "bench.raw")  # run 2 fix: run 1 globbed bench.op.raw (the operating point) and crashed
     g = {k: [x.real if isinstance(x, complex) else x for x in vals] for k, vals in raw.values.items()}
     _, checks, _, states = bl.gate_charge(g, vth)
     P = subckt_params(bl.library_path()[0].read_text(encoding="utf-8", errors="replace"), "EPC2302")

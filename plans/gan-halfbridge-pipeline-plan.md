@@ -475,6 +475,29 @@ in the scripts, saved reports and [build notes](../docs/build.md).
    1/2 and E2E-0 already establish their stated non-blind execution/handoff behavior;
    repeating them does not establish engineering judgement.
 
+**Model target clarification (owner, 8 October 2026).** Trust both EPC2302 Figure 5
+(capacitance) and Figure 7 (gate charge). A separately stored datasheet-calibrated
+model must satisfy both under the existing comparison tolerances and preserve the
+other passing checks. The existing uniform-scaling failure is not proof that the
+figures conflict. Keep the original vendor baseline and existing Figure 7-primary
+goals results with their limitations; hardware validation remains open.
+
+The next model step is a bounded device-level feasibility check, before further
+board use of a replacement: declare one charge-model extension and its parameters,
+check charge conservation and numerical behavior, then jointly compare Figures 5
+and 7. Declare the execution budget before running it. Stop on numerical or
+physical inconsistency, failure of the joint target within the budget, or a passing
+candidate ready for the other datasheet checks. Do not fit the board overshoot or
+relax a figure's tolerance to accept a candidate. This clarification does not
+authorize a broad parameter sweep or establish a uniquely identified device model.
+
+**Whole-datasheet clarification (owner, 8 October 2026).** Figures 5 and 7 are
+part of the target, not its full scope. The proposed coverage inventory and bounded
+sequence are in [the whole-datasheet model plan](epc2302-full-datasheet-model-plan.md).
+All electrical rows/curves require outcomes; thermal and ratings coverage needs its
+appropriate representation. Unsupported or unresolved requirements prevent a
+full-datasheet acceptance claim. No new fit has been executed for this clarification.
+
 **Work selection and stopping.** Before any additional study, name the decision
 it could change, the observable result that would change it, and a bounded compute
 budget. Prefer existing reports or a small discriminating check. Stop when the

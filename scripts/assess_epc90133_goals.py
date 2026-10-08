@@ -25,7 +25,10 @@ holds under both. The 0 pH alternatives are reported, not judged. Ideal probe at
   each against stock at the same corner.
 Model (owner decision, 8 October 2026): EPC2302QG is primary, cases named <case>-qg (--model-suffix -qg, the
 default); --model-suffix '' scores the vendor model's runs, which are reported alongside, not judged.
-A missing or unusable case makes that goal 'undetermined'. Output: --output (JSON) and a printed table.
+A missing or unusable case makes that goal 'undetermined'.
+Retrospective fix (8 October 2026, after the first scoring attempt crashed, no definition changed): at 0 % load the
+valley turn-on is soft and the bench reports no 10-90 % rise time; dv/dt and S4 are then None (undetermined) for
+that case. S13 uses only S1, S2, S7 and S8, so its corner verdicts are unaffected. Output: --output (JSON) and a printed table.
 """
 import argparse
 import hashlib
@@ -61,7 +64,7 @@ def metrics(c, vin):
     return {"vpk_V": max(b["sw_peak_V"], a["q1_vds_peak_V"]), "overshoot_V": b["sw_overshoot_above_bus_V"],
             "f_r_Hz": b["ringing_frequency_Hz"], "settling_s": settle, "settling_censored": settle >= t[-1] - 10e-9,
             "tr_s": b["sw_rise_time_10_90_s"], "tf_s": a["sw_fall_time_90_10_s"],
-            "dvdt_V_per_ns": 0.8 * vin / (b["sw_rise_time_10_90_s"] * 1e9),
+            "dvdt_V_per_ns": None if b["sw_rise_time_10_90_s"] is None else 0.8 * vin / (b["sw_rise_time_10_90_s"] * 1e9),
             "id_peak_A": b["q1_peak_drain_current_A"], "didt_A_per_ns": didt / 1e9,
             "vgs_max_V": max(vg[0::2]), "vgs_min_V": min(vg[1::2]), "q2_gate_peak_V": b["q2_gate_peak_during_rise_V"],
             "eon_eoff_J": a["q1_eoff_J"] + b["q1_eon_J"], "fet_loss_W": m["period_loss"]["fet_loss_W"],
@@ -72,7 +75,8 @@ def goals(c, s, vin):
     """Per-condition goal checks for candidate metrics c against stock metrics s."""
     return {"S1": c["vpk_V"] <= 80.0, "S2": c["overshoot_V"] <= 0.2 * vin and c["overshoot_V"] <= 0.9 * s["overshoot_V"],
             "S3": c["settling_s"] <= s["settling_s"] and not c["settling_censored"],
-            "S4": c["tr_s"] <= 1.1 * s["tr_s"] and c["tf_s"] <= 1.1 * s["tf_s"],
+            "S4": (None if None in (c["tr_s"], s["tr_s"], c["tf_s"], s["tf_s"])
+                   else c["tr_s"] <= 1.1 * s["tr_s"] and c["tf_s"] <= 1.1 * s["tf_s"]),
             "S6": c["id_peak_A"] <= s["id_peak_A"] and c["didt_A_per_ns"] <= s["didt_A_per_ns"],
             "S7": c["vgs_max_V"] <= 5.5 and c["vgs_min_V"] >= -3.0, "S8": c["q2_gate_peak_V"] < 0.5,
             "S9": True if c["q2_gate_peak_V"] < 0.8 else None,
