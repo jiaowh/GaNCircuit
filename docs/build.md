@@ -2047,6 +2047,24 @@ the previous boot; no shutdown sequence logged, cause not identified). Logs kept
 at 00:45 on the restarted VM with the same jobs; ten minutes in, the two G jobs held 2.4 GB each with 2.7 GB free and
 no swap.
 
+**G search, R80 1.3/1.4 and completion runs (8 October).** Declarations in the switching docstring (e525964, 5e4bd2c).
+Assumed parts: V8+R80-1.3 and V8+R80-1.4 meet C0-C2 (worst case ramp-Ls0 15.35 and 14.15 V; stock 24.23 V,
+stock+R80-1.5 16.13 V). Sourced parts: V8+R80-1.4 fails C1 (+5.12 %); V8+R80-1.3 passes three alternatives, its
+step-Ls0 case timed out at 2,400 s (step-Ls0 sourced cases take about 2,380 s; others about 40 s). Completion chain
+run 1 asked for 7,200 s, above the LTspice adapter's 3,600 s maximum, and stopped before simulating (logs
+*-run1-failed). Run 2 (3,600 s): V8+R80-1.3@ramp-Ls0-gear-ms50 completed and passes N (overshoot 15.35 V at both
+steps), so with assumed parts V8+R80-1.3 is 'found' (results/gan/epc90133-search-G-r13-N-assessment.json). The rest
+of run 2 (sourced 50 ps check, gate-charge check, the three sourced reruns) was stopped by a PC restart at about 13:10;
+rerun the same commands from runs/completion-r13.launch.json minus the finished first one. Still open for V8+R80-1.3:
+the sourced verdict, the gate-charge caveat and the B loop-L confirmation.
+
+**B run 3 failed (8 October).** Stock B hit the 14,400 s limit at 12:42: three FastHenry jobs (about 2.5 GB each)
+exceeded WSL's 8 GB and swapped about 3 GB, roughly halving speed against the stored 6,588 s profile. Its FastHenry
+processes kept running after the Python child was stopped; V8 B then started beside them and ended with exit 1 when
+they stopped. Logs kept as runs/board-export-*-B.log. Rerun with fewer parallel FastHenry jobs so the case fits in
+memory. The J33 probe extraction started at 12:56 and was also stopped by the restart; rerun from
+runs/probe-j33.launch.json (without the wait for B-run3.done).
+
 ### EPC90133 layout round 2a: thinner power-loop dielectric (5 October 2026)
 
 Plan: plans/layout-round-2-plan.md. Declared at 87b174d before any run. Question: does a thinner top-to-mid-layer-1

@@ -1,0 +1,347 @@
+{
+ "schema": "epc90133-search-assessment/1",
+ "evaluator_sha256": "8d707e840401b8ecc2b3fe98d651d63a466491e7e321405d1647cf42e55d8226",
+ "inputs": {
+  "results\\gan\\epc90133-search-G.json": "dafc6ffcde621627c03621628ad9f2441d4cbdc4d5c32717c0701bcfd86a2b7d",
+  "results\\gan\\epc90133-search-G-r13.json": "4975e8c52e8e7484250720671abbfef696624c5694d4ade973ec8c0c860310fb",
+  "results\\gan\\epc90133-search-G-r13-ms50.json": "47cbcf623f418cd854b15f09f840343e6d0b4914e73266b26ce04e8f9748a0a5"
+ },
+ "candidates": {
+  "V8": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.228374358401794,
+      "fet_loss_W": 1.9717009384764201,
+      "q2_gate_peak_V": 1.9824900627136264
+     },
+     "candidate": {
+      "overshoot_V": 19.860286310350112,
+      "fet_loss_W": 2.0030381663424817,
+      "q2_gate_peak_V": 1.533529281616211
+     },
+     "overshoot_change_pct": -18.028811935279254,
+     "loss_change_pct": 1.589349949301977,
+     "q2_change_V": -0.44896078109741544,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 15.913218488982075,
+      "fet_loss_W": 2.000174372181087,
+      "q2_gate_peak_V": 1.3978034257888774
+     },
+     "candidate": {
+      "overshoot_V": 12.849382199357159,
+      "fet_loss_W": 2.0204506469923555,
+      "q2_gate_peak_V": 1.1137396097183228
+     },
+     "overshoot_change_pct": -19.25340427988368,
+     "loss_change_pct": 1.0137253578125893,
+     "q2_change_V": -0.28406381607055464,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 11.125135694785051,
+      "fet_loss_W": 2.0788823546001036,
+      "q2_gate_peak_V": 1.9396140575408936
+     },
+     "candidate": {
+      "overshoot_V": 11.322384245684951,
+      "fet_loss_W": 2.0879718633341846,
+      "q2_gate_peak_V": 1.8521928787231445
+     },
+     "overshoot_change_pct": 1.7729990564731901,
+     "loss_change_pct": 0.4372305490961459,
+     "q2_change_V": -0.08742117881774902,
+     "C0_not_higher": false,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 10.793155646430527,
+      "fet_loss_W": 2.0709592682693487,
+      "q2_gate_peak_V": 1.658995121717453
+     },
+     "candidate": {
+      "overshoot_V": 10.764185249795013,
+      "fet_loss_W": 2.080528638743223,
+      "q2_gate_peak_V": 1.585530698299408
+     },
+     "overshoot_change_pct": -0.26841451735291066,
+     "loss_change_pct": 0.46207429670361844,
+     "q2_change_V": -0.07346442341804504,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.228374358401794,
+   "worst_case_candidate_V": 19.860286310350112,
+   "worst_alternative": "ramp-Ls0",
+   "C0": false,
+   "C1": true,
+   "C2": true,
+   "N": null,
+   "verdict": "not met"
+  },
+  "V8+R80-1.3": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.228374358401794,
+      "fet_loss_W": 1.9717009384764201,
+      "q2_gate_peak_V": 1.9824900627136264
+     },
+     "candidate": {
+      "overshoot_V": 15.35013343394202,
+      "fet_loss_W": 2.0493971277153347,
+      "q2_gate_peak_V": 1.3097474575042725
+     },
+     "overshoot_change_pct": -36.64398111539424,
+     "loss_change_pct": 3.9405666307057885,
+     "q2_change_V": -0.6727426052093539,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 15.913218488982075,
+      "fet_loss_W": 2.000174372181087,
+      "q2_gate_peak_V": 1.3978034257888774
+     },
+     "candidate": {
+      "overshoot_V": 10.263012029244948,
+      "fet_loss_W": 2.0582500849881997,
+      "q2_gate_peak_V": 0.997803270816803
+     },
+     "overshoot_change_pct": -35.506371408456395,
+     "loss_change_pct": 2.903532492708827,
+     "q2_change_V": -0.4000001549720744,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 11.125135694785051,
+      "fet_loss_W": 2.0788823546001036,
+      "q2_gate_peak_V": 1.9396140575408936
+     },
+     "candidate": {
+      "overshoot_V": 11.080994077025409,
+      "fet_loss_W": 2.116653945282895,
+      "q2_gate_peak_V": 1.8334556818008423
+     },
+     "overshoot_change_pct": -0.39677374704143453,
+     "loss_change_pct": 1.816918143502022,
+     "q2_change_V": -0.10615837574005127,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 10.793155646430527,
+      "fet_loss_W": 2.0709592682693487,
+      "q2_gate_peak_V": 1.658995121717453
+     },
+     "candidate": {
+      "overshoot_V": 10.012373603914988,
+      "fet_loss_W": 2.1125834232710625,
+      "q2_gate_peak_V": 1.5217116624116898
+     },
+     "overshoot_change_pct": -7.2340478363596805,
+     "loss_change_pct": 2.009897328231758,
+     "q2_change_V": -0.13728345930576324,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.228374358401794,
+   "worst_case_candidate_V": 15.35013343394202,
+   "worst_alternative": "ramp-Ls0",
+   "C0": true,
+   "C1": true,
+   "C2": true,
+   "N": true,
+   "verdict": "found"
+  },
+  "V8+R80-1.5": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.228374358401794,
+      "fet_loss_W": 1.9717009384764201,
+      "q2_gate_peak_V": 1.9824900627136264
+     },
+     "candidate": {
+      "overshoot_V": 13.074863880907643,
+      "fet_loss_W": 2.076968976915969,
+      "q2_gate_peak_V": 1.1967893838882446
+     },
+     "overshoot_change_pct": -46.0349106073078,
+     "loss_change_pct": 5.338945495501557,
+     "q2_change_V": -0.7857006788253817,
+     "C0_not_higher": true,
+     "C1": false,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 15.913218488982075,
+      "fet_loss_W": 2.000174372181087,
+      "q2_gate_peak_V": 1.3978034257888774
+     },
+     "candidate": {
+      "overshoot_V": 8.876064889196051,
+      "fet_loss_W": 2.0814989834857354,
+      "q2_gate_peak_V": 0.9350118637084961
+     },
+     "overshoot_change_pct": -44.22206359234229,
+     "loss_change_pct": 4.065876077392594,
+     "q2_change_V": -0.4627915620803813,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 11.125135694785051,
+      "fet_loss_W": 2.0788823546001036,
+      "q2_gate_peak_V": 1.9396140575408936
+     },
+     "candidate": {
+      "overshoot_V": 10.760670378784631,
+      "fet_loss_W": 2.13579184863087,
+      "q2_gate_peak_V": 1.804804503917694
+     },
+     "overshoot_change_pct": -3.276052769147475,
+     "loss_change_pct": 2.737504308737737,
+     "q2_change_V": -0.13480955362319946,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 10.793155646430527,
+      "fet_loss_W": 2.0709592682693487,
+      "q2_gate_peak_V": 1.658995121717453
+     },
+     "candidate": {
+      "overshoot_V": 9.504521042090822,
+      "fet_loss_W": 2.132153319542396,
+      "q2_gate_peak_V": 1.4796532988548279
+     },
+     "overshoot_change_pct": -11.939368304818975,
+     "loss_change_pct": 2.9548650333516946,
+     "q2_change_V": -0.17934182286262512,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.228374358401794,
+   "worst_case_candidate_V": 13.074863880907643,
+   "worst_alternative": "ramp-Ls0",
+   "C0": true,
+   "C1": false,
+   "C2": true,
+   "N": null,
+   "verdict": "not met"
+  },
+  "stock+R80-1.5": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.228374358401794,
+      "fet_loss_W": 1.9717009384764201,
+      "q2_gate_peak_V": 1.9824900627136264
+     },
+     "candidate": {
+      "overshoot_V": 16.132892578997215,
+      "fet_loss_W": 2.055596057806561,
+      "q2_gate_peak_V": 1.5297042131423904
+     },
+     "overshoot_change_pct": -33.41322723370117,
+     "loss_change_pct": 4.254961677655267,
+     "q2_change_V": -0.452785849571236,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 15.913218488982075,
+      "fet_loss_W": 2.000174372181087,
+      "q2_gate_peak_V": 1.3978034257888774
+     },
+     "candidate": {
+      "overshoot_V": 10.919308198603197,
+      "fet_loss_W": 2.0660306019976047,
+      "q2_gate_peak_V": 1.151627063751215
+     },
+     "overshoot_change_pct": -31.382151221241262,
+     "loss_change_pct": 3.2925244284929267,
+     "q2_change_V": -0.24617636203766247,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 11.125135694785051,
+      "fet_loss_W": 2.0788823546001036,
+      "q2_gate_peak_V": 1.9396140575408936
+     },
+     "candidate": {
+      "overshoot_V": 10.697242908134001,
+      "fet_loss_W": 2.1278715403534396,
+      "q2_gate_peak_V": 1.8909758925437927
+     },
+     "overshoot_change_pct": -3.846180382785136,
+     "loss_change_pct": 2.356515540426507,
+     "q2_change_V": -0.04863816499710083,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 10.793155646430527,
+      "fet_loss_W": 2.0709592682693487,
+      "q2_gate_peak_V": 1.658995121717453
+     },
+     "candidate": {
+      "overshoot_V": 9.626206684294758,
+      "fet_loss_W": 2.1240804786898484,
+      "q2_gate_peak_V": 1.5541014969348907
+     },
+     "overshoot_change_pct": -10.811934899889064,
+     "loss_change_pct": 2.5650533660612096,
+     "q2_change_V": -0.10489362478256226,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.228374358401794,
+   "worst_case_candidate_V": 16.132892578997215,
+   "worst_alternative": "ramp-Ls0",
+   "C0": true,
+   "C1": true,
+   "C2": true,
+   "N": null,
+   "verdict": "provisional (numerical check missing)"
+  }
+ }
+}
