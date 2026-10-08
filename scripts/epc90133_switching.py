@@ -356,6 +356,21 @@ them, so they are not held-out tests): V8+R80-1.3 and V8+R80-1.4 (E24/E96 values
 results), run with --with-r80 <value> --only V8+R80-<value>@... under assumed and sourced parts, assessed with stock
 from the run-3 reports by the same rule; reported against stock+R80-1.5 as well, since the layout adds value only if
 the worst case beats it.
+R80 1.3/1.4 results (8 October 2026; results/gan/epc90133-search-G-r1314-assessment.json and -src-r1314-): assumed
+parts, V8+R80-1.3 and V8+R80-1.4 meet C0-C2 (provisional; worst case ramp-Ls0 15.35 and 14.15 V against stock
+24.23 V and stock+R80-1.5 16.13 V). Sourced parts, V8+R80-1.4 fails C1 (ramp-Ls0 +5.12 %); V8+R80-1.3 meets C0-C2
+in three alternatives (ramp-Ls0 loss +4.36 %) and its step-Ls0-gear-src case timed out at 2400 s, so it is
+undetermined there. V8+R80-1.3 is the lead candidate. Completion runs (declared 8 October 2026 after these results,
+before any of the runs below), in this order, one report each, --jobs 2 on Windows:
+1. reruns of the three timed-out sourced cases with --timeout 7200 (the timeout only stops a run; settings unchanged):
+   V8+R80-1.3@step-Ls0-gear-src (completes the candidate), stock+R80-1.5@step-Ls0-gear-src and
+   V8+R80-1.5@ramp-Ls0-gear-src (complete the comparison rows; V8+R80-1.5 already fails C1 with assumed parts);
+2. numerical check N at the candidate's worst alternative, cases <case>-ms50 (half the step, otherwise identical; the
+   assessor's 2 % rule on overshoot, FET loss and Q2 gate peak): V8+R80-1.3@ramp-Ls0-gear-ms50 and, if the sourced
+   worst alternative is also ramp-Ls0 after rerun 1, V8+R80-1.3@ramp-Ls0-gear-src-ms50 (else that alternative's);
+3. the gate-charge check (above) for V8+R80-1.3 and stock, all four alternatives, assumed parts (--qg).
+V8+R80-1.3 is reported as found only if C0-C2 hold under both part sets, N passes under both, and the B extraction
+confirms V8's loop-L reduction beyond 4 %; the gate-charge check decides only whether a gate-charge caveat is attached.
 Gate-charge check (owner request, declared 7 October 2026 before any G search result): a candidate that meets the rule
 with the vendor model is rerun, with stock, under the gate-charge sensitivity revision EPC2302QG for all four
 alternatives (Gear, as --study qgfit), cases <NAME>@<alternative>-gear-qg via --qg; C1 and C2 must also hold there
@@ -1306,6 +1321,8 @@ def search_cases(names, r80=None, qg=False, sourced=False):
         cases = {f"{k}-qg": {**c, "model": QG_MODEL} for k, c in cases.items()}
     if sourced:  # sourced-parts check: vendor capacitor data and board switch-node capacitance
         cases = {f"{k}-src": {**c, "ci_model": TY_CI_RLC, "cm_model": AVX_CM, "c_sw": True} for k, c in cases.items()}
+    # numerical check N (declared 8 October 2026): half the step, selected with --only
+    cases.update({f"{k}-ms50": {**c, "maxstep": MAXSTEP_PKG / 2, "base": k} for k, c in list(cases.items())})
     return cases
 
 

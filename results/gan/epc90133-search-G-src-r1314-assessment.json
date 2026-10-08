@@ -1,0 +1,444 @@
+{
+ "schema": "epc90133-search-assessment/1",
+ "evaluator_sha256": "8d707e840401b8ecc2b3fe98d651d63a466491e7e321405d1647cf42e55d8226",
+ "inputs": {
+  "results\\gan\\epc90133-search-G-src.json": "7621ac696c9c2a2bdb02df029558598fc7a9a95537dc7eb34337efa52cae1fcc",
+  "results\\gan\\epc90133-search-G-src-r12.json": "0ecfbe64ceee89ef554953b685e3b82008683e3ffd276da7d7c4b019f598acee",
+  "results\\gan\\epc90133-search-G-src-r13.json": "46d940afa05f91a4b3eb7ca34940c054a9614e500dfdd6abf488f0be1e7ee20f",
+  "results\\gan\\epc90133-search-G-src-r14.json": "e085845d69c0973b7327cffe876a57ca6506f13868534ffc2a37fd2cdf854ff3"
+ },
+ "candidates": {
+  "V8": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.760393008592757,
+      "fet_loss_W": 1.9620597583455115,
+      "q2_gate_peak_V": 2.0053017139434814
+     },
+     "candidate": {
+      "overshoot_V": 20.623422771750114,
+      "fet_loss_W": 1.9970352329780379,
+      "q2_gate_peak_V": 1.5541890859603882
+     },
+     "overshoot_change_pct": -16.708015237912278,
+     "loss_change_pct": 1.7825896731106239,
+     "q2_change_V": -0.45111262798309326,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 16.7964697443088,
+      "fet_loss_W": 1.9989103343660595,
+      "q2_gate_peak_V": 1.4010759592056274
+     },
+     "candidate": {
+      "overshoot_V": 13.859629340168325,
+      "fet_loss_W": 2.021178707086558,
+      "q2_gate_peak_V": 1.1140658855438232
+     },
+     "overshoot_change_pct": -17.48486705151584,
+     "loss_change_pct": 1.1140255937273302,
+     "q2_change_V": -0.2870100736618042,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 12.014791794163258,
+      "fet_loss_W": 2.082505887143535,
+      "q2_gate_peak_V": 1.9393356442451477
+     },
+     "candidate": {
+      "overshoot_V": 12.164812445708321,
+      "fet_loss_W": 2.0918966115100273,
+      "q2_gate_peak_V": 1.8436148166656494
+     },
+     "overshoot_change_pct": 1.248632969386465,
+     "loss_change_pct": 0.45093386887722353,
+     "q2_change_V": -0.09572082757949829,
+     "C0_not_higher": false,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 11.52304812899915,
+      "fet_loss_W": 2.075663015550747,
+      "q2_gate_peak_V": 1.6408933401107788
+     },
+     "candidate": {
+      "overshoot_V": 11.456380035734007,
+      "fet_loss_W": 2.0855470487611076,
+      "q2_gate_peak_V": 1.5596347153186798
+     },
+     "overshoot_change_pct": -0.578563002764565,
+     "loss_change_pct": 0.47618679604106706,
+     "q2_change_V": -0.081258624792099,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.760393008592757,
+   "worst_case_candidate_V": 20.623422771750114,
+   "worst_alternative": "ramp-Ls0",
+   "C0": false,
+   "C1": true,
+   "C2": true,
+   "N": null,
+   "verdict": "not met"
+  },
+  "V8+R80-1.2": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.760393008592757,
+      "fet_loss_W": 1.9620597583455115,
+      "q2_gate_peak_V": 2.0053017139434814
+     },
+     "candidate": {
+      "overshoot_V": 17.563543528327173,
+      "fet_loss_W": 2.031757827376616,
+      "q2_gate_peak_V": 1.395510196685791
+     },
+     "overshoot_change_pct": -29.065974347693167,
+     "loss_change_pct": 3.552290837964933,
+     "q2_change_V": -0.6097915172576904,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 16.7964697443088,
+      "fet_loss_W": 1.9989103343660595,
+      "q2_gate_peak_V": 1.4010759592056274
+     },
+     "candidate": {
+      "overshoot_V": 12.097666369774238,
+      "fet_loss_W": 2.0480145028537415,
+      "q2_gate_peak_V": 1.032002568244934
+     },
+     "overshoot_change_pct": -27.974946200386384,
+     "loss_change_pct": 2.4565468317144346,
+     "q2_change_V": -0.36907339096069336,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 12.014791794163258,
+      "fet_loss_W": 2.082505887143535,
+      "q2_gate_peak_V": 1.9393356442451477
+     },
+     "candidate": {
+      "overshoot_V": 11.958284258874066,
+      "fet_loss_W": 2.111790191937371,
+      "q2_gate_peak_V": 1.8276790380477905
+     },
+     "overshoot_change_pct": -0.4703163921379261,
+     "loss_change_pct": 1.4062051384644114,
+     "q2_change_V": -0.11165660619735718,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 11.52304812899915,
+      "fet_loss_W": 2.075663015550747,
+      "q2_gate_peak_V": 1.6408933401107788
+     },
+     "candidate": {
+      "overshoot_V": 10.94325988363822,
+      "fet_loss_W": 2.1080523921863246,
+      "q2_gate_peak_V": 1.5154174864292145
+     },
+     "overshoot_change_pct": -5.031552752971868,
+     "loss_change_pct": 1.5604352148165912,
+     "q2_change_V": -0.12547585368156433,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.760393008592757,
+   "worst_case_candidate_V": 17.563543528327173,
+   "worst_alternative": "ramp-Ls0",
+   "C0": true,
+   "C1": true,
+   "C2": true,
+   "N": null,
+   "verdict": "provisional (numerical check missing)"
+  },
+  "V8+R80-1.3": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.760393008592757,
+      "fet_loss_W": 1.9620597583455115,
+      "q2_gate_peak_V": 2.0053017139434814
+     },
+     "candidate": {
+      "overshoot_V": 16.2629683023035,
+      "fet_loss_W": 2.0475794053120087,
+      "q2_gate_peak_V": 1.327229619026184
+     },
+     "overshoot_change_pct": -34.318618058042716,
+     "loss_change_pct": 4.358666783860388,
+     "q2_change_V": -0.6780720949172974,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": null,
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 12.014791794163258,
+      "fet_loss_W": 2.082505887143535,
+      "q2_gate_peak_V": 1.9393356442451477
+     },
+     "candidate": {
+      "overshoot_V": 11.80537614223229,
+      "fet_loss_W": 2.1219242084280014,
+      "q2_gate_peak_V": 1.8139132857322693
+     },
+     "overshoot_change_pct": -1.7429819469089836,
+     "loss_change_pct": 1.8928312053194007,
+     "q2_change_V": -0.12542235851287842,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 11.52304812899915,
+      "fet_loss_W": 2.075663015550747,
+      "q2_gate_peak_V": 1.6408933401107788
+     },
+     "candidate": {
+      "overshoot_V": 10.677540339481212,
+      "fet_loss_W": 2.118923340491062,
+      "q2_gate_peak_V": 1.492718905210495
+     },
+     "overshoot_change_pct": -7.337535867702538,
+     "loss_change_pct": 2.0841689916046846,
+     "q2_change_V": -0.1481744349002838,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "verdict": "undetermined"
+  },
+  "V8+R80-1.4": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.760393008592757,
+      "fet_loss_W": 1.9620597583455115,
+      "q2_gate_peak_V": 2.0053017139434814
+     },
+     "candidate": {
+      "overshoot_V": 15.100397229209214,
+      "fet_loss_W": 2.0625875163302916,
+      "q2_gate_peak_V": 1.265864372253418
+     },
+     "overshoot_change_pct": -39.01390327702461,
+     "loss_change_pct": 5.123582885648159,
+     "q2_change_V": -0.7394373416900635,
+     "C0_not_higher": true,
+     "C1": false,
+     "C2": true
+    },
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 16.7964697443088,
+      "fet_loss_W": 1.9989103343660595,
+      "q2_gate_peak_V": 1.4010759592056274
+     },
+     "candidate": {
+      "overshoot_V": 10.6502746977581,
+      "fet_loss_W": 2.0731444839317743,
+      "q2_gate_peak_V": 0.9656333327293396
+     },
+     "overshoot_change_pct": -36.59218359639671,
+     "loss_change_pct": 3.7137308407211522,
+     "q2_change_V": -0.43544262647628784,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 12.014791794163258,
+      "fet_loss_W": 2.082505887143535,
+      "q2_gate_peak_V": 1.9393356442451477
+     },
+     "candidate": {
+      "overshoot_V": 11.629648156417318,
+      "fet_loss_W": 2.132078239955988,
+      "q2_gate_peak_V": 1.7972803711891174
+     },
+     "overshoot_change_pct": -3.2055789592046247,
+     "loss_change_pct": 2.380418375692983,
+     "q2_change_V": -0.14205527305603027,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 11.52304812899915,
+      "fet_loss_W": 2.075663015550747,
+      "q2_gate_peak_V": 1.6408933401107788
+     },
+     "candidate": {
+      "overshoot_V": 10.410657368537287,
+      "fet_loss_W": 2.1294212527194145,
+      "q2_gate_peak_V": 1.4702483713626862
+     },
+     "overshoot_change_pct": -9.653615501808044,
+     "loss_change_pct": 2.58993086863879,
+     "q2_change_V": -0.17064496874809265,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "worst_case_stock_V": 24.760393008592757,
+   "worst_case_candidate_V": 15.100397229209214,
+   "worst_alternative": "ramp-Ls0",
+   "C0": true,
+   "C1": false,
+   "C2": true,
+   "N": null,
+   "verdict": "not met"
+  },
+  "V8+R80-1.5": {
+   "alternatives": {
+    "ramp-Ls0": null,
+    "step-Ls0": {
+     "stock": {
+      "overshoot_V": 16.7964697443088,
+      "fet_loss_W": 1.9989103343660595,
+      "q2_gate_peak_V": 1.4010759592056274
+     },
+     "candidate": {
+      "overshoot_V": 10.013057969540078,
+      "fet_loss_W": 2.0851501919195585,
+      "q2_gate_peak_V": 0.9366959929466248
+     },
+     "overshoot_change_pct": -40.38593750967918,
+     "loss_change_pct": 4.314343473583038,
+     "q2_change_V": -0.4643799662590027,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 12.014791794163258,
+      "fet_loss_W": 2.082505887143535,
+      "q2_gate_peak_V": 1.9393356442451477
+     },
+     "candidate": {
+      "overshoot_V": 11.436383627324432,
+      "fet_loss_W": 2.14212131619288,
+      "q2_gate_peak_V": 1.778518259525299
+     },
+     "overshoot_change_pct": -4.814133917158814,
+     "loss_change_pct": 2.862677575961925,
+     "q2_change_V": -0.16081738471984863,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 11.52304812899915,
+      "fet_loss_W": 2.075663015550747,
+      "q2_gate_peak_V": 1.6408933401107788
+     },
+     "candidate": {
+      "overshoot_V": 10.1441644355397,
+      "fet_loss_W": 2.139557920588764,
+      "q2_gate_peak_V": 1.4482013881206512
+     },
+     "overshoot_change_pct": -11.966310285464498,
+     "loss_change_pct": 3.078288939934848,
+     "q2_change_V": -0.19269195199012756,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "verdict": "undetermined"
+  },
+  "stock+R80-1.5": {
+   "alternatives": {
+    "ramp-Ls0": {
+     "stock": {
+      "overshoot_V": 24.760393008592757,
+      "fet_loss_W": 1.9620597583455115,
+      "q2_gate_peak_V": 2.0053017139434814
+     },
+     "candidate": {
+      "overshoot_V": 16.972144946456076,
+      "fet_loss_W": 2.0536374826039028,
+      "q2_gate_peak_V": 1.5492448806762695
+     },
+     "overshoot_change_pct": -31.454460595330115,
+     "loss_change_pct": 4.667427883828235,
+     "q2_change_V": -0.4560568332672119,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls0": null,
+    "ramp-Ls50": {
+     "stock": {
+      "overshoot_V": 12.014791794163258,
+      "fet_loss_W": 2.082505887143535,
+      "q2_gate_peak_V": 1.9393356442451477
+     },
+     "candidate": {
+      "overshoot_V": 11.445626616418707,
+      "fet_loss_W": 2.133486907601351,
+      "q2_gate_peak_V": 1.8777715563774109
+     },
+     "overshoot_change_pct": -4.737203835867132,
+     "loss_change_pct": 2.448061288688308,
+     "q2_change_V": -0.061564087867736816,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    },
+    "step-Ls50": {
+     "stock": {
+      "overshoot_V": 11.52304812899915,
+      "fet_loss_W": 2.075663015550747,
+      "q2_gate_peak_V": 1.6408933401107788
+     },
+     "candidate": {
+      "overshoot_V": 10.321694066677374,
+      "fet_loss_W": 2.130666089405489,
+      "q2_gate_peak_V": 1.5324322283267975
+     },
+     "overshoot_change_pct": -10.425662106699207,
+     "loss_change_pct": 2.6499038351920357,
+     "q2_change_V": -0.10846111178398132,
+     "C0_not_higher": true,
+     "C1": true,
+     "C2": true
+    }
+   },
+   "verdict": "undetermined"
+  }
+ }
+}
