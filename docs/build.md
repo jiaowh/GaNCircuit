@@ -3481,3 +3481,45 @@ and S10 together, so by the declared rule no power-loop geometry change acting m
 moves at most 0.02 points. These are the vendor model's results (the reported model); the primary-model cases and
 any EPC2302DS cases have not run. S8 remains the goal a gate-loop/Kelvin geometry could still address (ideal
 screen 0.25-0.33 V at 0 pH; not tested at 50 pH, where the package source inductance is in the gate loop).
+
+
+### EPC2302DS against Fig. 9; S8 bound at 50 pH; what the template lets change (8 October 2026)
+
+Owner decisions (8 October 2026): EPC2302DS is the model for new runs and the assumed 50 pH package source
+inductance the only package setting; the original model and 0 pH are no longer run or reported in new work.
+
+**Fig. 9 with EPC2302DS** (`results/gan/epc90133-fig9-ds-summary.md`; settling metric declared in
+`compare_epc90133_fig9.py` before the run): no match. Fig. 9: overshoot 5.7 V, zeta 0.077, settling 18.3 ns at 2 %
+of swing (9.5 ns at 5 %). G-m1-mid-Ls50-gear-ds: 11.3 V, 0.025, not settled within 45 ns (38.1 ns at 5 %);
+with vendor-sourced capacitors and C_SW: 12.1 V, 0.027, not settled (40.7 ns). Rise/fall time and ring frequency
+resemble Fig. 9; overshoot, damping and settling do not at any probe bandwidth. The gate-charge correction leaves the
+overshoot gap where it was, so the device's gate charge is not its cause. The J33 probe-location test (run 3,
+EPC2302DS, 50 pH) was launched: `runs/probe-j33.launch.json`.
+
+**S8 bound at 50 pH** (`results/gan/epc90133-goals-G-ds-ctlls.json`, declared in the switching docstring before
+the run): with Q2's gate stage ideal at its pads and the package source inductance kept, the Q2 gate peak during
+the rise is 1.28 V (ramp) / 1.10 V (step), against S8's 0.5 V. Stock is 1.94 / 1.66 V (vendor model; EPC2302DS
+nominal runs in progress). Mechanism, from the G extraction: the board common-source inductance of Q2 is 47.7 pH
+(Q1's 0.9 pH) and Q2's current changes at about 40 A/ns during the valley turn-on (47.7 pH x 40 A/ns = 1.9 V, the
+size of the stock spike). The board part can be removed by layout (EPC's Kelvin via is present, but the driver's
+ground pin also ties into the power ground plane); the assumed 50 pH, lumped by the bench into one path shared by
+the power current and the gate return, cannot. By the declared reading, no board gate-loop layout meets S8 under
+that assumption, so the F4 Kelvin family is not built. Open modelling question: whether EPC2302's source pin next to
+the gate gives the gate return a separate path inside the package. A split package inductance would lower this
+bound; no EPC data on the split is in hand.
+
+**Template changeables against the failing goals** (reasoning from saved results; no run unless stated):
+
+| Goal | Changeables that act on it | Evidence | Verdict in this model |
+|---|---|---|---|
+| S2 overshoot <= 9.6 V and -10 % | copper, vias, cap/FET positions, inner dielectric (all act through loop inductance) | bound sweep: needs whole-board L below about x0.5; flat 0.75-1.25 | not reachable by realistic geometry; depends strongly on the assumed package L |
+| S8 false turn-on < 0.5 V | gate loop, Kelvin return, driver position | 50 pH ideal-gate bound 1.10-1.28 V | not reachable under the lumped 50 pH |
+| S10 Eon+Eoff -10 % | loop L, switch-node copper area | Qoss x VIN = 85 nC x 48 V = 4.1 uJ of 5.6 uJ is device output-charge loss, fixed by the BOM; bound sweep 5.29-6.07 uJ at every scale | not reachable |
+| S11 optimum dead time 5-15 ns | switch-node copper area (slower commutation) | loss rises 18 mW/ns above 5 ns = VSD x (Ia+Ib) x fsw (reverse conduction); optimum below 5 ns; moving it needs about 1-2 nF more switch-node capacitance, against 0.14 nF for the whole SW copper | not a layout property |
+| S12 efficiency +0.3 pt (0.72 W) | copper resistance | FET-only estimator cannot see copper loss; extracted power-loop R 2.0 mohm (unconverged); 0.72 W at 20 A would need about 1.8 mohm removed | not reachable; also not measurable by the estimator |
+| S3 settling <= stock | damping, loop L | V8 1.3 % slower (vendor) | reachable in principle; EPC2302DS results pending |
+
+The template's acceptable end state is therefore the best legal candidate with these goals shown unreachable by
+bounds. V8 (thinned power-loop vias) remains the best legal candidate; its EPC2302DS goals runs are in progress
+(`runs/goals-G-ds.launch.json`). EPC2302DS switching runs take about 15-20 min per case against about 70 s for the
+vendor model (its narrow gate-drain charge step forces small time steps).

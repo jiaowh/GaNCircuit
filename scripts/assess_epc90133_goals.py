@@ -26,6 +26,9 @@ holds under both. The 0 pH alternatives are reported, not judged. Ideal probe at
 Model (owner decision, 8 October 2026): EPC2302QG is primary, cases named <case>-qg (--model-suffix -qg, the
 default); --model-suffix '' scores the vendor model's runs, which are reported alongside, not judged.
 A missing or unusable case makes that goal 'undetermined'.
+Model update (owner decision, 8 October 2026, after EPC2302DS passed its datasheet checks): EPC2302DS is primary,
+cases <case>-ds (--model-suffix -ds, now the default); EPC2302QG and vendor scoring remain available for the earlier
+runs. The 0 pH alternatives are not run for EPC2302DS; they appear as missing ("reported_0pH" empty).
 Retrospective fix (8 October 2026, after the first scoring attempt crashed, no definition changed): at 0 % load the
 valley turn-on is soft and the bench reports no 10-90 % rise time; dv/dt and S4 are then None (undetermined) for
 that case. S13 uses only S1, S2, S7 and S8, so its corner verdicts are unaffected. Output: --output (JSON) and a printed table.
@@ -94,7 +97,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("reports", nargs="+", type=Path)
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-goals-assessment.json")
-    ap.add_argument("--model-suffix", default="-qg", help="'-qg' (primary, EPC2302QG) or '' (vendor model, reported)")
+    ap.add_argument("--model-suffix", default="-ds", choices=("-ds", "-qg", ""),
+                    help="'-ds' (EPC2302DS, primary from 8 October 2026), '-qg' (EPC2302QG, earlier runs) or '' (vendor)")
     args = ap.parse_args()
     cases, vins = {}, {}
     for r in args.reports:
@@ -102,10 +106,10 @@ def main():
         if rep.get("study") != "goals":
             raise SystemExit(f"{r} is not a goals report")
         for k, c in rep["cases"].items():
-            qg = k.endswith("-qg")
-            if qg != bool(args.model_suffix):
+            suf = next((x for x in ("-qg", "-ds") if k.endswith(x)), "")  # model suffix of the case name
+            if suf != args.model_suffix:
                 continue
-            k = k[:-3] if qg else k
+            k = k[:-len(suf)] if suf else k
             cases[k], vins[k] = c, rep["conditions"]["VIN"]
     M = {k: metrics(c, vins[k]) for k, c in cases.items()}
     names = sorted({k.split("@")[0] for k in cases})
