@@ -159,6 +159,10 @@ What the bounds show, given the fixed parts:
 - The best candidate, V8, passes **S1, S4 and S7**. It narrowly misses **S3 settling** (133.2 against 131.5 ns) and
   **S6 di/dt** (30.9 against 29.9 A/ns), both within about 3 % of the baseline.
 
+With the parts fixed, the goals pull against each other: lowering the power-loop inductance lowers overshoot (S2)
+but speeds up the current change (S6) and raises switching energy (S10). No copper change can improve all three
+against the baseline, so further layout iterations only trade one goal for another.
+
 These verdicts depend on the assumed package inductance and on the unexplained damping difference from EPC's
 measured waveform, so they are simulation results to be checked by measurement, not hardware limits.
 
