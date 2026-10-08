@@ -89,3 +89,7 @@ The four nominal stock cases repeat the G search's stock cases and must reproduc
 Acceptable final result: a legal geometry-only candidate (BOM unchanged) that meets every goal, or, if no such
 candidate is found, the best candidate with each unmet goal shown unreachable within the model by a bound (for
 example an idealized screen that also fails it), not merely untried.
+
+Model (owner decision, 8 October 2026, before any goals result was read): the datasheet's gate-charge curve (Fig. 7)
+is the truth. EPC2302QG is the primary model (goals cases `<case>-qg`); its Crss about 23 % outside Fig. 5 is listed
+as a model inconsistency (template M1). The vendor model's goals runs (started first) are reported alongside.

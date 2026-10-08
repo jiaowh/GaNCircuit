@@ -408,6 +408,12 @@ settings (100 ps, Gear, Q2 sense, settled loss estimator revision 2):
   <NAME>@<ramp|step>-Ls50-gear-l<f> for f = 0.25, 0.5, 0.75, 1.25, 1.5, the whole extracted board network scaled.
   A uniform scale is not a layout, but it brackets what power-loop geometry can do in this model: if no f meets
   S2 and S10 together, no power-loop geometry change that acts mainly through inductance can either.
+* model (owner decision, 8 October 2026, before any goals result was read): the datasheet's gate-charge curve
+  (Fig. 7) is treated as the truth, so EPC2302QG (the Fig. 7-following revision, scripts/epc2302_qg_variant.py)
+  is the PRIMARY model of the goals study: run with --qg, cases <case>-qg. Its known cost is Crss about 23 %
+  outside Fig. 5, listed as a model inconsistency (template M1). The unmodified vendor model's goals runs are
+  reported alongside, not judged. The owner's 7 October request to include the gate-charge curve in the
+  verifications had been omitted from the first goals declaration; this supersedes it.
 Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed with this declaration).
 
 Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
@@ -1364,7 +1370,7 @@ TY_CI_RLC = {"C": 56.5e-9, "ESL": 0.326e-9, "ESR": 0.068}  # Taiyo Yuden DC-bias
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
-def goals_cases(names, vin=None, iout=None):
+def goals_cases(names, vin=None, iout=None, qg=False):
     """Goals study (see the module docstring)."""
     common = {"maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B_DESIGN, "sense_q2": True, "period_loss": True,
               "long_pulse": True, "method": "gear", "settle_trace": True}
@@ -1381,6 +1387,8 @@ def goals_cases(names, vin=None, iout=None):
         for dt in (2.5, 5, 7.5, 12.5, 15, 20):
             cases[f"{n}@ramp-Ls50-gear-dt{dt:g}"] = alt("ramp-Ls50", dead=dt * 1e-9)
         cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l") for a in ("ramp-Ls0", "step-Ls0")})
+    if qg:
+        cases = {f"{k}-qg": {**c, "model": QG_MODEL} for k, c in cases.items()}
     return cases
 
 
@@ -1555,7 +1563,7 @@ def main():
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "goals":
-        cases = goals_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.vin, args.iout)
+        cases = goals_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.vin, args.iout, args.qg)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "probe":

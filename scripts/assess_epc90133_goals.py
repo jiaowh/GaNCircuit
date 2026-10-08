@@ -23,6 +23,8 @@ holds under both. The 0 pH alternatives are reported, not judged. Ideal probe at
 * S12 FET-only estimated efficiency at least 0.3 points above stock's.
 * S13 S1, S2, S7 and S8 hold at VIN 40 and 60 V, 0 % load (or the declared 2 A fallback) and parasitics x0.9/x1.1,
   each against stock at the same corner.
+Model (owner decision, 8 October 2026): EPC2302QG is primary, cases named <case>-qg (--model-suffix -qg, the
+default); --model-suffix '' scores the vendor model's runs, which are reported alongside, not judged.
 A missing or unusable case makes that goal 'undetermined'. Output: --output (JSON) and a printed table.
 """
 import argparse
@@ -88,6 +90,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("reports", nargs="+", type=Path)
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-goals-assessment.json")
+    ap.add_argument("--model-suffix", default="-qg", help="'-qg' (primary, EPC2302QG) or '' (vendor model, reported)")
     args = ap.parse_args()
     cases, vins = {}, {}
     for r in args.reports:
@@ -95,6 +98,10 @@ def main():
         if rep.get("study") != "goals":
             raise SystemExit(f"{r} is not a goals report")
         for k, c in rep["cases"].items():
+            qg = k.endswith("-qg")
+            if qg != bool(args.model_suffix):
+                continue
+            k = k[:-3] if qg else k
             cases[k], vins[k] = c, rep["conditions"]["VIN"]
     M = {k: metrics(c, vins[k]) for k, c in cases.items()}
     names = sorted({k.split("@")[0] for k in cases})

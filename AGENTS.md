@@ -66,6 +66,9 @@ Read the relevant report and build-note section before quoting numbers.
   SENSITIVITY revision, not a tuned or validated model; it puts CRSS 23 % outside
   Fig. 5, so Figs. 5 and 7 cannot both be met in this structure (E7 decides).
   The stored plateau width (2.19 nC) is sampling-dependent: 2.40 nC resampled.
+  Owner decision (8 October 2026): treat the datasheet's Fig. 7 gate charge as the truth; EPC2302QG is the
+  primary model of the goals study (template S1-S13), its Crss deviation from Fig. 5 is listed as a model
+  inconsistency, and the vendor model is reported alongside.
 - **Extraction:** A/I/B/G are exploratory; no second full-board mesh has run.
   Fourth-mesh single-via inductance passes, resistance is unconverged; arrays,
   holes and Kelvin/multilayer connections are not qualified by that pass.
