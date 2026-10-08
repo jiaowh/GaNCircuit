@@ -419,8 +419,11 @@ Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed w
   after the vendor-model goals results and bound sweep were read): new runs use EPC2302DS (scripts/
   epc2302_ds_variant.py; Figs. 5 and 7 and every existing datasheet check pass) and the assumed 50 pH only; the
   original model and 0 pH are no longer run or reported in new work (existing reports keep their settings). --ds
-  gives cases <case>-ds; the 0 pH alternatives and the 0 pH-only ideal low-side screen (ctlls) are dropped, so S8's
-  layout bound needs another method. Same scoring definitions (--model-suffix -ds).
+  gives cases <case>-ds; the 0 pH alternatives are dropped. Same scoring definitions (--model-suffix -ds).
+  S8 bound at 50 pH (declared 8 October 2026 while the first -ds goals run was in progress, before any of its S8
+  results was read): <NAME>@<ramp|step>-Ls50-gear-ctlls-ds, the low-side gate stage ideal at Q2's gate pad and
+  returning at Q2's source-pad junction, the package source inductance (50 pH) still in its loop. It is the best any
+  board gate-loop geometry could do for S8 in this model: if it fails S8, no gate-loop layout can meet S8 here.
 Fig. 9 with EPC2302DS (--study damping --ds; same owner decision, declared before its runs): G-m1-mid-Ls50-gear-ds
 (the bench's assumed capacitors) and G-m1-mid-Ls50-tyrlc-avxcm-csw-gear-ds (vendor-sourced Ci/Cm values and the
 switch-node copper capacitance, as damping run 2), scored by scripts/compare_epc90133_fig9.py with its unchanged
@@ -825,8 +828,10 @@ Rbret bn {node(at + '.GND')} 1u"""
             # Matched control: G's network, B's gate drive (ideal stages at the gate pads, returning at the
             # source junction, as B returns at its single source terminal). The driver-ball and gate-resistor
             # copper is left open; 1 Gohm bleeders keep those nodes defined.
-            if ls:
-                raise ValueError("the gate control case takes no package inductance")
+            if ls and gate_ctl != "l":
+                # S8 bound at 50 pH (8 October 2026): only the low-side ideal stage is allowed with l_s; it returns
+                # at Q2's source-pad junction, so the package source inductance stays in its loop.
+                raise ValueError("the gate control case takes no package inductance (except the low-side stage)")
             # gate_ctl True: both stages ideal; "u" or "l": only that stage (split control, test 7 follow-up).
             ideal_st = ("u", "l") if gate_ctl is True else (gate_ctl,)
             owner = lambda t: STAGE_OF.get(t, STAGE_OF.get(t.split(".")[0]))
@@ -1418,8 +1423,8 @@ def goals_cases(names, vin=None, iout=None, qg=False, ds=False):
             cases.update({f"{n}@{a}-gear-l{f:g}": alt(a, l_scale=f) for a in ("ramp-Ls50", "step-Ls50")})
         for dt in (2.5, 5, 7.5, 12.5, 15, 20):
             cases[f"{n}@ramp-Ls50-gear-dt{dt:g}"] = alt("ramp-Ls50", dead=dt * 1e-9)
-        if not ds:  # the ideal low-side screen is allowed only at 0 pH, which the owner dropped for EPC2302DS runs
-            cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l") for a in ("ramp-Ls0", "step-Ls0")})
+        cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l")
+                      for a in (("ramp-Ls50", "step-Ls50") if ds else ("ramp-Ls0", "step-Ls0"))})
     if ds:
         cases = {f"{k}-ds": {**c, "model": DS_MODEL} for k, c in cases.items()}
     if qg:
