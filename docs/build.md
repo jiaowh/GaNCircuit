@@ -3464,3 +3464,20 @@ tested dead time (2.5 ns), so S11's 5-15 ns window fails for both designs indepe
 
 The declared bound sweep (stock, x0.25-1.5, ramp/step-Ls50, vendor model) was launched through WMI:
 `runs/goals-G-bound.launch.json`, output `results/gan/epc90133-goals-G-bound.json`.
+
+Bound sweep result (complete, all 10 cases usable; `results/gan/epc90133-goals-G-bound.json`). Stock, vendor model,
+whole extracted board network scaled, package source inductance assumed 50 pH and unscaled:
+
+| Scale | x0.25 | x0.5 | x0.75 | x0.9 | x1 | x1.1 | x1.25 | x1.5 |
+|---|---|---|---|---|---|---|---|---|
+| Overshoot ramp / step, V | 5.81 / 4.19 | 9.81 / 7.42 | 11.44 / 9.89 | 11.26 / 10.47 | 11.13 / 10.79 | 11.07 / 11.02 | 11.31 / 11.20 | 13.67 / 12.27 |
+| Eon+Eoff ramp / step, uJ | 5.91 / 6.07 | 5.72 / 5.88 | 5.65 / 5.83 | - | 5.58 / 5.78 | - | 5.42 / 5.62 | 5.29 / 5.53 |
+| FET-only efficiency ramp, % | 99.117 | 99.129 | 99.136 | - | 99.141 | - | 99.149 | 99.158 |
+
+Reading under the declared bound rule: S2 (<= 9.6 V under both drivers) needs the whole board network below about
+x0.5; between x0.75 and x1.25 the ramp overshoot is flat near 11 V. S10 (<= 0.9 x stock, 5.02 / 5.20 uJ) is met at
+no scale: lower inductance raises the switching energy, higher inductance lowers it too little. No scale meets S2
+and S10 together, so by the declared rule no power-loop geometry change acting mainly through inductance can; S12
+moves at most 0.02 points. These are the vendor model's results (the reported model); the primary-model cases and
+any EPC2302DS cases have not run. S8 remains the goal a gate-loop/Kelvin geometry could still address (ideal
+screen 0.25-0.33 V at 0 pH; not tested at 50 pH, where the package source inductance is in the gate loop).
