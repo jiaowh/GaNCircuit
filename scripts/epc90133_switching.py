@@ -434,6 +434,19 @@ dropped (30 mohm at 1 MHz). Cases -tyrlc-avxcm, -tyrlc-avxcm-csw (trapezoidal, a
 results/gan/epc90133-switching-damping-2.json. The layout search's --sourced check uses TY_CI_RLC in place of the
 encrypted model for the same reason.
 
+Probe-reference study (--study probe; owner request of 8 October 2026 to re-evaluate the Fig. 9 overshoot gap;
+declared before its run). An overlay of the digitized Fig. 9 with G-m1-mid-Ls50 shows the rising edge itself
+matching, a first rising crest about half the simulated one, and a falling-edge dip (-4.6 V) that the simulation
+lacks. QSG Fig. 8 places the switch-node probe and its ground in J33 (holes about 8.6 mm from Q2), not across Q2's
+pads. Hypothesis: a probe ground partway round the power loop sees only part of the rising-edge ring (the Q1-side
+share of the loop inductance) and picks up part of Q1's turn-off ring on the falling edge. The extraction has no J33
+terminals, so this run only BRACKETS the effect: cases G-m1-mid-Ls50-probe and G-m1-mid-probe (0 pH) save every
+extraction terminal's voltage; scripts/epc90133_probe_reference.py scores V(tip) - V(ground) for the tips Q2.D,
+Q1.S2, Q1.S46 against every GND-net terminal (Q2.S46 = the present observable, Q2.S2, Ci1-7, Cm1-10, U80.GND) with
+the unchanged Fig. 9 metric definitions. Reading rule: if no pair moves the rising overshoot toward 5.7 V while
+producing a falling dip, the location hypothesis is not supported by the bracket; if some pairs do, the decisive
+test is an extraction with J33 terminals (declared separately). Neither result identifies EPC's actual probe.
+
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
 """
@@ -621,7 +634,7 @@ def bench(ext, te_rise, te_fall, esl_scale=1.0, ideal=False, maxstep=MAXSTEP, re
           l_pkg=0.0, c_sw=False, r_pkg_corner=R_PKG_CORNER_HZ, r_scale=1.0, esr=None, r_src=R_SRC, r_snk=R_SNK,
           c_gd=0.0, l_d=None, l_s=None, l_g=0.0, kelvin=False, t_after_b=None, sense_q2=False, gate_ctl=False, no_gate_power_k=False,
           pin_c=None, full_r=False, internal=False, gate_r=None, dead=None, long_pulse=False, method=None,
-          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None, ci_model=None):
+          model="EPC2302", oss_rc=None, ci_vendor=False, cm_model=None, ci_model=None, save_terminals=False):
     dead = DEAD if dead is None else dead
     if gate_r and not is_gate_extraction(ext):
         raise ValueError("per-resistor gate values need the G network (its board resistors are separate elements)")
@@ -741,6 +754,8 @@ Rbret bn {node(at + '.GND')} 1u"""
         die.update(g1="p1g" if l_g else "gu", d1="p1d" if ld else "q1dd", s1=s1_die,
                    g2="p2g" if l_g else "gl", d2="p2d" if ld else q2dd, s2=s2_die)
     times["die_nodes"] = die
+    if save_terminals:
+        times["probe_nodes"] = sorted({node(t) for p_ in ext["ports"] for t in (p_["terminal"], p_["reference"])} - {"0"})
     if oss_rc:  # damping study: Coss-loss proxy, series R-C across each die's drain-source
         c_x, r_x = oss_rc
         for k in ("1", "2"):
@@ -765,6 +780,11 @@ Rbret bn {node(at + '.GND')} 1u"""
         SWITCH_MODELS.rstrip(),
         ".save V(q2_d) V(q1_d) V(q1_s) V(gu) V(gl) I(Vq1d) I(L1)" + (" I(Vq2d)" if sense_q2 else "") + (f" V({node(at + '.VIN')}) V({node(at + '.GND')})")
         + (" V(q2_s) V(u80_ph) V(u80_gnd) I(Vs12) I(Vs146) I(Vs22) I(Vs246)" if g_ext else "")
+        # Probe-reference study: every extraction terminal's node voltage.
+        + ("".join(f" V({nd})" for nd in sorted({node(t) for p_ in ext["ports"] for t in (p_["terminal"], p_["reference"])}
+                                                  - {"0", "gu", "gl", "q2_d", "q1_d", "q1_s", "q2_s", "u80_ph", "u80_gnd",
+                                                     node(at + ".VIN"), node(at + ".GND")}))
+           if save_terminals else "")
         + "".join(f" V({v})" for v in sorted(set(die.values()) - {"0", "gu", "gl", "q1_s", "q2_d", "q2_s", "q2dd", "q1dd"}))
         # Test 9 (opt-in): vendor-model internal nodes, behind rg/rs; the vendor model itself is unchanged.
         + (" V(x1:gate) V(x1:source) V(x2:gate) V(x2:source) I(x1:bswitch) I(x2:bswitch)" if internal else ""),
@@ -910,6 +930,10 @@ def edge_traces(s, times):
            "event_times_s": {"falling": times["t_off1"], "rising": times["t_on2"]},
            "falling_V": [round(float(x), 4) for x in np.interp(times["t_off1"] + rel, t, v)],
            "rising_V": [round(float(x), 4) for x in np.interp(times["t_on2"] + rel, t, v)]}
+    if times.get("probe_nodes"):  # probe-reference study: every saved terminal around both events
+        out["terminals"] = {nd: {ev: [round(float(x), 4) for x in np.interp(times[tk] + rel, t, np.array(s[f"v({nd})"]))]
+                                 for ev, tk in (("falling", "t_off1"), ("rising", "t_on2"))}
+                            for nd in times["probe_nodes"] if f"v({nd})" in s}
     if "i(vq2d)" in s:
         die = times["die_nodes"]
         zero = np.zeros(len(t))
@@ -1271,6 +1295,15 @@ TY_CI_RLC = {"C": 56.5e-9, "ESL": 0.326e-9, "ESR": 0.068}  # Taiyo Yuden DC-bias
 F_RING = 262e6  # damping study: G-m1-mid-Ls50 ring frequency (results/gan/epc90133-fig9-summary.md)
 
 
+def probe_cases(exts):
+    """Probe-reference study (see the module docstring)."""
+    g = "G-m1-mid"
+    if g not in exts:
+        raise SystemExit("the probe study needs extraction G-m1-mid")
+    common = {"ext": g, "maxstep": MAXSTEP_PKG, "t_after_b": T_AFTER_B, "sense_q2": True, "save_terminals": True}
+    return {f"{g}-Ls50-probe": {**common, "l_s": 50e-12}, f"{g}-probe": dict(common)}
+
+
 def damping_cases(exts):
     """Damping study (see the module docstring)."""
     g = "G-m1-mid"
@@ -1331,7 +1364,7 @@ def main():
     ap.add_argument("--reference", default=REFERENCE, help="reference extraction for differences and extra cases")
     ap.add_argument("--periodic-ext", default=NUMERICAL_REF, help="periodic study: extraction (default A-m1-mid)")
     ap.add_argument("--periodic-maxstep", type=float, default=MAXSTEP, help="periodic study: maximum step (s)")
-    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search", "damping"), default="sensitivity",
+    ap.add_argument("--study", choices=("sensitivity", "causes", "periodic", "paths", "gateloop", "phase", "fullr", "driver", "design", "layout", "qgfit", "search", "damping", "probe"), default="sensitivity",
                     help="sensitivity: extraction variants (tests 1-4); causes: candidate causes of the Fig. 9 gap (test 5); periodic: 3-period buck check on A")
     ap.add_argument("--jobs", type=int, default=1, help="cases run in parallel")
     ap.add_argument("--ext-file", nargs="*", default=[], help="search study: NAME=PATH extraction reports")
@@ -1419,6 +1452,8 @@ def main():
         cases = search_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.with_r80, args.qg, args.sourced)
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
+    elif args.study == "probe":
+        cases = probe_cases(exts)
     elif args.study == "damping":
         cases = damping_cases(exts)
         if args.only:
@@ -1494,7 +1529,8 @@ def main():
                   full_r=c.get("full_r", False), internal=c.get("internal", False),
                   gate_r=c.get("gate_r"), dead=c.get("dead"), long_pulse=c.get("long_pulse", False),
                   method=c.get("method"), model=c.get("model", "EPC2302"), oss_rc=c.get("oss_rc"),
-                  ci_vendor=c.get("ci_vendor", False), cm_model=c.get("cm_model"), ci_model=c.get("ci_model"))
+                  ci_vendor=c.get("ci_vendor", False), cm_model=c.get("cm_model"), ci_model=c.get("ci_model"),
+                  save_terminals=c.get("save_terminals", False))
         ter, tef = te_rise, te_fall
         if c.get("driver") == "step":  # test 11
             kw.update(r_src=DRIVER_STEP["r_src_ohm"], r_snk=DRIVER_STEP["r_snk_ohm"])
