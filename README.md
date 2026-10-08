@@ -123,6 +123,10 @@ The studies narrow the questions for measurement:
 - **The driver is not fully characterized by its datasheet edge times.** Two representations that meet the selected resistance and edge-time constraints produce substantially different overshoot. The actual gate waveform needs to be measured.
 - **Package inductance could matter, but its value is unknown.** The assumed 50 pH case matches some waveform features and still fails others. It does not identify the real package inductance.
 - **Damping remains unexplained.** Added capacitor loss can increase damping but barely reduces the first peak. Full extracted resistance has little effect in the B transient study. Partial transistor turn-on raises local damping but does not explain the matched ringing cycles. The energy study does not support a physical heat-loss breakdown.
+- **Probe location explains part of the overshoot gap, not the damping.** Reading the simulated switch node where
+  EPC's guide places the probe (the J33 holes) instead of at the transistor lowers the overshoot from 11.2 to 9.2 V
+  (EPC's waveform: 5.7 V) and produces part of the dip on the falling edge. The damping is unchanged, so the
+  missing ring loss still needs another explanation.
 - **Probe bandwidth alone is insufficient.** The tested bandwidth filters do not close the gap. Probe loading, connection location and resonances remain untested. A fixed added gate capacitor also does not resolve or bound the voltage-dependent gate-charge discrepancy.
 - **Low-side gate spikes and driver-pin stress still need measurements.** Sampled model traces show no appreciable positive low-side channel current during the examined turn-on windows. This does not establish immunity to false turn-on in hardware. Driver PHASE-pin voltage extremes remain unresolved and depend strongly on driver-model assumptions.
 

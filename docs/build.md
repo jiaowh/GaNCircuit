@@ -3559,3 +3559,15 @@ up to 6 %; Q2 board common-source 45.3 against 47.7 pH. The added J33 terminals 
 sensitivity, not convergence). The J33 test therefore cannot be read as the declared decisive test. Its two probe
 cases are still run (cheap), and the J33-against-Q2-pin comparison within the j33 extraction's own transient is
 reported as RETROSPECTIVE and indicative only.
+
+**J33 probe cases (EPC2302DS, 50 pH, Gear; RETROSPECTIVE reading, the declared control failed above).**
+`results/gan/epc90133-switching-probe-j33-ds.json`, scored in `results/gan/epc90133-probe-reference-j33-ds.json`.
+Through Q2's pins the j33 transient reproduces the control (11.2 against 11.3 V, 263 against 262 MHz, within 1 %).
+J33 tip against J33 ground: overshoot 9.2 V (Fig. 9 5.7 V; Q2 pins 11.2 V), rise 2.00 ns (1.68), falling dip below
+the plateau 2.0 V (3.14), pre-edge 9.3 V (8.1), plateau -1.12 V (-1.57), zeta 0.025 (0.077). The J33 location
+removes about a third of the overshoot gap and produces part of the falling dip, but misses the overshoot criterion
+(3.5 V off, 0.073 of swing) and leaves damping unchanged. By the declared reading the location-only explanation is
+weakened: location accounts for part of the gap, not all, and none of the damping. The capacitor-ground pairs reach
+4.9-6.7 V but with a 2.5 ns rise and a high pre-edge level, unlike Fig. 9. Remaining candidates for the rest: the
+probe's own loading/ground lead, the real package inductance, and loss mechanisms (output-capacitance loss,
+high-frequency copper resistance) that the model lacks.
