@@ -125,3 +125,11 @@ Gate to a full G extraction and goals run (fixed now): at least 45 % lower loop 
 stock dielectric, the level at which the bound sweep (x0.5: 9.81 / 7.42 V) starts to meet S2. Below it the screen
 confirms the bound reasoning with real geometry and no G run is spent. A is a ranking variant (no gate loops); its
 loop inductance is not the board's.
+Run 1 of the screen is INVALID and kept (`*-run1-invalid-epc-gerbers.json`, `runs/stack-screen-*-run1-invalid.log`):
+`scripts/epc90133_extract.py` was called directly without `EPC90133_GERBER_EXPORT`, which the route sets to the
+package directory, so both "stock" and "V8" read EPC's Gerbers (their reports record geometry_source epc_gerbers)
+and V8 came out identical to stock. Run 2 sets the variable per package, as `epc90133_board_export.child` does.
+Run 2 result (package geometry, variant A, against stock through the route at 0.127 mm, 0.4925 nH): stock -6.6 /
+-13.1 / -20.1 % at 0.100 / 0.075 / 0.050 mm; V8 -12.5 % at 0.127 mm and -20.0 / -27.6 / -36.0 %. Best legal
+combination (V8 at 0.075 mm) -27.6 %, below the 45 % gate; no G extraction is spent on it. Even the 0.050 mm
+sensitivity (-36 %) stays below the gate.

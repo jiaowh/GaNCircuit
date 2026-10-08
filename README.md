@@ -130,6 +130,37 @@ The studies narrow the questions for measurement:
 
 Failed, incomplete and invalid cases remain in the record and are excluded from acceptance verdicts. Numerical checks include spike detection and selected smaller-time-step runs. Passing those checks establishes only their stated scope, not overall physical accuracy. The [build notes](docs/build.md) preserve the individual studies and their limitations.
 
+## Layout goals: what can change and what it achieves
+
+The owner's design template sets thirteen goals (S1-S13) and fixes the bill of materials, schematic and topology. It
+allows changes to copper, vias and component positions on the switching paths. The open limits follow common
+industry practice: inner dielectric 0.075-0.127 mm, and parts moved at most 1 mm (an assumption, as there is no
+standard for this). Results use the EPC2302DS model and an assumed 50 pH package inductance. Loop inductance changes
+come from a partial board model used for ranking.
+
+| Changeable | Tried | Result | Goals it can move |
+|---|---|---|---|
+| Power-loop vias | V6-V9: thin the via rows under the transistors so the return plane runs closer | V8 lowers loop inductance 12.5 %; thinning further adds little | S2, S3, S10 only through inductance |
+| Inner dielectric | 0.100, 0.075 mm (and 0.050 mm as a check) | 0.075 mm alone -13 %; with V8 -28 % (-36 % at 0.050 mm) | same as above |
+| Decoupling capacitor positions | Input capacitors 0.4 mm closer (all the room available) | Under 1 % | same as above |
+| Capacitor return vias | Planned | Not built | same as above |
+| Transistor and driver positions | Move tool qualified | Not built | mainly inductance; driver position affects the gate loop |
+| Gate loop / Kelvin return | Ideal gate loop simulated as a bound | Low-side gate spike still 1.1-1.3 V against 0.5 V | S8: not reachable while the package inductance is shared |
+| Switch-node copper area | Reasoned only | Would need about 10 times the existing switch-node capacitance to move the dead-time optimum | S11: not reachable |
+
+What the bounds show, given the fixed parts:
+
+- **S2 overshoot (at most 9.6 V)** needs the whole board's inductance below about half. The best legal combination
+  reaches about -28 %, where the bound still gives 11.4 V / 9.9 V.
+- **S10 switching energy (-10 %)** cannot be met: most of it is the transistors' own output-charge loss, fixed by the
+  parts, and lower inductance raises the rest.
+- **S8 false turn-on**, **S11 dead time** and **S12 efficiency** are set by the package, the operating point and
+  the transistors, not by copper, in this model.
+- **S1, S4, S6, S7** pass for the candidates; **S3 settling** is within about 1 % of the baseline.
+
+These verdicts depend on the assumed package inductance and on the unexplained damping difference from EPC's
+measured waveform, so they are simulation results to be checked by measurement, not hardware limits.
+
 ## Stage 3: preparing for measurements
 
 The owner decided to purchase an EPC90133. Receipt, revision and fitted components have not yet been confirmed in the project record. The lab has a Keysight B1506A and PD1550A, which test devices in their own fixtures; their availability does not establish a setup for measuring this assembled board. The board-test equipment inventory is still needed from the lab's responsible person.

@@ -3523,3 +3523,11 @@ The template's acceptable end state is therefore the best legal candidate with t
 bounds. V8 (thinned power-loop vias) remains the best legal candidate; its EPC2302DS goals runs are in progress
 (`runs/goals-G-ds.launch.json`). EPC2302DS switching runs take about 15-20 min per case against about 70 s for the
 vendor model (its narrow gate-drain charge step forces small time steps).
+
+**Combined-stack screen (8 October 2026; declared in `plans/goal-targets-2026-10-08.md` with a 45 % gate).**
+Owner set the template's open limits to industry practice: inner dielectric 0.075-0.127 mm (0.050 mm as a
+sensitivity), 1 mm position limit as an assumption. Variant A, package geometry, against stock through the route:
+V8 at 0.075 mm lowers loop inductance by 27.6 % (V8 alone 12.5 %, 0.075 mm alone 13.1 %); 0.050 mm reaches 36.0 %.
+Below the gate, so no G run. Run 1 was invalid and is kept: the direct extraction call lacked
+`EPC90133_GERBER_EXPORT`, so both cases read EPC's Gerbers and V8 matched stock exactly (reports record
+geometry_source epc_gerbers).
