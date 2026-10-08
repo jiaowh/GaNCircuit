@@ -404,6 +404,10 @@ settings (100 ps, Gear, Q2 sense, settled loss estimator revision 2):
 * screen (upper bound, not a design): <NAME>@<ramp|step>-Ls0-gear-ctlls, the low-side gate stage ideal at Q2's
   pads (test 7's ctl-ls; the bench allows it only without package inductance). It shows how far any low-side
   gate-loop layout could move S8.
+* bound (declared 8 October 2026 while the first goals run was in progress, before any goals result was read):
+  <NAME>@<ramp|step>-Ls50-gear-l<f> for f = 0.25, 0.5, 0.75, 1.25, 1.5, the whole extracted board network scaled.
+  A uniform scale is not a layout, but it brackets what power-loop geometry can do in this model: if no f meets
+  S2 and S10 together, no power-loop geometry change that acts mainly through inductance can either.
 Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed with this declaration).
 
 Damping study (--study damping; owner request 7 October 2026; declared before any run). Question: with the assumed
@@ -1372,7 +1376,7 @@ def goals_cases(names, vin=None, iout=None):
             cases.update({f"{n}@{a}-gear{tag}": alt(a) for a in ("ramp-Ls50", "step-Ls50")})
             continue
         cases.update({f"{n}@{a}-gear": alt(a) for a in ALTERNATIVES})
-        for f in (0.9, 1.1):
+        for f in (0.9, 1.1, 0.25, 0.5, 0.75, 1.25, 1.5):
             cases.update({f"{n}@{a}-gear-l{f:g}": alt(a, l_scale=f) for a in ("ramp-Ls50", "step-Ls50")})
         for dt in (2.5, 5, 7.5, 12.5, 15, 20):
             cases[f"{n}@ramp-Ls50-gear-dt{dt:g}"] = alt("ramp-Ls50", dead=dt * 1e-9)
