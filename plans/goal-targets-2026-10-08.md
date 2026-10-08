@@ -100,3 +100,28 @@ the model used in those runs; it does not waive the Figure 5 failure. A replacem
 model must meet both figures and retain the other passing datasheet checks before
 being accepted as datasheet-consistent. Existing results retain their model identity
 and M1 limitation. No board result is reclassified or overwritten by this decision.
+
+## Layout limits (owner decision, 8 October 2026: "go with industry standard")
+
+The template's unfilled layout limits are set as follows. There is no industry standard for how far parts may move,
+so the position limits are a stated assumption, not a standard.
+
+* Inner dielectric (top to mid-layer 1, the power-loop return gap; stock 0.127 mm): 0.075-0.127 mm, the range of
+  widely stocked prepregs (1080 glass style at about 0.075 mm). 0.050 mm (106 style) is reported as a sensitivity
+  only. The other stackup layers stay as in the design files.
+* FET and driver positions: within 1 mm of stock (assumed). Decoupling capacitors: positions within 1 mm (assumed);
+  their number and parts are fixed by the BOM.
+
+## Combined-stack screen (declared 8 October 2026, before its runs)
+
+Question: does any combination of the remaining power-loop changeables reach the loop-inductance reduction that the
+bound sweep says S2 needs? All of them act mainly through loop inductance. Cases on variant A (top + mid-layer 1,
+about 2 minutes each) through the KiCad route, each against stock through the route at the same dielectric:
+stock and V8 at 0.100, 0.075 (limit) and 0.050 mm (sensitivity), via `scripts/epc90133_extract.py
+A:m1:mid:d<mm> --loop <package>/power-loop.json --tag <case>`. Capacitor moves are not added: L3a showed only
+0.75 % within the available room. Expected from the single-family results (round 2a: 0.100 -> -6.6 %, 0.075 ->
+-13 %; V8 -12.5 %): about -20 to -25 % for V8 at 0.075 mm.
+Gate to a full G extraction and goals run (fixed now): at least 45 % lower loop inductance than stock at the
+stock dielectric, the level at which the bound sweep (x0.5: 9.81 / 7.42 V) starts to meet S2. Below it the screen
+confirms the bound reasoning with real geometry and no G run is spent. A is a ranking variant (no gate loops); its
+loop inductance is not the board's.
