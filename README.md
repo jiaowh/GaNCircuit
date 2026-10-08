@@ -150,13 +150,14 @@ come from a partial board model used for ranking.
 
 What the bounds show, given the fixed parts:
 
-- **S2 overshoot (at most 9.6 V)** needs the whole board's inductance below about half. The best legal combination
-  reaches about -28 %, where the bound still gives 11.4 V / 9.9 V.
+- **S2 overshoot (at most 9.6 V)** needs the whole board's inductance cut to about half. The best legal combination
+  reaches about -28 %, where the simulated overshoot is still about 11 V.
 - **S10 switching energy (-10 %)** cannot be met: most of it is the transistors' own output-charge loss, fixed by the
   parts, and lower inductance raises the rest.
 - **S8 false turn-on**, **S11 dead time** and **S12 efficiency** are set by the package, the operating point and
   the transistors, not by copper, in this model.
-- **S1, S4, S6, S7** pass for the candidates; **S3 settling** is within about 1 % of the baseline.
+- The best candidate, V8, passes **S1, S4 and S7**. It narrowly misses **S3 settling** (133.2 against 131.5 ns) and
+  **S6 di/dt** (30.9 against 29.9 A/ns), both within about 3 % of the baseline.
 
 These verdicts depend on the assumed package inductance and on the unexplained damping difference from EPC's
 measured waveform, so they are simulation results to be checked by measurement, not hardware limits.

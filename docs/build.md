@@ -3531,3 +3531,19 @@ V8 at 0.075 mm lowers loop inductance by 27.6 % (V8 alone 12.5 %, 0.075 mm alone
 Below the gate, so no G run. Run 1 was invalid and is kept: the direct extraction call lacked
 `EPC90133_GERBER_EXPORT`, so both cases read EPC's Gerbers and V8 matched stock exactly (reports record
 geometry_source epc_gerbers).
+
+**Goals study with EPC2302DS, 50 pH (8 October 2026; `results/gan/epc90133-goals-G-ds*.json`, assessment
+`results/gan/epc90133-goals-assessment-ds.json`).** 51 of 52 cases usable; V8@ramp-Ls50-gear-l0.9-ds failed (its
+timing run hit the adapter's 3,600 s maximum, a solver stall; the other cases took 15-20 min), so that corner is
+undetermined. V8 against stock: S1, S4, S7 met; S2, S3, S6, S8, S10, S11, S12, S13 not met; S9 undetermined. New
+against the vendor model: S6 fails (step di/dt 30.9 against 29.9 A/ns) and S3 fails (ramp settling 133.2 against
+131.5 ns), both within about 3 %. Bound sweep (stock, EPC2302DS):
+
+| Scale | x0.25 | x0.5 | x0.75 | x0.9 | x1 | x1.1 | x1.25 | x1.5 |
+|---|---|---|---|---|---|---|---|---|
+| Overshoot ramp / step, V | 5.32 / 3.79 | 9.08 / 6.74 | 11.17 / 9.39 | 11.23 / 10.10 | 11.15 / 10.47 | 11.10 / 10.85 | 11.28 / 11.28 | 12.97 / 11.94 |
+| Eon+Eoff ramp / step, uJ | 6.04 / 6.21 | 5.86 / 6.07 | 5.76 / 5.97 | 5.73 / 5.96 | 5.70 / 5.94 | 5.65 / 5.88 | 5.57 / 5.79 | 5.45 / 5.70 |
+
+S2 alone is met at x0.5 (the vendor model needed below x0.5); S10 (5.13 / 5.35 uJ) at no scale, so no scale meets
+both and the declared conclusion stands under EPC2302DS. The best legal combination (about x0.72 on variant A) is
+in the flat region near 11 V.
