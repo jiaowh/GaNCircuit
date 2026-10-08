@@ -456,6 +456,17 @@ V(J33.SW) - V(J33.GND). Reading: the location hypothesis is supported if, at som
 0-50 pH bracket, that pair comes within the Fig. 9 criteria for overshoot (3 V / 0.05 of swing), rise time
 (25 %) and ring frequency (10 %) and shows the falling dip; it is weakened if the J33 pair stays near the Q2-pin
 result. Damping is not expected to change with location. The probe's own loop is not modelled.
+Amendment (8 October 2026, after an external review, before the J33 run started): the reading also requires the
+shape metrics of scripts/epc90133_probe_reference.py (pre-edge level 1 ns before the rising crossing; falling-edge
+dead-time plateau and the dip below it, separated) and reports the fitted damping per pair, since several modes
+can make the apparent decay depend on location. Fig. 9 on these metrics: pre-edge 8.1 V, plateau -1.57 V, dip
+3.14 V; bracket (50 pH): Q2 pins 7.3 / -1.44 / 1.22 V, capacitor ground 13.1 / -0.41 / 3.75 V. Interpretation is
+narrowed: agreement would show only that this extracted board, the assumed package inductance and an ideal
+J33 observation are consistent with the selected Fig. 9 features; it would not establish EPC's probe connection
+(the guide offers J33 and J32 and does not say which Fig. 9 used), the probe's loading, the measured board's
+revision, or the 50 pH value (choosing it to match this waveform is model selection, not validation), and it would
+not make the layout-search rankings physically validated. Disagreement weakens only this location-only explanation.
+The J33 and Q2-pin observations come from the same extraction and transient.
 
 Every report carries an input manifest (extraction files, vendor library and
 imported modules by sha256).
