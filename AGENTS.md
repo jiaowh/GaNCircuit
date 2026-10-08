@@ -89,7 +89,10 @@ Read the relevant report and build-note section before quoting numbers.
   heat or energy not returned to ideal sources. Test 13 remains 'not supported':
   partial turn-on raises local damping but fails matched-cycle comparisons.
   Full-R transient evidence is on B; G evidence is local AC.
-- **Design:** overshoot is the single objective, FET loss at most +5% over stock
+- **Design target (8 October 2026):** the owner's execution template, goals S1-S13 with the BOM fixed
+  (`plans/goal-targets-2026-10-08.md`), replaces the rule below; gate-resistor changes are out of scope, and
+  stock and V8 do not meet S2, S8 or S10 in the existing runs. The rule below describes the earlier rounds.
+- **Design (5 October rule):** overshoot is the single objective, FET loss at most +5% over stock
   and Q2 gate peak not above stock are constraints. R80 1.5 ohm is the best tested
   candidate under four declared driver/package alternatives (assessor revision 5,
   `results/gan/epc90133-design-round3-assessment-rev5.json`). It is provisional,
