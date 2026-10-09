@@ -146,7 +146,7 @@ allows changes to copper, vias and component positions on the switching paths. T
 industry practice: inner dielectric 0.075-0.127 mm, and parts moved at most 1 mm (an assumption, as there is no
 standard for this). Results use EPC's original transistor model (the default from 9 October) and an assumed 50 pH package
 inductance; EPC2302DS results are noted where they differ. Loop inductance changes come from a partial board model
-used for ranking. The [candidate comparison](results/gan/epc90133-candidates.html) lists every candidate's values.
+used for ranking. The [candidate comparison](epc90133-candidates.html) lists every candidate's values.
 
 | Changeable | Tried | Result | Goals it can move |
 |---|---|---|---|

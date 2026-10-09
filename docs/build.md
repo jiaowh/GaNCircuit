@@ -3694,7 +3694,7 @@ decided (9 October 2026) to pause the candidate search; no geometry was built an
 
 ### Candidate comparison page (9 October 2026)
 
-`python scripts/epc90133_candidate_table.py` regenerates `results/gan/epc90133-candidates.{json,html}` from saved
+`python scripts/epc90133_candidate_table.py` regenerates `results/gan/epc90133-candidates.json` and the page `epc90133-candidates.html` (repository root; it was in results/gan until 9 October) from saved
 results only: every built candidate's variant A/G extraction (loop L and R, board common-source inductance) and the
 S1-S13 goal values (EPC2302DS revision 2 and vendor assessments), each compared with stock through the same route.
 Extraction changes below the route's 4 % threshold are tinted pale. Per-candidate extraction reports are read from the

@@ -5,7 +5,7 @@ Reads saved results only (no solver): the goals assessments (scorer revision 2; 
 board-export reports and the per-candidate extraction reports under the git-ignored reconstruction export folder
 (numbers only). Every value is compared with stock through the same route: green better, red worse; extraction
 changes smaller than the route's declared 4 % comparison threshold are tinted pale. Writes
-results/gan/epc90133-candidates.json (the data) and results/gan/epc90133-candidates.html (the page). Rerun after any
+results/gan/epc90133-candidates.json (the data) and epc90133-candidates.html in the repository root (the page). Rerun after any
 new candidate, extraction or goals assessment, then republish the page.
 """
 import json
@@ -388,7 +388,7 @@ def main():
     data["generated"] = datetime.date.today().isoformat()
     (RES / "epc90133-candidates.json").write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
     page = PAGE.replace("__DATA__", json.dumps(data).replace("</", "<\\/"))
-    (RES / "epc90133-candidates.html").write_text(page, encoding="utf-8")
+    (ROOT / "epc90133-candidates.html").write_text(page, encoding="utf-8")
     for r in data["candidates"]:
         a, g = r["A"], r["G"]
         print(f"{r['id']:10s} A {a and a.get('L_loop_nH')}  G {g and g.get('L_loop_nH')}  goals "
