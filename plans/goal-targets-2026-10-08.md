@@ -139,3 +139,36 @@ Run 2 result (package geometry, variant A, against stock through the route at 0.
 -13.1 / -20.1 % at 0.100 / 0.075 / 0.050 mm; V8 -12.5 % at 0.127 mm and -20.0 / -27.6 / -36.0 %. Best legal
 combination (V8 at 0.075 mm) -27.6 %, below the 45 % gate; no G extraction is spent on it. Even the 0.050 mm
 sensitivity (-36 %) stays below the gate.
+
+## Confirmation run: V8 + 0.075 mm on the full board (declared 9 October 2026, before any of its runs)
+
+Labelled as declared AFTER the combined-stack screen failed its 45 % gate (-27.6 %). This is not a gate pass and
+not a search: one candidate, one run, owner request after a review (docs/build.md, correction note of 9 October).
+
+Decision it serves: whether V8 + 0.075 mm or V8 is the candidate to carry if a revised board is fabricated.
+Question: does the variant-A advantage survive the full coupled G network, and what are its S1-S13 values against
+stock and V8 under matched conditions? It cannot show that this is the best design or settle layout feasibility.
+
+Method:
+1. Extraction `G:m1:mid:d0.075` of the V8 KiCad package, called as the combined-stack screen run 2 did
+   (`EPC90133_GERBER_EXPORT` = the V8 package directory; `--loop` its power-loop.json; `--tag V8`), one FastHenry job
+   (`--jobs 1`; about 3 GB, the host has about 5 GB available beside another project's job). Output
+   `G-m1-mid-d0.075-V8.json` in the package's extraction folder. Checks: outcome complete, every extractor check
+   passes, geometry_source names the V8 KiCad export (the screen's run-1 failure mode). Matched controls: stock and
+   V8 G extractions through the same route at 0.127 mm (same x-y mesh; only the layer heights change).
+   Time: the J33 single-job G extraction took 21,755 s; expected 5-7 h. If it has not finished after 15 h it is
+   recorded as incomplete and stopped by PID only.
+2. Goals switching, vendor model (owner decision, 9 October), assumed 50 pH, the standard goals case set for
+   `--ext-file stock, V8, V8d075` (nominal, then --vin 40, --vin 60, --iout 0; one process at a time, LTspice jobs
+   2, timeout 3,600 s per case). Stock and V8 are rerun as matched controls; reproduction check: their nominal
+   overshoot and FET loss within 0.1 % of `epc90133-goals-G.json`. Scoring: `assess_epc90133_goals.py` revision 2 on
+   the four new reports.
+3. Switch-node capacitance: the thinner dielectric raises the SW copper's capacitance to mid-layer 1, which the
+   inductance extraction omits. Parallel-plate estimate from the V8 package rasters (SW on the top layer over GND on
+   G1, no fringing) at 0.127 and 0.075 mm. If the increase, scaled by the observed +0.8 V for the whole 135 pF on G,
+   exceeds 0.1 V of overshoot, a nominal-only sensitivity with that capacitance is declared separately; otherwise
+   the estimate is reported and no case is run.
+
+Frozen prediction (before any result): G loop inductance -10 to -20 % against stock (V8 gave -4.95 % on G for
+-12.5 % on A); overshoot still above S2's 9.6 V under the ramp driver; S6 and S10 no better than V8. No follow-up
+sweep follows whatever the outcome; the candidate page gets the new row.
