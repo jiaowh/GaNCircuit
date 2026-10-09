@@ -22,7 +22,7 @@ As of 9 October 2026:
 
 The simulation baseline is frozen. Broad parameter sweeps and further diagnosis of the ringing are on hold unless they answer a specific decision. The stock-board simulation checkpoint, **G3**, remains open.
 
-For detailed results and replay instructions, see the [build notes](docs/build.md). The [project plan](plans/gan-halfbridge-pipeline-plan.md) defines the scope, stage interfaces and approval checkpoints.
+The [simulation-only report](docs/simulation-report-2026-10-09.md) summarizes what the simulations show and which questions need measurements. For detailed results and replay instructions, see the [build notes](docs/build.md). The [project plan](plans/gan-halfbridge-pipeline-plan.md) defines the scope, stage interfaces and approval checkpoints.
 
 ## What the project is building
 

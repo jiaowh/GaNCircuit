@@ -3668,3 +3668,26 @@ items are not modelled: there is no EPC2302 thermal network in hand and no self-
 not checked, because no ratings checker exists. Three structural items are outside the model. **Neither model
 satisfies the whole datasheet.** The flagged leakage is small next to the ampere-level gate currents of the switching edges, so it
 should matter little to the switching studies, but it would matter for any gate-leakage or standby-loss question.
+
+### L4a low-side driver return: inspection only, search paused (9 October 2026)
+
+The proposed first candidate was a better low-side (Q2) driver return. EPC's guidance is to join all source pins in
+a plane and take the driver return from that plane near the gate. Read-only inspection of EPC's eight copper layers
+(x 13-24.5, y 22.5-36.5 mm; scratch render, not saved) found the following:
+
+- On the top layer, the U80 GND pour and Q2's source pin-2 pad (next to Q2's gate) are separated by the
+  low-side gate probe connection (J2 net): its through-hole pin at (16.05, 24.8) and its trace up toward R83/R22.
+  With probe features held fixed, a top-layer return from the driver to Q2's source is not possible.
+- G1-G4 are solid GND planes carrying the power-loop return; the driver ground drops into them through the vias
+  near (15.4-15.6, 26.2-28.5) and returns to Q2 through Q2's own source vias. That shared path is the 47.7 pH
+  board common-source inductance of G-m1-mid.
+- A dedicated return would need a new via at Q2's source near its gate, a strip on one inner layer, and the driver
+  ground cut off from the other planes. That ground also serves the driver supply and logic inputs. The qualified
+  KiCad route has no add-via primitive (`add_via` exists only in the raster editor used by the invalid screens).
+
+The expected effect is bounded by the saved ideal low-side gate screen (`epc90133-goals-G-ds-ctlls.json`, which
+removes all board return impedance): Q2 gate peak 1.28 / 1.10 V against stock 1.93 / 1.64 V and S8's 0.5 V. The
+screen is not a proven bound for every layout, but a realizable return cannot be expected to meet S8 or S9 under
+the assumed 50 pH. L3b acts only through loop inductance, where the scaling sweep is flat near stock. The owner
+decided (9 October 2026) to pause the candidate search; no geometry was built and no solver ran. Closing report:
+`docs/simulation-report-2026-10-09.md`.

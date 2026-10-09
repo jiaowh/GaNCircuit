@@ -509,6 +509,11 @@ S5 undetermined so no all-goals pass). The J33 probe-location result is indicati
 only: its declared extraction control failed. See the audit note of 9 October in
 the build notes.
 
+**Layout search paused (owner, 9 October 2026).** The L4a low-side return was inspected and not
+built: a realizable return cannot be expected to meet S8/S9 under the assumed 50 pH, and it needs
+a driver-ground redesign plus an add-via primitive. Closing simulation-only report:
+[simulation report](../docs/simulation-report-2026-10-09.md). Next: board identity and equipment (item 1).
+
 **Work selection and stopping.** Before any additional study, name the decision
 it could change, the observable result that would change it, and a bounded compute
 budget. Prefer existing reports or a small discriminating check. Stop when the
