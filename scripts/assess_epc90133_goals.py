@@ -32,6 +32,8 @@ runs. The 0 pH alternatives are not run for EPC2302DS; they appear as missing ("
 Retrospective fix (8 October 2026, after the first scoring attempt crashed, no definition changed): at 0 % load the
 valley turn-on is soft and the bench reports no 10-90 % rise time; dv/dt and S4 are then None (undetermined) for
 that case. S13 uses only S1, S2, S7 and S8, so its corner verdicts are unaffected. Output: --output (JSON) and a printed table.
+Model update (owner decision, 9 October 2026): the vendor model, as EPC provides it, is primary for new work and
+the default here (--model-suffix ''); EPC2302DS (-ds) and EPC2302QG (-qg) scoring remain available for their runs.
 Acceptance-gate repair (9 October 2026, after the audit docs/project-audit-274cd46.md; no goal definition or limit
 changed): a case carrying "interpretation_invalid" is unusable, as in the other evaluators; a case name supplied by two
 reports stops the scoring; every report contributing cases must record the same model-library identity (vendor and,
@@ -132,8 +134,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("reports", nargs="+", type=Path)
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-goals-assessment.json")
-    ap.add_argument("--model-suffix", default="-ds", choices=("-ds", "-qg", ""),
-                    help="'-ds' (EPC2302DS, primary from 8 October 2026), '-qg' (EPC2302QG, earlier runs) or '' (vendor)")
+    ap.add_argument("--model-suffix", default="", choices=("-ds", "-qg", ""),
+                    help="'' (vendor, primary from 9 October 2026), '-ds' (EPC2302DS) or '-qg' (EPC2302QG, earlier runs)")
     args = ap.parse_args()
     cases, vins, used = {}, {}, []
     for r in args.reports:

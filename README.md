@@ -50,7 +50,7 @@ The results are:
 - **Datasheet curves:** all 24 curves in Figures 1–6 and 8–10 pass the declared checks. They were digitized from the PDF's vector drawings. Their very close agreement suggests they may have been drawn from the same model, so the result mainly supports correct model execution. See the [curve comparison](results/gan/epc2302-curve-comparison.json).
 - **Gate charge, Figure 7:** the model's Miller plateau is narrower than EPC's curve (about 16–24%, depending on how the curve is sampled), and charge after the plateau is about 1.2 nC low. The cause and the table's QGD/QG(TH) discrepancies remain unresolved. See the [gate-charge comparison](results/gan/epc2302-fig7-comparison.json). A separate sensitivity revision of the model that follows Figure 7 [exists](results/gan/epc2302-qg-variant.json), but it puts the reverse-transfer capacitance 23% above Figure 5. The tested parameter scaling does not match both figures. A different representation does: **EPC2302DS** adds two small charge steps, placed where the gate-charge test goes but the capacitance curves do not, and passes Figure 7 together with all 24 other curves and every existing table and numerical check ([report](results/gan/epc2302-ds-variant.json)). It is a calibration to EPC's published curves, not identified device physics. The table's gate-drain charge and threshold gate charge stay flagged for both models, because the table's measurement definition and Figure 7 disagree. A [coverage record](results/gan/epc2302-coverage.md) lists every datasheet item for both models. Leakage currents are inside their limits but several times off the typical values, with no temperature dependence. The model has no breakdown mechanism, so the breakdown rating cannot be tested. Reverse recovery is zero, as the datasheet states, because the model stores no charge beyond its capacitances. There is no thermal model, and the ratings and safe operating area are not checked, so neither model covers the whole datasheet.
 
-The original model remains the reproducible **provisional baseline**. Both the capacitance curves (Figure 5) and the gate-charge curve (Figure 7) are required datasheet targets. EPC2302DS meets both while keeping the other tested checks, and is the model used for new board runs; earlier results keep the model they were run with. Agreement with the datasheet is distinct from validation against hardware.
+The original model remains the reproducible **provisional baseline**. Both the capacitance curves (Figure 5) and the gate-charge curve (Figure 7) are required datasheet targets. EPC2302DS meets both while keeping the other tested checks. New board runs use EPC's original model, since that is the model EPC provides; results run with EPC2302DS keep that model, and the comparison page shows both. Agreement with the datasheet is distinct from validation against hardware.
 
 ## Stage 2: modelling the board
 
@@ -144,8 +144,9 @@ Failed, incomplete and invalid cases remain in the record and are excluded from 
 The owner's design template sets thirteen goals (S1-S13) and fixes the bill of materials, schematic and topology. It
 allows changes to copper, vias and component positions on the switching paths. The open limits follow common
 industry practice: inner dielectric 0.075-0.127 mm, and parts moved at most 1 mm (an assumption, as there is no
-standard for this). Results use the EPC2302DS model and an assumed 50 pH package inductance. Loop inductance changes
-come from a partial board model used for ranking.
+standard for this). Results use EPC's original transistor model (the default from 9 October) and an assumed 50 pH package
+inductance; EPC2302DS results are noted where they differ. Loop inductance changes come from a partial board model
+used for ranking. The [candidate comparison](results/gan/epc90133-candidates.html) lists every candidate's values.
 
 | Changeable | Tried | Result | Goals it can move |
 |---|---|---|---|
@@ -167,10 +168,10 @@ What the screens show, given the fixed parts:
 - **S8 false turn-on**, **S11 dead time** and **S12 efficiency** fail in every case run with the assumed 50 pH package
   inductance (an ideal gate connection without package inductance did meet S8). S12 is scored from
   transistor losses only, so it cannot see copper-loss savings or judge the whole converter's efficiency.
-- The best candidate, V8, passes **S1, S4 and S7**. It narrowly misses **S3 settling** (133.2 against 131.5 ns) and
-  **S6 di/dt** (30.9 against 29.9 A/ns), both within about 3 % of the baseline. **S5** has no limit set and **S9**
-  cannot be decided from these runs, so even a candidate passing everything else would not count as meeting all
-  goals. One V8 corner run stalled and is undetermined; V8 fails S13 on other corners regardless.
+- The best candidate, V8, passes **S1, S4, S6 and S7**. It narrowly misses **S3 settling** (132.5 against 130.8 ns
+  and 133.0 against 131.5 ns for the two driver models, about 1 % slower). With EPC2302DS it also narrowly misses
+  S6 (step di/dt 30.9 against 29.9 A/ns). **S5** has no limit set and **S9** cannot be decided from these runs, so
+  even a candidate passing everything else would not count as meeting all goals. V8 fails S13 on every corner set.
 
 In these screens the goals pull against each other: lowering the power-loop inductance lowers overshoot (S2) but
 speeds up the current change (S6) and raises switching energy (S10). The screens scale every inductance together or

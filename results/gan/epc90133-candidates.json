@@ -200,6 +200,63 @@
     "L_cs_Q2_pH": 48.022676994035514
    },
    "goals": {
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": true,
+      "S4": true,
+      "S5": null,
+      "S6": true,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": false,
+      "S12": false,
+      "S13": false
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-vendor-rev2.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.31907272338867,
+       "overshoot_V": 11.125135694785051,
+       "settling_s": 1.3075e-07,
+       "tr_s": 1.6835128915519736e-09,
+       "tf_s": 4.1755571370396125e-09,
+       "dvdt_V_per_ns": 22.80944814423152,
+       "id_peak_A": 58.51051330566406,
+       "didt_A_per_ns": 42.22576000000001,
+       "vgs_max_V": 5.030094146728516,
+       "vgs_min_V": -1.8991279602050781,
+       "q2_gate_peak_V": 1.9396140575408936,
+       "eon_eoff_J": 5.583397802773839e-06,
+       "efficiency": 0.9914123762701659
+      },
+      "step-Ls50": {
+       "vpk_V": 58.99005126953125,
+       "overshoot_V": 10.793155646430527,
+       "settling_s": 1.315e-07,
+       "tr_s": 1.7907956492993428e-09,
+       "tf_s": 4.219821814983239e-09,
+       "dvdt_V_per_ns": 21.44298262899186,
+       "id_peak_A": 52.476253509521484,
+       "didt_A_per_ns": 33.47063999999999,
+       "vgs_max_V": 4.990875244140625,
+       "vgs_min_V": -1.32490449026227,
+       "q2_gate_peak_V": 1.658995121717453,
+       "eon_eoff_J": 5.777370113996714e-06,
+       "efficiency": 0.9914448256224975
+      }
+     },
+     "dead_time_optimum_ns": 2.5,
+     "corners": {
+      "passed": 0,
+      "usable": 10,
+      "declared": 10
+     }
+    },
     "EPC2302DS": {
      "verdict": {
       "S1": true,
@@ -256,62 +313,6 @@
       "usable": 10,
       "declared": 10
      }
-    },
-    "vendor": {
-     "verdict": {
-      "S1": true,
-      "S2": false,
-      "S3": true,
-      "S4": true,
-      "S6": true,
-      "S7": true,
-      "S8": false,
-      "S9": null,
-      "S10": false,
-      "S12": false,
-      "S11": false,
-      "S13": false
-     },
-     "all_met": false,
-     "source": "results/gan/epc90133-goals-assessment-vendor.json",
-     "values": {
-      "ramp-Ls50": {
-       "vpk_V": 59.31907272338867,
-       "overshoot_V": 11.125135694785051,
-       "settling_s": 1.3075e-07,
-       "tr_s": 1.6835128915519736e-09,
-       "tf_s": 4.1755571370396125e-09,
-       "dvdt_V_per_ns": 22.80944814423152,
-       "id_peak_A": 58.51051330566406,
-       "didt_A_per_ns": 42.22576000000001,
-       "vgs_max_V": 5.030094146728516,
-       "vgs_min_V": -1.8991279602050781,
-       "q2_gate_peak_V": 1.9396140575408936,
-       "eon_eoff_J": 5.583397802773839e-06,
-       "efficiency": 0.9914123762701659
-      },
-      "step-Ls50": {
-       "vpk_V": 58.99005126953125,
-       "overshoot_V": 10.793155646430527,
-       "settling_s": 1.315e-07,
-       "tr_s": 1.7907956492993428e-09,
-       "tf_s": 4.219821814983239e-09,
-       "dvdt_V_per_ns": 21.44298262899186,
-       "id_peak_A": 52.476253509521484,
-       "didt_A_per_ns": 33.47063999999999,
-       "vgs_max_V": 4.990875244140625,
-       "vgs_min_V": -1.32490449026227,
-       "q2_gate_peak_V": 1.658995121717453,
-       "eon_eoff_J": 5.777370113996714e-06,
-       "efficiency": 0.9914448256224975
-      }
-     },
-     "dead_time_optimum_ns": 2.5,
-     "corners": {
-      "passed": 0,
-      "usable": 10,
-      "declared": 10
-     }
     }
    }
   },
@@ -337,8 +338,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -363,8 +364,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -396,6 +397,63 @@
     "L_cs_Q2_pH": 40.80335125736374
    },
    "goals": {
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": false,
+      "S4": true,
+      "S5": null,
+      "S6": true,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": false,
+      "S12": false,
+      "S13": false
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-vendor-rev2.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.51451110839844,
+       "overshoot_V": 11.322384245684951,
+       "settling_s": 1.325e-07,
+       "tr_s": 1.7501419957168833e-09,
+       "tf_s": 4.183790286502077e-09,
+       "dvdt_V_per_ns": 21.941076834894652,
+       "id_peak_A": 56.333473205566406,
+       "didt_A_per_ns": 41.68775999999999,
+       "vgs_max_V": 5.039867401123047,
+       "vgs_min_V": -1.7104232758283615,
+       "q2_gate_peak_V": 1.8521928787231445,
+       "eon_eoff_J": 5.628918951978885e-06,
+       "efficiency": 0.9913751523990919
+      },
+      "step-Ls50": {
+       "vpk_V": 58.958473205566406,
+       "overshoot_V": 10.764185249795013,
+       "settling_s": 1.33e-07,
+       "tr_s": 1.8330034910208685e-09,
+       "tf_s": 4.23027847065008e-09,
+       "dvdt_V_per_ns": 20.949223603831545,
+       "id_peak_A": 50.642051696777344,
+       "didt_A_per_ns": 32.92716,
+       "vgs_max_V": 4.993877410888672,
+       "vgs_min_V": -1.188991516828537,
+       "q2_gate_peak_V": 1.585530698299408,
+       "eon_eoff_J": 5.822263702185174e-06,
+       "efficiency": 0.9914056341067893
+      }
+     },
+     "dead_time_optimum_ns": 2.5,
+     "corners": {
+      "passed": 0,
+      "usable": 10,
+      "declared": 10
+     }
+    },
     "EPC2302DS": {
      "verdict": {
       "S1": true,
@@ -452,62 +510,6 @@
       "usable": 9,
       "declared": 10
      }
-    },
-    "vendor": {
-     "verdict": {
-      "S1": true,
-      "S2": false,
-      "S3": false,
-      "S4": true,
-      "S6": true,
-      "S7": true,
-      "S8": false,
-      "S9": null,
-      "S10": false,
-      "S12": false,
-      "S11": false,
-      "S13": false
-     },
-     "all_met": false,
-     "source": "results/gan/epc90133-goals-assessment-vendor.json",
-     "values": {
-      "ramp-Ls50": {
-       "vpk_V": 59.51451110839844,
-       "overshoot_V": 11.322384245684951,
-       "settling_s": 1.325e-07,
-       "tr_s": 1.7501419957168833e-09,
-       "tf_s": 4.183790286502077e-09,
-       "dvdt_V_per_ns": 21.941076834894652,
-       "id_peak_A": 56.333473205566406,
-       "didt_A_per_ns": 41.68775999999999,
-       "vgs_max_V": 5.039867401123047,
-       "vgs_min_V": -1.7104232758283615,
-       "q2_gate_peak_V": 1.8521928787231445,
-       "eon_eoff_J": 5.628918951978885e-06,
-       "efficiency": 0.9913751523990919
-      },
-      "step-Ls50": {
-       "vpk_V": 58.958473205566406,
-       "overshoot_V": 10.764185249795013,
-       "settling_s": 1.33e-07,
-       "tr_s": 1.8330034910208685e-09,
-       "tf_s": 4.23027847065008e-09,
-       "dvdt_V_per_ns": 20.949223603831545,
-       "id_peak_A": 50.642051696777344,
-       "didt_A_per_ns": 32.92716,
-       "vgs_max_V": 4.993877410888672,
-       "vgs_min_V": -1.188991516828537,
-       "q2_gate_peak_V": 1.585530698299408,
-       "eon_eoff_J": 5.822263702185174e-06,
-       "efficiency": 0.9914056341067893
-      }
-     },
-     "dead_time_optimum_ns": 2.5,
-     "corners": {
-      "passed": 0,
-      "usable": 10,
-      "declared": 10
-     }
     }
    }
   },
@@ -533,8 +535,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -559,8 +561,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -576,8 +578,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -593,8 +595,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -610,8 +612,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -627,8 +629,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -644,8 +646,8 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   },
   {
@@ -661,14 +663,14 @@
    },
    "G": null,
    "goals": {
-    "EPC2302DS": null,
-    "vendor": null
+    "vendor": null,
+    "EPC2302DS": null
    }
   }
  ],
  "sources": {
-  "EPC2302DS": "results/gan/epc90133-goals-assessment-ds-rev2.json",
-  "vendor": "results/gan/epc90133-goals-assessment-vendor.json"
+  "vendor": "results/gan/epc90133-goals-assessment-vendor-rev2.json",
+  "EPC2302DS": "results/gan/epc90133-goals-assessment-ds-rev2.json"
  },
  "generated": "2026-10-09"
 }

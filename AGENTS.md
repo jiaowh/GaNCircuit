@@ -83,8 +83,9 @@ Read the relevant report and build-note section before quoting numbers.
   outside the VGS=0/VGD<=0 capacitance domain; passes Figs. 5 AND 7, all 24 curves, the 13 table
   rows' limits/flags and numerical checks. Calibration, not physics; QGD/QG(TH) still flagged;
   Coverage record (`scripts/epc2302_coverage.py` run 2): IDSS/IGSS inside limits but flagged (no TC), BVDSS
-  unsupported (no breakdown element), QRR 0 by construction; thermal not modelled, ratings/SOA not checked, so not whole-datasheet. Board runs since 8 October
-  (goals, Fig. 9, J33) use it. Its waveform similarity to the vendor model excludes this gate-charge
+  unsupported (no breakdown element), QRR 0 by construction; thermal not modelled, ratings/SOA not checked, so not whole-datasheet. Board runs of
+  8 October (goals, Fig. 9, J33) use it. Owner decision (9 October 2026): the vendor model, as EPC provides it, is
+  primary for new work (switching without --ds; goals scorer default ''); DS results stay valid for their model. Its waveform similarity to the vendor model excludes this gate-charge
   correction as the remedy, not the device model as a contributor.
 - **Extraction:** A/I/B/G are exploratory; no second full-board mesh has run.
   Fourth-mesh single-via inductance passes, resistance is unconverged; arrays,
@@ -96,7 +97,8 @@ Read the relevant report and build-note section before quoting numbers.
   measurements. Owner decision (7 October 2026): new simulations default to an
   assumed package source inductance of 50 pH (within EPC's < 0.2 nH LGA estimate);
   label it 'assumed 50 pH'. A later owner decision (8 October, build notes) made
-  EPC2302DS at 50 pH the only setting for new runs; 0 pH is no longer run. Existing
+  50 pH the only package setting for new runs (0 pH no longer run); the model part is superseded by the 9 October
+  vendor-model decision. Existing
   reports keep their settings; do not rerun only to change the default.
   J33 probe location (8 October) is indicative only: its extraction control failed
   (-1.2 % vs 0.5 %) and J33 is not confirmed as Fig. 9's connection. Probe

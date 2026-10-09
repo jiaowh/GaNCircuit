@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Candidate comparison page: every built layout candidate, its extracted parasitics and its S1-S13 goal values.
 
-Reads saved results only (no solver): the goals assessments (EPC2302DS revision 2 and the vendor model), the
+Reads saved results only (no solver): the goals assessments (scorer revision 2; vendor model primary, EPC2302DS alternative), the
 board-export reports and the per-candidate extraction reports under the git-ignored reconstruction export folder
 (numbers only). Every value is compared with stock through the same route: green better, red worse; extraction
 changes smaller than the route's declared 4 % comparison threshold are tinted pale. Writes
@@ -14,7 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results/gan"
 EXPORT = ROOT / "vendor/epc/epc90133/reconstruction/export"
-ASSESS = {"EPC2302DS": RES / "epc90133-goals-assessment-ds-rev2.json", "vendor": RES / "epc90133-goals-assessment-vendor.json"}
+# Vendor model primary from 9 October 2026 (owner decision); EPC2302DS shown as the alternative.
+ASSESS = {"vendor": RES / "epc90133-goals-assessment-vendor-rev2.json", "EPC2302DS": RES / "epc90133-goals-assessment-ds-rev2.json"}
 ROUTE_THRESHOLD = 0.04
 PRIMARY = ("ramp-Ls50", "step-Ls50")
 
@@ -132,16 +133,16 @@ PAGE = r"""<title>EPC90133 Layout Candidates</title>
   --head: #eceeeb; --accent: #2f5d50;
   --good: #1f7a45; --good-bg: #d9f0e1; --good-pale: #eef8f1;
   --bad: #a3322b; --bad-bg: #f7dcd9; --bad-pale: #fbefed;
-  --na: #8a938e;
+  --na: #8a938e; --shade: rgba(29, 35, 32, 0.16);
   --sans: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #141816; --panel: #1b201d; --ink: #e5eae6; --muted: #9aa49f; --rule: #2f3632; --head: #222824; --accent: #8fc1b0;
-  --good: #7fd6a0; --good-bg: #1e3d2a; --good-pale: #18291f; --bad: #f09a92; --bad-bg: #462421; --bad-pale: #2c1c1a; --na: #6f7873;
+  --good: #7fd6a0; --good-bg: #1e3d2a; --good-pale: #18291f; --bad: #f09a92; --bad-bg: #462421; --bad-pale: #2c1c1a; --na: #6f7873; --shade: rgba(0, 0, 0, 0.45);
   color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #141816; --panel: #1b201d; --ink: #e5eae6; --muted: #9aa49f; --rule: #2f3632; --head: #222824; --accent: #8fc1b0;
-  --good: #7fd6a0; --good-bg: #1e3d2a; --good-pale: #18291f; --bad: #f09a92; --bad-bg: #462421; --bad-pale: #2c1c1a; --na: #6f7873;
+  --good: #7fd6a0; --good-bg: #1e3d2a; --good-pale: #18291f; --bad: #f09a92; --bad-bg: #462421; --bad-pale: #2c1c1a; --na: #6f7873; --shade: rgba(0, 0, 0, 0.45);
   color-scheme: dark }
 body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; }
 main { padding-block: 28px 48px; padding-inline: 16px; max-width: 1500px; margin: 0 auto; display: grid; gap: 20px; }
@@ -157,10 +158,30 @@ p { margin: 0; line-height: 1.5; max-width: 75ch; color: var(--muted); }
 .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); align-items: center; }
 .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; }
-.wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; }
+.sheet { display: grid; gap: 8px; min-width: 0; }
+.nav { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 6px; }
+.nav button { font: inherit; font-size: 12px; padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); cursor: pointer; }
+.nav button:hover { border-color: var(--accent); }
+.nav button.on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.nav .arrow { font-size: 14px; padding: 2px 10px; }
+.nav .hint { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+.frame { position: relative; min-width: 0; }
+.wrap { overflow: auto; max-height: calc(100dvh - 120px); min-height: 320px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px;
+  scrollbar-width: auto; scrollbar-color: var(--muted) var(--head); cursor: grab; overscroll-behavior-x: contain; }
+.wrap:focus-visible { outline: 2px solid var(--accent); }
+.wrap.drag { cursor: grabbing; user-select: none; }
+.wrap::-webkit-scrollbar { height: 14px; width: 12px; }
+.wrap::-webkit-scrollbar-track { background: var(--head); }
+.wrap::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 7px; border: 3px solid var(--head); }
+.fade { position: absolute; top: 1px; bottom: 15px; width: 28px; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 4; }
+.fade.r { right: 13px; background: linear-gradient(to left, var(--shade), transparent); }
+.fade.l { left: 186px; background: linear-gradient(to right, var(--shade), transparent); }
+.fade.show { opacity: 1; }
 table { border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; font-size: 12.5px; }
 th, td { border-bottom: 1px solid var(--rule); border-right: 1px solid var(--rule); padding: 6px 8px; text-align: right; white-space: nowrap; vertical-align: top; }
 thead th { background: var(--head); font-weight: 600; position: sticky; top: 0; z-index: 2; }
+thead tr.sub th { top: var(--grp-h, 0px); }
 thead tr.grp th { text-align: center; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
 thead tr.sub th { font-weight: 500; }
 thead .tgt { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted); }
@@ -194,8 +215,8 @@ tr.ref td { font-weight: 600; }
     <div class="controls">
       <span class="lbl">Goal values from</span>
       <div class="seg" role="group" aria-label="Transistor model">
-        <button type="button" id="m-ds" data-model="EPC2302DS" aria-pressed="true">EPC2302DS (primary)</button>
-        <button type="button" id="m-vendor" data-model="vendor" aria-pressed="false">Vendor model</button>
+        <button type="button" id="m-vendor" data-model="vendor" aria-pressed="true">Vendor model (primary)</button>
+        <button type="button" id="m-ds" data-model="EPC2302DS" aria-pressed="false">EPC2302DS</button>
       </div>
     </div>
   </div>
@@ -206,7 +227,16 @@ tr.ref td { font-weight: 600; }
     <span><span class="chip met">met</span> <span class="chip not">not met</span> <span class="chip und">undetermined</span> goal verdict (both drivers)</span>
     <span class="meta" id="gen"></span>
   </div>
-  <div class="wrap"><table id="t"></table></div>
+  <div class="sheet">
+    <div class="nav" id="nav" aria-label="Jump to columns">
+      <button type="button" class="arrow" id="prev" aria-label="Scroll left">&#8592;</button>
+      <button type="button" class="arrow" id="next" aria-label="Scroll right">&#8594;</button>
+      <span id="jumps" style="display:contents"></span>
+      <span class="hint">Drag the table, use the arrows, or Shift + scroll wheel</span>
+    </div>
+    <div class="frame"><div class="wrap" id="wrap" tabindex="0" aria-label="Candidate table"><table id="t"></table></div>
+      <div class="fade l" id="fl"></div><div class="fade r" id="fr"></div></div>
+  </div>
   <div class="cols">
     <div class="card"><h2>How to read it</h2><ul>
       <li>Percentages are the change from stock in the same column. Lower inductance and resistance are shown as better; lower inductance also raises switching energy (S10) and current slope (S6) in this model.</li>
@@ -221,8 +251,8 @@ tr.ref td { font-weight: 600; }
 <script>
 const DATA = __DATA__;
 const $ = (s) => document.querySelector(s);
-let model = "EPC2302DS";
-try { const m = localStorage.getItem("cand-model"); if (m === "vendor" || m === "EPC2302DS") model = m; } catch (e) {}
+let model = "vendor";
+try { const m = localStorage.getItem("cand-model-v2"); if (m === "vendor" || m === "EPC2302DS") model = m; } catch (e) {}
 const ref = DATA.candidates.find((c) => c.id === DATA.reference);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 function cmp(v, r, better, pale) {
@@ -252,12 +282,12 @@ function render() {
   const cols = DATA.columns;
   const groups = []; cols.forEach((c) => { const g = groups[groups.length - 1]; if (g && g.goal === c[1]) g.n++; else groups.push({ goal: c[1], n: 1 }); });
   const order = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13"];
-  let h = '<thead><tr class="grp"><th class="name" rowspan="2">Candidate</th><th colspan="1" rowspan="2">Build</th><th colspan="6">Extracted parasitics</th>';
+  let h = '<thead><tr class="grp"><th class="name" rowspan="2">Candidate</th><th colspan="1" rowspan="2">Build</th><th colspan="6" data-jump="Parasitics">Extracted parasitics</th>';
   const subs = [];
   order.forEach((g) => {
     const cs = cols.filter((c) => c[1] === g);
     const n = Math.max(cs.length, 1);
-    h += `<th colspan="${n}">${g}<span class="tgt">${esc(DATA.targets[g])}</span></th>`;
+    h += `<th colspan="${n}" data-jump="${g}">${g}<span class="tgt">${esc(DATA.targets[g])}</span></th>`;
     if (cs.length) cs.forEach((c) => subs.push(`<th>${esc(c[2])}<span class="tgt">${esc(c[4])}</span></th>`));
     else subs.push(`<th>${g === "S9" ? "Shoot-through" : g === "S11" ? "Best dead time" : "Corners kept"}<span class="tgt">${g === "S11" ? "ns" : g === "S13" ? "count" : "verdict"}</span></th>`);
   });
@@ -294,9 +324,56 @@ function render() {
     h += "</tr>";
   }
   $("#t").innerHTML = h + "</tbody>";
+  layout();
 }
+const wrap = $("#wrap");
+const nameW = () => (document.querySelector("th.name") || { offsetWidth: 0 }).offsetWidth;
+const smooth = () => (matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth");
+function layout() {
+  const grp = document.querySelector("thead tr.grp");
+  if (grp) wrap.style.setProperty("--grp-h", grp.getBoundingClientRect().height + "px");
+  $("#fl").style.left = nameW() + 1 + "px";
+  $("#jumps").innerHTML = [...document.querySelectorAll("th[data-jump]")]
+    .map((th) => `<button type="button" data-to="${th.dataset.jump}">${th.dataset.jump}</button>`).join("");
+  document.querySelectorAll("#jumps button").forEach((b) => b.addEventListener("click", () => {
+    const th = document.querySelector(`th[data-jump="${b.dataset.to}"]`);
+    wrap.scrollTo({ left: th.offsetLeft - nameW(), behavior: smooth() });
+  }));
+  edges();
+}
+function edges() {
+  const max = wrap.scrollWidth - wrap.clientWidth;
+  $("#fl").classList.toggle("show", wrap.scrollLeft > 2);
+  $("#fr").classList.toggle("show", wrap.scrollLeft < max - 2);
+  const x = wrap.scrollLeft + nameW() + 4;
+  let cur = null;
+  document.querySelectorAll("th[data-jump]").forEach((th) => { if (th.offsetLeft <= x) cur = th.dataset.jump; });
+  document.querySelectorAll("#jumps button").forEach((b) => b.classList.toggle("on", b.dataset.to === cur));
+}
+wrap.addEventListener("scroll", edges, { passive: true });
+addEventListener("resize", layout);
+const page = (dir) => wrap.scrollBy({ left: dir * (wrap.clientWidth - nameW()) * 0.8, behavior: smooth() });
+$("#prev").addEventListener("click", () => page(-1));
+$("#next").addEventListener("click", () => page(1));
+wrap.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") { page(1); e.preventDefault(); }
+  if (e.key === "ArrowLeft") { page(-1); e.preventDefault(); }
+});
+let drag = null;
+wrap.addEventListener("pointerdown", (e) => {
+  if (e.pointerType !== "mouse" || e.button !== 0) return;
+  drag = { x: e.clientX, y: e.clientY, l: wrap.scrollLeft, t: wrap.scrollTop, moved: false };
+});
+addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+  drag.moved = true; wrap.classList.add("drag");
+  wrap.scrollLeft = drag.l - dx; wrap.scrollTop = drag.t - dy;
+});
+addEventListener("pointerup", () => { drag = null; wrap.classList.remove("drag"); });
 document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
-  model = b.dataset.model; try { localStorage.setItem("cand-model", model); } catch (e) {} render();
+  model = b.dataset.model; try { localStorage.setItem("cand-model-v2", model); } catch (e) {} render();
 }));
 $("#notin").innerHTML = DATA.not_in_table.map(([a, b]) => `<li><b>${esc(a)}</b><br><span>${esc(b)}</span></li>`).join("");
 $("#gen").textContent = "Generated " + DATA.generated + " from saved results";

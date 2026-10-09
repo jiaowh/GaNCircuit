@@ -415,6 +415,8 @@ settings (100 ps, Gear, Q2 sense, settled loss estimator revision 2):
   reported alongside, not judged. The owner's 7 October request to include the gate-charge curve in the
   verifications had been omitted from the first goals declaration; this supersedes it.
 Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed with this declaration).
+* model (owner decision, 9 October 2026, supersedes the model part of the next item): new runs use the vendor
+  model as EPC provides it (omit --ds); EPC2302DS runs keep their '-ds' names and remain valid for their model.
 * model and package inductance (owner decision, 8 October 2026, after EPC2302DS passed its datasheet checks and
   after the vendor-model goals results and bound sweep were read): new runs use EPC2302DS (scripts/
   epc2302_ds_variant.py; Figs. 5 and 7 and every existing datasheet check pass) and the assumed 50 pH only; the

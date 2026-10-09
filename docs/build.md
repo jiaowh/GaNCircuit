@@ -3701,3 +3701,14 @@ Extraction changes below the route's 4 % threshold are tinted pale. Per-candidat
 git-ignored reconstruction export folder; the tracked JSON keeps the numbers. Published as a private page
 (https://claude.ai/artifact/8VJjUm161X4JHfEJSZbJYJ); after a new candidate, extraction or goals assessment, add it to
 CANDIDATES in the script, rerun, and republish the same file.
+
+### Vendor model primary again; comparison page navigation (9 October 2026)
+
+Owner decision (9 October 2026): new work uses EPC's vendor model as provided (switching without `--ds`; the goals
+scorer's default is now `--model-suffix ''`). EPC2302DS results stay valid for their model and are shown alongside.
+The saved vendor goals runs were rescored with scorer revision 2 into
+`results/gan/epc90133-goals-assessment-vendor-rev2.json` (no solver): verdicts equal the original vendor assessment
+apart from the added S5 (undetermined). Vendor model, V8 against stock: S1, S4, S6, S7 met; S3 missed by about 1 %
+(132.5 / 133.0 against 130.8 / 131.5 ns); S2, S8, S10-S13 not met; S5, S9 undetermined; all corner runs complete.
+The candidate page now opens on the vendor model and scrolls inside a window-height frame (pinned headers and name
+column, column jump bar, arrows, drag to pan).
