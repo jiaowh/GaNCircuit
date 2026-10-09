@@ -90,6 +90,12 @@ Acceptable final result: a legal geometry-only candidate (BOM unchanged) that me
 candidate is found, the best candidate with each unmet goal shown unreachable within the model by a bound (for
 example an idealized screen that also fails it), not merely untried.
 
+Status (9 October 2026): neither end state is reached. No tested candidate meets every goal, and the uniform
+inductance-scaling, combined-stack and ideal-gate screens each cover one family of networks under the assumed lumped
+50 pH package inductance; they do not bound every legal copper, via, coupling or gate-return change. S12's FET-only
+estimator cannot assess converter efficiency, S11 reports the best sampled dead time, and S5 has no limit. V8 is the
+best tested candidate and is provisional; the search is stopped for limited expected information gain.
+
 Model (owner decision, 8 October 2026, before any goals result was read): the datasheet's gate-charge curve (Fig. 7)
 is the truth. EPC2302QG is the primary model (goals cases `<case>-qg`); its Crss about 23 % outside Fig. 5 is listed
 as a model inconsistency (template M1). The vendor model's goals runs (started first) are reported alongside.

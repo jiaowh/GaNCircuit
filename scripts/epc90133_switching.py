@@ -1678,8 +1678,10 @@ def main():
         **({"ds_library": {"file": ds_lib.relative_to(ROOT).as_posix(), "sha256": sha256(ds_lib),
                            "report": DS_VARIANT_REPORT.relative_to(ROOT).as_posix(),
                            "report_sha256": sha256(DS_VARIANT_REPORT)}} if ds_lib else {}),
+        # Transitive helpers bound 9 October 2026 (audit docs/project-audit-274cd46.md); earlier reports omit them.
         "modules": {m: sha256(ROOT / m) for m in ("scripts/epc9097_switching.py", "scripts/epc2302_baseline.py",
-                                                  "src/circuit_tools/ltspice.py")}}
+                                                  "scripts/epc2204_baseline.py", "src/circuit_tools/ltspice.py",
+                                                  "src/circuit_tools/adapters.py")}}
     results, slopes = {}, {}
     import threading
     save_lock = threading.Lock()

@@ -82,6 +82,15 @@ class ComparisonStatusTests(unittest.TestCase):
             self.assertIsNone(b["resembles"])
             self.assertIn("declared invalid", b["excluded"])
 
+    def test_settling_outside_band_at_window_end_is_censored(self):
+        steps = [(i * 1e-9, 10.0 + (0.0 if i < 20 else 1.0 if i % 2 else -1.0)) for i in range(46)]
+        s = self.cmp.settling(steps, 10.0)
+        self.assertTrue(s["settling_2pct_censored"])
+        self.assertTrue(s["settling_5pct_censored"])
+        quiet = self.cmp.settling([(i * 1e-9, 10.0 + (1.0 if i < 5 else 0.0)) for i in range(46)], 10.0)
+        self.assertFalse(quiet["settling_2pct_censored"])
+        self.assertAlmostEqual(quiet["settling_2pct_s"], 4e-9)
+
     def test_gaussian_rise_time_known_answer(self):
         dt = 5e-12
         t = np.arange(-5e-9, 5e-9, dt)

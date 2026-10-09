@@ -10,15 +10,15 @@ GaN devices switch fast enough that small amounts of inductance in the board, pa
 
 **The simulation workflow runs, but the board predictions are not yet validated. Preparing for our own measurements is the priority.**
 
-As of 7 October 2026:
+As of 9 October 2026:
 
 | Area | What works | What remains open |
 |---|---|---|
-| Transistor model | The original EPC2302 model runs in LTspice. It passes the checks for 24 datasheet curves and the limited table rows tested. | The gate-charge curve fails. Switching times and losses that depend on gate charge remain unvalidated. |
+| Transistor model | The original EPC2302 model runs in LTspice and passes the checks for 24 datasheet curves and the limited table rows tested. A separately stored calibration, EPC2302DS, also matches the gate-charge curve. | Two gate-charge table values remain flagged. Leakage, breakdown, reverse recovery, thermal and rating data are unchecked for either model, so neither covers the whole datasheet. |
 | Board simulation | The published layout has been read, power and gate paths extracted, and switching cases compared with EPC's waveform. | No tested case passes every waveform criterion. Board extraction is still exploratory. |
 | Measurements | A draft test plan, proposed probe locations and preparation studies are available. | The exact lab equipment, actual board identity and approved first-power procedure are still needed. No project hardware measurements are reported. |
 | Software agents | Agents have reproduced script results, passed results between stages and stopped on deliberately changed inputs. | These are execution tests. They do not demonstrate independent engineering judgement or a validated automated measurement loop. |
-| New board design | The KiCad reconstruction reproduces EPC's saved geometry and passes the independent net readback. A qualified edit workflow moves parts and vias and reshapes copper areas while keeping the rest of EPC's copper unchanged. | Edited boards now feed the inductance extraction. The first candidate, input capacitors 0.4 mm closer to the transistors, changed loop inductance by under 1 %, below what the extraction can resolve. Nothing is approved for fabrication. |
+| New board design | The KiCad reconstruction reproduces EPC's saved geometry and passes the independent net readback. A qualified edit workflow moves parts and vias and reshapes copper areas while keeping the rest of EPC's copper unchanged. Edited boards feed the inductance extraction and are scored against the owner's thirteen layout goals. | No tested layout meets all goals; the best, V8, is a provisional simulation candidate. The layout search is paused because further runs would rest on the same unresolved assumptions, not because every legal layout has been shown to fail. Nothing is approved for fabrication. |
 
 The simulation baseline is frozen. Broad parameter sweeps and further diagnosis of the ringing are on hold unless they answer a specific decision. The stock-board simulation checkpoint, **G3**, remains open.
 
@@ -48,9 +48,9 @@ The results are:
 
 - **Datasheet table:** the tested rows with specified limits are inside those limits. Total gate charge is about 4% below the typical value. This is a limited table check, not verification of every device specification. See the [table report](results/gan/epc2302-baseline.json).
 - **Datasheet curves:** all 24 curves in Figures 1–6 and 8–10 pass the declared checks. They were digitized from the PDF's vector drawings. Their very close agreement suggests they may have been drawn from the same model, so the result mainly supports correct model execution. See the [curve comparison](results/gan/epc2302-curve-comparison.json).
-- **Gate charge, Figure 7:** the model's Miller plateau is narrower than EPC's curve (about 16–24%, depending on how the curve is sampled), and charge after the plateau is about 1.2 nC low. The cause and the table's QGD/QG(TH) discrepancies remain unresolved. See the [gate-charge comparison](results/gan/epc2302-fig7-comparison.json). A separate sensitivity revision of the model that follows Figure 7 [exists](results/gan/epc2302-qg-variant.json), but it puts the reverse-transfer capacitance 23% above Figure 5. The tested parameter scaling does not match both figures. A different representation does: **EPC2302DS** adds two small charge steps, placed where the gate-charge test goes but the capacitance curves do not, and passes Figure 7 together with all 24 other curves and every existing table and numerical check ([report](results/gan/epc2302-ds-variant.json)). It is a calibration to EPC's published curves, not identified device physics. The leakage, breakdown and reverse-recovery rows and the thermal and rating data are not yet checked for any model, so it does not yet cover the whole datasheet. With either model, the R80 1.5 Ω design candidate meets its constraints ([assessment](results/gan/epc90133-qgfit-assessment.json)).
+- **Gate charge, Figure 7:** the model's Miller plateau is narrower than EPC's curve (about 16–24%, depending on how the curve is sampled), and charge after the plateau is about 1.2 nC low. The cause and the table's QGD/QG(TH) discrepancies remain unresolved. See the [gate-charge comparison](results/gan/epc2302-fig7-comparison.json). A separate sensitivity revision of the model that follows Figure 7 [exists](results/gan/epc2302-qg-variant.json), but it puts the reverse-transfer capacitance 23% above Figure 5. The tested parameter scaling does not match both figures. A different representation does: **EPC2302DS** adds two small charge steps, placed where the gate-charge test goes but the capacitance curves do not, and passes Figure 7 together with all 24 other curves and every existing table and numerical check ([report](results/gan/epc2302-ds-variant.json)). It is a calibration to EPC's published curves, not identified device physics. The table's gate-drain charge and threshold gate charge stay flagged for both models, because the table's measurement definition and Figure 7 disagree. The leakage, breakdown and reverse-recovery rows and the thermal and rating data are not yet checked for any model, so it does not yet cover the whole datasheet.
 
-The original model remains the reproducible **provisional baseline**. Owner clarification (8 October 2026): trust both the capacitance curves (Figure 5) and gate-charge curve (Figure 7) as required datasheet targets. A separately stored datasheet-calibrated candidate must pass both and preserve the other passing checks; neither existing model meets that joint requirement. The goals study's Figure 7-primary results retain their recorded model and limitations. Agreement with the datasheet is distinct from validation against hardware.
+The original model remains the reproducible **provisional baseline**. Both the capacitance curves (Figure 5) and the gate-charge curve (Figure 7) are required datasheet targets. EPC2302DS meets both while keeping the other tested checks, and is the model used for new board runs; earlier results keep the model they were run with. Agreement with the datasheet is distinct from validation against hardware.
 
 ## Stage 2: modelling the board
 
@@ -123,14 +123,19 @@ The studies narrow the questions for measurement:
 - **The driver is not fully characterized by its datasheet edge times.** Two representations that meet the selected resistance and edge-time constraints produce substantially different overshoot. The actual gate waveform needs to be measured.
 - **Package inductance could matter, but its value is unknown.** The assumed 50 pH case matches some waveform features and still fails others. It does not identify the real package inductance.
 - **Damping remains unexplained.** Added capacitor loss can increase damping but barely reduces the first peak. Full extracted resistance has little effect in the B transient study. Partial transistor turn-on raises local damping but does not explain the matched ringing cycles. The energy study does not support a physical heat-loss breakdown.
-- **Probe location explains part of the overshoot gap, not the damping.** Reading the simulated switch node where
-  EPC's guide places the probe (the J33 holes) instead of at the transistor lowers the overshoot from 11.2 to 9.2 V
-  (EPC's waveform: 5.7 V) and produces part of the dip on the falling edge. The damping is unchanged, so the
-  missing ring loss still needs another explanation.
+- **Probe location may explain part of the overshoot gap, not the damping.** Reading the simulated switch node at
+  one of the guide's probe points (the J33 holes) instead of at the transistor lowers the overshoot from 11.2 to
+  9.2 V (EPC's waveform: 5.7 V), about a third of the gap, and produces part of the dip on the falling edge. The
+  damping is unchanged. This is an indicative result only: adding the J33 connection changed the board model's
+  loop inductance by 1.2 %, beyond the 0.5 % control set before the run, and the guide does not say whether
+  EPC's figure was taken at J33. It assumes an ideal probe, so it says nothing about the real probe's loading.
+- **The gate-charge correction does not close the gap.** EPC2302DS and the original model give nearly the same
+  overshoot and damping. That rules out this particular correction as the remedy, not the transistor model as a
+  contributor: both share most of their equations, including output charge and loss.
 - **Probe bandwidth alone is insufficient.** The tested bandwidth filters do not close the gap. Probe loading, connection location and resonances remain untested. A fixed added gate capacitor also does not resolve or bound the voltage-dependent gate-charge discrepancy.
 - **Low-side gate spikes and driver-pin stress still need measurements.** Sampled model traces show no appreciable positive low-side channel current during the examined turn-on windows. This does not establish immunity to false turn-on in hardware. Driver PHASE-pin voltage extremes remain unresolved and depend strongly on driver-model assumptions.
 
-- **A stock-board design change is selected for testing.** The goal is lower switch-node overshoot, with FET loss at most 5 % above stock and no larger low-side gate spike. Under those constraints the best of the tested part swaps is a 1.5 Ω high-side turn-on resistor instead of 1 Ω. It meets the constraints under all four unresolved driver and package assumptions, and it lowers the worst-case simulated overshoot by about a third. With an assumed 50 pH package inductance, the gain shrinks to 4-11 %. Larger resistors cut overshoot further but exceed the loss limit. Tested layout changes, a thinner power-loop dielectric and extra return vias, gave smaller or no gains. These are model rankings to be checked on the purchased board.
+- **Earlier part-swap round (superseded).** The owner's later layout goals fix the parts list, so part swaps are no longer candidates; this result is kept as a tested model ranking. That round aimed at lower switch-node overshoot, with FET loss at most 5 % above stock and no larger low-side gate spike. Under those constraints the best of the tested part swaps was a 1.5 Ω high-side turn-on resistor instead of 1 Ω ([assessment](results/gan/epc90133-qgfit-assessment.json)). It meets the constraints under all four unresolved driver and package assumptions, and it lowers the worst-case simulated overshoot by about a third. With an assumed 50 pH package inductance, the gain shrinks to 4-11 %. Larger resistors cut overshoot further but exceed the loss limit. Tested layout changes, a thinner power-loop dielectric and extra return vias, gave smaller or no gains in that round.
 
 Failed, incomplete and invalid cases remain in the record and are excluded from acceptance verdicts. Numerical checks include spike detection and selected smaller-time-step runs. Passing those checks establishes only their stated scope, not overall physical accuracy. The [build notes](docs/build.md) preserve the individual studies and their limitations.
 
@@ -149,23 +154,29 @@ come from a partial board model used for ranking.
 | Decoupling capacitor positions | Input capacitors 0.4 mm closer (all the room available) | Under 1 % | same as above |
 | Capacitor return vias | Planned | Not built | same as above |
 | Transistor and driver positions | Move tool qualified | Not built | mainly inductance; driver position affects the gate loop |
-| Gate loop / Kelvin return | Ideal gate loop simulated as a bound | Low-side gate spike still 1.1-1.3 V against 0.5 V | S8: not reachable while the package inductance is shared |
-| Switch-node copper area | Reasoned only | Would need about 10 times the existing switch-node capacitance to move the dead-time optimum | S11: not reachable |
+| Gate loop / Kelvin return | Ideal low-side gate connection simulated | Low-side gate spike still 1.1-1.3 V against 0.5 V | S8: not met in this screen while the package inductance is modelled as shared |
+| Switch-node copper area | Reasoned only | Would need about 10 times the existing switch-node capacitance to move the dead-time optimum | S11: not met at any sampled dead time |
 
-What the bounds show, given the fixed parts:
+What the screens show, given the fixed parts:
 
-- **S2 overshoot (at most 9.6 V)** needs the whole board's inductance cut to about half. The best legal combination
-  reaches about -28 %, where the simulated overshoot is still about 11 V.
-- **S10 switching energy (-10 %)** cannot be met: most of it is the transistors' own output-charge loss, fixed by the
-  parts, and lower inductance raises the rest.
-- **S8 false turn-on**, **S11 dead time** and **S12 efficiency** are set by the package, the operating point and
-  the transistors, not by copper, in this model.
+- **S2 overshoot (at most 9.6 V)**: when every board inductance is scaled together, the simulated overshoot meets S2
+  only at about half the stock value. The best legal combination tried lowers loop inductance by about 28 % in a
+  partial board model, where the overshoot is still about 11 V.
+- **S10 switching energy (-10 %)** is met at no tested scale: most of it is the transistors' own output-charge loss,
+  fixed by the parts, and lower inductance raises the rest.
+- **S8 false turn-on**, **S11 dead time** and **S12 efficiency** fail in every case run with the assumed 50 pH package
+  inductance (an ideal gate connection without package inductance did meet S8). S12 is scored from
+  transistor losses only, so it cannot see copper-loss savings or judge the whole converter's efficiency.
 - The best candidate, V8, passes **S1, S4 and S7**. It narrowly misses **S3 settling** (133.2 against 131.5 ns) and
-  **S6 di/dt** (30.9 against 29.9 A/ns), both within about 3 % of the baseline.
+  **S6 di/dt** (30.9 against 29.9 A/ns), both within about 3 % of the baseline. **S5** has no limit set and **S9**
+  cannot be decided from these runs, so even a candidate passing everything else would not count as meeting all
+  goals. One V8 corner run stalled and is undetermined; V8 fails S13 on other corners regardless.
 
-With the parts fixed, the goals pull against each other: lowering the power-loop inductance lowers overshoot (S2)
-but speeds up the current change (S6) and raises switching energy (S10). No copper change can improve all three
-against the baseline, so further layout iterations only trade one goal for another.
+In these screens the goals pull against each other: lowering the power-loop inductance lowers overshoot (S2) but
+speeds up the current change (S6) and raises switching energy (S10). The screens scale every inductance together or
+idealize one connection, so they do not cover every legal copper, via and gate-return change. Meeting all goals has
+therefore not been demonstrated, rather than shown impossible. The layout search is paused because more runs would
+rest on the same unresolved package inductance and damping.
 
 These verdicts depend on the assumed package inductance and on the unexplained damping difference from EPC's
 measured waveform, so they are simulation results to be checked by measurement, not hardware limits.

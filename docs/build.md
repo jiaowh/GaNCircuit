@@ -3602,3 +3602,35 @@ bindings and stale continuity summaries are listed in the report for bounded rep
 
 Prior reports and production scripts are unchanged. Audit scratch is in ignored
 `runs/audit-274cd46/`. Measurement readiness remains the priority and G3 stays open.
+
+### Repairs after the 274cd46 audit (9 October 2026)
+
+The audit above was replayed before any repair: `python scripts/audit_epc90133_2026_10_09.py` reproduced its
+evidence file byte for byte (60 hash references match, goals replay identical, J33 36.1 % of the gap). Its
+evaluator-hash checks refer to the pre-repair code; replay it at the audit commit. No solver, geometry export or
+fit ran for the repairs below.
+
+- **Goals scorer, revision 2** (`scripts/assess_epc90133_goals.py`; no goal definition or limit changed):
+  `interpretation_invalid` cases are unusable; a case supplied by two reports, reports with different model-library
+  hashes, or (for -ds) a changed or non-passing `epc2302-ds-variant.json` stop the scoring; S5 is reported as
+  undetermined, so `all_met` cannot pass while its limit is unset; an empty goal set is undetermined. New
+  `results/gan/epc90133-goals-assessment-ds-rev2.json` (schema /2, records the model identity) replaces the DS
+  assessment for further use; the original is kept. Every verdict and metric equals the original apart from the
+  added S5 (`None`); V8 and stock remain `all_met: false`. The vendor-model scoring replays identically likewise
+  (scratch only, `runs/repair-274cd46/`). Fault tests: `tests/test_goals_assessment.py` (5, each failing on the
+  old code).
+- **Dependency binding (future runs only):** the switching manifest adds `scripts/epc2204_baseline.py` and
+  `src/circuit_tools/adapters.py`; the probe-reference report adds `compare_epc90133_fig9.py` and
+  `digitize_epc90133_qsg_fig9.py` and now passes a case's `interpretation_invalid` to the comparison. Existing
+  reports keep their manifests.
+- **Fig. 9 settling censoring:** `settling_<band>_censored` marks a trace still outside the band at the window's last
+  sample; tables print ">45.0" and the 25 % settling criterion is undetermined when only a passing lower bound
+  exists. The saved `epc90133-fig9-ds-summary.md` was not regenerated: its two 45.0 ns entries at 2 % are censored
+  (not settled), as the note on EPC2302DS against Fig. 9 states. Test added to `tests/test_fig9_comparison.py`.
+- **Summaries:** README, plan section 10, the goals plan and AGENTS now say that no tested layout meets all goals
+  and that infeasibility of the remaining legal layouts is not demonstrated (the search is paused for limited
+  information gain); carry the failed J33 control and unconfirmed J33-as-Fig. 9 connection; treat the R80 part swap
+  as historical under the fixed BOM; record DS board use, 50 pH only for new runs, and that DS/vendor similarity
+  excludes only this gate-charge correction. The goals count is 55/56 usable (see the audit note).
+
+Targeted tests: `python -m unittest tests.test_fig9_comparison tests.test_goals_assessment`, 16 pass.

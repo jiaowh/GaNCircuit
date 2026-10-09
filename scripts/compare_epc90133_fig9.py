@@ -45,6 +45,9 @@ goals study's S3 uses 2 % of VIN; the swing is used because Fig. 9's volt scale 
 a resolution check (one Fig. 9 pixel is 0.31 V, about 0.7 % of the swing). The same function is applied to the
 digitized trace and to every simulated trace. Judgement criterion, reported separately from "resembles": within
 25 % of Fig. 9's value at the 2 % band.
+Censoring flag (9 October 2026, audit docs/project-audit-274cd46.md; no definition changed): a trace still outside
+the band at the last sample of the window is not settled; settling_<band>_censored is then true, the value is only a
+lower bound, tables print it as ">x", and the 25 % criterion is undetermined unless that bound already fails it.
 """
 import argparse
 import hashlib
@@ -127,9 +130,11 @@ def edge(t, v, rising):
 def settling(tr, hi):
     """Settling time per band: last time in [0, 45 ns] after the 50 % crossing outside +-band x swing of the high level."""
     out = {}
+    end = max((a for a, _ in tr if 0 <= a <= SETTLE[1]), default=None)
     for b in SETTLE_BANDS:
         late = [a for a, v in tr if 0 <= a <= SETTLE[1] and abs(v - hi) > b * hi]
         out[f"settling_{b * 100:g}pct_s"] = max(late) if late else 0.0
+        out[f"settling_{b * 100:g}pct_censored"] = bool(late) and max(late) == end
     return out
 
 
@@ -205,8 +210,11 @@ def evaluate_case(case, fig9, meas):
                            else "switching checks failed; kept for inspection only"}
         else:
             ms, mm = m["rising"].get("settling_2pct_s"), meas["rising"]["settling_2pct_s"]
+            within = None if ms is None else bool(abs(ms / mm - 1) <= SETTLE_REL)
+            if within and m["rising"].get("settling_2pct_censored"):
+                within = None  # a lower bound inside the band does not show settling within it
             per_bw[key] = {"metrics": m, "resembles": resembles(m, meas), "consistency": consistency(m, fig9),
-                           "settling_within_25pct": None if ms is None else bool(abs(ms / mm - 1) <= SETTLE_REL)}
+                           "settling_within_25pct": within}
     return {"usable": usable, "interpretation_invalid": invalid, "checks": case.get("checks"),
             "parameters": case.get("parameters"), "bandwidths": per_bw}
 
@@ -216,10 +224,14 @@ def summary_md(report, fig9):
     def f(v, sc, d):
         return "–" if v is None else f"{v * sc:.{d}f}"
 
+    def st(r, b):
+        v = f(r.get(f"settling_{b}pct_s"), 1e9, 1)
+        return f">{v}" if r.get(f"settling_{b}pct_censored") else v
+
     def row(label, r, fl, note=""):
         return (f"| {label} | {f(r.get('edge_10_90_s'), 1e9, 2)} | {f(r.get('overshoot_above_settled_V'), 1, 1)} | "
                 f"{f(r.get('ring_frequency_Hz'), 1e-6, 0)} | {f(r.get('ring_damping_ratio'), 1, 3)} | "
-                f"{f(r.get('settling_2pct_s'), 1e9, 1)} / {f(r.get('settling_5pct_s'), 1e9, 1)} | "
+                f"{st(r, 2)} / {st(r, 5)} | "
                 f"{f(fl.get('edge_10_90_s'), 1e9, 2)} | {f(r.get('plateau_duration_s'), 1e9, 1)} ns, "
                 f"{f(r.get('plateau_mean_V'), 1, 1)} V | {note} |")
 

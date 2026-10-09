@@ -458,9 +458,12 @@ in the scripts, saved reports and [build notes](../docs/build.md).
    and transient overlap remain measurement questions, not established guarantees.
 3. After approval, characterize the measurement chain and driver; freeze predictions
    and held-out conditions using the hardware plan's frozen-prediction record;
-   perform approved stock-board measurements, then evaluate the R80 1.5 ohm candidate
-   in E4. It is the best tested simulation candidate, not a frozen or validated
-   hardware improvement. Efficiency E9 and controlled temperature remain core work.
+   perform approved stock-board measurements. The owner's 8 October goals (S1-S13,
+   [goal targets](goal-targets-2026-10-08.md)) fix the BOM, so the R80 1.5 ohm part
+   swap is historical, not the active candidate. No tested layout meets all goals;
+   V8 is a provisional simulation candidate and the layout search is paused for limited
+   expected information, not because the remaining legal layouts were shown infeasible.
+   Efficiency E9 and controlled temperature remain core work.
 4. Use the measurements to decide what model or layout change is justified. Keep
    unidentified causes explicit. The geometry-edit workflow is qualified for moving
    parts and vias (7 October 2026, `scripts/epc90133_edit_workflow.py` run 2: no-edit,
@@ -497,6 +500,14 @@ sequence are in [the whole-datasheet model plan](epc2302-full-datasheet-model-pl
 All electrical rows/curves require outcomes; thermal and ratings coverage needs its
 appropriate representation. Unsupported or unresolved requirements prevent a
 full-datasheet acceptance claim. No new fit has been executed for this clarification.
+
+**Status, 9 October 2026.** EPC2302DS passes Figs. 5 and 7 and the other declared
+checks; QGD/QG(TH) stay flagged and leakage, breakdown, reverse recovery, thermal and
+ratings are uncovered. Goals scoring must use `scripts/assess_epc90133_goals.py`
+revision 2 or later (invalid cases excluded, duplicate/incompatible inputs rejected,
+S5 undetermined so no all-goals pass). The J33 probe-location result is indicative
+only: its declared extraction control failed. See the audit note of 9 October in
+the build notes.
 
 **Work selection and stopping.** Before any additional study, name the decision
 it could change, the observable result that would change it, and a bounded compute

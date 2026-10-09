@@ -99,7 +99,8 @@ def main():
             for g in grounds:
                 pseudo = {"traces": {"step_s": tr["step_s"], "start_s": tr["start_s"],
                                      **{f"{ev}_V": list(sig[tip][ev] - sig[g][ev]) for ev in ("rising", "falling")}},
-                          "usable": case.get("usable"), "checks": case.get("checks")}
+                          "usable": case.get("usable"), "checks": case.get("checks"),
+                          "interpretation_invalid": case.get("interpretation_invalid")}
                 ev = cmp.evaluate_case(pseudo, fig9, meas)
                 bw = ev.get("bandwidths", {})
                 pick = {}
@@ -128,6 +129,9 @@ def main():
         "schema": "epc90133-probe-reference/1", "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "inputs": {str(args.report): hashlib.sha256(args.report.read_bytes()).hexdigest(),
                    str(args.fig9): hashlib.sha256(args.fig9.read_bytes()).hexdigest()},
+        # Imported comparison/digitizer code bound 9 October 2026 (audit); the J33 report of 8 October omits it.
+        "modules": {m: hashlib.sha256((ROOT / m).read_bytes()).hexdigest()
+                    for m in ("scripts/compare_epc90133_fig9.py", "scripts/digitize_epc90133_qsg_fig9.py")},
         "measured": meas_row, "cases": out}, indent=1) + "\n")
 
 

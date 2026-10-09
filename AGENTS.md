@@ -41,8 +41,8 @@ recommend a course of action rather than offering unexplained technical choices.
   Preserve failed, incomplete and invalid runs. Label post-result amendments as
   retrospective. Never overwrite the first frozen prediction score.
 - Bind complete dependencies (imported helpers, extractions, vendor models) when
-  a bench next changes. The switching manifest still needs its transitive
-  `epc2204_baseline.py` helper. Do not rerun solvers solely for metadata. Validate
+  a bench next changes. The switching and probe-reference manifests bind their
+  transitive helpers from 9 October; earlier reports omit them. Do not rerun solvers solely for metadata. Validate
   upstream status and artifact identity before reuse.
 - One matching waveform cannot separate device, layout, driver, thermal and probe
   errors. Each attributed layer needs independent evidence. Benchmark errors are
@@ -82,7 +82,9 @@ Read the relevant report and build-note section before quoting numbers.
   EPC2302DS (`scripts/epc2302_ds_variant.py` run 2): vendor model plus two charge steps
   outside the VGS=0/VGD<=0 capacitance domain; passes Figs. 5 AND 7, all 24 curves, the 13 table
   rows' limits/flags and numerical checks. Calibration, not physics; QGD/QG(TH) still flagged;
-  BVDSS/IDSS/IGSS/QRR, thermal and ratings unchecked, so not whole-datasheet. No board run uses it yet.
+  BVDSS/IDSS/IGSS/QRR, thermal and ratings unchecked, so not whole-datasheet. Board runs since 8 October
+  (goals, Fig. 9, J33) use it. Its waveform similarity to the vendor model excludes this gate-charge
+  correction as the remedy, not the device model as a contributor.
 - **Extraction:** A/I/B/G are exploratory; no second full-board mesh has run.
   Fourth-mesh single-via inductance passes, resistance is unconverged; arrays,
   holes and Kelvin/multilayer connections are not qualified by that pass.
@@ -92,8 +94,11 @@ Read the relevant report and build-note section before quoting numbers.
   criteria. Package L is assumed, not identified by a waveform match or stock E3
   measurements. Owner decision (7 October 2026): new simulations default to an
   assumed package source inductance of 50 pH (within EPC's < 0.2 nH LGA estimate);
-  label it 'assumed 50 pH' and report a 0 pH alternative alongside. Existing
-  reports keep their settings; do not rerun only to change the default. Probe
+  label it 'assumed 50 pH'. A later owner decision (8 October, build notes) made
+  EPC2302DS at 50 pH the only setting for new runs; 0 pH is no longer run. Existing
+  reports keep their settings; do not rerun only to change the default.
+  J33 probe location (8 October) is indicative only: its extraction control failed
+  (-1.2 % vs 0.5 %) and J33 is not confirmed as Fig. 9's connection. Probe
   filters do not bound loading/location errors. PHASE-ball stress remains unresolved.
   Damping study (7 October): vendor capacitor data (devices/capacitor-sources.json;
   bench CAP_MODEL values are assumptions, Ci 2x and ESR 5-7x off) and the tested loss
@@ -108,7 +113,10 @@ Read the relevant report and build-note section before quoting numbers.
   Full-R transient evidence is on B; G evidence is local AC.
 - **Design target (8 October 2026):** the owner's execution template, goals S1-S13 with the BOM fixed
   (`plans/goal-targets-2026-10-08.md`), replaces the rule below; gate-resistor changes are out of scope, and
-  stock and V8 do not meet S2, S8 or S10 in the existing runs. The rule below describes the earlier rounds.
+  stock and V8 do not meet S2, S8 or S10 in the existing runs. The screens (uniform L scaling, combined
+  stack, ideal gate) do not prove the remaining legal layouts infeasible; say 'not demonstrated', and the search
+  is paused for limited information gain. Score with `assess_epc90133_goals.py` revision 2 or later (S5 and
+  invalid cases block an all-goals pass). The rule below describes the earlier rounds.
 - **Design (5 October rule):** overshoot is the single objective, FET loss at most +5% over stock
   and Q2 gate peak not above stock are constraints. R80 1.5 ohm is the best tested
   candidate under four declared driver/package alternatives (assessor revision 5,

@@ -32,6 +32,12 @@ runs. The 0 pH alternatives are not run for EPC2302DS; they appear as missing ("
 Retrospective fix (8 October 2026, after the first scoring attempt crashed, no definition changed): at 0 % load the
 valley turn-on is soft and the bench reports no 10-90 % rise time; dv/dt and S4 are then None (undetermined) for
 that case. S13 uses only S1, S2, S7 and S8, so its corner verdicts are unaffected. Output: --output (JSON) and a printed table.
+Acceptance-gate repair (9 October 2026, after the audit docs/project-audit-274cd46.md; no goal definition or limit
+changed): a case carrying "interpretation_invalid" is unusable, as in the other evaluators; a case name supplied by two
+reports stops the scoring; every report contributing cases must record the same model-library identity (vendor and,
+for -ds/-qg, the variant), and a -ds run's recorded model report must still match its file and pass every D check;
+S5 has no template limit, so it is reported as undetermined and keeps 'all_met' from passing; an empty goal set is
+undetermined, not met. S13 covers the declared separate voltage/load/scale corners only, not combined corners.
 """
 import argparse
 import hashlib
@@ -45,10 +51,12 @@ PRIMARY = ("ramp-Ls50", "step-Ls50")
 REPORTED = ("ramp-Ls0", "step-Ls0")
 DEADS = (2.5, 5, 7.5, 10, 12.5, 15, 20)
 CORNERS = ("-v40", "-v60", "-i0", "-l0.9", "-l1.1")
+GOALS = ("S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13")
+LIBRARIES = {"-ds": ("vendor_library", "ds_library"), "-qg": ("vendor_library", "variant_library"), "": ("vendor_library",)}
 
 
 def metrics(c, vin):
-    if not c or c.get("usable") is not True:
+    if not c or c.get("usable") is not True or c.get("interpretation_invalid"):
         return None
     m = c["metrics"]
     a, b = m["event_a_turn_off_at_peak"], m["event_b_turn_on_at_valley"]
@@ -88,9 +96,36 @@ def goals(c, s, vin):
 
 def combine(vals):
     vals = list(vals)
+    if not vals:
+        return None
     if any(v is None for v in vals):
         return None if all(v is not False for v in vals) else False
     return all(vals)
+
+
+def check_inputs(reps, suffix):
+    """Identity checks on the reports that supplied cases; returns the shared model identity or stops."""
+    ids = {}
+    for r, rep in reps:
+        m = rep.get("input_manifest") or {}
+        key = tuple((lib, (m.get(lib) or {}).get("sha256")) for lib in LIBRARIES[suffix])
+        if any(h is None for _, h in key):
+            raise SystemExit(f"{r}: no recorded model-library identity for model suffix {suffix!r}")
+        ids.setdefault(key, []).append(str(r))
+    if len(ids) != 1:
+        raise SystemExit(f"reports disagree on the model library: {list(ids.values())}")
+    identity = dict(next(iter(ids)))
+    if suffix == "-ds":
+        lib = reps[0][1]["input_manifest"]["ds_library"]
+        f = ROOT / lib["report"]
+        if hashlib.sha256(f.read_bytes()).hexdigest() != lib["report_sha256"]:
+            raise SystemExit(f"{lib['report']} changed since the runs recorded it")
+        failed = [k for k, v in json.loads(f.read_text(encoding="utf-8")).items()
+                  if k.startswith("D") and isinstance(v, dict) and v.get("outcome") != "pass"]
+        if failed:
+            raise SystemExit(f"model report checks not passed: {failed}")
+        identity["model_report"] = {"file": lib["report"], "sha256": lib["report_sha256"], "D_checks": "pass"}
+    return identity
 
 
 def main():
@@ -100,17 +135,25 @@ def main():
     ap.add_argument("--model-suffix", default="-ds", choices=("-ds", "-qg", ""),
                     help="'-ds' (EPC2302DS, primary from 8 October 2026), '-qg' (EPC2302QG, earlier runs) or '' (vendor)")
     args = ap.parse_args()
-    cases, vins = {}, {}
+    cases, vins, used = {}, {}, []
     for r in args.reports:
         rep = json.loads(r.read_text(encoding="utf-8"))
         if rep.get("study") != "goals":
             raise SystemExit(f"{r} is not a goals report")
+        n0 = len(cases)
         for k, c in rep["cases"].items():
             suf = next((x for x in ("-qg", "-ds") if k.endswith(x)), "")  # model suffix of the case name
             if suf != args.model_suffix:
                 continue
             k = k[:-len(suf)] if suf else k
+            if k in cases:
+                raise SystemExit(f"case {k} is supplied by more than one report")
             cases[k], vins[k] = c, rep["conditions"]["VIN"]
+        if len(cases) > n0:
+            used.append((r, rep))
+    if not used:
+        raise SystemExit(f"no cases for model suffix {args.model_suffix!r}")
+    identity = check_inputs(used, args.model_suffix)
     M = {k: metrics(c, vins[k]) for k, c in cases.items()}
     names = sorted({k.split("@")[0] for k in cases})
     out = {}
@@ -147,10 +190,12 @@ def main():
                 s13.append(None if gl is None else combine(gl[g] for g in ("S1", "S2", "S7", "S8")))
             res["corners"][tag] = row
         verdict["S13"] = combine(s13)
-        res["verdict"] = verdict
-        res["all_met"] = combine(verdict.values())
+        verdict["S5"] = None  # reported dv/dt; the template's limit is unfilled, so undetermined
+        res["verdict"] = {g: verdict[g] for g in GOALS}
+        res["all_met"] = combine(res["verdict"].values())
         out[n] = res
-        print(n, " ".join(f"{g}:{'-' if v is None else 'Y' if v else 'n'}" for g, v in verdict.items()))
+        print(n, " ".join(f"{g}:{'-' if v is None else 'Y' if v else 'n'}" for g, v in res["verdict"].items()),
+              "all:" + ('-' if res["all_met"] is None else 'Y' if res["all_met"] else 'n'))
         for a in PRIMARY + REPORTED:
             r_ = (res["conditions"] if a in PRIMARY else res["reported_0pH"])[a]["metrics"]
             if r_:
@@ -158,8 +203,9 @@ def main():
                       f"tr {r_['tr_s'] * 1e9:4.2f} tf {r_['tf_s'] * 1e9:4.2f} di/dt {r_['didt_A_per_ns']:5.1f} "
                       f"Q2g {r_['q2_gate_peak_V']:4.2f} E {r_['eon_eoff_J'] * 1e6:5.2f} uJ eff {100 * r_['efficiency']:6.3f}")
     args.output.write_text(json.dumps({
-        "schema": "epc90133-goals-assessment/1", "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-        "inputs": {str(r): hashlib.sha256(r.read_bytes()).hexdigest() for r in args.reports}, "designs": out},
+        "schema": "epc90133-goals-assessment/2", "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "inputs": {str(r): hashlib.sha256(r.read_bytes()).hexdigest() for r in args.reports},
+        "model_identity": identity, "designs": out},
         indent=1, default=lambda o: bool(o) if isinstance(o, np.bool_) else float(o)) + "\n")
 
 
