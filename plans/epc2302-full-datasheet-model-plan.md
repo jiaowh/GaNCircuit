@@ -4,6 +4,11 @@ Owner clarification, 8 October 2026: the target is the whole datasheet, not only
 Figures 5 and 7. This is a proposed sequence, not an executed calibration study.
 The original vendor model and prior prediction reports remain immutable references.
 
+Status (9 October 2026): the coverage record exists (`scripts/epc2302_coverage.py`, run 2;
+`results/gan/epc2302-coverage.md`). EPC2302DS covers steps 1-4 for electrical rows and curves;
+leakage rows are flagged, BVDSS unsupported, QGD/QG(TH) unresolved. Step 5 (thermal network,
+ratings/SOA checker) is open. Neither model satisfies the whole datasheet.
+
 ## Acceptance meaning
 
 Use the pinned April 29, 2026 datasheet identified in

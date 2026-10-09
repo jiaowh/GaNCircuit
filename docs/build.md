@@ -3634,3 +3634,37 @@ fit ran for the repairs below.
   excludes only this gate-charge correction. The goals count is 55/56 usable (see the audit note).
 
 Targeted tests: `python -m unittest tests.test_fig9_comparison tests.test_goals_assessment`, 16 pass.
+
+### EPC2302 whole-datasheet coverage record (9 October 2026)
+
+Declared in `scripts/epc2302_coverage.py` before its first run (decision, checks, 20-run / 10-minute budget, no
+refit). Report: `results/gan/epc2302-coverage.json`, generated table `results/gan/epc2302-coverage.md`. Run 1 is
+kept (`-run1`): its reverse gate leakage was classified with a signed value, so the limit check passed vacuously;
+the RETROSPECTIVE fix uses magnitudes, as the datasheet does, with no check or tolerance changed. Run 2 repeated the
+suite: 20 benches completed, 25 s of solver time.
+
+Reading the vendor subcircuit first: off-state current flows only through two 36.8 Mohm convergence resistors,
+the gate diodes and the subthreshold channel. None of these has a temperature coefficient. There is no breakdown or
+stored-charge element. EPC2302DS adds charge only, so its DC rows are identical. LTspice agrees with the hand
+evaluation of these equations within 1 % for all four leakage rows (E0), so the model was read correctly.
+
+| Row (datasheet typ / max) | Model, both | Status |
+|---|---|---|
+| IDSS, 80 V (1 / 100 uA) | 4.5 uA | inside limit, 4.5x typical: flagged |
+| IGSS +5 V, 25 C (0.01 / 4 mA) | 0.59 mA | inside limit, 59x typical: flagged |
+| IGSS +5 V, 125 C (0.4 / 9 mA) | 0.59 mA (same as 25 C) | inside limit, +48 %: flagged; no temperature dependence |
+| IGSS -4 V (0.01 / 0.2 mA) | 0.49 uA | inside limit, 20x below typical: flagged |
+| BVDSS (min 100 V at 0.15 mA) | 5.6 uA at 100 V, 11 uA at 200 V | unsupported: no breakdown element |
+| QRR (0) | recovered 91.4 nC (DS 91.7) = capacitive 91.6 (91.9), -0.26 % | pass: 0 by construction |
+
+IGSS assumes VDS = 0 V, which the datasheet does not print; drain open gives the same forward value and 0.34 uA
+reverse. QRR: the recovered charge equals the model's own output-capacitance charge, and is identical at 10 and
+50 A forward current, as expected with no stored charge. This confirms the reading and the integration, not device
+physics. The page-4 note holds qualitatively: VSD rises from 1.83 to 3.82 V at VGS = -2 V.
+
+Coverage, both models: 11 table rows, QRR, all 24 curves and the note pass (EPC2302DS also Fig. 7; the vendor model
+fails it). QGD and QG(TH) remain unresolved, four leakage rows are flagged and BVDSS is unsupported. The five thermal
+items are not modelled: there is no EPC2302 thermal network in hand and no self-heating. The ten rating/SOA items are
+not checked, because no ratings checker exists. Three structural items are outside the model. **Neither model
+satisfies the whole datasheet.** The flagged leakage is small next to the ampere-level gate currents of the switching edges, so it
+should matter little to the switching studies, but it would matter for any gate-leakage or standby-loss question.

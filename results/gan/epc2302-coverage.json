@@ -1,0 +1,1074 @@
+{
+ "schema": "epc2302-coverage/1",
+ "date": "2026-10-09",
+ "run": 2,
+ "scope": "EPC2302 whole-datasheet coverage record, with the missing electrical rows checked (declared 9 October 2026).\n\nDecision it serves: what the vendor model and EPC2302DS do and do not cover in the datasheet (revised April 29,\n2026; plans/epc2302-full-datasheet-model-plan.md), so later board results state their device-model limits. It does\nnot tune either model; a failure is recorded, not refitted.\n\nModel reading before any run (vendor subcircuit, identical in EPC2302DS apart from two charge-only capacitors):\noff-state drain current flows only through two 1e11/aWg = 36.8 Mohm convergence resistors (drain-source and\ndrain-gate), the gate-drain diode and the subthreshold channel; gate leakage only through the two gate diodes and\nthe gate convergence resistors. None has a temperature coefficient. There is no avalanche or breakdown element and\nno stored-charge (diode) element: reverse conduction is the channel. Expected, by hand: IDSS(80 V) about 4.5 uA,\nIGSS(+5 V, VDS = 0) about 0.6 mA at both 25 and 125 C, IGSS(-4 V) about 0.3 uA, and no breakdown below kilovolts.\nThe datasheet does not print the drain condition for IGSS; VDS = 0 V (drain tied to source) is assumed and the\ndrain-open case is reported as a sensitivity.\n\nNew electrical checks, both models, LTspice 26.1.1 through the existing adapter, reltol 1e-6:\n\n* E0 machinery: IDSS and the three IGSS operating points agree with the subcircuit equations evaluated by hand\n  (model_leakage below) within 1 %. A failure means the model was misread: those rows become 'unresolved'.\n* Rows IDSS, IGSS forward 25 C, IGSS forward 125 C, IGSS reverse: classified exactly as the existing table rows\n  (epc2302_baseline.classify: limit compliance, and a 25 % typical-value screen that flags for review).\n* BVDSS: VGS = 0, VDS swept 0-200 V; the voltage at which ID reaches 0.15 mA, or none within the sweep. With no\n  breakdown element, meeting the 100 V minimum says nothing about breakdown: status 'unsupported' whatever the value.\n* QRR: diode-commutation bench (50 V bus, DUT as freewheeling low side at VGS = 0, forward currents 10 and 50 A,\n  1 A/ns current ramp in an ideal high-side source, ideal clamp). Recovered charge = integral of the DUT drain\n  current from its zero crossing to the end of the run. R1: it equals the model's own capacitive drain charge\n  between the two states (charge equations, as for the gate-charge equation check) within 2 % - the remainder is\n  channel/leakage conduction, reported. R2: recovered charge at 50 A within 2 % of that at 10 A (stored charge would\n  scale with forward current). Both pass -> QRR consistent with the datasheet's 0 for this model; it is 0 by\n  construction (no stored-charge element), so this confirms the reading and integration, not device physics.\n* Note check (page 4, Fig. 11 note: negative gate drive increases the reverse drain-source voltage): VSD at 0.5 A\n  with VGS = -2 V exceeds VSD at VGS = 0. Qualitative only.\n\nReused evidence (no rerun): the 13 table rows, the 24 curves of Figs. 1-6 and 8-10 and Fig. 7, from the saved vendor\nand EPC2302DS reports, after checking that the DS report still records the vendor baseline and libraries by hash and\nthat its D0-D5 outcomes pass. QGD and QG(TH) stay 'unresolved' (table definition and Fig. 7 disagree, docs/build.md).\n\nNot electrical-subcircuit properties, given explicit dispositions (no invented passes): thermal resistances and Fig. 12\n(no EPC2302 thermal network in hand; EPC's library archive has none; the subcircuit has no self-heating),\nmaximum ratings, Fig. 11 SOA and the page-5 repetitive-overvoltage illustration (application limits; no checker in\nthe evaluation layer), and package/pinout/marking/layout notes (structural, outside the model).\n\nBudget: 10 benches x 2 models = 20 LTspice runs, 120 s timeout each, expected under 2 minutes in total; stop at\n10 minutes of solver time. A bench that does not complete makes its item 'not-run' and is kept. One run of the\nsuite; any change after a result is a labelled revision.\n\nOutputs: results/gan/epc2302-coverage.json and results/gan/epc2302-coverage.md (generated). Evidence in runs/.\n\nRun 1 (9 October 2026, kept as results/gan/epc2302-coverage-run1.{json,md}): all 20 benches completed (23.6 s), E0\npassed. RETROSPECTIVE correction after reading it, no check or tolerance changed: IGSS reverse was classified with\nits signed value (current leaves the gate, -0.49 uA), so its limit check against +0.2 mA passed vacuously; the\ndatasheet quotes magnitudes, so the leakage rows now use |I|. Run 2 repeats the whole suite with that fix.\n",
+ "evaluator_sha256": "a9668dfa7a862e80a28ea7b389cdea626e8e7860f679fd2b5f6d25ebd60b56e2",
+ "modules": {
+  "scripts/epc2302_baseline.py": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+  "scripts/epc2204_baseline.py": "d11c193b89a9756700acb73a01cf0ef457a95a2a8581e83f4ae2a20d06cd02f9",
+  "src/circuit_tools/ltspice.py": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+  "src/circuit_tools/adapters.py": "6bb00770b2b6d7316107d29f9089f45ce6c0b254ceecd1d7274198cd41711a39"
+ },
+ "datasheet": {
+  "file": "vendor/epc/epc90133/EPC2302_datasheet.pdf",
+  "revision": "Revised April 29, 2026",
+  "sha256": "c77d265a098910385c9a4d334223316eea85d4b9d6ad93da5858a3b790495f0b"
+ },
+ "vendor_library_sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069",
+ "ds_library": {
+  "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+  "sha256": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+  "subckt": "EPC2302DS",
+  "location_note": "git-ignored (EPC model text)"
+ },
+ "reused_reports": {
+  "results/gan/epc2302-ds-variant.json": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+  "results/gan/epc2302-baseline.json": "a6546383969a312e96e7ff401899d0130ba75255af9192c24f0578954d00abc6",
+  "results/gan/epc2302ds-baseline.json": "25a8f0ee10e8fcb008412a0bdc4ab6ff84d1756ed822015230f24d5b05ad8c1b",
+  "results/gan/epc2302-curve-comparison.json": "a40b2fe4d82cc6a9e4b7d1d367bff6001887ae7d2fadc7f23bd26145fe789f18",
+  "results/gan/epc2302ds-curve-comparison.json": "39ca3408e9bdb303e37c13af5153cb5fa2f1bd29ea04e78a04624b05c61905d5",
+  "results/gan/epc2302-fig7-comparison.json": "1790894d3bf3ba834ed72335690380b02893c67b927fd04c2810449e3c189fe1",
+  "results/gan/epc2302ds-fig7-comparison.json": "2679e8d08160e56b038ff0aec3344d24c2ce3bcd5c0d0d770d9183870fb29df8"
+ },
+ "solver_time_s": 25.077999999999975,
+ "evidence_directory": "runs/epc2302-coverage-fea765a14a59465f90b609f6268f7cf6",
+ "new_checks": {
+  "vendor": {
+   "failed_benches": {},
+   "rows": {
+    "idss": {
+     "unit": "A",
+     "typ": 1e-06,
+     "max": 0.0001,
+     "conditions": "VDS = 80 V, VGS = 0 V",
+     "model": 4.488723334361566e-06,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": 3.4887233343615662,
+     "typical_check": "outside-screening-band",
+     "review": true
+    },
+    "igss_fwd_25C": {
+     "unit": "A",
+     "typ": 1e-05,
+     "max": 0.004,
+     "conditions": "VGS = 5 V (VDS = 0 V assumed)",
+     "model": 0.0005933696520514786,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": 58.336965205147855,
+     "typical_check": "outside-screening-band",
+     "review": true
+    },
+    "igss_fwd_125C": {
+     "unit": "A",
+     "typ": 0.0004,
+     "max": 0.009,
+     "conditions": "VGS = 5 V, TJ = 125 C (defined by design)",
+     "model": 0.0005933694774284959,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": 0.4834236935712397,
+     "typical_check": "outside-screening-band",
+     "review": true
+    },
+    "igss_rev": {
+     "unit": "A",
+     "typ": 1e-05,
+     "max": 0.0002,
+     "conditions": "VGS = -4 V (VDS = 0 V assumed)",
+     "model": 4.872657086707477e-07,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": -0.9512734291329252,
+     "typical_check": "outside-screening-band",
+     "review": true
+    }
+   },
+   "machinery": {
+    "idss": {
+     "hand_evaluated_A": 4.488723370507439e-06,
+     "ltspice_A": 4.488723334361566e-06,
+     "relative_difference": -8.052595368290838e-09,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    },
+    "igss_fwd_25C": {
+     "hand_evaluated_A": 0.0005940064285732103,
+     "ltspice_A": 0.0005933696520514786,
+     "relative_difference": -0.0010720027445851876,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    },
+    "igss_fwd_125C": {
+     "hand_evaluated_A": 0.0005940064285732103,
+     "ltspice_A": 0.0005933694774284959,
+     "relative_difference": -0.001072296719489052,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    },
+    "igss_rev": {
+     "hand_evaluated_A": 4.872657391805595e-07,
+     "ltspice_A": 4.872657086707477e-07,
+     "relative_difference": -6.261431761966918e-08,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    }
+   },
+   "sensitivity": {
+    "igss_fwd_25C_drain_open": {
+     "igss_A": 0.0005933693610131741,
+     "drain_V": 3.0680044156879616e-07
+    },
+    "igss_rev_drain_open": {
+     "igss_A": -3.3518506370455725e-07,
+     "drain_V": -3.365862107465473
+    }
+   },
+   "bvdss": {
+    "v_at_0.15mA_V": null,
+    "id_at_100V_A": 5.576701369136572e-06,
+    "id_at_200V_A": 1.1016614735126495e-05,
+    "sweep_max_V": 200.0,
+    "datasheet_min_V": 100.0,
+    "limit_check": "inside-limits"
+   },
+   "vsd_note": {
+    "vsd_vgs_neg2_V": 3.815723196801905
+   },
+   "qrr": {
+    "per_forward_current": {
+     "10A": {
+      "recovered_charge_C": 9.135641998462736e-08,
+      "capacitive_charge_C": 9.159404318866266e-08,
+      "residual_C": -2.376232040352956e-10,
+      "residual_fraction": -0.0025943084917197778,
+      "zero_crossing_s": 6.000401988249855e-08,
+      "vds_at_zero_crossing_V": -1.8054083733900403,
+      "vds_end_V": 50.01999999714223,
+      "drain_current_end_A": 2.8577855146227545e-06
+     },
+     "50A": {
+      "recovered_charge_C": 9.135638780512246e-08,
+      "capacitive_charge_C": 9.159353972391347e-08,
+      "residual_C": -2.371519187910069e-10,
+      "residual_fraction": -0.002589177353619523,
+      "zero_crossing_s": 1.0000499999999054e-07,
+      "vds_at_zero_crossing_V": -1.8052714025776642,
+      "vds_end_V": 50.019999997142214,
+      "drain_current_end_A": 2.8577855146227545e-06
+     }
+    },
+    "R1_capacitive": true,
+    "R2_current_independent": true,
+    "current_ratio_change": -3.5224130834343725e-07,
+    "tolerance": 0.02
+   }
+  },
+  "EPC2302DS": {
+   "failed_benches": {},
+   "rows": {
+    "idss": {
+     "unit": "A",
+     "typ": 1e-06,
+     "max": 0.0001,
+     "conditions": "VDS = 80 V, VGS = 0 V",
+     "model": 4.488723334361566e-06,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": 3.4887233343615662,
+     "typical_check": "outside-screening-band",
+     "review": true
+    },
+    "igss_fwd_25C": {
+     "unit": "A",
+     "typ": 1e-05,
+     "max": 0.004,
+     "conditions": "VGS = 5 V (VDS = 0 V assumed)",
+     "model": 0.0005933696520514786,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": 58.336965205147855,
+     "typical_check": "outside-screening-band",
+     "review": true
+    },
+    "igss_fwd_125C": {
+     "unit": "A",
+     "typ": 0.0004,
+     "max": 0.009,
+     "conditions": "VGS = 5 V, TJ = 125 C (defined by design)",
+     "model": 0.0005933694774284959,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": 0.4834236935712397,
+     "typical_check": "outside-screening-band",
+     "review": true
+    },
+    "igss_rev": {
+     "unit": "A",
+     "typ": 1e-05,
+     "max": 0.0002,
+     "conditions": "VGS = -4 V (VDS = 0 V assumed)",
+     "model": 4.872657086707477e-07,
+     "limit_check": "inside-limits",
+     "deviation_from_typ": -0.9512734291329252,
+     "typical_check": "outside-screening-band",
+     "review": true
+    }
+   },
+   "machinery": {
+    "idss": {
+     "hand_evaluated_A": 4.488723370507439e-06,
+     "ltspice_A": 4.488723334361566e-06,
+     "relative_difference": -8.052595368290838e-09,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    },
+    "igss_fwd_25C": {
+     "hand_evaluated_A": 0.0005940064285732103,
+     "ltspice_A": 0.0005933696520514786,
+     "relative_difference": -0.0010720027445851876,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    },
+    "igss_fwd_125C": {
+     "hand_evaluated_A": 0.0005940064285732103,
+     "ltspice_A": 0.0005933694774284959,
+     "relative_difference": -0.001072296719489052,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    },
+    "igss_rev": {
+     "hand_evaluated_A": 4.872657391805595e-07,
+     "ltspice_A": 4.872657086707477e-07,
+     "relative_difference": -6.261431761966918e-08,
+     "tolerance": 0.01,
+     "outcome": "pass"
+    }
+   },
+   "sensitivity": {
+    "igss_fwd_25C_drain_open": {
+     "igss_A": 0.0005933693610131741,
+     "drain_V": 3.0680044156879616e-07
+    },
+    "igss_rev_drain_open": {
+     "igss_A": -3.3518506370455725e-07,
+     "drain_V": -3.365862107465473
+    }
+   },
+   "bvdss": {
+    "v_at_0.15mA_V": null,
+    "id_at_100V_A": 5.576701369136572e-06,
+    "id_at_200V_A": 1.1016614735126495e-05,
+    "sweep_max_V": 200.0,
+    "datasheet_min_V": 100.0,
+    "limit_check": "inside-limits"
+   },
+   "vsd_note": {
+    "vsd_vgs_neg2_V": 3.815723196801905
+   },
+   "qrr": {
+    "per_forward_current": {
+     "10A": {
+      "recovered_charge_C": 9.170006933048097e-08,
+      "capacitive_charge_C": 9.193697283709851e-08,
+      "residual_C": -2.3690350661753564e-10,
+      "residual_fraction": -0.00257680342637886,
+      "zero_crossing_s": 6.00053785496708e-08,
+      "vds_at_zero_crossing_V": -1.8052575195936995,
+      "vds_end_V": 50.01999999714221,
+      "drain_current_end_A": 2.8577855146227545e-06
+     },
+     "50A": {
+      "recovered_charge_C": 9.17000453285277e-08,
+      "capacitive_charge_C": 9.193711873671886e-08,
+      "residual_C": -2.370734081911636e-10,
+      "residual_fraction": -0.0025786473564618968,
+      "zero_crossing_s": 1.0000499999999054e-07,
+      "vds_at_zero_crossing_V": -1.8052962002620272,
+      "vds_end_V": 50.01999999714224,
+      "drain_current_end_A": 2.8577548497139124e-06
+     }
+    },
+    "R1_capacitive": true,
+    "R2_current_independent": true,
+    "current_ratio_change": -2.6174411271728815e-07,
+    "tolerance": 0.02
+   }
+  }
+ },
+ "inventory": [
+  {
+   "page": 2,
+   "item": "rds_on",
+   "conditions": "VGS = 5 V, ID = 50 A",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "vgs_th",
+   "conditions": "VDS = VGS, ID = 14 mA",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "vsd",
+   "conditions": "IS = 0.5 A, VGS = 0 V (defined by design)",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "ciss",
+   "conditions": "VDS = 50 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "crss",
+   "conditions": "VDS = 50 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "coss",
+   "conditions": "VDS = 50 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "coss_er",
+   "conditions": "VDS = 0 to 50 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "coss_tr",
+   "conditions": "VDS = 0 to 50 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "qg",
+   "conditions": "VDS = 50 V, VGS = 5 V, ID = 50 A",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "qgs",
+   "conditions": "VDS = 50 V, ID = 50 A",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "qgd",
+   "conditions": "VDS = 50 V, ID = 50 A",
+   "kind": "table row",
+   "status": {
+    "vendor": "unresolved",
+    "EPC2302DS": "unresolved"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": "table definition and Fig. 7 disagree (docs/build.md); flagged in both"
+  },
+  {
+   "page": 2,
+   "item": "qg_th",
+   "conditions": "VDS = 50 V, ID = 50 A",
+   "kind": "table row",
+   "status": {
+    "vendor": "unresolved",
+    "EPC2302DS": "unresolved"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": "table definition and Fig. 7 disagree (docs/build.md); flagged in both"
+  },
+  {
+   "page": 2,
+   "item": "qoss",
+   "conditions": "VDS = 50 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "results/gan/epc2302-baseline.json; epc2302-ds-variant.json D3",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "idss",
+   "conditions": "VDS = 80 V, VGS = 0 V",
+   "kind": "table row",
+   "status": {
+    "vendor": "flagged",
+    "EPC2302DS": "flagged"
+   },
+   "evidence": "this report",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "igss_fwd_25C",
+   "conditions": "VGS = 5 V (VDS = 0 V assumed)",
+   "kind": "table row",
+   "status": {
+    "vendor": "flagged",
+    "EPC2302DS": "flagged"
+   },
+   "evidence": "this report",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "igss_fwd_125C",
+   "conditions": "VGS = 5 V, TJ = 125 C (defined by design)",
+   "kind": "table row",
+   "status": {
+    "vendor": "flagged",
+    "EPC2302DS": "flagged"
+   },
+   "evidence": "this report",
+   "note": "no temperature dependence in the model's leakage"
+  },
+  {
+   "page": 2,
+   "item": "igss_rev",
+   "conditions": "VGS = -4 V (VDS = 0 V assumed)",
+   "kind": "table row",
+   "status": {
+    "vendor": "flagged",
+    "EPC2302DS": "flagged"
+   },
+   "evidence": "this report",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "bvdss",
+   "conditions": "VGS = 0 V, ID = 0.15 mA",
+   "kind": "table row",
+   "status": {
+    "vendor": "unsupported",
+    "EPC2302DS": "unsupported"
+   },
+   "evidence": "this report",
+   "note": "no breakdown element: the 100 V minimum is met only because nothing breaks down"
+  },
+  {
+   "page": 2,
+   "item": "qrr",
+   "conditions": "datasheet value 0",
+   "kind": "table row",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "this report",
+   "note": "0 by construction (no stored-charge element); recovered charge is output charge"
+  },
+  {
+   "page": 4,
+   "item": "Figure 7",
+   "conditions": "VDS = 50 V, ID = 50 A",
+   "kind": "curve",
+   "status": {
+    "vendor": "fail",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "epc2302-fig7-comparison.json; epc2302ds-fig7-comparison.json",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 1 VGS=5V",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 1 VGS=4V",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 1 VGS=3V",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 1 VGS=2V",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 2 25C",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 2 125C",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 3 ID=25A",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 3 ID=50A",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 3 ID=75A",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 3 ID=100A",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 4 25C",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 4 125C",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 5a CISS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 5a COSS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 5a CRSS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 5b CISS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 5b COSS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 3,
+   "item": "Figure 5b CRSS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Figure 6 QOSS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Figure 6 EOSS",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Figure 8 25C",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Figure 8 125C",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Figure 9 normalized",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Figure 10 normalized",
+   "conditions": "",
+   "kind": "curve",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "curve comparisons",
+   "note": ""
+  },
+  {
+   "page": 4,
+   "item": "Fig. 11 note: negative gate drive raises reverse VDS",
+   "conditions": "IS = 0.5 A, VGS = -2 vs 0 V",
+   "kind": "qualitative note",
+   "status": {
+    "vendor": "pass",
+    "EPC2302DS": "pass"
+   },
+   "evidence": "this report",
+   "note": ""
+  },
+  {
+   "page": 2,
+   "item": "RthJC 0.2 C/W",
+   "conditions": "",
+   "kind": "thermal",
+   "status": {
+    "vendor": "not-modelled",
+    "EPC2302DS": "not-modelled"
+   },
+   "evidence": "none",
+   "note": "no EPC2302 thermal network in hand (not in EPC's library archive); the subcircuit has no self-heating"
+  },
+  {
+   "page": 2,
+   "item": "RthJB 1.5 C/W",
+   "conditions": "",
+   "kind": "thermal",
+   "status": {
+    "vendor": "not-modelled",
+    "EPC2302DS": "not-modelled"
+   },
+   "evidence": "none",
+   "note": "no EPC2302 thermal network in hand (not in EPC's library archive); the subcircuit has no self-heating"
+  },
+  {
+   "page": 2,
+   "item": "RthJA JEDEC 45 C/W",
+   "conditions": "",
+   "kind": "thermal",
+   "status": {
+    "vendor": "not-modelled",
+    "EPC2302DS": "not-modelled"
+   },
+   "evidence": "none",
+   "note": "no EPC2302 thermal network in hand (not in EPC's library archive); the subcircuit has no self-heating"
+  },
+  {
+   "page": 2,
+   "item": "RthJA EPC90142 EVB 21 C/W",
+   "conditions": "",
+   "kind": "thermal",
+   "status": {
+    "vendor": "not-modelled",
+    "EPC2302DS": "not-modelled"
+   },
+   "evidence": "none",
+   "note": "no EPC2302 thermal network in hand (not in EPC's library archive); the subcircuit has no self-heating"
+  },
+  {
+   "page": 5,
+   "item": "Figure 12 transient thermal impedance",
+   "conditions": "",
+   "kind": "thermal",
+   "status": {
+    "vendor": "not-modelled",
+    "EPC2302DS": "not-modelled"
+   },
+   "evidence": "none",
+   "note": "no EPC2302 thermal network in hand (not in EPC's library archive); the subcircuit has no self-heating"
+  },
+  {
+   "page": 1,
+   "item": "VDS 100 V continuous",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "VDS(tr) 120 V repetitive, duty factor <= 1 %",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "ID 133 A continuous (TJ < 125 C)",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "ID 408 A pulsed (300 us)",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "VGS +6 V",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "VGS -4 V",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "TJ -40 to 150 C",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 1,
+   "item": "TSTG -55 to 175 C",
+   "conditions": "",
+   "kind": "maximum rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit, not a model property; no ratings checker in the evaluation layer (goals S1/S7 are stricter template limits on board runs only)"
+  },
+  {
+   "page": 4,
+   "item": "Figure 11 safe operating area",
+   "conditions": "",
+   "kind": "rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "application limit"
+  },
+  {
+   "page": 5,
+   "item": "Repetitive-overvoltage illustration (page 5)",
+   "conditions": "",
+   "kind": "rating",
+   "status": {
+    "vendor": "not-checked",
+    "EPC2302DS": "not-checked"
+   },
+   "evidence": "none",
+   "note": "duty-factor limit; no checker"
+  },
+  {
+   "page": 1,
+   "item": "Package 3 x 5 mm QFN, pinout, top connected to source",
+   "conditions": "",
+   "kind": "structural",
+   "status": {
+    "vendor": "not-an-electrical-target",
+    "EPC2302DS": "not-an-electrical-target"
+   },
+   "evidence": "none",
+   "note": "outside the subcircuit; the board reconstruction uses EPC's own pads"
+  },
+  {
+   "page": 6,
+   "item": "Layout recommendation (page 6)",
+   "conditions": "",
+   "kind": "structural",
+   "status": {
+    "vendor": "not-an-electrical-target",
+    "EPC2302DS": "not-an-electrical-target"
+   },
+   "evidence": "none",
+   "note": "outside the subcircuit; the board reconstruction uses EPC's own pads"
+  },
+  {
+   "page": 1,
+   "item": "Packaging, marking, MSL1",
+   "conditions": "",
+   "kind": "structural",
+   "status": {
+    "vendor": "not-an-electrical-target",
+    "EPC2302DS": "not-an-electrical-target"
+   },
+   "evidence": "none",
+   "note": "outside the subcircuit; the board reconstruction uses EPC's own pads"
+  }
+ ],
+ "counts": {
+  "vendor": {
+   "pass": 37,
+   "unresolved": 2,
+   "flagged": 4,
+   "unsupported": 1,
+   "fail": 1,
+   "not-modelled": 5,
+   "not-checked": 10,
+   "not-an-electrical-target": 3
+  },
+  "EPC2302DS": {
+   "pass": 38,
+   "unresolved": 2,
+   "flagged": 4,
+   "unsupported": 1,
+   "not-modelled": 5,
+   "not-checked": 10,
+   "not-an-electrical-target": 3
+  }
+ },
+ "whole_datasheet_satisfied": false
+}

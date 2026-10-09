@@ -82,7 +82,8 @@ Read the relevant report and build-note section before quoting numbers.
   EPC2302DS (`scripts/epc2302_ds_variant.py` run 2): vendor model plus two charge steps
   outside the VGS=0/VGD<=0 capacitance domain; passes Figs. 5 AND 7, all 24 curves, the 13 table
   rows' limits/flags and numerical checks. Calibration, not physics; QGD/QG(TH) still flagged;
-  BVDSS/IDSS/IGSS/QRR, thermal and ratings unchecked, so not whole-datasheet. Board runs since 8 October
+  Coverage record (`scripts/epc2302_coverage.py` run 2): IDSS/IGSS inside limits but flagged (no TC), BVDSS
+  unsupported (no breakdown element), QRR 0 by construction; thermal not modelled, ratings/SOA not checked, so not whole-datasheet. Board runs since 8 October
   (goals, Fig. 9, J33) use it. Its waveform similarity to the vendor model excludes this gate-charge
   correction as the remedy, not the device model as a contributor.
 - **Extraction:** A/I/B/G are exploratory; no second full-board mesh has run.
