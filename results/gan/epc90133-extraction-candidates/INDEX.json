@@ -1,0 +1,97 @@
+{
+ "note": "Copy the per-candidate extraction reports from the git-ignored reconstruction export into tracked results.",
+ "files": {
+  "results/gan/epc90133-extraction-candidates/L3a/A-m1-mid-L3a.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/L3a/extraction/A-m1-mid-L3a.json",
+   "original_sha256": "d5147165d51cdcb85b27c8616e224bdbaa1281faadef6917e5bd28f8d690002e"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-d0.050-stock-run1-invalid-epc-gerbers.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.050-stock-run1-invalid-epc-gerbers.json",
+   "original_sha256": "3cd07159022f719e9e02fa4d0fcb2ccfd7b0a8d6731ca42ea097e10d5d6d772a"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-d0.050-stock.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.050-stock.json",
+   "original_sha256": "bb2eb879b14dbe6b7a235d40356239056c9694c39e30a448f577da9484426edd"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-d0.075-stock-run1-invalid-epc-gerbers.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.075-stock-run1-invalid-epc-gerbers.json",
+   "original_sha256": "fcda926d9d88f55351ab2c6abe6bd8a3f56f018a49892786a0009d9cad796086"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-d0.075-stock.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.075-stock.json",
+   "original_sha256": "32e613954686e73bc30867cacd02caf7cbf94204b8f254d129c20d6c9a3f34bb"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-d0.100-stock-run1-invalid-epc-gerbers.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.100-stock-run1-invalid-epc-gerbers.json",
+   "original_sha256": "9117ed9f6bf15423d7f2e7808081668644f12049b64bde6c8acb3290bce33856"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-d0.100-stock.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.100-stock.json",
+   "original_sha256": "ac2117de3f4b04971cb8e6e5b88023d046c5826803e15db9cc4bed3c8f60cc98"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/A-m1-mid-stock.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-stock.json",
+   "original_sha256": "bbfdabae9ca3e0699291ed51111304a9e708de9c8f3d1b57a79bd2dc650ab77e"
+  },
+  "results/gan/epc90133-extraction-candidates/stock/G-m1-mid-stock.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/stock/extraction/G-m1-mid-stock.json",
+   "original_sha256": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7"
+  },
+  "results/gan/epc90133-extraction-candidates/V6/A-m1-mid-V6.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V6/extraction/A-m1-mid-V6.json",
+   "original_sha256": "8501cded853e9a67c6178cce4fa379ce09d47f745b1674e4927142eacec5d926"
+  },
+  "results/gan/epc90133-extraction-candidates/V6-run1-slit/A-m1-mid-V6.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V6-run1-slit/extraction/A-m1-mid-V6.json",
+   "original_sha256": "0ccb0b23eb5a7e7fa14290d3f5eba2a8ffcd38b3dcf2224c7687eaae31c15cf2"
+  },
+  "results/gan/epc90133-extraction-candidates/V7/A-m1-mid-V7.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V7/extraction/A-m1-mid-V7.json",
+   "original_sha256": "a649dd58338266b601a4ed478b1a39e44aec2d2d6993dcb91abcceefc3d55d01"
+  },
+  "results/gan/epc90133-extraction-candidates/V7-run1-slit/A-m1-mid-V7.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V7-run1-slit/extraction/A-m1-mid-V7.json",
+   "original_sha256": "019e141b2c62d06f632185df8834d24165dbe4eabd018b168e79691915a761c9"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-d0.050-V8-run1-invalid-epc-gerbers.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.050-V8-run1-invalid-epc-gerbers.json",
+   "original_sha256": "f685eeb0a9a1bc2be77fc00a7b943e15328d60532c28aafb5e619544af394f48"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-d0.050-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.050-V8.json",
+   "original_sha256": "1f1f7c0c29859571aea9c125c305592c80758b525da0a29240d4f296fa73e487"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-d0.075-V8-run1-invalid-epc-gerbers.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.075-V8-run1-invalid-epc-gerbers.json",
+   "original_sha256": "e5d747d9994ecb72d1b08c6263b5198f99eb6544c3424aa88aad6b0aab116287"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-d0.075-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.075-V8.json",
+   "original_sha256": "347447fb88c9c7dad4176abd943d4daec88a191c0e982b7ca38dc1ce17c866ca"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-d0.100-V8-run1-invalid-epc-gerbers.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.100-V8-run1-invalid-epc-gerbers.json",
+   "original_sha256": "c41c4e4e4247bc4ab92836a204b2de8483eb6959c7998ee4b35738dcddd5b3f1"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-d0.100-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.100-V8.json",
+   "original_sha256": "d31ef7a74ff74158d2255ee4372957c88a385237f1f42cd1c7ae362d97adbc55"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/A-m1-mid-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-V8.json",
+   "original_sha256": "81d6c29e654f79b6a75e8252133b1db41065cf25445ea7ea1321a86ba3784fc5"
+  },
+  "results/gan/epc90133-extraction-candidates/V8/G-m1-mid-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/G-m1-mid-V8.json",
+   "original_sha256": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a"
+  },
+  "results/gan/epc90133-extraction-candidates/V8-run1-slit/A-m1-mid-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8-run1-slit/extraction/A-m1-mid-V8.json",
+   "original_sha256": "567f2e76675365b8857e9b7917c88283e049dbe2229e95383c63b5d51064b8f2"
+  },
+  "results/gan/epc90133-extraction-candidates/V9/A-m1-mid-V9.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V9/extraction/A-m1-mid-V9.json",
+   "original_sha256": "cd6aaa16b01c81cccbf12b1286d9787eb48e2933c4201933b8745ddf49646d97"
+  }
+ }
+}

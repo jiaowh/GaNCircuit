@@ -3732,3 +3732,13 @@ An owner-supplied review found these statements overstated; each was checked aga
   run of V8 + 0.075 mm therefore needs its own new declaration, labelled as after that gate's result.
 
 The pause decision rests mainly on L4a's implementation cost (blocked top-layer route, driver-ground redesign).
+
+### Candidate extraction reports archived in git (9 October 2026)
+
+The per-candidate FastHenry reports (stock, V6-V9, L3a and the dielectric screens, including invalid and defective
+runs; 23 files, 1.2 MB, numbers only) lived only in the git-ignored reconstruction export. `python
+scripts/archive_candidate_extractions.py` copies them to `results/gan/epc90133-extraction-candidates/` with absolute
+local paths made relative; `INDEX.json` gives each original's path and SHA-256, the identity the switching manifests
+recorded. Rerun after every new candidate extraction. Still local only: vendor files and the KiCad reconstruction
+(private by reuse terms), raw solver evidence in `runs/` (about 79 GB, mostly regenerable waveforms) and the owner's
+template document.
