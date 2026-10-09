@@ -3691,3 +3691,13 @@ screen is not a proven bound for every layout, but a realizable return cannot be
 the assumed 50 pH. L3b acts only through loop inductance, where the scaling sweep is flat near stock. The owner
 decided (9 October 2026) to pause the candidate search; no geometry was built and no solver ran. Closing report:
 `docs/simulation-report-2026-10-09.md`.
+
+### Candidate comparison page (9 October 2026)
+
+`python scripts/epc90133_candidate_table.py` regenerates `results/gan/epc90133-candidates.{json,html}` from saved
+results only: every built candidate's variant A/G extraction (loop L and R, board common-source inductance) and the
+S1-S13 goal values (EPC2302DS revision 2 and vendor assessments), each compared with stock through the same route.
+Extraction changes below the route's 4 % threshold are tinted pale. Per-candidate extraction reports are read from the
+git-ignored reconstruction export folder; the tracked JSON keeps the numbers. Published as a private page
+(https://claude.ai/artifact/8VJjUm161X4JHfEJSZbJYJ); after a new candidate, extraction or goals assessment, add it to
+CANDIDATES in the script, rerun, and republish the same file.

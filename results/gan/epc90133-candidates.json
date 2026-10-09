@@ -1,0 +1,674 @@
+{
+ "schema": "epc90133-candidates/1",
+ "reference": "stock",
+ "route_threshold": 0.04,
+ "primary_conditions": [
+  "ramp-Ls50",
+  "step-Ls50"
+ ],
+ "columns": [
+  [
+   "S1",
+   "S1",
+   "Peak voltage",
+   "vpk_V",
+   "V",
+   1,
+   "lower",
+   1
+  ],
+  [
+   "S2",
+   "S2",
+   "Overshoot",
+   "overshoot_V",
+   "V",
+   1,
+   "lower",
+   2
+  ],
+  [
+   "S3",
+   "S3",
+   "Settling",
+   "settling_s",
+   "ns",
+   1000000000.0,
+   "lower",
+   1
+  ],
+  [
+   "S4tr",
+   "S4",
+   "Rise time",
+   "tr_s",
+   "ns",
+   1000000000.0,
+   "lower",
+   2
+  ],
+  [
+   "S4tf",
+   "S4",
+   "Fall time",
+   "tf_s",
+   "ns",
+   1000000000.0,
+   "lower",
+   2
+  ],
+  [
+   "S5",
+   "S5",
+   "dv/dt",
+   "dvdt_V_per_ns",
+   "V/ns",
+   1,
+   null,
+   1
+  ],
+  [
+   "S6i",
+   "S6",
+   "Q1 peak current",
+   "id_peak_A",
+   "A",
+   1,
+   "lower",
+   1
+  ],
+  [
+   "S6d",
+   "S6",
+   "Q1 di/dt",
+   "didt_A_per_ns",
+   "A/ns",
+   1,
+   "lower",
+   1
+  ],
+  [
+   "S7max",
+   "S7",
+   "Gate max",
+   "vgs_max_V",
+   "V",
+   1,
+   "lower",
+   2
+  ],
+  [
+   "S7min",
+   "S7",
+   "Gate min",
+   "vgs_min_V",
+   "V",
+   1,
+   "higher",
+   2
+  ],
+  [
+   "S8",
+   "S8",
+   "Q2 gate spike",
+   "q2_gate_peak_V",
+   "V",
+   1,
+   "lower",
+   2
+  ],
+  [
+   "S10",
+   "S10",
+   "Eon + Eoff",
+   "eon_eoff_J",
+   "uJ",
+   1000000.0,
+   "lower",
+   2
+  ],
+  [
+   "S12",
+   "S12",
+   "Efficiency (FET only)",
+   "efficiency",
+   "%",
+   100,
+   "higher",
+   3
+  ]
+ ],
+ "targets": {
+  "S1": "<= 80 V",
+  "S2": "<= 9.6 V and -10 % vs stock",
+  "S3": "<= stock",
+  "S4": "<= 1.1 x stock",
+  "S5": "limit not set",
+  "S6": "<= stock",
+  "S7": "+5.5 / -3 V",
+  "S8": "< 0.5 V",
+  "S9": "Q2 spike < 0.8 V",
+  "S10": "-10 % vs stock",
+  "S11": "optimum 5-15 ns",
+  "S12": "+0.3 points",
+  "S13": "S1, S2, S7, S8 at corners"
+ },
+ "not_in_table": [
+  [
+   "R80 gate-resistor swaps (1.2-1.5 ohm, with and without V8)",
+   "Superseded: the owner's goals fix the parts list. Kept in results/gan/epc90133-search-G*.json and the design-round assessments."
+  ],
+  [
+   "Screens S1-S8 (filled return-plane slots)",
+   "Invalid: the fills bonded non-GND vias to the ground plane (results/gan/epc90133-layout-screen.json)."
+  ],
+  [
+   "V6/V7/V8 run 1",
+   "Defective builds (a thin slit per slot), replaced by revision 2; kept as *-run1-slit."
+  ],
+  [
+   "Added return vias (round 2b)",
+   "Four legal additions changed screened loop inductance by -0.02 %; earlier additions damaged the power path."
+  ],
+  [
+   "L4a low-side driver return",
+   "Inspected 9 October, not built: the low-side gate probe connection blocks a top-layer return."
+  ],
+  [
+   "L3b capacitors with their return vias",
+   "Not built."
+  ]
+ ],
+ "candidates": [
+  {
+   "id": "stock",
+   "label": "Stock",
+   "what": "EPC's published layout, rebuilt in KiCad (the reference)",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-stock.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.4924935073888023,
+    "R_loop_mohm": 4.035428888666547
+   },
+   "G": {
+    "source": "vendor/epc/epc90133/reconstruction/export/stock/extraction/G-m1-mid-stock.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.25273804560281526,
+    "R_loop_mohm": 2.0173414389926196,
+    "L_cs_Q1_pH": 0.9853388792761811,
+    "L_cs_Q2_pH": 48.022676994035514
+   },
+   "goals": {
+    "EPC2302DS": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": true,
+      "S4": true,
+      "S5": null,
+      "S6": true,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": false,
+      "S12": false,
+      "S13": false
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-ds-rev2.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.34213638305664,
+       "overshoot_V": 11.14557771011534,
+       "settling_s": 1.315e-07,
+       "tr_s": 1.7287225690292422e-09,
+       "tf_s": 4.236898656957815e-09,
+       "dvdt_V_per_ns": 22.212933809016782,
+       "id_peak_A": 55.91946029663086,
+       "didt_A_per_ns": 38.04796,
+       "vgs_max_V": 5.028255462646484,
+       "vgs_min_V": -1.682946503162384,
+       "q2_gate_peak_V": 1.933672547340393,
+       "eon_eoff_J": 5.6979201011567655e-06,
+       "efficiency": 0.9912756696280371
+      },
+      "step-Ls50": {
+       "vpk_V": 58.66228485107422,
+       "overshoot_V": 10.465159218735167,
+       "settling_s": 1.3225e-07,
+       "tr_s": 1.8347563575063535e-09,
+       "tf_s": 4.317153097383561e-09,
+       "dvdt_V_per_ns": 20.929209397693576,
+       "id_peak_A": 50.763885498046875,
+       "didt_A_per_ns": 29.913,
+       "vgs_max_V": 4.985530853271484,
+       "vgs_min_V": -1.1209874600172043,
+       "q2_gate_peak_V": 1.6391326785087585,
+       "eon_eoff_J": 5.935980377168419e-06,
+       "efficiency": 0.9912614914141201
+      }
+     },
+     "dead_time_optimum_ns": 2.5,
+     "corners": {
+      "passed": 0,
+      "usable": 10,
+      "declared": 10
+     }
+    },
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": true,
+      "S4": true,
+      "S6": true,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S12": false,
+      "S11": false,
+      "S13": false
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-vendor.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.31907272338867,
+       "overshoot_V": 11.125135694785051,
+       "settling_s": 1.3075e-07,
+       "tr_s": 1.6835128915519736e-09,
+       "tf_s": 4.1755571370396125e-09,
+       "dvdt_V_per_ns": 22.80944814423152,
+       "id_peak_A": 58.51051330566406,
+       "didt_A_per_ns": 42.22576000000001,
+       "vgs_max_V": 5.030094146728516,
+       "vgs_min_V": -1.8991279602050781,
+       "q2_gate_peak_V": 1.9396140575408936,
+       "eon_eoff_J": 5.583397802773839e-06,
+       "efficiency": 0.9914123762701659
+      },
+      "step-Ls50": {
+       "vpk_V": 58.99005126953125,
+       "overshoot_V": 10.793155646430527,
+       "settling_s": 1.315e-07,
+       "tr_s": 1.7907956492993428e-09,
+       "tf_s": 4.219821814983239e-09,
+       "dvdt_V_per_ns": 21.44298262899186,
+       "id_peak_A": 52.476253509521484,
+       "didt_A_per_ns": 33.47063999999999,
+       "vgs_max_V": 4.990875244140625,
+       "vgs_min_V": -1.32490449026227,
+       "q2_gate_peak_V": 1.658995121717453,
+       "eon_eoff_J": 5.777370113996714e-06,
+       "efficiency": 0.9914448256224975
+      }
+     },
+     "dead_time_optimum_ns": 2.5,
+     "corners": {
+      "passed": 0,
+      "usable": 10,
+      "declared": 10
+     }
+    }
+   }
+  },
+  {
+   "id": "V6",
+   "label": "V6",
+   "what": "Every other via removed in Q1's slotted via columns",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-V6.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V6/extraction/A-m1-mid-V6.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.47168667469537306,
+    "R_loop_mohm": 4.012032467365346
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "V7",
+   "label": "V7",
+   "what": "Every other via removed in Q2's slotted via columns",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-V7.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V7/extraction/A-m1-mid-V7.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.4501903138732512,
+    "R_loop_mohm": 4.0515240778536485
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "V8",
+   "label": "V8",
+   "what": "Every other via removed under both FETs (20 of 40)",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-V8.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-V8.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.43106022033846675,
+    "R_loop_mohm": 4.0411780751215085
+   },
+   "G": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/G-m1-mid-V8.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.24022573699582303,
+    "R_loop_mohm": 2.099160224231481,
+    "L_cs_Q1_pH": 4.1458161995333755,
+    "L_cs_Q2_pH": 40.80335125736374
+   },
+   "goals": {
+    "EPC2302DS": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": false,
+      "S4": true,
+      "S5": null,
+      "S6": false,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": false,
+      "S12": false,
+      "S13": false
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-ds-rev2.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.52567672729492,
+       "overshoot_V": 11.33047934991368,
+       "settling_s": 1.3325e-07,
+       "tr_s": 1.7863862738763352e-09,
+       "tf_s": 4.246254417893623e-09,
+       "dvdt_V_per_ns": 21.495910801349055,
+       "id_peak_A": 53.800662994384766,
+       "didt_A_per_ns": 37.46944000000001,
+       "vgs_max_V": 5.0377197265625,
+       "vgs_min_V": -1.5060614794492722,
+       "q2_gate_peak_V": 1.8523907661437988,
+       "eon_eoff_J": 5.734515728100786e-06,
+       "efficiency": 0.991241246499605
+      },
+      "step-Ls50": {
+       "vpk_V": 58.569366455078125,
+       "overshoot_V": 10.375101715312674,
+       "settling_s": 1.3025000000000002e-07,
+       "tr_s": 1.8737251897118907e-09,
+       "tf_s": 4.33064038898239e-09,
+       "dvdt_V_per_ns": 20.4939338014154,
+       "id_peak_A": 49.12763977050781,
+       "didt_A_per_ns": 30.884799999999995,
+       "vgs_max_V": 4.989837646484375,
+       "vgs_min_V": -1.0010167956352234,
+       "q2_gate_peak_V": 1.5624111890792847,
+       "eon_eoff_J": 5.972090236692734e-06,
+       "efficiency": 0.991225391406726
+      }
+     },
+     "dead_time_optimum_ns": 2.5,
+     "corners": {
+      "passed": 0,
+      "usable": 9,
+      "declared": 10
+     }
+    },
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": false,
+      "S4": true,
+      "S6": true,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S12": false,
+      "S11": false,
+      "S13": false
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-vendor.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.51451110839844,
+       "overshoot_V": 11.322384245684951,
+       "settling_s": 1.325e-07,
+       "tr_s": 1.7501419957168833e-09,
+       "tf_s": 4.183790286502077e-09,
+       "dvdt_V_per_ns": 21.941076834894652,
+       "id_peak_A": 56.333473205566406,
+       "didt_A_per_ns": 41.68775999999999,
+       "vgs_max_V": 5.039867401123047,
+       "vgs_min_V": -1.7104232758283615,
+       "q2_gate_peak_V": 1.8521928787231445,
+       "eon_eoff_J": 5.628918951978885e-06,
+       "efficiency": 0.9913751523990919
+      },
+      "step-Ls50": {
+       "vpk_V": 58.958473205566406,
+       "overshoot_V": 10.764185249795013,
+       "settling_s": 1.33e-07,
+       "tr_s": 1.8330034910208685e-09,
+       "tf_s": 4.23027847065008e-09,
+       "dvdt_V_per_ns": 20.949223603831545,
+       "id_peak_A": 50.642051696777344,
+       "didt_A_per_ns": 32.92716,
+       "vgs_max_V": 4.993877410888672,
+       "vgs_min_V": -1.188991516828537,
+       "q2_gate_peak_V": 1.585530698299408,
+       "eon_eoff_J": 5.822263702185174e-06,
+       "efficiency": 0.9914056341067893
+      }
+     },
+     "dead_time_optimum_ns": 2.5,
+     "corners": {
+      "passed": 0,
+      "usable": 10,
+      "declared": 10
+     }
+    }
+   }
+  },
+  {
+   "id": "V9",
+   "label": "V9",
+   "what": "Every third via kept under both FETs",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-V9.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V9/extraction/A-m1-mid-V9.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.4246607992550975,
+    "R_loop_mohm": 4.009247748254079
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "L3a",
+   "label": "L3a",
+   "what": "Input capacitors Ci1-Ci7 moved 0.40 mm toward Q1",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-L3a.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/L3a/extraction/A-m1-mid-L3a.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.49619929781778,
+    "R_loop_mohm": 4.022670456773489
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "d0.100",
+   "label": "Dielectric 0.100 mm",
+   "what": "Power-loop dielectric 0.127 -> 0.100 mm",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.100-stock.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.4599980366857151,
+    "R_loop_mohm": 4.188077598231331
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "d0.075",
+   "label": "Dielectric 0.075 mm",
+   "what": "Power-loop dielectric 0.075 mm (thinnest standard)",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.075-stock.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.42819607498844386,
+    "R_loop_mohm": 4.400561831881331
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "d0.050",
+   "label": "Dielectric 0.050 mm *",
+   "what": "Sensitivity only: below the industry-practice limit",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/stock/extraction/A-m1-mid-d0.050-stock.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.39366252713698835,
+    "R_loop_mohm": 4.754328502393966
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "V8+d0.100",
+   "label": "V8 + 0.100 mm",
+   "what": "V8 with 0.100 mm dielectric",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.100-V8.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.393819077408091,
+    "R_loop_mohm": 4.249154158213282
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "V8+d0.075",
+   "label": "V8 + 0.075 mm",
+   "what": "V8 with 0.075 mm dielectric (best legal combination)",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.075-V8.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.35652368948542296,
+    "R_loop_mohm": 4.53327044685355
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  },
+  {
+   "id": "V8+d0.050",
+   "label": "V8 + 0.050 mm *",
+   "what": "Sensitivity only: below the industry-practice limit",
+   "board_export": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.050-V8.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.31508578387503433,
+    "R_loop_mohm": 4.983996421582043
+   },
+   "G": null,
+   "goals": {
+    "EPC2302DS": null,
+    "vendor": null
+   }
+  }
+ ],
+ "sources": {
+  "EPC2302DS": "results/gan/epc90133-goals-assessment-ds-rev2.json",
+  "vendor": "results/gan/epc90133-goals-assessment-vendor.json"
+ },
+ "generated": "2026-10-09"
+}
