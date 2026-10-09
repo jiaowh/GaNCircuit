@@ -191,3 +191,10 @@ SW-to-GND capacitance; stock keeps the 135 pF estimate, V8d075 adds the computed
 `results/gan/epc90133-csw-dielectric.json`). Reading: a V8d075 goal whose verdict against stock (S1, S2, S3, S4, S6,
 S7, S8, S10 at the nominal point) differs between the plain and the -csw pair is reported as capacitance-sensitive,
 not as met. Unchanged: reproduction control within 0.1 %, scoring with stock and V8 from the 8 October reports.
+
+Run 2 procedural change (9 October 2026, 17:35-17:40, before any V8d075 result was read): with 8 cases at once the
+first timing stages took about 13 min (792-849 s) against 72-146 s for identical netlists on 8 October (same
+library, LTspice 26.1.1, 16 solver threads each, CPU not throttled; cause not identified). Process B (control,
+corners, C_SW) was stopped after 13 min; process A (V8d075 nominal, 4 jobs) continues alone; B's five steps are
+queued to run one after another after A (4 jobs), then scoring (`runs/confirm-V8d075-queue.ps1`). No case
+definition, check or reading rule changed.
