@@ -636,7 +636,7 @@
   {
    "id": "V8+d0.075",
    "label": "V8 + 0.075 mm",
-   "what": "V8 with 0.075 mm dielectric (best legal combination)",
+   "what": "V8 with 0.075 mm dielectric (best screened legal combination)",
    "board_export": null,
    "A": {
     "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-d0.075-V8.json",
@@ -644,7 +644,14 @@
     "L_loop_nH": 0.35652368948542296,
     "R_loop_mohm": 4.53327044685355
    },
-   "G": null,
+   "G": {
+    "source": "vendor/epc/epc90133/reconstruction/export/V8/extraction/G-m1-mid-d0.075-V8.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.209227504475492,
+    "R_loop_mohm": 2.3750515341571563,
+    "L_cs_Q1_pH": 2.751316250359207,
+    "L_cs_Q2_pH": 31.653629541528957
+   },
    "goals": {
     "vendor": null,
     "EPC2302DS": null
@@ -669,8 +676,12 @@
   }
  ],
  "sources": {
-  "vendor": "results/gan/epc90133-goals-assessment-vendor-rev2.json",
-  "EPC2302DS": "results/gan/epc90133-goals-assessment-ds-rev2.json"
+  "vendor": [
+   "results/gan/epc90133-goals-assessment-vendor-rev2.json"
+  ],
+  "EPC2302DS": [
+   "results/gan/epc90133-goals-assessment-ds-rev2.json"
+  ]
  },
  "generated": "2026-10-09"
 }

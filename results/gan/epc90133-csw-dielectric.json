@@ -1,0 +1,18 @@
+{
+ "geometry_source": {
+  "kind": "kicad_export",
+  "manifest_sha256": "d4d3074183ee982b9f4ec910c2acc37497e0da8cdd39de586118b1465354e172",
+  "case": "V8",
+  "board_sha256": "9f166fa867a07b0b09de9bc9266a48b60572706c6392b1234bfa7b91f956bb1e"
+ },
+ "overlap_area_mm2": 232.05566492000003,
+ "C_top_to_G1_pF": {
+  "0.127 mm": 77.65496153203199,
+  "0.075 mm": 131.49573486090753
+ },
+ "increase_pF": 53.84077332887553,
+ "scaled_overshoot_effect_V": 0.31905643454148463,
+ "threshold_V": 0.1,
+ "sensitivity_case_needed": true,
+ "scope": "Switch-node capacitance added by a thinner top dielectric (V8 + 0.075 mm confirmation, step 3; declared in\nplans/goal-targets-2026-10-08.md before any of its runs).\n\nParallel-plate estimate, no fringing: switch-node (SW) copper on the top layer over GND copper on mid-layer 1, from the\nboard rasters (1 mil pixels), eps_r 4.8 (stackup FR370-HR), at the stock 0.127 mm and at 0.075 mm. Read the V8 KiCad\npackage by setting EPC90133_GERBER_EXPORT to its directory. Decision rule (declared): if the increase, scaled by the\n+0.8 V of overshoot observed for the whole 135 pF C_SW on G, exceeds 0.1 V, a nominal sensitivity case is declared\nseparately; otherwise the estimate is reported and no case is run. Output: results/gan/epc90133-csw-dielectric.json.\n"
+}

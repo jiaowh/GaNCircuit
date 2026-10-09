@@ -81,6 +81,10 @@
    "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/A-m1-mid-V8.json",
    "original_sha256": "81d6c29e654f79b6a75e8252133b1db41065cf25445ea7ea1321a86ba3784fc5"
   },
+  "results/gan/epc90133-extraction-candidates/V8/G-m1-mid-d0.075-V8.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/G-m1-mid-d0.075-V8.json",
+   "original_sha256": "60106e67e4d74a866fb136052a752b7cf8e345e1a99ae26bbdc9937a61787b7c"
+  },
   "results/gan/epc90133-extraction-candidates/V8/G-m1-mid-V8.json": {
    "original": "vendor/epc/epc90133/reconstruction/export/V8/extraction/G-m1-mid-V8.json",
    "original_sha256": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a"

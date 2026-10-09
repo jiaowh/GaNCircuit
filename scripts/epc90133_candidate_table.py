@@ -15,7 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results/gan"
 EXPORT = ROOT / "vendor/epc/epc90133/reconstruction/export"
 # Vendor model primary from 9 October 2026 (owner decision); EPC2302DS shown as the alternative.
-ASSESS = {"vendor": RES / "epc90133-goals-assessment-vendor-rev2.json", "EPC2302DS": RES / "epc90133-goals-assessment-ds-rev2.json"}
+# Per model, assessments searched in order; a design is taken from the first file that scores it.
+ASSESS = {"vendor": [RES / "epc90133-goals-assessment-V8d075.json", RES / "epc90133-goals-assessment-vendor-rev2.json"],
+          "EPC2302DS": [RES / "epc90133-goals-assessment-ds-rev2.json"]}
+GOAL_NAME = {"V8+d0.075": "V8d075"}  # candidate id -> design name in the goals runs
 ROUTE_THRESHOLD = 0.04
 PRIMARY = ("ramp-Ls50", "step-Ls50")
 
@@ -31,7 +34,7 @@ CANDIDATES = [
     ("d0.075", "Dielectric 0.075 mm", "Power-loop dielectric 0.075 mm (thinnest standard)", "stock", "A-m1-mid-d0.075-stock", None, None),
     ("d0.050", "Dielectric 0.050 mm *", "Sensitivity only: below the industry-practice limit", "stock", "A-m1-mid-d0.050-stock", None, None),
     ("V8+d0.100", "V8 + 0.100 mm", "V8 with 0.100 mm dielectric", "V8", "A-m1-mid-d0.100-V8", None, None),
-    ("V8+d0.075", "V8 + 0.075 mm", "V8 with 0.075 mm dielectric (best legal combination)", "V8", "A-m1-mid-d0.075-V8", None, None),
+    ("V8+d0.075", "V8 + 0.075 mm", "V8 with 0.075 mm dielectric (best screened legal combination)", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
     ("V8+d0.050", "V8 + 0.050 mm *", "Sensitivity only: below the industry-practice limit", "V8", "A-m1-mid-d0.050-V8", None, None),
 ]
 
@@ -89,10 +92,14 @@ def extraction(folder, stem):
     return out
 
 
-def goals(assessment, name):
-    d = load(assessment)["designs"].get(name)
-    if not d:
+def goals(assessments, cid):
+    name = GOAL_NAME.get(cid, cid)
+    for assessment in assessments:
+        if Path(assessment).is_file() and name in load(assessment)["designs"]:
+            break
+    else:
         return None
+    d = load(assessment)["designs"][name]
     out = {"verdict": d["verdict"], "all_met": d.get("all_met"), "source": rel(assessment), "values": {}}
     for a in PRIMARY:
         m = d["conditions"][a]["metrics"]
@@ -122,7 +129,7 @@ def build():
     return {"schema": "epc90133-candidates/1", "reference": "stock", "route_threshold": ROUTE_THRESHOLD,
             "primary_conditions": list(PRIMARY), "columns": COLUMNS, "targets": TARGETS,
             "not_in_table": NOT_IN_TABLE, "candidates": rows,
-            "sources": {m: rel(p) for m, p in ASSESS.items()}}
+            "sources": {m: [rel(x) for x in ps if Path(x).is_file()] for m, ps in ASSESS.items()}}
 
 
 PAGE = r"""<title>EPC90133 Layout Candidates</title>

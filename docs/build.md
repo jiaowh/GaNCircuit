@@ -3742,3 +3742,35 @@ local paths made relative; `INDEX.json` gives each original's path and SHA-256, 
 recorded. Rerun after every new candidate extraction. Still local only: vendor files and the KiCad reconstruction
 (private by reuse terms), raw solver evidence in `runs/` (about 79 GB, mostly regenerable waveforms) and the owner's
 template document.
+
+### V8 + 0.075 mm confirmation: extraction complete, switching run 1 stopped (9 October 2026)
+
+Declared in `plans/goal-targets-2026-10-08.md` (after the 45 % gate failed; pre-result amendment for parallel switching).
+
+**Extraction `G:m1:mid:d0.075` of the V8 package** (one FastHenry job, 10:08-16:37, 6.47 h; outcome complete, every
+check passes, geometry_source the V8 KiCad export; archived as
+`results/gan/epc90133-extraction-candidates/V8/G-m1-mid-d0.075-V8.json`):
+
+| G (full board) | Stock | V8 | V8 + 0.075 mm | vs stock |
+|---|---|---|---|---|
+| Loop inductance | 0.2527 nH | 0.2402 nH | 0.2092 nH | -17.2 % |
+| Loop resistance | 2.017 mohm | 2.099 mohm | 2.375 mohm | +17.7 % (resistance unconverged; tentative) |
+| Board common-source L, Q1 | 0.99 pH | 4.15 pH | 2.75 pH | |
+| Board common-source L, Q2 | 48.0 pH | 40.8 pH | 31.7 pH | -34.1 % |
+
+The frozen prediction (G loop L -10 to -20 %) holds: about two thirds of the variant-A screen's -27.6 % survives.
+
+**Switch-node capacitance (declared step 3; `scripts/epc90133_csw_dielectric.py`,
+`results/gan/epc90133-csw-dielectric.json`):** top-layer SW over mid-layer-1 GND, 232 mm2, parallel plate, eps_r 4.8:
+77.7 pF at 0.127 mm, 131.5 pF at 0.075 mm, +53.8 pF. Scaled by +0.8 V per 135 pF this is about +0.32 V of overshoot,
+above the declared 0.1 V, so a nominal with-capacitance sensitivity case must be declared before the V8d075 switching
+verdicts are used. (A chat estimate of about 40 mm2 / +9 pF before the calculation was wrong.)
+
+**Switching run 1 STOPPED (kept as runs/confirm-V8d075-goals-*.log and the run folders created 16:37):** the
+amended plan ran 14 LTspice cases at once (one process with 6 jobs and four with 2). None of their first (timing) stage
+finished in 38 min at 100 % CPU, against 72-146 s for the identical netlists on 8 October with 8 at once; each
+instance had used 10-77 CPU-minutes. Most likely CPU oversubscription by LTspice's own solver threads (not
+separately diagnosed). The cases would have hit the 3,600 s limit at 17:37 and the queue would have run for hours,
+past the owner's 17:45 deadline, so the chain (PID 24416), its five switching processes and 14 LTspice instances
+were stopped by PID at 17:15. No switching result exists for V8d075. Rerun: at most 8 LTspice at once (as on
+8 October), V8d075 goals plus the --vin 48 control, then the declared with-capacitance sensitivity case.
