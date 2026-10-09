@@ -172,3 +172,13 @@ Method:
 Frozen prediction (before any result): G loop inductance -10 to -20 % against stock (V8 gave -4.95 % on G for
 -12.5 % on A); overshoot still above S2's 9.6 V under the ramp driver; S6 and S10 no better than V8. No follow-up
 sweep follows whatever the outcome; the candidate page gets the new row.
+
+Pre-result amendment (9 October 2026, 13:30, while the extraction runs; no switching case has started): the owner
+needs results by 17:45. Step 2 as declared would take about 3 h after the extraction (a goals case takes about
+5 min, as in the vendor goals runs of 8 October). Changed to: the full goals case set for V8d075 only (nominal,
+--vin 40, --vin 60, --iout 0, run in parallel, up to 14 LTspice cases at once on the 16-thread host); stock and V8
+are scored from their complete vendor goals reports of 8 October (`epc90133-goals-G{,-v40,-v60,-i0}.json`); the
+matched control reruns stock and V8 at the nominal point under another case name (`--vin 48`, identical operating
+point) and must reproduce those reports' nominal overshoot and FET loss within 0.1 %. If it does not, the V8d075
+verdicts are reported as not comparable. Parallelism changes no case definition. The original chain (cmd PID 24040)
+is stopped by PID after the extraction process is confirmed independent of it.
