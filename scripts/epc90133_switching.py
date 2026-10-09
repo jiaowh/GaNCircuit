@@ -415,6 +415,8 @@ settings (100 ps, Gear, Q2 sense, settled loss estimator revision 2):
   reported alongside, not judged. The owner's 7 October request to include the gate-charge curve in the
   verifications had been omitted from the first goals declaration; this supersedes it.
 Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed with this declaration).
+* SW capacitance sensitivity (V8 + 0.075 mm confirmation, declared 9 October 2026 before its run): --csw NAME=pF
+  runs <NAME>@<ramp|step>-Ls50-gear-csw with that SW-to-GND capacitance (2 pF to VIN as before).
 * model (owner decision, 9 October 2026, supersedes the model part of the next item): new runs use the vendor
   model as EPC provides it (omit --ds); EPC2302DS runs keep their '-ds' names and remain valid for their model.
 * model and package inductance (owner decision, 8 October 2026, after EPC2302DS passed its datasheet checks and
@@ -857,7 +859,8 @@ Rbret bn {node(at + '.GND')} 1u"""
         "Vq1d q1_d q1dd 0",
         *(["Vq2d q2_d q2dd 0"] if sense_q2 else []),
         *fet1, *fet2,
-        *([f"Csw_gnd q2_d 0 {C_SW['GND']:g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
+        # c_sw True: the 135 pF estimate; a number: that SW-to-GND capacitance in F (V8 + 0.075 mm sensitivity)
+        *([f"Csw_gnd q2_d 0 {(C_SW['GND'] if c_sw is True else c_sw):g}", f"Csw_vin q2_d q1_d {C_SW['VIN']:g}"] if c_sw else []),
         *([f"Cgdx1 gu q1dd {c_gd:g}", f"Cgdx2 gl q2_d {c_gd:g}"] if c_gd else []),
         f"L1 q2_d out {L_OUT:g}{l_ic}",
         f"Vout out 0 {VOUT:g}",
@@ -1522,6 +1525,7 @@ def main():
                     help="s per LTspice run (default 600, the limit of all runs before test 7; G needs more)")
     ap.add_argument("--only", nargs="*", default=None, help="causes study: run only these case names")
     ap.add_argument("--vin", type=float, default=None, help="goals study: input-voltage corner (V)")
+    ap.add_argument("--csw", nargs="*", default=[], help="goals study: NAME=pF, nominal ramp/step-Ls50 cases with that SW-to-GND C")
     ap.add_argument("--iout", type=float, default=None, help="goals study: load corner (A)")
     args = ap.parse_args()
     REFERENCE = args.reference
@@ -1609,6 +1613,10 @@ def main():
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "goals":
         cases = goals_cases([s_.split("=", 1)[0] for s_ in args.ext_file], args.vin, args.iout, args.qg, args.ds)
+        if args.csw:  # SW capacitance sensitivity (V8 + 0.075 mm confirmation; plans/goal-targets-2026-10-08.md)
+            vals = {k: float(v) * 1e-12 for k, v in (s_.split("=", 1) for s_ in args.csw)}
+            cases = {f"{n}@{a}-gear-csw": {**cases[f"{n}@{a}-gear"], "c_sw": vals[n]}
+                     for n in vals for a in ("ramp-Ls50", "step-Ls50")}
         if args.only:
             cases = {k: c for k, c in cases.items() if k in args.only}
     elif args.study == "probe":

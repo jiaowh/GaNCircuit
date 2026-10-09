@@ -182,3 +182,12 @@ matched control reruns stock and V8 at the nominal point under another case name
 point) and must reproduce those reports' nominal overshoot and FET loss within 0.1 %. If it does not, the V8d075
 verdicts are reported as not comparable. Parallelism changes no case definition. The original chain (cmd PID 24040)
 is stopped by PID after the extraction process is confirmed independent of it.
+
+Switching run 2 (declared 9 October 2026 before its launch; run 1 was stopped for CPU oversubscription, see
+docs/build.md): at most 8 LTspice cases at once, as on 8 October. Process A: V8d075 nominal goals set, 4 jobs.
+Process B, one after another with 4 jobs each: the stock/V8 --vin 48 control, V8d075 --vin 40, --vin 60, --iout 0,
+then the switch-node capacitance sensitivity (`--csw stock=135 V8d075=188.84`: nominal ramp/step-Ls50 with that
+SW-to-GND capacitance; stock keeps the 135 pF estimate, V8d075 adds the computed +53.84 pF of
+`results/gan/epc90133-csw-dielectric.json`). Reading: a V8d075 goal whose verdict against stock (S1, S2, S3, S4, S6,
+S7, S8, S10 at the nominal point) differs between the plain and the -csw pair is reported as capacitance-sensitive,
+not as met. Unchanged: reproduction control within 0.1 %, scoring with stock and V8 from the 8 October reports.
