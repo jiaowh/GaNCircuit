@@ -3712,3 +3712,23 @@ apart from the added S5 (undetermined). Vendor model, V8 against stock: S1, S4, 
 (132.5 / 133.0 against 130.8 / 131.5 ns); S2, S8, S10-S13 not met; S5, S9 undetermined; all corner runs complete.
 The candidate page now opens on the vendor model and scrolls inside a window-height frame (pinned headers and name
 column, column jump bar, arrows, drag to pan).
+
+### Correction to the L4a note and later chat claims (review, 9 October 2026)
+
+An owner-supplied review found these statements overstated; each was checked against the repository:
+
+- The ideal low-side gate screen (1.28 / 1.10 V) is a screen, not a proven floor, and it exists only for EPC2302DS
+  at 50 pH (`epc90133-goals-G-ds-ctlls.json`); the vendor model, now primary, has it only at 0 pH (0.25-0.33 V).
+- S9 is not failed by a gate spike above 0.8 V: the assessor claims 'none' only below 0.8 V and otherwise reports
+  S9 undetermined (`assess_epc90133_goals.py`, S9 rule).
+- L3a moved the capacitors but not their return vias, so its +0.75 % does not bound L3b (capacitors, return vias
+  and bottom copper moved together). L3b is untested, not shown ineffective.
+- V8 + 0.075 mm (-27.6 % on variant A) is the largest reduction among the legal combinations screened, not the
+  maximum within the constraints. It has no G extraction or goals run, so no overall goal ranking against other
+  directions exists.
+- A lower simulated gate spike is a promising change, not a demonstrated hardware benefit; false turn-on and
+  driver-ground side effects are unvalidated.
+- The combined-stack declaration gated G runs at 45 % (`plans/goal-targets-2026-10-08.md`); -27.6 % failed it. A full
+  run of V8 + 0.075 mm therefore needs its own new declaration, labelled as after that gate's result.
+
+The pause decision rests mainly on L4a's implementation cost (blocked top-layer route, driver-ground redesign).

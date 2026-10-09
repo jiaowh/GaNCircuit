@@ -124,8 +124,10 @@ S8's 0.5 V, because of the assumed package inductance.
 **What they do not show.** These screens cover particular families of changes. They do not prove that no permitted
 layout meets the goals. A low-side driver return redesign (L4a) was examined on 9 October. On the top layer, the
 low-side gate probe connection blocks a direct return to the transistor's source. A separate return would need a
-driver-ground redesign on an inner layer, plus a new via-editing tool. Under the ideal-connection result above, it
-could lower the gate spike but not to S8's limit. It was not built.
+driver-ground redesign on an inner layer, plus a new via-editing tool, so it was not built. Its benefit is
+uncertain: the ideal-connection screen above suggests the spike would stay above S8's limit, but it is a screen, not a
+proven floor, and it was run with EPC2302DS only. Moving the capacitors together with their return vias (L3b) is
+untested.
 
 ## 5. What depends on assumptions
 

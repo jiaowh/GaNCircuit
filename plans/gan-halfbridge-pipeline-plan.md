@@ -510,8 +510,10 @@ only: its declared extraction control failed. See the audit note of 9 October in
 the build notes.
 
 **Layout search paused (owner, 9 October 2026).** The L4a low-side return was inspected and not
-built: a realizable return cannot be expected to meet S8/S9 under the assumed 50 pH, and it needs
-a driver-ground redesign plus an add-via primitive. Closing simulation-only report:
+built, mainly for implementation cost: the low-side gate probe connection blocks a top-layer return, and an
+inner-layer return needs a driver-ground redesign plus an add-via primitive. Its benefit is uncertain: the
+ideal-gate screen (EPC2302DS, 50 pH; not run with the vendor model at 50 pH) is a screen, not a proven floor.
+L3b is parked as untested. Closing simulation-only report:
 [simulation report](../docs/simulation-report-2026-10-09.md). Next: board identity and equipment (item 1).
 
 **Work selection and stopping.** Before any additional study, name the decision
