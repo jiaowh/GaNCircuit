@@ -1,0 +1,539 @@
+{
+  "schema": "project-audit/1",
+  "reviewed_commit": "274cd46",
+  "date": "2026-10-09",
+  "scope": "Retrospective, solver-free audit of 274cd46. Does not modify prior evidence.\n\nBudget: stored JSON/matrix reads, one goals-assessor replay, selected probe metric\nrecomputation and in-memory fault probes; no LTspice/FastHenry/geometry runs.\nWrites separate audit evidence and ignored scratch. Checks are audit checks, not\nnew acceptance criteria for the historical studies.\n",
+  "script_sha256": "089a8e185db8efe58441717672a78093bc27cfa1e8de85f1a9b46cb74fc1d487",
+  "case_counts": {
+    "results/gan/epc90133-goals-G-ds.json": {
+      "total": 44,
+      "usable": 43,
+      "unusable": [
+        "V8@ramp-Ls50-gear-l0.9-ds"
+      ]
+    },
+    "results/gan/epc90133-goals-G-ds-v40.json": {
+      "total": 4,
+      "usable": 4,
+      "unusable": []
+    },
+    "results/gan/epc90133-goals-G-ds-v60.json": {
+      "total": 4,
+      "usable": 4,
+      "unusable": []
+    },
+    "results/gan/epc90133-goals-G-ds-i0.json": {
+      "total": 4,
+      "usable": 4,
+      "unusable": []
+    },
+    "results/gan/epc90133-goals-G-ds-ctlls.json": {
+      "total": 2,
+      "usable": 2,
+      "unusable": []
+    },
+    "results/gan/epc90133-switching-probe-j33-ds.json": {
+      "total": 2,
+      "usable": 2,
+      "unusable": []
+    }
+  },
+  "model_checks": {
+    "D0_machinery": "pass",
+    "D1_fig7": "pass",
+    "D2_curves": "pass",
+    "D3_table": "pass",
+    "D4_charge_cycle": "pass",
+    "D5_domain": "pass"
+  },
+  "hash_checks": [
+    {
+      "file": "scripts\\epc9097_switching.py",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+      "actual": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\V8\\extraction\\G-m1-mid-V8.json",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a",
+      "actual": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\stock\\extraction\\G-m1-mid-stock.json",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7",
+      "actual": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7"
+    },
+    {
+      "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+      "actual": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea"
+    },
+    {
+      "file": "results\\gan\\epc2302-ds-variant.json",
+      "source": "results/gan/epc90133-goals-G-ds.json",
+      "matches": true,
+      "expected": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+      "actual": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f"
+    },
+    {
+      "file": "scripts\\epc9097_switching.py",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+      "actual": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\V8\\extraction\\G-m1-mid-V8.json",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a",
+      "actual": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\stock\\extraction\\G-m1-mid-stock.json",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7",
+      "actual": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7"
+    },
+    {
+      "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+      "actual": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea"
+    },
+    {
+      "file": "results\\gan\\epc2302-ds-variant.json",
+      "source": "results/gan/epc90133-goals-G-ds-v40.json",
+      "matches": true,
+      "expected": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+      "actual": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f"
+    },
+    {
+      "file": "scripts\\epc9097_switching.py",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+      "actual": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\V8\\extraction\\G-m1-mid-V8.json",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a",
+      "actual": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\stock\\extraction\\G-m1-mid-stock.json",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7",
+      "actual": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7"
+    },
+    {
+      "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+      "actual": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea"
+    },
+    {
+      "file": "results\\gan\\epc2302-ds-variant.json",
+      "source": "results/gan/epc90133-goals-G-ds-v60.json",
+      "matches": true,
+      "expected": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+      "actual": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f"
+    },
+    {
+      "file": "scripts\\epc9097_switching.py",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+      "actual": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\V8\\extraction\\G-m1-mid-V8.json",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a",
+      "actual": "d207f7321050978dd03f95d6214ec0a552ac1bfd484f33bd9f78ff892d7a6e3a"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\stock\\extraction\\G-m1-mid-stock.json",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7",
+      "actual": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7"
+    },
+    {
+      "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+      "actual": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea"
+    },
+    {
+      "file": "results\\gan\\epc2302-ds-variant.json",
+      "source": "results/gan/epc90133-goals-G-ds-i0.json",
+      "matches": true,
+      "expected": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+      "actual": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f"
+    },
+    {
+      "file": "scripts\\epc9097_switching.py",
+      "source": "results/gan/epc90133-goals-G-ds-ctlls.json",
+      "matches": true,
+      "expected": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+      "actual": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "results/gan/epc90133-goals-G-ds-ctlls.json",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "results/gan/epc90133-goals-G-ds-ctlls.json",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "vendor\\epc\\epc90133\\reconstruction\\export\\stock\\extraction\\G-m1-mid-stock.json",
+      "source": "results/gan/epc90133-goals-G-ds-ctlls.json",
+      "matches": true,
+      "expected": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7",
+      "actual": "640040324c9d10335c6c04877990837d92a9ab8d9de09d739ef3d219a952b8f7"
+    },
+    {
+      "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+      "source": "results/gan/epc90133-goals-G-ds-ctlls.json",
+      "matches": true,
+      "expected": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+      "actual": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea"
+    },
+    {
+      "file": "results\\gan\\epc2302-ds-variant.json",
+      "source": "results/gan/epc90133-goals-G-ds-ctlls.json",
+      "matches": true,
+      "expected": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+      "actual": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f"
+    },
+    {
+      "file": "scripts\\epc9097_switching.py",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+      "actual": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "results\\gan\\epc90133-extraction\\G-m1-mid.json",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "d1b5a9adc1e6ea24a0835de25cce0663acb3bd097ff4cd75a4e5f02d31cb2693",
+      "actual": "d1b5a9adc1e6ea24a0835de25cce0663acb3bd097ff4cd75a4e5f02d31cb2693"
+    },
+    {
+      "file": "results\\gan\\epc90133-extraction\\G-m1-mid-j33.json",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "529e1d8f129f7dfe2756794035629b86f66bf909c71dd2904ad4577074940645",
+      "actual": "529e1d8f129f7dfe2756794035629b86f66bf909c71dd2904ad4577074940645"
+    },
+    {
+      "file": "vendor\\epc\\derived\\EPC2302DS.lib",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea",
+      "actual": "2ce90d2b7a2df23faf1ff19a2eba52fa1ad13f86ac2bde84b963c81ca081aeea"
+    },
+    {
+      "file": "results\\gan\\epc2302-ds-variant.json",
+      "source": "results/gan/epc90133-switching-probe-j33-ds.json",
+      "matches": true,
+      "expected": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f",
+      "actual": "750a6272a151afdd0415cee09cc4c7ffd59f26972d832f6f3e5ddccdbf34347f"
+    },
+    {
+      "file": "scripts\\assess_epc90133_goals.py",
+      "source": "epc90133-goals-assessment-ds.json",
+      "matches": true,
+      "expected": "e440dffc0be8016158e91c35ededfc8ffcf8e632fe9eb4c3cca414ea20a38ad7",
+      "actual": "e440dffc0be8016158e91c35ededfc8ffcf8e632fe9eb4c3cca414ea20a38ad7"
+    },
+    {
+      "file": "results\\gan\\epc90133-goals-G-ds.json",
+      "source": "epc90133-goals-assessment-ds.json",
+      "matches": true,
+      "expected": "7059791cd1dbe1df1ec62b1fe0d78a6ff29ef63130c4bca94cfb23a1f0b58f86",
+      "actual": "7059791cd1dbe1df1ec62b1fe0d78a6ff29ef63130c4bca94cfb23a1f0b58f86"
+    },
+    {
+      "file": "results\\gan\\epc90133-goals-G-ds-v40.json",
+      "source": "epc90133-goals-assessment-ds.json",
+      "matches": true,
+      "expected": "2de1be267e95048032bbcd669fcbbf2146745351756d06a7a8eb20c138f2a043",
+      "actual": "2de1be267e95048032bbcd669fcbbf2146745351756d06a7a8eb20c138f2a043"
+    },
+    {
+      "file": "results\\gan\\epc90133-goals-G-ds-v60.json",
+      "source": "epc90133-goals-assessment-ds.json",
+      "matches": true,
+      "expected": "5f1d946bf7ab963b75becb949017cfb36e5eca9d2411f6c37a89a649288af35d",
+      "actual": "5f1d946bf7ab963b75becb949017cfb36e5eca9d2411f6c37a89a649288af35d"
+    },
+    {
+      "file": "results\\gan\\epc90133-goals-G-ds-i0.json",
+      "source": "epc90133-goals-assessment-ds.json",
+      "matches": true,
+      "expected": "eca1b5eb9d7f359d6ebd963ef220f854ebc4b3b9996d74f91726eb461036ff0d",
+      "actual": "eca1b5eb9d7f359d6ebd963ef220f854ebc4b3b9996d74f91726eb461036ff0d"
+    },
+    {
+      "file": "scripts\\epc90133_probe_reference.py",
+      "source": "epc90133-probe-reference-j33-ds.json",
+      "matches": true,
+      "expected": "dba0973006800c6366664522f9490ce9576f3f8d84eb86acd203043d5fc2d797",
+      "actual": "dba0973006800c6366664522f9490ce9576f3f8d84eb86acd203043d5fc2d797"
+    },
+    {
+      "file": "results\\gan\\epc90133-switching-probe-j33-ds.json",
+      "source": "epc90133-probe-reference-j33-ds.json",
+      "matches": true,
+      "expected": "f41705f27ee4b530bbac9cd2bf28fea27dfee0149c35c705ff42ed9f2dcff7fb",
+      "actual": "f41705f27ee4b530bbac9cd2bf28fea27dfee0149c35c705ff42ed9f2dcff7fb"
+    },
+    {
+      "file": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\results\\gan\\epc90133-qsg-fig9.json",
+      "source": "epc90133-probe-reference-j33-ds.json",
+      "matches": true,
+      "expected": "696004faf53cf39558aba134f303d5ae920554585d5222b1b40b09e597a7d25b",
+      "actual": "696004faf53cf39558aba134f303d5ae920554585d5222b1b40b09e597a7d25b"
+    },
+    {
+      "file": "scripts\\epc2302_ds_variant.py",
+      "source": "model",
+      "matches": true,
+      "expected": "60862291be6e5a2f96d7b352f3fa85f74e2b6f76f26748ea4972383ecc5fe63d",
+      "actual": "60862291be6e5a2f96d7b352f3fa85f74e2b6f76f26748ea4972383ecc5fe63d"
+    },
+    {
+      "file": "scripts\\epc2302_baseline.py",
+      "source": "model",
+      "matches": true,
+      "expected": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+      "actual": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db"
+    },
+    {
+      "file": "scripts\\epc2302_curve_benches.py",
+      "source": "model",
+      "matches": true,
+      "expected": "c9fa38cfebe1515063a68b381996a90e57e475b7ae43a963c46c585e5b0a9bc6",
+      "actual": "c9fa38cfebe1515063a68b381996a90e57e475b7ae43a963c46c585e5b0a9bc6"
+    },
+    {
+      "file": "scripts\\compare_epc2302_curves.py",
+      "source": "model",
+      "matches": true,
+      "expected": "e741ae45e277b69a9955f730ef8b92962ab141e59a5c78f53774119663ec4d6c",
+      "actual": "e741ae45e277b69a9955f730ef8b92962ab141e59a5c78f53774119663ec4d6c"
+    },
+    {
+      "file": "scripts\\compare_epc2302_gate_charge.py",
+      "source": "model",
+      "matches": true,
+      "expected": "c42c820cc72c0d3b4ad09a7414885867a523155124cfbc18c602140f9cd2a3e8",
+      "actual": "c42c820cc72c0d3b4ad09a7414885867a523155124cfbc18c602140f9cd2a3e8"
+    },
+    {
+      "file": "scripts\\epc2302_qg_variant.py",
+      "source": "model",
+      "matches": true,
+      "expected": "f65f9b20350c0a49841cd8e5eb1783da14a0ef7671bf8a3e15f3130ddb1c3a27",
+      "actual": "f65f9b20350c0a49841cd8e5eb1783da14a0ef7671bf8a3e15f3130ddb1c3a27"
+    },
+    {
+      "file": "scripts\\epc2204_baseline.py",
+      "source": "model",
+      "matches": true,
+      "expected": "d11c193b89a9756700acb73a01cf0ef457a95a2a8581e83f4ae2a20d06cd02f9",
+      "actual": "d11c193b89a9756700acb73a01cf0ef457a95a2a8581e83f4ae2a20d06cd02f9"
+    },
+    {
+      "file": "scripts\\compare_epc2204_curves.py",
+      "source": "model",
+      "matches": true,
+      "expected": "0e8d2d02f50b2d496b16c4abc8ee63f10d38f0a24b8e66e0ec212cab72154162",
+      "actual": "0e8d2d02f50b2d496b16c4abc8ee63f10d38f0a24b8e66e0ec212cab72154162"
+    },
+    {
+      "file": "scripts\\compare_epc2204_gate_charge.py",
+      "source": "model",
+      "matches": true,
+      "expected": "8e28bddabaa4b491dc1630850b9d342a457e3a9d14342da3a4b018dad3d8781f",
+      "actual": "8e28bddabaa4b491dc1630850b9d342a457e3a9d14342da3a4b018dad3d8781f"
+    },
+    {
+      "file": "src\\circuit_tools\\ltspice.py",
+      "source": "model",
+      "matches": true,
+      "expected": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+      "actual": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea"
+    },
+    {
+      "file": "results\\gan\\epc2302-baseline.json",
+      "source": "model",
+      "matches": true,
+      "expected": "a6546383969a312e96e7ff401899d0130ba75255af9192c24f0578954d00abc6",
+      "actual": "a6546383969a312e96e7ff401899d0130ba75255af9192c24f0578954d00abc6"
+    }
+  ],
+  "goals_replay": {
+    "returncode": 0,
+    "stdout": "V8 S1:Y S2:n S3:n S4:Y S6:n S7:Y S8:n S9:- S10:n S12:n S11:n S13:n\n  ramp-Ls50  Vpk  59.5 os 11.33 settle 133.2 ns tr 1.79 tf 4.25 di/dt  37.5 Q2g 1.85 E  5.73 uJ eff 99.124\n  step-Ls50  Vpk  58.6 os 10.38 settle 130.3 ns tr 1.87 tf 4.33 di/dt  30.9 Q2g 1.56 E  5.97 uJ eff 99.123\nstock S1:Y S2:n S3:Y S4:Y S6:Y S7:Y S8:n S9:- S10:n S12:n S11:n S13:n\n  ramp-Ls50  Vpk  59.3 os 11.15 settle 131.5 ns tr 1.73 tf 4.24 di/dt  38.0 Q2g 1.93 E  5.70 uJ eff 99.128\n  step-Ls50  Vpk  58.7 os 10.47 settle 132.2 ns tr 1.83 tf 4.32 di/dt  29.9 Q2g 1.64 E  5.94 uJ eff 99.126\n",
+    "stderr": "",
+    "designs_identical": true
+  },
+  "fault_probes": {
+    "goals_scores_interpretation_invalid_case": true,
+    "empty_goal_set_combines_to_pass": true
+  },
+  "goals_verdict_keys": [
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S6",
+    "S7",
+    "S8",
+    "S9",
+    "S10",
+    "S12",
+    "S11",
+    "S13"
+  ],
+  "j33_extraction": {
+    "matrix_kind": "Impedance",
+    "matrix_sha256": "e6731b56c2102b3090990730ab7b0eacdd2d089365c92284a170263573759cc6",
+    "port_order_matches": true,
+    "relative_matrix_error": 0.0,
+    "loop_L_relative_change": -0.011953167219360794,
+    "declared_control_limit": 0.005
+  },
+  "probe_replay": {
+    "saved_j33": {
+      "rise_s": 2.0015103983596034e-09,
+      "overshoot_V": 9.223908999999992,
+      "ring_Hz": 262836411.27288345,
+      "zeta": 0.02479134107714835,
+      "fall_s": 3.997029403755091e-09,
+      "undershoot_V": 3.133954375,
+      "rising_shape": {
+        "pre_edge_V": 9.28340722518978
+      },
+      "falling_shape": {
+        "plateau_V": -1.11945,
+        "dip_below_plateau_V": 2.02335
+      }
+    },
+    "saved_q2": {
+      "rise_s": 1.7131086886159007e-09,
+      "overshoot_V": 11.217455125,
+      "ring_Hz": 262830966.2747465,
+      "zeta": 0.024802522866016873,
+      "fall_s": 3.9848380887148596e-09,
+      "undershoot_V": 2.68729675,
+      "rising_shape": {
+        "pre_edge_V": 7.618463745835664
+      },
+      "falling_shape": {
+        "plateau_V": -1.4576500000000001,
+        "dip_below_plateau_V": 1.2337499999999997
+      }
+    },
+    "fig9_overshoot_V": 5.698080279232109,
+    "recomputed_j33_overshoot_V": 9.223908999999992,
+    "recomputed_j33_zeta": 0.02479134107714835,
+    "fraction_of_gap_closed": 0.3611905660889487
+  }
+}

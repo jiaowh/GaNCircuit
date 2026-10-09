@@ -3571,3 +3571,34 @@ weakened: location accounts for part of the gap, not all, and none of the dampin
 4.9-6.7 V but with a 2.5 ns rise and a high pre-edge level, unlike Fig. 9. Remaining candidates for the rest: the
 probe's own loading/ground lead, the real package inductance, and loss mechanisms (output-capacitance loss,
 high-frequency copper resistance) that the model lacks.
+
+### Audit of the 8 October model, goals and J33 work (9 October 2026)
+
+Reviewed `274cd46` and the preceding 8 October work against the saved declarations,
+code and evidence. Report: `docs/project-audit-274cd46.md`; separate evidence:
+`results/gan/project-audit-274cd46.json`. Replay from the repository root:
+`python scripts/audit_epc90133_2026_10_09.py`. This is a retrospective audit, not a
+new simulation study or amendment of the original acceptance criteria.
+
+The J33 arithmetic reproduces: 11.2175 V at Q2, 9.2239 V at J33, 5.6981 V in the
+digitized figure, hence 36.1% of the gap removed. The extraction control still
+fails (-1.1953% versus 0.5%), and damping is unchanged within this comparison.
+All 60 checked recorded hash references match. The goals scorer reproduces the
+saved design records exactly; the four assessment inputs contain 55/56 usable
+cases, correcting the 51/52 count above (57/58 including the separate ideal-gate
+screen). The same V8/ramp/Ls50/x0.9 corner remains unusable and undetermined.
+The single-job impedance parse reproduces the saved matrix; 10 targeted Fig. 9
+comparison tests pass. No physical solver, geometry export or model fit was run.
+
+The audit finds that uniform inductance scaling and the ideal-gate screen do not
+prove every legal layout infeasible. FET-only efficiency cannot close the total
+converter-efficiency goal. Similar vendor/DS waveforms exclude only this tested
+gate-charge correction as a remedy, not every device-model contribution. A known
+probe-point measurement would constrain the causes, not uniquely identify package
+inductance and losses. The goals assessor ignores interpretation-invalid flags and
+omits undecided S5 from its all-met aggregation; current V8 failures are unchanged,
+but these defects prevent using it as a general acceptance gate. Missing dependency
+bindings and stale continuity summaries are listed in the report for bounded repair.
+
+Prior reports and production scripts are unchanged. Audit scratch is in ignored
+`runs/audit-274cd46/`. Measurement readiness remains the priority and G3 stays open.
