@@ -322,3 +322,21 @@ T5): board solves use conjugate gradient with a diagonal preconditioner (relativ
 a direct LU, whose fill on the 500,000-node board ran for over 10 minutes and 2 GB without finishing a case; on the
 0.4 mm grid both give the same answer to 1e-11. Self-tests T2/T3 keep the LU and still pass. No definition, input or
 check changes. T4's second cell size is 0.127 mm as declared (factor 5).
+
+### Common-source screen (declared 10 October 2026, about 22:30, before its first run; owner request)
+
+Question: can a cheap run tell, before a 5-6 h G extraction, whether a gate-return candidate changes Q2's board
+common-source inductance as intended? (K1's frozen prediction, at least -30 %, failed at -2.9 %.) Method
+(`scripts/epc90133_cs_screen.py`): the candidate's G FastHenry deck unchanged (same mesh, vias and terminal ties)
+except its 47 ports, replaced by the shorts that `g_summary` applies afterwards (every capacitor VIN to GND, Q2.D to
+Q2.S46, Q1.S2 to Q1.S46, Q2.S2 to Q2.S46) as `.equiv` lines, and three ports: Q1.D-Q1.S46 (loop), U80.GND-Q2.S46,
+U80.PH-Q1.S46. L_loop = Im Z11 / w; L_cs = Im Z21 (Z31) / w, the open-terminal voltage per ampere of loop current,
+which is g_summary's definition; for a linear network this reduction is exact, so differences come from the
+solver's 1e-3 iterative tolerance only. Gate-net copper stays in the deck and carries no current, as in g_summary.
+Acceptance (both stock and K1, against their G reports: stock 0.25274 nH / 48.02 pH, K1 0.25247 nH / 46.64 pH):
+L_loop and L_cs(Q2) each within 1 %, and the K1 - stock change of L_cs(Q2) within 0.3 pH of -1.39 pH. The sign
+convention is read on stock (FastHenry's port orientation), not tuned. Run time recorded. One job at a time beside
+K2's G extraction (two heavy WSL jobs, about 2.5 GB each). If it passes: it becomes a pre-check for candidates whose
+mechanism is common-source inductance; it says nothing about switching (gate peak, settling), which still needs G
+and LTspice. If it fails: recorded, not used. K2's screen value is then frozen before K2's G result as its first
+blind test.
