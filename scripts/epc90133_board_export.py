@@ -176,6 +176,12 @@ CASES.update({
     # copper (top) and the bottom layer.
     "K2": CASES["K1"] + [("antipad", x, y, EPC_ANTIPAD_R, ("In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu"))
                          for x, y in ((15.429, 27.201), (15.592, 26.200), (15.603, 28.549))],
+})
+CASES.update({
+    # P1 (free-placement study, declared 10 October 2026 before its build; owner: parts may move anywhere viable):
+    # the outlying input capacitor Ci7 moved into the free Ci-row slot at x = 24.15 (row pitch 1.30 mm), whose vias
+    # follow the same pattern as an occupied slot (filled, plated-over vias: via-in-pad allowed by EPC's fab note).
+    "P1": [("move_footprint", "Ci7", -2.70, 0.0)],
 })  # retrospective amendment after X0 run 1
 
 

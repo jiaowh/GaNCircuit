@@ -1,0 +1,66 @@
+{
+ "schema": "epc90133-board-export-candidate/1",
+ "case": "P1",
+ "evaluator_sha256": "38caf0a7a7883f36011f466930ff526041f9e727961f6321315caafaf119351a",
+ "edits": [
+  [
+   "move_footprint",
+   "Ci7",
+   -2.7,
+   0.0
+  ]
+ ],
+ "edit_log": [
+  {
+   "op": [
+    "move_footprint",
+    "Ci7",
+    -2.7,
+    0.0
+   ],
+   "footprint_line": 416,
+   "silk_moved": 2
+  }
+ ],
+ "manifest_sha256": "0eb7c2e8927c94441f4247fb41abb6e75eb41effb5a94a74cbd7e9ebcd340041",
+ "stock_manifest_sha256": "1c68807a5c3c9688f9ce8b74f65491d39dfd8c7e6fde3af028eba25138a8e00f",
+ "L1_drc": {
+  "types": {
+   "isolated_copper": 13,
+   "silk_edge_clearance": 4,
+   "padstack": 1,
+   "lib_footprint_issues": 106,
+   "silk_over_copper": 3
+  },
+  "unconnected": 0,
+  "clearance_below_rule": 0,
+  "pass": false,
+  "new_types": [
+   "silk_over_copper"
+  ]
+ },
+ "L2_nets": {
+  "differences": [],
+  "pass": true
+ },
+ "L3_power_loop": {
+  "checks": {
+   "C1_paste_on_mask_open_copper": false,
+   "C2_Q1_seven_contacts_unique_orientation": true,
+   "C3_Q1_pin_centres_within_0.03mm": true,
+   "C4_Q1_pin_nets": true,
+   "C2_Q2_seven_contacts_unique_orientation": true,
+   "C3_Q2_pin_centres_within_0.03mm": true,
+   "C4_Q2_pin_nets": true,
+   "C4_gates_on_different_nets": true,
+   "C5_Ci_pairs_one_vin_one_gnd": false,
+   "C5_Cm_pairs_one_vin_one_gnd": true
+  },
+  "pass": false
+ },
+ "L4_extraction": {
+  "pass": false
+ },
+ "accepted": false,
+ "outcome": "rejected (acceptance)"
+}

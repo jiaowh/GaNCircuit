@@ -3973,7 +3973,7 @@ goals assessor's efficiency.
 Declared in `plans/goal-targets-2026-10-08.md` (commit 93c362a, plus the pre-result solver change noted there).
 `scripts/epc90133_thermal.py`: steady-state conduction on a 0.2 mm cell grid (8 copper planes, laminate between,
 plated-hole barrels), FET junction nodes through EPC's R_thJB 1.5 K/W and R_thJC 0.2 K/W, the copper-loss map from
-`epc90133_copper_loss.py --map`, R_ds(T) from datasheet Fig. 9 iterated to 0.05 K. Replay: `runs/thermal/run-layouts.sh`
+`epc90133_copper_loss.py --map`, R_ds(T) from datasheet Fig. 9 iterated to 0.05 K. Replay: `scripts/epc90133_thermal_runs.sh`
 (copper maps first: `EPC90133_GERBER_EXPORT=<export> python scripts/epc90133_copper_loss.py --tag scratch-<b>
 --factors 8 --map runs/thermal/copper-heat-<b>-route-f8.npz`, then delete the scratch JSON). About 1 min per case.
 
@@ -4004,3 +4004,21 @@ K2 waits for its switching result. Limits: cooling coefficient and spreader resi
 connectors, inductor (L1 TBD in the BOM) and other parts excluded; switching and dead-time loss temperature-
 independent; package thermal resistances from the datasheet, not this board. No hardware temperature is predicted
 with a stated uncertainty.
+
+### Free-placement study: preparation and P1 (10-11 October 2026)
+
+Declared in `plans/goal-targets-2026-10-08.md` ("Free-placement study"), after the owner's correction that part
+positions are not limited to 1 mm. Loop split from existing G reports (`scripts/epc90133_loop_split.py`,
+`results/gan/epc90133-loop-split.json`; no solver run): stock 252.7 pH = VIN copper 18.1 (7 %), SW copper 54.2
+(21 %), GND return under both FETs 180.4 (71 %); V8 168.0, V8d075 142.7, K1 179.9 pH in the GND section. Capacitor
+placement acts on a small part of the loop; S2 needs about 45 % less.
+
+**P1 run 1 REJECTED by acceptance** (`results/gan/epc90133-board-export-P1.json`, log `runs/board-export-P1.log`,
+package `export/P1`): Ci7 moved -2.70 mm into the empty Ci-row slot at x = 24.15. L2 nets pass, no unconnected
+items, nothing below the clearance rule; but L1 shows a new DRC type (silk_over_copper, 3) and L3 fails C5 (Ci7 has
+one detected pad). Cause: EPC's slot lies inside an existing solder-mask opening over VIN copper (about x 23.5-26.2,
+y below 33.0-34.3; stock's one clipped contact in the Ci window), so the moved VIN pad is not mask-defined: it
+merges with that opening (detected region 2.2 mm^2 touching the window edge) and solder could spread onto the
+exposed copper and vias. A mask-edit primitive would be needed; with P1's frozen prediction at 0 to -2 % A loop L
+(below the 4 % threshold) it is not built. P1 stops here; no extraction was run. The common-source screen (stock,
+K1) was still running at this point.
