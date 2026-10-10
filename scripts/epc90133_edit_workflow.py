@@ -360,6 +360,41 @@ def apply_edits(text, edits, geo):
                         reworked[lay] += 1
             lines = "".join(lines).splitlines(keepends=True)
             log.append({"op": [op[0], len(pts), r_ap], "vias_removed": len(removed), "holes_reworked": dict(reworked)})
+        elif op[0] == "add_via":
+            # Candidate K1 (10 October 2026, declared in plans/goal-targets-2026-10-08.md before its build): a new
+            # through via of an existing net, written like the board's own vias (pads only where copper connects),
+            # and a round keep-out of radius r_ap (EPC's inner antipad) on each listed layer, because the planes keep
+            # only the hole clearance (0 in this project) from a padless barrel (see remove_vias).
+            _, x, y, size, drill, net, ap_layers, r_ap = op
+            num = re.search(rf'\(net (\d+) "{re.escape(net)}"\)', "".join(lines))
+            if not num:
+                raise SystemExit(f"add_via: net {net} not on the board")
+            kx, ky = to_kicad(x, y)
+            near = [ln for ln in lines if (m := re.match(r"\t\(via \(at ([-\d.]+) ([-\d.]+)\)", ln))
+                    and abs(float(m.group(1)) - kx) < 0.3 and abs(float(m.group(2)) - ky) < 0.3]
+            if near:
+                raise SystemExit(f"add_via ({x}, {y}): an existing via lies within 0.3 mm")
+            via = (f'\t(via (at {kx:.6f} {ky:.6f}) (size {size:g}) (drill {drill:g}) (layers "F.Cu" "B.Cu") '
+                   f'(remove_unused_layers yes) (keep_end_layers yes) (net {num.group(1)}) (uuid "{uuid.uuid4()}"))\n')
+            first = next(i for i, ln in enumerate(lines) if ln.startswith("\t(via "))
+            lines.insert(first, via)
+            for lay in ap_layers:
+                lines.insert(len(lines) - 1, keepout_line(lay, Point(x, y).buffer(r_ap, 16)))
+            log.append({"op": [op[0], x, y, size, drill, net, list(ap_layers), r_ap], "net_number": int(num.group(1))})
+        elif op[0] == "add_track":
+            # K1 build run 3 (10 October 2026, RETROSPECTIVE after run 2's DRC): a via joined only through rebuilt
+            # zones (no frozen fill at load) was given the surrounding zone's net (GND) by KiCad, so the new via is
+            # tied to its net's pads by ordinary tracks. Points in EPC millimetres; width in mm.
+            _, lay, net, pts, width = op
+            num = re.search(rf'\(net (\d+) "{re.escape(net)}"\)', "".join(lines))
+            if not num:
+                raise SystemExit(f"add_track: net {net} not on the board")
+            first = next(i for i, ln in enumerate(lines) if ln.startswith("\t(via "))
+            for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+                (a0, b0), (a1, b1) = to_kicad(x0, y0), to_kicad(x1, y1)
+                lines.insert(first, f'\t(segment (start {a0:.6f} {b0:.6f}) (end {a1:.6f} {b1:.6f}) (width {width:g}) '
+                                    f'(layer "{lay}") (net {num.group(1)}) (uuid "{uuid.uuid4()}"))\n')
+            log.append({"op": [op[0], lay, net, [list(q) for q in pts], width], "segments": len(pts) - 1})
         elif op[0] == "reshape":
             _, lay, net, add, cut = op
             lines, info = reshape(lines, lay, net, add and sbox(*add), cut and sbox(*cut))
@@ -461,7 +496,9 @@ def reshape(lines, layer, net, add, cut):
                 info["other_net_zones_cut"] += 1
         for i, ln, p in zones:
             if is_keepout(ln) and p.intersects(add):
-                rest = p.difference(add)
+                # K1 build run 1 (10 October 2026) crashed here on a self-touching stock-hole keep-out (GEOS side
+                # location conflict); RETROSPECTIVE robustness fix: invalid outlines are repaired (buffer(0)) first.
+                rest = (p if p.is_valid else p.buffer(0)).difference(add)
                 new[i] = [keepout_line(layer, q) for part in polygons(rest) for q in split_holes(part) if q.area >= 1e-6]
                 info["keepouts_trimmed"] += 1
         kept = []

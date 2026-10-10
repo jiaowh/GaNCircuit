@@ -1,0 +1,181 @@
+{
+ "schema": "epc90133-board-export-candidate/1",
+ "case": "K1",
+ "evaluator_sha256": "8d094533bd942b360592b4a361eb4e2837f4f2389704538715e783bc78f1a4f3",
+ "edits": [
+  [
+   "reshape",
+   "F.Cu",
+   "NetJ2_1",
+   [
+    15.85,
+    26.7,
+    16.3,
+    27.05
+   ],
+   null
+  ],
+  [
+   "reshape",
+   "F.Cu",
+   "GND",
+   [
+    15.6,
+    25.8,
+    17.2,
+    26.44
+   ],
+   null
+  ],
+  [
+   "reshape",
+   "B.Cu",
+   "NetJ2_1",
+   [
+    15.95,
+    25.4,
+    16.25,
+    27.06
+   ],
+   null
+  ],
+  [
+   "add_via",
+   15.98,
+   26.88,
+   0.3488,
+   0.1981,
+   "NetJ2_1",
+   [
+    "In1.Cu",
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu"
+   ],
+   0.3275
+  ]
+ ],
+ "edit_log": [
+  {
+   "op": [
+    "reshape",
+    "F.Cu",
+    "NetJ2_1",
+    [
+     15.85,
+     26.7,
+     16.3,
+     27.05
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 2,
+   "keepouts_added": 0
+  },
+  {
+   "op": [
+    "reshape",
+    "F.Cu",
+    "GND",
+    [
+     15.6,
+     25.8,
+     17.2,
+     26.44
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 4,
+   "keepouts_added": 0
+  },
+  {
+   "op": [
+    "reshape",
+    "B.Cu",
+    "NetJ2_1",
+    [
+     15.95,
+     25.4,
+     16.25,
+     27.06
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 4,
+   "keepouts_added": 0
+  },
+  {
+   "op": [
+    "add_via",
+    15.98,
+    26.88,
+    0.3488,
+    0.1981,
+    "NetJ2_1",
+    [
+     "In1.Cu",
+     "In2.Cu",
+     "In3.Cu",
+     "In4.Cu",
+     "In5.Cu",
+     "In6.Cu"
+    ],
+    0.3275
+   ],
+   "net_number": 20
+  }
+ ],
+ "manifest_sha256": "e0b5bbc522728b58119c6869efe405d0354c78b81f600660de3ab7964398fb54",
+ "stock_manifest_sha256": "1c68807a5c3c9688f9ce8b74f65491d39dfd8c7e6fde3af028eba25138a8e00f",
+ "L1_drc": {
+  "types": {
+   "clearance": 1,
+   "solder_mask_bridge": 2,
+   "via_dangling": 1,
+   "isolated_copper": 13,
+   "silk_edge_clearance": 4,
+   "padstack": 1,
+   "lib_footprint_issues": 106
+  },
+  "unconnected": 2,
+  "clearance_below_rule": 1,
+  "pass": false,
+  "new_types": [
+   "clearance",
+   "solder_mask_bridge",
+   "via_dangling"
+  ]
+ },
+ "L2_nets": {
+  "differences": [],
+  "pass": true
+ },
+ "L3_power_loop": {
+  "checks": {
+   "C1_paste_on_mask_open_copper": false,
+   "C2_Q1_seven_contacts_unique_orientation": true,
+   "C3_Q1_pin_centres_within_0.03mm": true,
+   "C4_Q1_pin_nets": true,
+   "C2_Q2_seven_contacts_unique_orientation": true,
+   "C3_Q2_pin_centres_within_0.03mm": true,
+   "C4_Q2_pin_nets": true,
+   "C4_gates_on_different_nets": true,
+   "C5_Ci_pairs_one_vin_one_gnd": true,
+   "C5_Cm_pairs_one_vin_one_gnd": true
+  },
+  "pass": true
+ },
+ "L4_extraction": {
+  "pass": true
+ },
+ "accepted": false,
+ "outcome": "rejected (acceptance)"
+}

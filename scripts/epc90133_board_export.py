@@ -158,6 +158,17 @@ CASES.update({
     "V7": [("remove_vias", thin_list(["Q2"]), EPC_ANTIPAD_R)],
     "V8": [("remove_vias", thin_list(["Q1", "Q2"]), EPC_ANTIPAD_R)],
     "V9": [("remove_vias", thin_list(["Q1", "Q2"], keep_every=3), EPC_ANTIPAD_R)],
+    # Candidate K1 (declared 10 October 2026 before its build; plans/goal-targets-2026-10-08.md): Q2 Kelvin-style
+    # driver return on the top layer. The probe net NetJ2_1 (R22 pad 1 -> J22 pin 1) moves to B.Cu through one new
+    # via beside R22 pad 1; the freed top-layer gap becomes GND joining the driver's GND copper to Q2's source copper.
+    "K1": [("reshape", "F.Cu", "NetJ2_1", (15.85, 26.70, 16.30, 27.05), None),
+           ("reshape", "F.Cu", "GND", (15.60, 25.80, 17.20, 26.44), None),
+           ("reshape", "B.Cu", "NetJ2_1", (15.95, 25.40, 16.25, 27.06), None),
+           ("add_via", 15.98, 26.88, 0.3488, 0.1981, "NetJ2_1",
+            ("In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu"), EPC_ANTIPAD_R),
+           # Run 3 (RETROSPECTIVE after run 2's DRC: the via came out on GND): tracks tie the via to R22.1 and J22.1.
+           ("add_track", "F.Cu", "NetJ2_1", [(15.98, 26.88), (16.379, 26.90)], 0.25),
+           ("add_track", "B.Cu", "NetJ2_1", [(15.98, 26.88), (16.10, 26.75), (16.10, 25.30)], 0.30)],
 })  # retrospective amendment after X0 run 1
 
 

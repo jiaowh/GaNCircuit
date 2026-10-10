@@ -3899,3 +3899,29 @@ Linear programs over mixes of the saved directions (uniform board-L x0.9 / x1.1,
 Limits: linear superposition of separately simulated changes; uniform L scaling and the ideal stage are brackets,
 not layouts; a real geometry may move along directions not spanned here (for example a common-source change that
 keeps the gate loop's own inductance). No geometry candidate is built for the declared rule. No limit was changed.
+
+### Candidate K1: top-layer Kelvin-style low-side driver return (10 October 2026)
+
+Declared in `plans/goal-targets-2026-10-08.md` (post-result amendment allowing settling +5 %; owner instruction to
+seek the best achievable value for unreachable goals with practical, standard-fabrication designs). On stock: the
+probe net NetJ2_1 (R22 pad 1 -> J22 pin 1) moves to the bottom layer through one new via of the board's smallest size
+(0.3488 / 0.1981 mm) at (15.98, 26.88), beside R22 pad 1 (not in it), with EPC-size inner antipads (r 0.3275 mm); a
+0.25 mm top track joins the via to R22.1 and a 0.30 mm bottom track and strip join it to J22.1. The freed top-layer
+gap between R22 and J22 (y 25.80-26.44) becomes GND, joining the driver's GND copper (U80 ball A2, C80) directly to
+Q2's source-pad copper. New edit primitives `add_via` and `add_track` (`scripts/epc90133_edit_workflow.py`).
+
+Build history (all kept): run 1 crashed in `reshape` on a self-touching stock-hole keep-out
+(`runs/board-export-K1-run1-crashed.log`; RETROSPECTIVE robustness fix: invalid keep-outs repaired with buffer(0)
+before trimming). Run 2 REJECTED by DRC (`results/gan/epc90133-board-export-K1-run2-rejected.json`, package
+`export/K1-run2-rejected`): KiCad assigned the new via the surrounding zone's net (GND) at load because rebuilt zones
+carry no fill, giving a 0.025 mm clearance to R22.1, two mask bridges, a dangling via and two unconnected items.
+RETROSPECTIVE: tracks now tie the via to its pads (checked by a load-only IPC-D-356 export before the build).
+
+Run 3 ACCEPTED (`results/gan/epc90133-board-export-K1.json`): L1 DRC types as stock (0 unconnected, no shorts,
+nothing below the 0.150114 mm rule), L2 pad nets equal stock's, L3 power-loop checks as stock, L4 A extraction
+complete. Drill file: stock's 445 holes plus exactly the new 0.198 mm plated hole. Gate-loop checks K1-K5 pass on the
+export (terminal boxes within 0.005 mm of stock's, the route's usual representation difference). A loop inductance
+0.49242 against 0.49249 nH (-0.01 %): the power loop is untouched, as intended.
+
+G extraction and the nominal K1 switching pair launched 10 October 14:59 through WMI (`runs/K1-chain.ps1`,
+`runs/K1-chain.launch.json`; one FastHenry job, expected about 6.5 h, 15 h cap, stopped by PID only).
