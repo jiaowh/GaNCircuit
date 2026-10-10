@@ -3865,3 +3865,37 @@ not been isolated, so no attribution is claimed. S8 fails at every usable scored
 0.65 V at no load up to 2.21 V at 60 V), and V8d075's S13 corner failure alone rejects an all-goals pass; the
 timed-out cases cannot reverse it. V8 stays the provisional candidate; neither design is hardware-validated. As declared, no follow-up sweep is launched and the timed-out
 cases are not rerun. Candidate page republished with two with-capacitance rows compared with each other.
+
+### "Outperforms stock" rule: gate-return inspection and trade-off screen (10 October 2026)
+
+Rule (owner decision, declared in `plans/goal-targets-2026-10-08.md` before any result): under both drivers, every
+stock-relative goal quantity no more than 0.5 % worse than stock and Q2's gate peak at least 10 % lower.
+
+**Gate-return inspection (read-only, no solver).** On the top layer the driver's GND copper (U80 ball A2, C80, the
+driver vias at (15.43, 27.20), (15.59, 26.20), (15.60, 28.55)) is enclosed by the chain U80 LGL trace - R83 - VGl
+copper - R22 - NetJ2_1 trace - J22 (through-hole probe pin at about (16.05, 24.8)) - J2 (12.2, 23.5); the board's top
+GND reaches Q2's source pad only by a long detour. Every inner GND plane already joins the driver vias to Q2's source
+vias, so an inner-layer strip would still share the source vias' top-to-In1 segment with the power current (the part
+that thinner dielectric shortened in V8d075, -34 % common-source L). A top-layer Kelvin return needs the NetJ2_1 trace
+moved to another layer, i.e. a new via; the existing-via candidate stops as declared.
+
+**Trade-off screen** (`python scripts/epc90133_tradeoff_screen.py`, no field solver; result
+`results/gan/epc90133-tradeoff-screen.json`). One new switching pair first: the vendor-model ideal low-side gate
+stage at 50 pH, `stock@{ramp,step}-Ls50-gear-ctlls` (`results/gan/epc90133-goals-G-ctlls50.json`, about 2 min, both
+usable; log `runs/goals-G-ctlls50.log`). Against stock: Q2 gate peak -34.8 / -33.7 %, settling +12.6 / +15.2 %,
+overshoot +1.8 / +0.6 %, Eon + Eoff +0.4 / +0.3 % (ramp / step); the EPC2302DS stand-in gave nearly the same.
+Linear programs over mixes of the saved directions (uniform board-L x0.9 / x1.1, V8, ideal low-side gate):
+
+- The rule is **not feasible to first order**. With every other quantity within +0.5 %, the largest Q2 gate-peak
+  reduction is 2.5 %; no other quantity improves by more than 1.4 % (settling), overshoot and peak voltage not at all.
+- Every direction that lowers the gate peak lengthens settling (the gate coupling also damps the ring), and the
+  direction that shortens settling (lower loop L) raises Eon + Eoff and, under the ramp driver, overshoot.
+- Spike reduction against allowed settling increase (others within +0.5 %): +2 % -> 5.3 %, +5 % -> 10.1 %,
+  +10 % -> 10.7 % (then overshoot binds; with overshoot +1 %: 20 %). The 10 % mix is about 30 % of the ideal
+  gate-return effect with no loop-inductance reduction.
+- Even the ideal stage leaves Q2's peak at about 1.27 / 1.10 V, so S8 (< 0.5 V) is not reachable by board layout
+  under the assumed 50 pH.
+
+Limits: linear superposition of separately simulated changes; uniform L scaling and the ideal stage are brackets,
+not layouts; a real geometry may move along directions not spanned here (for example a common-source change that
+keeps the gate loop's own inductance). No geometry candidate is built for the declared rule. No limit was changed.
