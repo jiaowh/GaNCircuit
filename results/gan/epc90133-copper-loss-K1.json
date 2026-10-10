@@ -1,0 +1,73 @@
+{
+ "schema": "epc90133-copper-loss/1",
+ "evaluator_sha256": "bf837f04bd7cde2c864a9bd2bcd74fc8819705f99815c38ed5f2f7febf9ef483",
+ "geometry": {
+  "kind": "kicad_export",
+  "dir": "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\vendor\\epc\\epc90133\\reconstruction\\export\\K1",
+  "manifest_sha256": "7e4a5f6133a977c6c1a4f0729db51114624c36226fbe7cdf836845b685b61131",
+  "case": "K1",
+  "board_sha256": "756f15ab8c8c05c01330977bdfb5e54123208e5d5d07e895c076d3423eb17aee"
+ },
+ "tag": "K1",
+ "assumptions": {
+  "rho_ohm_m": 1.724e-08,
+  "t_cu_mm": 0.07111999999999999,
+  "barrel_wall_m": 1.9989800000000003e-05,
+  "VIN": 48.0,
+  "VOUT": 12.0,
+  "IOUT": 20.0,
+  "D": 0.25,
+  "ripple_pp_A": 16.363636363636363,
+  "ripple_factor": 1.0557851239669422,
+  "temperature_C": 20
+ },
+ "results": {
+  "4": {
+   "cell_mm": 0.1016,
+   "nets": {
+    "VIN": {
+     "cells": 265398,
+     "vias_used": 121,
+     "terminal_ties": {},
+     "loss_W": {
+      "Q1": 0.01690930290090617,
+      "Q2": 0.0025543282518266665,
+      "average": 0.006143071914096542
+     }
+    },
+    "SW": {
+     "cells": 126588,
+     "vias_used": 80,
+     "terminal_ties": {},
+     "loss_W": {
+      "Q1": 0.1049845643100106,
+      "Q2": 0.08403261372660752,
+      "average": 0.08927060137245829
+     }
+    },
+    "VOUT": {
+     "cells": 30297,
+     "vias_used": 1,
+     "terminal_ties": {},
+     "loss_W": {
+      "Q1": 0.06362362441811663,
+      "Q2": 0.06362362441811663,
+      "average": 0.06362362441811663
+     }
+    },
+    "GND": {
+     "cells": 1367064,
+     "vias_used": 159,
+     "terminal_ties": {},
+     "loss_W": {
+      "Q1": 0.020714504337440688,
+      "Q2": 0.027566493567716677,
+      "average": 0.025853496260147678
+     }
+    }
+   },
+   "total_W": 0.18489079396481914,
+   "total_with_ripple_W": 0.19520494982649295
+  }
+ }
+}

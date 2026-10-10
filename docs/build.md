@@ -3944,3 +3944,26 @@ isolated from the plane. G extraction and nominal pair launched 19:29 through WM
 S6 missed by +0.03 % di/dt (numerical-noise size, reported as the definition gives it). Reading: with the driver
 vias still joined to the planes, the new top bridge is in parallel with the plane path and carries power current,
 so it changes little; this is a hypothesis, tested by K2. Decision tree step 2 (spike-limited) applies: K2.
+
+### Board copper (DC conduction) loss, first calculation (10 October 2026)
+
+Owner question: the goals study's loss and efficiency (S12) are FET-only, so no board copper loss had been computed
+for any board. `python scripts/epc90133_copper_loss.py --tag <name>` (with EPC90133_GERBER_EXPORT for edited boards;
+no field solver, about 30 s): resistor-grid model of every copper layer of the VIN, SW, GND and VOUT nets (EPC stackup:
+all eight layers 2.80 mil), vias as plated barrels (EPC fab note: >= 0.787 mil wall), connector pins (J3 power
+header, J9 output) and pads (FETs, Ci/Cm, L1 lands 10.2 x 6.1 mm) as terminals; buck point 48 V -> 12 V, 20 A,
+D = 0.25, two conduction states; 20 C copper; ripple (16.4 A p-p with L1 2.2 uH at 250 kHz) as a +5.6 % factor.
+
+| Board | 0.2 mm cells | 0.1 mm cells | with ripple |
+|---|---|---|---|
+| stock (EPC Gerbers) | 0.182 W | 0.185 W | 0.196 W |
+| stock through the KiCad route | | 0.185 W | 0.196 W |
+| V8 (V8 + 0.075 mm has the same copper) | | 0.191 W | 0.202 W (+3.2 %, SW net +7 %) |
+| K1, K2 | | 0.185 W | 0.195 W |
+
+Breakdown (stock, 0.1 mm): SW copper 0.089 W, VOUT 0.064 W, GND 0.026 W, VIN 0.006 W. Copper loss is about 0.2 W
+against about 2.1 W FET loss: about 0.08 efficiency points at 240 W. Even zero copper loss would not reach S12's
++0.3 points; V8's extra 6 mW (0.003 points) does not change any ranking. Limits: DC model (skin depth at 250 kHz,
+130 um, exceeds the 71 um copper), pads and pins ideal equipotentials, capacitor pads of a net tied together,
+20 C (copper resistance rises 0.393 %/K), two cell sizes give sensitivity (1.8 %), not convergence. Not yet in the
+goals assessor's efficiency.
