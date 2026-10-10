@@ -223,3 +223,23 @@ route needs a new via, whole-driver ground isolation, cut source pads or moved p
 there. If feasible: the edit, its DRC/net/power-loop checks, one G extraction (planned from the 6.47 h V8d075 case,
 15 h cap), then the nominal stock/candidate pair under both drivers (4 cases plus a 50 ps check of deciding cases).
 Stop after that pair whatever the outcome; corners only by a separate declaration.
+
+### Trade-off screen against the "outperforms stock" rule (declared 10 October 2026, before its runs)
+
+Inspection result (read-only, no solver; recorded in docs/build.md): a top-layer driver return to Q2's source pad is
+blocked by the chain U80 LGL trace - R83 - VGl - R22 - NetJ2_1 trace - J22 - J2, which surrounds the driver's top
+GND copper, and inner-layer returns still share Q2's source vias; the existing-via gate-return candidate therefore
+stops as declared above. Saved results also show that the ideal low-side gate stage (EPC2302DS, 50 pH) lowers the Q2
+gate peak by 33-34 % but lengthens settling by 12-15 % and raises overshoot by 0.9-1.6 %.
+
+Screen (`scripts/epc90133_tradeoff_screen.py`, no field solver): per-metric relative changes against stock, both
+drivers, of every saved direction (uniform board-L scale x0.9/x1.1, V8, ideal low-side gate), and a linear program
+over non-negative mixes within the directions' tested ranges: (a) is the rule (all no-worse quantities <= +0.5 %, S4
+<= +10 %, Q2 gate peak <= -10 %) feasible; (b) the largest Q2 gate-peak reduction and the largest improvement of each
+other quantity with the rest no worse. Linear superposition is a SCREENING assumption: an infeasible result
+means no mix of these directions passes to first order, not that no layout can. One run before it: the vendor-model
+ideal low-side gate at 50 pH, `stock@{ramp,step}-Ls50-gear-ctlls` (2 cases, about 1-4 min each, timeout 3,600 s),
+replacing the EPC2302DS stand-in; the EPC2302DS direction is reported alongside. The C_SW direction is reported
+but not mixed (the trimmable copper is unidentified, and it is a different bench condition).
+Reading: if (a) is infeasible, the rule is reported as not reachable by these directions, no geometry candidate is
+built for it, and the owner is told which directions or rule changes the screen leaves open. No limit is changed here.
