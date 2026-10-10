@@ -243,3 +243,29 @@ replacing the EPC2302DS stand-in; the EPC2302DS direction is reported alongside.
 but not mixed (the trimmable copper is unidentified, and it is a different bench condition).
 Reading: if (a) is infeasible, the rule is reported as not reachable by these directions, no geometry candidate is
 built for it, and the owner is told which directions or rule changes the screen leaves open. No limit is changed here.
+
+### Amendment after the trade-off screen, and best-achievable targets (owner, 10 October 2026; POST-RESULT)
+
+Labelled RETROSPECTIVE: made after the screen showed the 0.5 % rule infeasible. The owner chose to allow settling (S3
+quantity) up to +5 % against stock; every other no-worse quantity stays within +0.5 %, rise/fall within S4's
++10 %, and Q2's gate peak must be at least 10 % lower, under both drivers. The original rule's verdict (not met) is kept.
+
+Owner instruction: for goals that cannot be met, search for the best achievable value instead, with every design
+physically feasible and practically realistic (standard fabrication, legal clearances, fixed BOM, probes and
+functions kept). Screen optima (linear, keeping S1, S3 within +5 %, S4, S6, S7): S2 overshoot cannot improve under
+both drivers; S10 at best -0.3 %; S12 none; S11 is not a layout property; S8 (Q2 gate peak) -25 / -30 % at the
+screen's edge (ideal-gate fraction 0.8 with lower loop L, not a realistic layout). S8 is the only failing goal with
+room, so the search proceeds with it.
+
+Candidate K1 (declared before its build): Q2 Kelvin-style driver return on the top layer. The NetJ2_1 trace between
+R22 pad 1 (16.379, 26.9) and probe pin J22.1 (16.05, 24.795) moves to the bottom layer: one new via of the board's
+smallest size (0.3488 mm pad, 0.1981 mm drill) beside R22 pad 1 on NetJ2_1, a 0.30 mm NetJ2_1 strip on B.Cu to J22.1;
+the freed top-layer gap (y about 25.80-26.44) becomes GND copper joining the driver's GND copper to Q2's source-pad
+copper. All on stock (base). Clearances >= EPC's 0.150114 mm. Via in pad is avoided (filled vias would be needed).
+New primitive add_via in the qualified KiCad route; acceptance: L1 DRC as stock (0 unconnected, no shorts, no new
+types, nothing below the clearance rule), L2 pad nets equal stock's, L3 power-loop checks as stock, drill file equal
+to stock's plus exactly the new hole, gate-loop checks K1-K5 pass on the export, then one G extraction (6.47 h
+profile, 15 h cap). Frozen prediction: board common-source L of Q2 at least 30 % below stock's 48 pH; Q2 gate peak
+-5 to -15 %; settling +1 to +6 %; ramp overshoot within +1 %. Then the nominal stock/K1 pair under both drivers
+against the amended rule, a 50 ps check of deciding cases, and the four corners only if the nominal pair passes.
+Corrected for practicality before build (owner, same day): via beside the pad, not in it.
