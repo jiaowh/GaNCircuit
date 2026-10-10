@@ -291,3 +291,29 @@ Pre-result procedural change (10 October 2026, about 19:55, while K1's G extract
 switching result): K2 is built and extracted now, in parallel with K1 (two G jobs fit WSL's 8 GB: about 2.8 GB
 each, 4.7 GB free), to remove a 6.5 h wait. Its results are used only as the decision tree allows (step 2, or as
 recorded information on the gate-return family's range); no definition, check or reading rule changes.
+
+### Board thermal model (declared 10 October 2026 before its first run; owner request)
+
+Question: do layouts differ in FET junction temperature (V8 removes 20 vias under the FETs, which also carry heat),
+and what are the FET and copper losses at operating temperature? Tool: `scripts/epc90133_thermal.py`, steady-state
+3D conduction on a cell grid (no field solver; SciPy sparse solve), same geometry route as the copper-loss script.
+Inputs and their status:
+* copper: every layer's copper (all nets) as an area fraction per cell, 2.8 mil, k 385 W/m K; laminate Isola 370HR
+  k 0.4 W/m K (Isola datasheet, ASTM E1952; one revision shows no value: sensitivity x0.5 / x1.5), EPC stackup
+  thicknesses; plated holes as copper barrels (0.787 mil wall) spanning all layers whatever their net; fill ignored.
+* FETs: junction node per FET, R_thJB 1.5 K/W to its pads (EPC2302 datasheet), R_thJC(top) 0.2 K/W to its case top.
+* heat: Q1 and Q2 split from the simulated total (Q2 = R_ds (1-D) I_rms^2 + dead-time loss from the dead-time
+  sweep slope; Q1 the remainder); only the conduction parts scale with R_ds(T_J) (datasheet Fig. 9, digitized:
+  0.852, 1.000, 1.162, 1.341, 1.537, 1.771, 2.039 at 0-150 C); switching and dead-time loss held at their 25 C
+  values (assumption). Board copper loss as its per-cell dissipation map from the copper-loss solve, scaled by
+  1 + 0.00393 (T - 20) at the mean copper temperature. Inductor (L1 "TBD" in the BOM) and other parts: excluded.
+* cooling: both faces to 25 C ambient, h = 10 W/m^2 K total (natural convection plus radiation; ASSUMED, range 5-25);
+  case "spreader": EPC's optional heat-spreader (QSG section 7) as each FET's case top to ambient through an ASSUMED
+  5 K/W; edges, spacers and parts as heat paths ignored.
+Checks before any layout result is used: (T1) energy balance within 0.1 %; (T2) analytic 1D slab (uniform flux
+through bare laminate) within 1 %; (T3) one via barrel against k A / L within 1 %; (T4) two cell sizes (0.2 and
+0.127 mm) reported as sensitivity; (T5) single-FET junction-to-ambient at 1 W on this board reported beside EPC's
+45 K/W (JEDEC board) and 21 K/W (EPC90142 board) as an order-of-magnitude check, not a pass/fail.
+Runs: stock, V8, V8 + 0.075 mm (V8 copper with the thinner top dielectric), K1, K2, with the R_ds(T) iteration
+(stop at 0.05 K change). Outputs: T_J of Q1 and Q2, the change against stock, temperature-corrected FET and copper
+loss and efficiency. Absolute temperatures depend on the assumed cooling; the layout comparison is the target.
