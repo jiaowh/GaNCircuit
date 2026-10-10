@@ -108,20 +108,55 @@ def sample_near(centres, n, spread, rng):
     return out
 
 
-def run_round(r, nets):
-    ext = [f"stock={BASE}"]
-    for name, f in nets.items():
-        try:
-            ext.append(f"{name}={make(name, f)}")
-        except SystemExit as e:
-            print("skip", name, e, flush=True)
-    only = [f"{e.split('=')[0]}@{a}-gear" for e in ext for a in DRIVERS]
-    report = OUTDIR / f"round{r}.json"
+def simulate(ext, only, report, log_path):
     cmd = [sys.executable, str(ROOT / "scripts/epc90133_switching.py"), "--study", "goals", "--jobs", "4",
            "--timeout", "3600", "--ext-file", *ext, "--only", *only, "--output", str(report)]
-    with open(ROOT / f"runs/network-search-round{r}.log", "w") as log:
+    with open(log_path, "w") as log:
         subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT, env=dict(os.environ, PYTHONPATH="src"), check=False)
-    return json.loads(report.read_text(encoding="utf-8"))["cases"] if report.exists() else {}
+
+
+def load_cases(r):
+    """Round r's cases, with the retry report (if any) replacing failed cases."""
+    cases = {}
+    for f in (OUTDIR / f"round{r}.json", OUTDIR / f"round{r}-retry.json"):
+        if f.exists():
+            cases.update({k: c for k, c in json.loads(f.read_text(encoding="utf-8"))["cases"].items() if c.get("usable")
+                          or k not in cases})
+    return cases
+
+
+def retry_failed(r, ext):
+    """Round 1 (11 October 2026): the first batch (both stock cases, one network case) hung until the 3,600 s
+    timeout while the other 63 ran in about 2 min each. RETROSPECTIVE robustness change: failed cases are rerun once
+    (round<r>-retry.json) and replace the failed ones; nothing else is rerun."""
+    rep_ = json.loads((OUTDIR / f"round{r}.json").read_text(encoding="utf-8"))
+    failed = [k for k, v in rep_.get("runs", {}).items() if v.get("status") != "completed" and "@" in k]
+    if not failed:
+        return
+    names = {k.split("@")[0] for k in failed}
+    ext_ = [e for e in ext if e.split("=")[0] in names | {"stock"}]
+    print(f"round {r}: retrying {failed}", flush=True)
+    simulate(ext_, failed, OUTDIR / f"round{r}-retry.json", ROOT / f"runs/network-search-round{r}-retry.log")
+
+
+def ext_for(nets):
+    ext = [f"stock={BASE}"]
+    for name, f in nets.items():
+        path = ds.OUT / f"{name}.json"
+        try:
+            ext.append(f"{name}={path if path.exists() else make(name, f)}")
+        except SystemExit as e:
+            print("skip", name, e, flush=True)
+    return ext
+
+
+def run_round(r, nets):
+    ext = ext_for(nets)
+    only = [f"{e.split('=')[0]}@{a}-gear" for e in ext for a in DRIVERS]
+    if not (OUTDIR / f"round{r}.json").exists():
+        simulate(ext, only, OUTDIR / f"round{r}.json", ROOT / f"runs/network-search-round{r}.log")
+    retry_failed(r, ext)
+    return load_cases(r)
 
 
 def main():
@@ -135,13 +170,28 @@ def main():
     OUTDIR.mkdir(parents=True, exist_ok=True)
     state_path = OUTDIR / "search.json"
     state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {"networks": {}, "rounds": []}
-    spread = 0.25
+    spread = 0.25 / 2 ** max(0, len(state["rounds"]) - 1)
+    # Rescore rounds whose stock reference was unusable (round 1, 11 October 2026): retry failed cases, then rescore.
+    for rd in state["rounds"]:
+        if not rd["stock"]["usable"]:
+            nets = {k: v["factors"] for k, v in state["networks"].items() if v["round"] == rd["round"]}
+            cases = run_round(rd["round"], nets)
+            rd["stock"] = score(cases, "stock")
+            for name in nets:
+                state["networks"][name]["score"] = score(cases, name)
+            rd["rescored"] = True
+            state_path.write_text(json.dumps(state, indent=1) + "\n", encoding="utf-8")
+            print(f"round {rd['round']} rescored: stock {rd['stock']['count']}", flush=True)
+            if not rd["stock"]["usable"]:
+                raise SystemExit(f"round {rd['round']}: stock still unusable")
     for r in range(len(state["rounds"]) + 1, a.rounds + 1):
         if r == 1:
             fs = sample_lhs(a.n1, rng)
         else:
             ranked = sorted((v for v in state["networks"].values() if v["score"]["usable"]),
                             key=lambda v: (-v["score"]["count"], v["score"]["shortfall"]))
+            if not ranked:
+                raise SystemExit(f"round {r}: no usable network to search around")
             fs = sample_near([v["factors"] for v in ranked[:3]], a.n, spread, rng)
             spread /= 2
         nets = {f"N{r}_{k:02d}": f for k, f in enumerate(fs)}
