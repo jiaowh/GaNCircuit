@@ -20,7 +20,7 @@ ASSESS = {"vendor": [RES / "epc90133-goals-assessment-V8d075.json", RES / "epc90
           "EPC2302DS": [RES / "epc90133-goals-assessment-ds-rev2.json"]}
 GOAL_NAME = {"V8+d0.075": "V8d075", "stock+csw": "stock", "V8+d0.075+csw": "V8d075"}  # candidate id -> design name
 # Sensitivity rows scored from their own assessment and compared with their own reference row, not plain stock.
-OWN_ASSESS = {"K1": {"vendor": [RES / "epc90133-goals-assessment-K1.json"]},"stock+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]},
+OWN_ASSESS = {"K1": {"vendor": [RES / "epc90133-goals-assessment-K1.json"]}, "K2": {"vendor": [RES / "epc90133-goals-assessment-K2.json"]},"stock+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]},
               "V8+d0.075+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]}}
 OWN_REF = {"stock+csw": "stock+csw", "V8+d0.075+csw": "stock+csw"}
 ROUTE_THRESHOLD = 0.04
@@ -41,6 +41,7 @@ CANDIDATES = [
     ("V8+d0.075", "V8 + 0.075 mm", "V8 with 0.075 mm dielectric (best screened legal combination)", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
     ("V8+d0.050", "V8 + 0.050 mm *", "Sensitivity only: below the industry-practice limit", "V8", "A-m1-mid-d0.050-V8", None, None),
     ("K1", "K1 Kelvin return", "Q2 driver ground joined to Q2's source on the top layer; probe trace moved to the bottom through one new via", "K1", "A-m1-mid-K1", "G-m1-mid-K1", "K1"),
+    ("K2", "K2 isolated driver return", "K1 plus the three driver ground vias cut off from the inner planes: the driver's ground reaches the planes only through Q2's source copper and the bottom layer", "K2", "A-m1-mid-K2", "G-m1-mid-K2", "K2"),
     ("stock+csw", "Stock + SW capacitance", "Reference for the row below: stock with 135 pF switch-node-to-ground capacitance (estimate)", "stock", "A-m1-mid-stock", "G-m1-mid-stock", None),
     ("V8+d0.075+csw", "V8 + 0.075 mm + SW capacitance", "V8 + 0.075 mm with 188.8 pF (the thinner layer adds 53.8 pF); compared with the row above", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
 ]
@@ -52,6 +53,7 @@ NOT_IN_TABLE = [
     ("Added return vias (round 2b)", "Four legal additions changed screened loop inductance by -0.02 %; earlier additions damaged the power path."),
     ("L4a low-side driver return", "Inspected 9 October, not built: the low-side gate probe connection blocks a top-layer return."),
     ("L3b capacitors with their return vias", "Not built."),
+    ("P1 Ci7 into the empty capacitor slot", "Rejected at build: the slot lies inside an EPC solder-mask opening, so the pad is not mask-defined (results/gan/epc90133-board-export-P1.json)."),
     ("Gate return with existing vias", "Not buildable: the probe connection (R22, J22, J2) encloses the driver's top-layer ground; K1 adds one via instead."),
 ]
 

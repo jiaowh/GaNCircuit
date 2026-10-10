@@ -179,6 +179,10 @@
    "Not built."
   ],
   [
+   "P1 Ci7 into the empty capacitor slot",
+   "Rejected at build: the slot lies inside an EPC solder-mask opening, so the pad is not mask-defined (results/gan/epc90133-board-export-P1.json)."
+  ],
+  [
    "Gate return with existing vias",
    "Not buildable: the probe connection (R22, J22, J2) encloses the driver's top-layer ground; K1 adds one via instead."
   ]
@@ -809,6 +813,96 @@
    }
   },
   {
+   "id": "K2",
+   "label": "K2 isolated driver return",
+   "what": "K1 plus the three driver ground vias cut off from the inner planes: the driver's ground reaches the planes only through Q2's source copper and the bottom layer",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-K2.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "ref": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/K2/extraction/A-m1-mid-K2.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.49254453407299603,
+    "R_loop_mohm": 4.0353067781289065
+   },
+   "G": {
+    "source": "vendor/epc/epc90133/reconstruction/export/K2/extraction/G-m1-mid-K2.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.25317013122358806,
+    "R_loop_mohm": 2.0216978301690087,
+    "L_cs_Q1_pH": 1.2260061553370512,
+    "L_cs_Q2_pH": 37.1365908967316
+   },
+   "goals": {
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": false,
+      "S4": true,
+      "S5": null,
+      "S6": false,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": null,
+      "S12": false,
+      "S13": null
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-K2.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.31361770629883,
+       "overshoot_V": 11.115788483970476,
+       "settling_s": 1.5775000000000002e-07,
+       "tr_s": 1.678805717507639e-09,
+       "tf_s": 4.172929445759401e-09,
+       "dvdt_V_per_ns": 22.873403157697595,
+       "id_peak_A": 58.56594467163086,
+       "didt_A_per_ns": 42.13671999999999,
+       "vgs_max_V": 5.083057403564453,
+       "vgs_min_V": -1.2440743818879128,
+       "q2_gate_peak_V": 1.3782561421394348,
+       "eon_eoff_J": 5.5719204037989125e-06,
+       "efficiency": 0.9913923223670014
+      },
+      "step-Ls50": {
+       "vpk_V": 58.97346496582031,
+       "overshoot_V": 10.776453875001387,
+       "settling_s": 1.5825e-07,
+       "tr_s": 1.7866547894810855e-09,
+       "tf_s": 4.2156636201368135e-09,
+       "dvdt_V_per_ns": 21.492680189860778,
+       "id_peak_A": 52.67268371582031,
+       "didt_A_per_ns": 33.911199999999994,
+       "vgs_max_V": 5.024646759033203,
+       "vgs_min_V": -0.917556494474411,
+       "q2_gate_peak_V": 1.2423577308654785,
+       "eon_eoff_J": 5.782503038148279e-06,
+       "efficiency": 0.9914181068358093
+      }
+     },
+     "dead_time_optimum_ns": null,
+     "corners": {
+      "passed": 0,
+      "usable": 0,
+      "declared": 10
+     }
+    },
+    "EPC2302DS": null
+   }
+  },
+  {
    "id": "stock+csw",
    "label": "Stock + SW capacitance",
    "what": "Reference for the row below: stock with 135 pF switch-node-to-ground capacitance (estimate)",
@@ -976,6 +1070,7 @@
    "results/gan/epc90133-goals-assessment-V8d075.json",
    "results/gan/epc90133-goals-assessment-vendor-rev2.json",
    "results/gan/epc90133-goals-assessment-K1.json",
+   "results/gan/epc90133-goals-assessment-K2.json",
    "results/gan/epc90133-goals-assessment-V8d075-csw.json",
    "results/gan/epc90133-goals-assessment-V8d075-csw.json"
   ],
@@ -983,5 +1078,5 @@
    "results/gan/epc90133-goals-assessment-ds-rev2.json"
   ]
  },
- "generated": "2026-10-10"
+ "generated": "2026-10-11"
 }

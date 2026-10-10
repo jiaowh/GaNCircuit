@@ -18,4 +18,5 @@ stock-route $X/stock $G/epc90133-goals-G.json stock runs/thermal/copper-heat-sto
 V8 $X/V8 $G/epc90133-goals-G.json V8 runs/thermal/copper-heat-V8-route-f8.npz
 V8d075 $X/V8 $G/epc90133-goals-G-V8d075.json V8d075 runs/thermal/copper-heat-V8-route-f8.npz --top-dielectric-mm 0.075
 K1 $X/K1 $G/epc90133-goals-G-K1.json K1 runs/thermal/copper-heat-K1-route-f8.npz
+K2 $X/K2 $G/epc90133-goals-G-K2.json K2 runs/thermal/copper-heat-K2-route-f8.npz
 JOBS

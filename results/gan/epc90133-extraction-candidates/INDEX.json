@@ -17,6 +17,10 @@
    "original": "vendor/epc/epc90133/reconstruction/export/K2/extraction/A-m1-mid-K2.json",
    "original_sha256": "c45507ae4243d95273de360af26cc4e9a312b1ed24c5ff76f446b6dd7c42fff0"
   },
+  "results/gan/epc90133-extraction-candidates/K2/G-m1-mid-K2.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/K2/extraction/G-m1-mid-K2.json",
+   "original_sha256": "9165f51f2c7e8f6939b5b436bb5155ddae72a59e055bd3433c7d87112035729a"
+  },
   "results/gan/epc90133-extraction-candidates/L3a/A-m1-mid-L3a.json": {
    "original": "vendor/epc/epc90133/reconstruction/export/L3a/extraction/A-m1-mid-L3a.json",
    "original_sha256": "d5147165d51cdcb85b27c8616e224bdbaa1281faadef6917e5bd28f8d690002e"

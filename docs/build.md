@@ -4022,3 +4022,33 @@ merges with that opening (detected region 2.2 mm^2 touching the window edge) and
 exposed copper and vias. A mask-edit primitive would be needed; with P1's frozen prediction at 0 to -2 % A loop L
 (below the 4 % threshold) it is not built. P1 stops here; no extraction was run. The common-source screen (stock,
 K1) was still running at this point.
+
+### K2 result and confirmation (11 October 2026)
+
+G extraction 5.0 h (19:29-00:29), nominal pair 00:32, both usable (`results/gan/epc90133-goals-G-K2.json`). G against
+stock through the route: loop L 0.2527 -> 0.2532 nH (+0.2 %), Q2 board common-source L 48.02 -> 37.14 pH (-22.7 %;
+K1 -2.9 %), Q1 0.99 -> 1.23 pH. Switching against stock (`results/gan/epc90133-outperform-K2.json`, ramp / step):
+
+| Quantity | K2 change | Rule |
+|---|---|---|
+| Q2 gate peak | -28.9 / -25.1 % (1.94 -> 1.38 V, 1.66 -> 1.24 V) | at least -10 %: met |
+| settling | +20.7 / +20.3 % (130.8 -> 157.8 ns, 131.5 -> 158.2 ns) | at most +5 % (amended): missed |
+| step di/dt | +1.32 % | at most +0.5 %: missed |
+| everything else | within +/-0.4 % | |
+
+Declared and amended rule NOT met. Goals (`results/gan/epc90133-goals-assessment-K2.json`, nominal): S1, S4, S7 met;
+S3 now missed (stock meets it), S6 missed on step di/dt, S8 still missed (1.38 / 1.24 V against < 0.5 V). The frozen
+prediction (common-source L below K1's, gate peak lower, settling longer) holds in direction; K1's top bridge was in
+parallel with the plane path, as hypothesised. The switch-node ring's damping ratio falls from about 0.027 to 0.019
+(switching logs), consistent with the shared inductance having coupled ring energy into the resistive gate loop
+(a reading, not separately tested).
+
+Confirmation checks (declared before running; plan "K2 result and confirmation checks"): at 50 ps
+(`-K2-ms50.json`, `-K2-ms50-stock.json`) every quantity matches 100 ps within 0.01 %: confirmed. With 135 pF
+switch-node capacitance on both (`-K2-csw.json`, stock rerun with the same code): gate peak -28.6 / -24.9 %, settling
++20.3 / +23.2 %: the penalty persists. Outcome as declared: the gate-return family stops; K2 is the best tested S8
+value (about the -25 to -30 % that the trade-off screen showed at its edge) at a settling cost. No intermediate
+variant was built (the declared scaling argument). The free-placement driver family (D) acts through the same
+mechanism and is not started. Thermal: as stock within 0.2 K (`results/gan/epc90133-thermal-K2.json`).
+Run notes: the first C_SW call failed before any case (stock needs its extraction passed with --ext-file); the stock
+50 ps pair ran in a separate call for the same reason. The common-source screen's blind test on K2 was missed.
