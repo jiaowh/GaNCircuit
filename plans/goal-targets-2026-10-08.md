@@ -269,3 +269,20 @@ profile, 15 h cap). Frozen prediction: board common-source L of Q2 at least 30 %
 -5 to -15 %; settling +1 to +6 %; ramp overshoot within +1 %. Then the nominal stock/K1 pair under both drivers
 against the amended rule, a 50 ps check of deciding cases, and the four corners only if the nominal pair passes.
 Corrected for practicality before build (owner, same day): via beside the pad, not in it.
+
+### K1 follow-up decision tree (declared 10 October 2026, 19:40, before any K1 G or switching result)
+
+Owner: continue autonomously (evaluate, change the design, run full-board extractions as needed). Scoring:
+`scripts/assess_epc90133_outperform.py K1 results/gan/epc90133-goals-G-K1.json` (declared and amended rule).
+1. K1 passes the amended rule under both drivers: numerical check (stock and K1 `@{ramp,step}-Ls50-gear-ms50`, 4
+   cases; the verdict must be the same at 50 ps), then K1's goals corners (--vin 40, --vin 60, --iout 0 and the
+   -l0.9/-l1.1 cases) scored with `assess_epc90133_goals.py` alongside stock's 8 October reports. Then report.
+2. K1 is spike-limited (Q2 gate peak reduction under 10 % under either driver, every other quantity within the
+   amended limits): build K2 = K1 plus EPC-size antipads (r 0.3275 mm) on In1-In6 around the three driver GND vias
+   at (15.429, 27.201), (15.592, 26.200), (15.603, 28.549), so the driver's ground reaches the planes only through
+   Q2's source copper (top bridge) and the bottom layer. Same acceptance (L1-L4, drills unchanged, gate-loop checks),
+   one G extraction, the nominal pair and the same scoring; then step 1 or stop. Prediction for K2 before its build:
+   Q2 board common-source L below K1's, gate peak lower, settling longer.
+3. K1 is cost-limited (overshoot, Eon + Eoff, loss or settling beyond the amended limits): no stronger variant
+   (it would move the same way); its full balance sheet goes to the owner and the family stops.
+At most two new G extractions in this tree. Every outcome, including failures, is recorded in docs/build.md.

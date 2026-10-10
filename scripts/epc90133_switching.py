@@ -419,6 +419,9 @@ Scoring: scripts/assess_epc90133_goals.py (definitions in its docstring, fixed w
   the vendor-model goals set also defines <NAME>@<ramp|step>-Ls50-gear-ctlls, the low-side ideal stage of the
   -ctlls-ds S8 bound (package source inductance kept in its loop) with the vendor model, so the screen's
   gate-return direction comes from the primary model instead of EPC2302DS. Existing reports are unaffected.
+* outperform-rule numerical check (declared 10 October 2026 before any K1 switching result): the goals set also
+  defines <NAME>@<ramp|step>-Ls50-gear-ms50 (nominal at half the 100 ps step). A candidate's verdict under the
+  outperform rule stands only if, with stock and the candidate both at 50 ps, the verdict is the same.
 * SW capacitance sensitivity (V8 + 0.075 mm confirmation, declared 9 October 2026 before its run): --csw NAME=pF
   runs <NAME>@<ramp|step>-Ls50-gear-csw with that SW-to-GND capacitance (2 pF to VIN as before).
 * model (owner decision, 9 October 2026, supersedes the model part of the next item): new runs use the vendor
@@ -1434,6 +1437,8 @@ def goals_cases(names, vin=None, iout=None, qg=False, ds=False):
             cases[f"{n}@ramp-Ls50-gear-dt{dt:g}"] = alt("ramp-Ls50", dead=dt * 1e-9)
         cases.update({f"{n}@{a}-gear-ctlls": alt(a, gate_ctl="l")
                       for a in (("ramp-Ls50", "step-Ls50") if ds else ("ramp-Ls0", "step-Ls0", "ramp-Ls50", "step-Ls50"))})
+        # Numerical check of the outperform rule (declared 10 October 2026 before any K1 result): nominal at 50 ps.
+        cases.update({f"{n}@{a}-gear-ms50": alt(a, maxstep=MAXSTEP_PKG / 2) for a in ("ramp-Ls50", "step-Ls50")})
     if ds:
         cases = {f"{k}-ds": {**c, "model": DS_MODEL} for k, c in cases.items()}
     if qg:
