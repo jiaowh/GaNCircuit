@@ -3774,3 +3774,86 @@ separately diagnosed). The cases would have hit the 3,600 s limit at 17:37 and t
 past the owner's 17:45 deadline, so the chain (PID 24416), its five switching processes and 14 LTspice instances
 were stopped by PID at 17:15. No switching result exists for V8d075. Rerun: at most 8 LTspice at once (as on
 8 October), V8d075 goals plus the --vin 48 control, then the declared with-capacitance sensitivity case.
+
+### Fixed-BOM circuit-improvement research (9 October 2026)
+
+Owner requested research into further improvements and combinations while V8d075
+switching run 2 was pending. Research snapshot `7fa9a60`; no new circuit/field
+solver, export, or geometry edit was launched, and the active run was not changed.
+Report: `docs/circuit-improvement-research-2026-10-09.md`. Sources, review depth,
+retrieval dates, SHA-256 and reuse terms:
+`devices/literature-circuit-improvements-2026-10-09.json` (seven entries, five local
+source files hash-verified; two online-only entries explicit). Copyright source
+files remain in ignored `vendor/literature/`; reviewed page renders are in ignored
+`runs/research-improvements-2026-10-09/`.
+
+The deeper reading of Infineon DG165832 section 2.3/Figure 4 identifies a local
+gate/power-return separation as a candidate short of fully isolating driver ground.
+Feasibility with existing EPC90133 vias is unproven; source pads must remain joined
+as EPC directs. Other proposals: selective via relocation rather than more thinning,
+coordinated L3b capacitor/return movement, and V8 at 0.100 mm if the running C_SW
+sensitivity exposes a material penalty at 0.075 mm. These are research hypotheses,
+not qualified designs or claims of all-goals feasibility. C80/C81 relocation cannot
+be judged by the current switching bench, which keeps driver supplies ideal.
+
+One bounded geometry inventory was executed, to decide whether switch-node copper
+trimming has useful scope inside the loop envelope. Replay:
+`python scripts/epc90133_research_overlap.py`; result:
+`results/gan/epc90133-research-overlap.json`. It reads the existing V8 export once,
+checks its manifest and records code/input hashes. About 6.4 s, no solver. Total
+top-SW/G1-GND overlap 232.0557 mm2 reproduces the prior capacitance calculation and
+its geometry identity exactly. Only 79.0882 mm2 (34.08%) lies inside the G rectangle,
+which is a screening envelope, not an authorized edit mask or removable-copper map.
+Of the +53.84 pF dielectric increment, 18.35 pF arises there. The remainder is
+outside that rectangle, and outside-loop copper stays fixed.
+
+At 0.075 mm, 25 mm2 of hypothetical removable overlap represents only 14.17 pF;
+no such legal polygon was identified. Its simple linear-capacitor full-cycle energy
+scale is 0.0326 uJ at 48 V, not the bench's FET-only switching-energy allocation.
+This limits expectations for copper trimming as a standalone S10 remedy. No
+numerical thresholds were relaxed, models tuned, or existing results overwritten.
+The note proposes a bounded later study; it does not launch it.
+
+### V8 + 0.075 mm switching run 2: result (scored 10 October 2026)
+
+Run 2 (declared above; queue `runs/confirm-V8d075-queue.ps1`) finished on 9 October at 20:20. Vendor model, assumed
+50 pH. Reports: `results/gan/epc90133-goals-G-V8d075{,-v40,-v60,-i0,-control,-csw}.json`.
+
+- **Main V8d075 cases incomplete.** 5 of 71 LTspice runs in the nominal set reached the 3,600 s limit: the
+  nominal ramp-Ls50 and step-Ls50 cases, ramp-Ls0, step-Ls50 x0.9 and the timing stage of step-Ls50 x1.1. Every
+  other case completed (on 8 October identical-size cases took 72-146 s; 8 to 49 min here; cause not identified).
+  As declared, a missing case makes its goal undetermined: `epc90133-goals-assessment-V8d075.json` (scorer revision 2,
+  stock and V8 from the 8 October reports) leaves S1-S12 undetermined for V8d075 and fails S13. Stock and V8 verdicts
+  are unchanged.
+- **Reproduction control passes:** stock and V8 at `--vin 48` reproduce the 8 October nominal overshoot and FET loss
+  exactly (0.000 %, limit 0.1 %), so the V8d075 numbers are comparable.
+- **Corners (S1, S2, S7, S8 against stock at the same corner):** V8d075 overshoot 9.92 / 9.40 V at 40 V (stock
+  11.24 / 10.52), 14.29 / 11.85 V at 60 V (stock 13.74 / 12.50), 4.51 / 4.27 V at no load (stock 4.86 / 5.54);
+  ramp x0.9 and x1.1 within 2 % of stock. Every corner fails S8 (Q2 gate peak 0.65-2.21 V against < 0.5 V), as for
+  stock and V8.
+- **Switch-node capacitance pair** (stock + 135 pF, V8d075 + 188.84 pF; scored RETROSPECTIVELY with the new
+  `--case-tag=-csw` scorer option, added after this result and checked to leave the default scoring identical:
+  `results/gan/epc90133-goals-assessment-V8d075-csw.json`):
+
+| Nominal, 48 V, ramp / step | Stock + C_SW | V8d075 + C_SW |
+|---|---|---|
+| Overshoot | 12.10 / 11.56 V | 12.64 / 11.21 V |
+| Q1 peak current | 58.96 / 53.06 A | 55.28 / 50.55 A |
+| Q1 di/dt | 42.4 / 33.6 A/ns | 42.4 / 36.9 A/ns |
+| Q2 gate peak | 1.97 / 1.66 V | 1.86 / 1.51 V |
+| Eon + Eoff | 5.76 / 5.95 uJ | 5.89 / 6.09 uJ |
+| FET loss | 2.118 / 2.112 W | 2.146 / 2.145 W |
+
+  V8d075 meets S1, S3, S4 and S7 and fails S2, S6, S8, S10 and S12 under both drivers; S5, S9, S11 and S13 are
+  undetermined (no corners or dead-time sweep in this pair). The declared plain-versus-C_SW comparison cannot be
+  made because the plain nominal pair is missing, so these verdicts are reported only for the with-capacitance
+  condition and are not called capacitance-insensitive.
+- **Frozen prediction holds:** overshoot stays above S2's 9.6 V under the ramp driver (12.64 V with C_SW); S6 and S10
+  are no better than V8 (both fail).
+
+Reading: the 17 % lower board loop inductance did not lower the switch-node overshoot in this bench; the ring
+frequency rose (about 263 to 279 MHz at no load) while the overshoot amplitude barely changed. The bench adds the
+assumed 50 pH package source inductance, the device model's capacitances and the extra C_SW, but the dominant term has
+not been isolated, so no attribution is claimed. S8 fails at every condition for every design, so no candidate
+reaches all goals irrespective of the timed-out cases. As declared, no follow-up sweep is launched and the timed-out
+cases are not rerun. Candidate page republished with two with-capacitance rows compared with each other.

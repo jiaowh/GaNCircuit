@@ -18,7 +18,11 @@ EXPORT = ROOT / "vendor/epc/epc90133/reconstruction/export"
 # Per model, assessments searched in order; a design is taken from the first file that scores it.
 ASSESS = {"vendor": [RES / "epc90133-goals-assessment-V8d075.json", RES / "epc90133-goals-assessment-vendor-rev2.json"],
           "EPC2302DS": [RES / "epc90133-goals-assessment-ds-rev2.json"]}
-GOAL_NAME = {"V8+d0.075": "V8d075"}  # candidate id -> design name in the goals runs
+GOAL_NAME = {"V8+d0.075": "V8d075", "stock+csw": "stock", "V8+d0.075+csw": "V8d075"}  # candidate id -> design name
+# Sensitivity rows scored from their own assessment and compared with their own reference row, not plain stock.
+OWN_ASSESS = {"stock+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]},
+              "V8+d0.075+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]}}
+OWN_REF = {"stock+csw": "stock+csw", "V8+d0.075+csw": "stock+csw"}
 ROUTE_THRESHOLD = 0.04
 PRIMARY = ("ramp-Ls50", "step-Ls50")
 
@@ -36,6 +40,8 @@ CANDIDATES = [
     ("V8+d0.100", "V8 + 0.100 mm", "V8 with 0.100 mm dielectric", "V8", "A-m1-mid-d0.100-V8", None, None),
     ("V8+d0.075", "V8 + 0.075 mm", "V8 with 0.075 mm dielectric (best screened legal combination)", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
     ("V8+d0.050", "V8 + 0.050 mm *", "Sensitivity only: below the industry-practice limit", "V8", "A-m1-mid-d0.050-V8", None, None),
+    ("stock+csw", "Stock + SW capacitance", "Reference for the row below: stock with 135 pF switch-node-to-ground capacitance (estimate)", "stock", "A-m1-mid-stock", "G-m1-mid-stock", None),
+    ("V8+d0.075+csw", "V8 + 0.075 mm + SW capacitance", "V8 + 0.075 mm with 188.8 pF (the thinner layer adds 53.8 pF); compared with the row above", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
 ]
 
 NOT_IN_TABLE = [
@@ -123,13 +129,15 @@ def build():
             e = load(RES / f"epc90133-board-export-{export}.json")
             exp = {"accepted": e.get("accepted"), "source": rel(RES / f"epc90133-board-export-{export}.json"),
                    "checks": {k: e[k].get("pass") for k in ("L1_drc", "L2_nets", "L3_power_loop", "L4_extraction")}}
-        rows.append({"id": cid, "label": label, "what": what, "board_export": exp,
+        own = OWN_ASSESS.get(cid)
+        rows.append({"id": cid, "label": label, "what": what, "board_export": exp, "ref": OWN_REF.get(cid),
                      "A": extraction(folder, a_stem), "G": extraction(folder, g_stem),
-                     "goals": {m: goals(p, cid) for m, p in ASSESS.items()}})
+                     "goals": {m: goals(own.get(m, []) if own else p, cid) for m, p in ASSESS.items()}})
     return {"schema": "epc90133-candidates/1", "reference": "stock", "route_threshold": ROUTE_THRESHOLD,
             "primary_conditions": list(PRIMARY), "columns": COLUMNS, "targets": TARGETS,
             "not_in_table": NOT_IN_TABLE, "candidates": rows,
-            "sources": {m: [rel(x) for x in ps if Path(x).is_file()] for m, ps in ASSESS.items()}}
+            "sources": {m: [rel(x) for x in ps + [y for o in OWN_ASSESS.values() for y in o.get(m, [])] if Path(x).is_file()]
+                        for m, ps in ASSESS.items()}}
 
 
 PAGE = r"""<title>EPC90133 Layout Candidates</title>
@@ -197,6 +205,7 @@ thead th.name { z-index: 3; background: var(--head); }
 td.name b { display: block; font-size: 13px; }
 td.name small { color: var(--muted); font-size: 11px; line-height: 1.35; display: block; max-width: 220px; }
 tr.ref td { font-weight: 600; }
+tr.sens td { border-top: 2px solid var(--rule); }
 .v { display: block; font-family: var(--mono); font-size: 12px; padding: 1px 4px; border-radius: 3px; }
 .v small { font-family: var(--sans); font-size: 10.5px; opacity: 0.85; margin-left: 4px; }
 .good { background: var(--good-bg); color: var(--good); }
@@ -248,7 +257,8 @@ tr.ref td { font-weight: 600; }
     <div class="card"><h2>How to read it</h2><ul>
       <li>Percentages are the change from stock in the same column. Lower inductance and resistance are shown as better; lower inductance also raises switching energy (S10) and current slope (S6) in this model.</li>
       <li>Lower common-source inductance (L<sub>cs</sub>) means less gate disturbance; on the high side, coupling into the gate path also slows the edge, which lowers overshoot.</li>
-      <li>Goal columns are blank where a candidate has no switching run. Only stock and V8 have full goal runs.</li>
+      <li>Goal columns are blank where a candidate has no switching run. Stock and V8 have full goal runs; V8 + 0.075 mm has its corners, but its two main cases ran past the 1-hour limit, so most of its goals are undetermined.</li>
+      <li>The last two rows add the switch-node capacitance that the thinner layer raises; V8 + 0.075 mm is compared there with stock under the same addition. Corners and dead time were not run for them.</li>
       <li>S9 and S11 are verdicts on derived quantities; S13 counts corner runs (40/60 V, no load, parasitics ±10 %, both drivers) that keep S1, S2, S7 and S8.</li>
       <li>Hover a value to see the saved report it comes from.</li>
     </ul></div>
@@ -260,7 +270,6 @@ const DATA = __DATA__;
 const $ = (s) => document.querySelector(s);
 let model = "vendor";
 try { const m = localStorage.getItem("cand-model-v2"); if (m === "vendor" || m === "EPC2302DS") model = m; } catch (e) {}
-const ref = DATA.candidates.find((c) => c.id === DATA.reference);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 function cmp(v, r, better, pale) {
   if (v == null || r == null || better == null || r === 0) return { cls: "", pct: null };
@@ -300,10 +309,11 @@ function render() {
   });
   h += '</tr><tr class="sub">' + PAR.map((p) => `<th>${p[2]}<span class="tgt">${p[3]}</span></th>`).join("") + subs.join("") + "</tr></thead><tbody>";
   for (const c of DATA.candidates) {
-    const isRef = c.id === DATA.reference;
+    const isRef = c.id === (c.ref || DATA.reference);
+    const ref = DATA.candidates.find((x) => x.id === (c.ref || DATA.reference));
     const ex = c.board_export;
     const build = isRef ? '<span class="na">reference</span>' : ex ? (ex.accepted ? '<span class="chip met" title="' + esc(ex.source) + '">legal</span>' : '<span class="chip not">rejected</span>') : '<span class="na" title="stackup change only">stackup</span>';
-    h += `<tr class="${isRef ? "ref" : ""}"><td class="name"><b>${esc(c.label)}</b><small>${esc(c.what)}</small></td><td>${build}</td>`;
+    h += `<tr class="${isRef ? "ref" : ""}${c.ref ? " sens" : ""}"><td class="name"><b>${esc(c.label)}</b><small>${esc(c.what)}</small></td><td>${build}</td>`;
     for (const [v, k, , , dg, pale] of PAR) {
       const x = c[v], rx = ref[v];
       h += `<td>${x && !x.missing ? cell(x[k], rx && rx[k], "lower", dg, x.source, pale, isRef) : '<span class="na">' + (x && x.missing ? "file missing" : "not run") + "</span>"}</td>`;

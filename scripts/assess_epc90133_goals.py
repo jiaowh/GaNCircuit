@@ -40,6 +40,10 @@ reports stops the scoring; every report contributing cases must record the same 
 for -ds/-qg, the variant), and a -ds run's recorded model report must still match its file and pass every D check;
 S5 has no template limit, so it is reported as undetermined and keeps 'all_met' from passing; an empty goal set is
 undetermined, not met. S13 covers the declared separate voltage/load/scale corners only, not combined corners.
+Case-tag option (10 October 2026, RETROSPECTIVE: added after V8d075 switching run 2, whose plain nominal cases timed out;
+no goal definition or limit changed): --case-tag -csw scores only the cases whose names end with that tag (stripped),
+so a design is compared with stock under the same added condition (the switch-node capacitance sensitivity pair).
+Without the option every case is read as before.
 """
 import argparse
 import hashlib
@@ -136,6 +140,7 @@ def main():
     ap.add_argument("--output", type=Path, default=ROOT / "results/gan/epc90133-goals-assessment.json")
     ap.add_argument("--model-suffix", default="", choices=("-ds", "-qg", ""),
                     help="'' (vendor, primary from 9 October 2026), '-ds' (EPC2302DS) or '-qg' (EPC2302QG, earlier runs)")
+    ap.add_argument("--case-tag", default="", help="score only cases ending with this tag (stripped), e.g. -csw")
     args = ap.parse_args()
     cases, vins, used = {}, {}, []
     for r in args.reports:
@@ -148,6 +153,10 @@ def main():
             if suf != args.model_suffix:
                 continue
             k = k[:-len(suf)] if suf else k
+            if args.case_tag:
+                if not k.endswith(args.case_tag):
+                    continue
+                k = k[:-len(args.case_tag)]
             if k in cases:
                 raise SystemExit(f"case {k} is supplied by more than one report")
             cases[k], vins[k] = c, rep["conditions"]["VIN"]
