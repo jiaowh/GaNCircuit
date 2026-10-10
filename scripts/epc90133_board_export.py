@@ -177,6 +177,22 @@ CASES.update({
     "K2": CASES["K1"] + [("antipad", x, y, EPC_ANTIPAD_R, ("In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu"))
                          for x, y in ((15.429, 27.201), (15.592, 26.200), (15.603, 28.549))],
 })
+INNER = ("In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu")
+DRIVER_GND_VIAS = ((15.429, 27.201), (15.592, 26.200), (15.603, 28.549))
+CASES.update({
+    # Candidate C3 (search stage 2, declared 11 October 2026 before its build; plans/goal-targets-2026-10-08.md): K1
+    # plus a dedicated driver-return island on In1 under Q2's gate drive. Driver GND vias isolated on In2-In6 only;
+    # slits (0.18 mm copper-pour keep-outs; runs 1-3 cut the plane outline and were rejected) separate the island from the In1 plane; one new GND via on the top-layer source
+    # copper joins the island to Q2's source near the gate end (top and In1 only).
+    "C3": CASES["K1"] + [("antipad", x, y, EPC_ANTIPAD_R, INNER[1:]) for x, y in DRIVER_GND_VIAS] + [
+        ("keepout", "In1.Cu", (15.00, 25.90, 17.45, 26.08)),   # bottom slit
+        ("keepout", "In1.Cu", (15.00, 25.90, 15.18, 27.73)),   # left slit, lower
+        ("keepout", "In1.Cu", (15.00, 27.55, 15.40, 27.73)),   # left step
+        ("keepout", "In1.Cu", (15.22, 27.55, 15.40, 29.48)),   # left slit, upper
+        ("keepout", "In1.Cu", (15.22, 29.30, 17.45, 29.48)),   # top slit
+        ("keepout", "In1.Cu", (17.27, 25.90, 17.45, 29.48)),   # right slit
+        ("add_via", 17.00, 26.25, 0.3488, 0.1981, "GND", INNER[1:], EPC_ANTIPAD_R)],
+})
 CASES.update({
     # P1 (free-placement study, declared 10 October 2026 before its build; owner: parts may move anywhere viable):
     # the outlying input capacitor Ci7 moved into the free Ci-row slot at x = 24.15 (row pitch 1.30 mm), whose vias

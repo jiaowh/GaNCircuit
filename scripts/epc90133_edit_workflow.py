@@ -104,6 +104,7 @@ from shapely.affinity import affine_transform, translate
 from shapely.geometry import Point, Polygon, box as sbox
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
+from shapely.validation import make_valid
 from shapely.strtree import STRtree
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -393,6 +394,14 @@ def apply_edits(text, edits, geo):
             for lay in ap_layers:
                 lines.insert(len(lines) - 1, keepout_line(lay, Point(x, y).buffer(r_ap, 16)))
             log.append({"op": [op[0], x, y, r_ap, list(ap_layers)]})
+        elif op[0] == "keepout":
+            # C3 build run 4 (11 October 2026, RETROSPECTIVE after runs 1-3: cutting the In1 plane outline needs a
+            # repair of EPC's self-touching outline that changes the plane elsewhere): a rectangular copper-pour
+            # keep-out on one layer, the same mechanism as the stock-hole keep-outs; zone outlines are not edited and
+            # the refill leaves the region empty.
+            _, lay, rect = op
+            lines.insert(len(lines) - 1, keepout_line(lay, sbox(*rect)))
+            log.append({"op": [op[0], lay, list(rect)]})
         elif op[0] == "add_track":
             # K1 build run 3 (10 October 2026, RETROSPECTIVE after run 2's DRC): a via joined only through rebuilt
             # zones (no frozen fill at load) was given the surrounding zone's net (GND) by KiCad, so the new via is
@@ -487,6 +496,15 @@ def reshape(lines, layer, net, add, cut):
     if cut is not None:
         for i, p in outlines.items():
             if p.intersects(cut):
+                if not p.is_valid:
+                    # C3 build run 1 (11 October 2026) crashed here: the In1 GND plane outline self-touches at
+                    # (8.76, 31.94). RETROSPECTIVE robustness fix: repair first, keeping every area (make_valid,
+                    # polygonal parts; run 2 used buffer(0), which dropped 5.9 mm^2 of plane and isolated a GND
+                    # piece, kept as C3-run2-rejected). The repair's area change is logged.
+                    q = unary_union(polygons(make_valid(p)))
+                    info["repaired_outlines"] += 1
+                    info["repair_area_change_um2"] += round(abs(q.area - p.area) * 1e6)
+                    p = q
                 updated[i] = p.difference(cut)
                 changed.add(i)
                 info["zones_cut"] += 1

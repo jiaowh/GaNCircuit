@@ -1,0 +1,52 @@
+{
+ "schema": "epc90133-cs-screen/1",
+ "tag": "stock",
+ "evaluator_sha256": "17ec98fb224b4409d4c273bcc8d0f51ca7fde7f32f1375e64c2b8f341d70fd5c",
+ "source_deck": "runs\\epc90133-extract-e55729756482\\G_m1_mid\\case.inp",
+ "source_deck_sha256": "4af4f5bab941bdd760c1190989f5dcc3ad8dc5e71ddabcc3ec202ce2bd213309",
+ "frequency_Hz": 100000000.0,
+ "wall_time_s": 16432.103315353394,
+ "ports": [
+  [
+   "ngtl_48_68",
+   "ngtl_56_68",
+   "loop"
+  ],
+  [
+   "ngtl_16_64",
+   "ngtl_56_20",
+   "cs_q2"
+  ],
+  [
+   "ngtl_20_72",
+   "ngtl_56_68",
+   "cs_q1"
+  ]
+ ],
+ "n_shorts": 20,
+ "result": {
+  "L_loop_nH": 0.2527396411793607,
+  "R_loop_mohm": 2.01746,
+  "L_cs_Q2_pH": 48.04792238978466,
+  "L_cs_Q1_pH": 0.9722154769205829,
+  "reciprocity_cs_q2": 0.0010234466876773525
+ },
+ "g_report": "vendor\\epc\\epc90133\\reconstruction\\export\\stock\\extraction\\G-m1-mid-stock.json",
+ "against_g": {
+  "L_loop_nH": {
+   "screen": 0.2527396411793607,
+   "G": 0.25273804560281526,
+   "rel": 6.313163266158384e-06
+  },
+  "L_cs_Q2_pH": {
+   "screen": 48.04792238978466,
+   "G": 48.022676994035514,
+   "rel": 0.0005256973856806457
+  },
+  "L_cs_Q1_pH": {
+   "screen": 0.9722154769205829,
+   "G": 0.9853388792761811,
+   "rel": -0.013318668969236835
+  }
+ }
+}

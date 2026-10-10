@@ -1,0 +1,503 @@
+{
+ "schema": "epc90133-board-export-candidate/1",
+ "case": "C3",
+ "evaluator_sha256": "421b761a93d73d760769bbcbd6a66435e0bbaa58e2347af0b8c18aa99db9e48c",
+ "edits": [
+  [
+   "reshape",
+   "F.Cu",
+   "NetJ2_1",
+   [
+    15.85,
+    26.7,
+    16.3,
+    27.05
+   ],
+   null
+  ],
+  [
+   "reshape",
+   "F.Cu",
+   "GND",
+   [
+    15.6,
+    25.8,
+    17.2,
+    26.44
+   ],
+   null
+  ],
+  [
+   "reshape",
+   "B.Cu",
+   "NetJ2_1",
+   [
+    15.95,
+    25.4,
+    16.25,
+    27.06
+   ],
+   null
+  ],
+  [
+   "add_via",
+   15.98,
+   26.88,
+   0.3488,
+   0.1981,
+   "NetJ2_1",
+   [
+    "In1.Cu",
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu"
+   ],
+   0.3275
+  ],
+  [
+   "add_track",
+   "F.Cu",
+   "NetJ2_1",
+   [
+    [
+     15.98,
+     26.88
+    ],
+    [
+     16.379,
+     26.9
+    ]
+   ],
+   0.25
+  ],
+  [
+   "add_track",
+   "B.Cu",
+   "NetJ2_1",
+   [
+    [
+     15.98,
+     26.88
+    ],
+    [
+     16.1,
+     26.75
+    ],
+    [
+     16.1,
+     25.3
+    ]
+   ],
+   0.3
+  ],
+  [
+   "antipad",
+   15.429,
+   27.201,
+   0.3275,
+   [
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu"
+   ]
+  ],
+  [
+   "antipad",
+   15.592,
+   26.2,
+   0.3275,
+   [
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu"
+   ]
+  ],
+  [
+   "antipad",
+   15.603,
+   28.549,
+   0.3275,
+   [
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu"
+   ]
+  ],
+  [
+   "keepout",
+   "In1.Cu",
+   [
+    15.0,
+    25.9,
+    17.45,
+    26.08
+   ]
+  ],
+  [
+   "keepout",
+   "In1.Cu",
+   [
+    15.0,
+    25.9,
+    15.18,
+    27.73
+   ]
+  ],
+  [
+   "keepout",
+   "In1.Cu",
+   [
+    15.0,
+    27.55,
+    15.4,
+    27.73
+   ]
+  ],
+  [
+   "keepout",
+   "In1.Cu",
+   [
+    15.22,
+    27.55,
+    15.4,
+    29.48
+   ]
+  ],
+  [
+   "keepout",
+   "In1.Cu",
+   [
+    15.22,
+    29.3,
+    17.45,
+    29.48
+   ]
+  ],
+  [
+   "keepout",
+   "In1.Cu",
+   [
+    17.27,
+    25.9,
+    17.45,
+    29.48
+   ]
+  ],
+  [
+   "add_via",
+   17.0,
+   26.25,
+   0.3488,
+   0.1981,
+   "GND",
+   [
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu"
+   ],
+   0.3275
+  ]
+ ],
+ "edit_log": [
+  {
+   "op": [
+    "reshape",
+    "F.Cu",
+    "NetJ2_1",
+    [
+     15.85,
+     26.7,
+     16.3,
+     27.05
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 2,
+   "keepouts_added": 0
+  },
+  {
+   "op": [
+    "reshape",
+    "F.Cu",
+    "GND",
+    [
+     15.6,
+     25.8,
+     17.2,
+     26.44
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 4,
+   "keepouts_added": 0
+  },
+  {
+   "op": [
+    "reshape",
+    "B.Cu",
+    "NetJ2_1",
+    [
+     15.95,
+     25.4,
+     16.25,
+     27.06
+    ],
+    null
+   ],
+   "target_zones_merged": 1,
+   "other_net_zones_cut": 2,
+   "keepouts_trimmed": 4,
+   "keepouts_added": 0
+  },
+  {
+   "op": [
+    "add_via",
+    15.98,
+    26.88,
+    0.3488,
+    0.1981,
+    "NetJ2_1",
+    [
+     "In1.Cu",
+     "In2.Cu",
+     "In3.Cu",
+     "In4.Cu",
+     "In5.Cu",
+     "In6.Cu"
+    ],
+    0.3275
+   ],
+   "net_number": 20
+  },
+  {
+   "op": [
+    "add_track",
+    "F.Cu",
+    "NetJ2_1",
+    [
+     [
+      15.98,
+      26.88
+     ],
+     [
+      16.379,
+      26.9
+     ]
+    ],
+    0.25
+   ],
+   "segments": 1
+  },
+  {
+   "op": [
+    "add_track",
+    "B.Cu",
+    "NetJ2_1",
+    [
+     [
+      15.98,
+      26.88
+     ],
+     [
+      16.1,
+      26.75
+     ],
+     [
+      16.1,
+      25.3
+     ]
+    ],
+    0.3
+   ],
+   "segments": 2
+  },
+  {
+   "op": [
+    "antipad",
+    15.429,
+    27.201,
+    0.3275,
+    [
+     "In2.Cu",
+     "In3.Cu",
+     "In4.Cu",
+     "In5.Cu",
+     "In6.Cu"
+    ]
+   ]
+  },
+  {
+   "op": [
+    "antipad",
+    15.592,
+    26.2,
+    0.3275,
+    [
+     "In2.Cu",
+     "In3.Cu",
+     "In4.Cu",
+     "In5.Cu",
+     "In6.Cu"
+    ]
+   ]
+  },
+  {
+   "op": [
+    "antipad",
+    15.603,
+    28.549,
+    0.3275,
+    [
+     "In2.Cu",
+     "In3.Cu",
+     "In4.Cu",
+     "In5.Cu",
+     "In6.Cu"
+    ]
+   ]
+  },
+  {
+   "op": [
+    "keepout",
+    "In1.Cu",
+    [
+     15.0,
+     25.9,
+     17.45,
+     26.08
+    ]
+   ]
+  },
+  {
+   "op": [
+    "keepout",
+    "In1.Cu",
+    [
+     15.0,
+     25.9,
+     15.18,
+     27.73
+    ]
+   ]
+  },
+  {
+   "op": [
+    "keepout",
+    "In1.Cu",
+    [
+     15.0,
+     27.55,
+     15.4,
+     27.73
+    ]
+   ]
+  },
+  {
+   "op": [
+    "keepout",
+    "In1.Cu",
+    [
+     15.22,
+     27.55,
+     15.4,
+     29.48
+    ]
+   ]
+  },
+  {
+   "op": [
+    "keepout",
+    "In1.Cu",
+    [
+     15.22,
+     29.3,
+     17.45,
+     29.48
+    ]
+   ]
+  },
+  {
+   "op": [
+    "keepout",
+    "In1.Cu",
+    [
+     17.27,
+     25.9,
+     17.45,
+     29.48
+    ]
+   ]
+  },
+  {
+   "op": [
+    "add_via",
+    17.0,
+    26.25,
+    0.3488,
+    0.1981,
+    "GND",
+    [
+     "In2.Cu",
+     "In3.Cu",
+     "In4.Cu",
+     "In5.Cu",
+     "In6.Cu"
+    ],
+    0.3275
+   ],
+   "net_number": 6
+  }
+ ],
+ "manifest_sha256": "116de70eaa714fb6ceade70620abcc30d1dc57273168efb761fbb92b4cc9c4c8",
+ "stock_manifest_sha256": "1c68807a5c3c9688f9ce8b74f65491d39dfd8c7e6fde3af028eba25138a8e00f",
+ "L1_drc": {
+  "types": {
+   "isolated_copper": 13,
+   "silk_edge_clearance": 4,
+   "padstack": 1,
+   "lib_footprint_issues": 106
+  },
+  "unconnected": 0,
+  "clearance_below_rule": 0,
+  "pass": true,
+  "new_types": []
+ },
+ "L2_nets": {
+  "differences": [],
+  "pass": true
+ },
+ "L3_power_loop": {
+  "checks": {
+   "C1_paste_on_mask_open_copper": false,
+   "C2_Q1_seven_contacts_unique_orientation": true,
+   "C3_Q1_pin_centres_within_0.03mm": true,
+   "C4_Q1_pin_nets": true,
+   "C2_Q2_seven_contacts_unique_orientation": true,
+   "C3_Q2_pin_centres_within_0.03mm": true,
+   "C4_Q2_pin_nets": true,
+   "C4_gates_on_different_nets": true,
+   "C5_Ci_pairs_one_vin_one_gnd": true,
+   "C5_Cm_pairs_one_vin_one_gnd": true
+  },
+  "pass": true
+ },
+ "L4_extraction": {
+  "pass": false
+ },
+ "accepted": false,
+ "outcome": "rejected (acceptance)"
+}
