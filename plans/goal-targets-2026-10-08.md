@@ -286,3 +286,8 @@ Owner: continue autonomously (evaluate, change the design, run full-board extrac
 3. K1 is cost-limited (overshoot, Eon + Eoff, loss or settling beyond the amended limits): no stronger variant
    (it would move the same way); its full balance sheet goes to the owner and the family stops.
 At most two new G extractions in this tree. Every outcome, including failures, is recorded in docs/build.md.
+
+Pre-result procedural change (10 October 2026, about 19:55, while K1's G extraction runs and before any K1 G or
+switching result): K2 is built and extracted now, in parallel with K1 (two G jobs fit WSL's 8 GB: about 2.8 GB
+each, 4.7 GB free), to remove a 6.5 h wait. Its results are used only as the decision tree allows (step 2, or as
+recorded information on the gate-return family's range); no definition, check or reading rule changes.
