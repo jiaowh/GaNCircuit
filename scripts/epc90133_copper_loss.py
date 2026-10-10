@@ -71,6 +71,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", default="stock")
     ap.add_argument("--factors", nargs="*", type=int, default=[8, 4])
+    ap.add_argument("--map", type=Path, help="save the per-cell dissipation (W, state- and ripple-weighted) of the "
+                    "last factor as an .npz (thermal model input)")
     a = ap.parse_args()
     t0 = time.time()
     b = rg.load_board()
@@ -103,6 +105,7 @@ def main():
     for f in a.factors:
         pitch = rg.PITCH * f
         res = {"cell_mm": pitch, "nets": {}}
+        heat = {}
         for net, tdef in terms.items():
             root = roots[net]
             cells, index = {}, {}
@@ -180,6 +183,9 @@ def main():
                     link(c, tn, G_TIE)
             N = n + len(tnode)
             G = sparse.csr_matrix((vals, (rows, cols)), shape=(N, N))
+            off = G.tocoo()
+            sel = (off.row < off.col) & (off.data < 0)
+            er, ec, eg = off.row[sel], off.col[sel], -off.data[sel]
             # Floating islands of the net (not reachable from a terminal) are pinned by a tiny leak to ground.
             G = G + sparse.identity(N, format="csr") * 1e-9
             ref = tnode[next(iter(tdef))]
@@ -194,6 +200,13 @@ def main():
                 v_[keep] = spsolve(Gr, rhs[keep])
                 p = float(sum(ival * v_[tnode[t]] for t, ival in cur[net].items()))
                 net_res["loss_W"][st] = p
+                if a.map:
+                    pe = eg * (v_[er] - v_[ec]) ** 2 * (D if st == "Q1" else 1 - D) * RIPPLE / 2
+                    node_p = np.bincount(er, pe, N) + np.bincount(ec, pe, N)
+                    for e in rg.LAYERS:
+                        idx = index[e]
+                        hm = heat.setdefault(e, np.zeros(idx.shape))
+                        hm[idx >= 0] += node_p[idx[idx >= 0]]
             net_res["loss_W"]["average"] = D * net_res["loss_W"]["Q1"] + (1 - D) * net_res["loss_W"]["Q2"]
             res["nets"][net] = net_res
             print(f"cell {pitch:.4f} mm {net:4s} cells {n:7d} vias {nvia:4d} loss Q1 {net_res['loss_W']['Q1']:.4f} "
@@ -202,6 +215,10 @@ def main():
         res["total_W"] = sum(v["loss_W"]["average"] for v in res["nets"].values())
         res["total_with_ripple_W"] = res["total_W"] * RIPPLE
         out["results"][str(f)] = res
+        if a.map:
+            a.map.parent.mkdir(parents=True, exist_ok=True)
+            np.savez_compressed(a.map, factor=f, pitch_mm=pitch, **heat)
+            print(f"map {a.map}: {sum(h.sum() for h in heat.values()):.4f} W", flush=True)
         print(f"cell {pitch:.4f} mm total {res['total_W']:.4f} W, with ripple {res['total_with_ripple_W']:.4f} W", flush=True)
     path = ROOT / f"results/gan/epc90133-copper-loss-{a.tag}.json"
     path.write_text(json.dumps(out, indent=1, default=str) + "\n", encoding="utf-8")

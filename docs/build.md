@@ -3967,3 +3967,40 @@ against about 2.1 W FET loss: about 0.08 efficiency points at 240 W. Even zero c
 130 um, exceeds the 71 um copper), pads and pins ideal equipotentials, capacitor pads of a net tied together,
 20 C (copper resistance rises 0.393 %/K), two cell sizes give sensitivity (1.8 %), not convergence. Not yet in the
 goals assessor's efficiency.
+
+### Board thermal model, first runs (10 October 2026)
+
+Declared in `plans/goal-targets-2026-10-08.md` (commit 93c362a, plus the pre-result solver change noted there).
+`scripts/epc90133_thermal.py`: steady-state conduction on a 0.2 mm cell grid (8 copper planes, laminate between,
+plated-hole barrels), FET junction nodes through EPC's R_thJB 1.5 K/W and R_thJC 0.2 K/W, the copper-loss map from
+`epc90133_copper_loss.py --map`, R_ds(T) from datasheet Fig. 9 iterated to 0.05 K. Replay: `runs/thermal/run-layouts.sh`
+(copper maps first: `EPC90133_GERBER_EXPORT=<export> python scripts/epc90133_copper_loss.py --tag scratch-<b>
+--factors 8 --map runs/thermal/copper-heat-<b>-route-f8.npz`, then delete the scratch JSON). About 1 min per case.
+
+Checks: T1 energy balance within 1e-10 in every case; T2 slab and T3 via barrel exact
+(`results/gan/epc90133-thermal-selftest.json`); T4 0.127 mm against 0.2 mm cells (stock, h 10): T_J +0.4 K (Q1),
++0.3 K (Q2) bare, within 0.05 K with spreader (`-t4-stock-f5.json`): sensitivity, not convergence; T5 1 W in Q2
+alone: 43 / 24 / 12 K/W junction-to-ambient at h 5 / 10 / 25 (EPC: 45 K/W JEDEC board, 21 K/W EPC90142 board),
+3.1-3.5 K/W with the assumed spreader (`-t5-stock.json`).
+
+Loss split at 25 C (stock): Q1 1.40 W switching + 0.08 W conduction; Q2 0.43 W conduction + 0.17 W dead time.
+Results (`results/gan/epc90133-thermal-{stock,stock-route,V8,K1}.json`; stock-route is the reference for edited boards):
+
+| Cooling (laminate k 0.4) | stock T_J Q1 / Q2 | FET + Cu loss | V8 change Q1 / Q2 | K1 change |
+|---|---|---|---|---|
+| bare, h 5 (still air, low) | 142.9 / 140.4 C | 2.83 W | +2.1 / +1.6 K | 0.0 K |
+| bare, h 10 (assumed nominal) | 81.4 / 78.2 C | 2.50 W | +1.35 / +0.84 K | 0.0 K |
+| bare, h 25 | 51.3 / 47.9 C | 2.37 W | +1.06 / +0.53 K | 0.0 K |
+| spreader (5 K/W per FET), any h | 31 / 29 C | 2.29 W | +0.1 / 0.0 K | 0.0 K |
+
+Laminate k 0.2-0.6 moves stock by under 0.4 K and V8's change by about 0.1-0.3 K. Stock from EPC's Gerbers and from
+the export route agree within 0.1 K. Efficiency counting FET and copper loss: 98.97 % at h 10 against 99.05 % with
+the spreader; V8 is 0.009 points lower (h 10). Reading: V8's removed vias under the FETs raise junction temperature
+by about 1 K with bare-board cooling, about the size of the T4 grid sensitivity on absolute values (layout differences
+on one grid are expected to share most of that error); with a heat-spreader the FETs cool through their top and the
+layouts do not differ. The temperature rise is driven by Q1's switching loss, which is held at its 25 C value
+(assumption). V8 + 0.075 mm not run: its nominal switching case is incomplete (9 October), so it has no FET loss.
+K2 waits for its switching result. Limits: cooling coefficient and spreader resistance assumed; edges, spacers,
+connectors, inductor (L1 TBD in the BOM) and other parts excluded; switching and dead-time loss temperature-
+independent; package thermal resistances from the datasheet, not this board. No hardware temperature is predicted
+with a stated uncertainty.

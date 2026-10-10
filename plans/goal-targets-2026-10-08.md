@@ -317,3 +317,8 @@ through bare laminate) within 1 %; (T3) one via barrel against k A / L within 1 
 Runs: stock, V8, V8 + 0.075 mm (V8 copper with the thinner top dielectric), K1, K2, with the R_ds(T) iteration
 (stop at 0.05 K change). Outputs: T_J of Q1 and Q2, the change against stock, temperature-corrected FET and copper
 loss and efficiency. Absolute temperatures depend on the assumed cooling; the layout comparison is the target.
+Pre-result change (10 October 2026, about 21:10, before any layout result; the declaring session had crashed during
+T5): board solves use conjugate gradient with a diagonal preconditioner (relative residual 1e-10, checked) instead of
+a direct LU, whose fill on the 500,000-node board ran for over 10 minutes and 2 GB without finishing a case; on the
+0.4 mm grid both give the same answer to 1e-11. Self-tests T2/T3 keep the LU and still pass. No definition, input or
+check changes. T4's second cell size is 0.127 mm as declared (factor 5).

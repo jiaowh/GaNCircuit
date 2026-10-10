@@ -1,0 +1,191 @@
+{
+ "schema": "epc90133-thermal/1",
+ "evaluator_sha256": "c67baf0947f8cb5d5190799d8f5b24e353e43fd681d8c66303a6c042489fb420",
+ "geometry": {
+  "kind": "epc_gerbers",
+  "zip_sha256": "76189d4293607795fc195f6766171b588e269a4ecb1c5d3e3da2be4c8525acd1"
+ },
+ "tag": "t5-stock",
+ "cell_mm": 0.2032,
+ "dielectric_mil": [
+  5.0,
+  5.0,
+  7.2,
+  5.0,
+  7.2,
+  5.0,
+  5.0
+ ],
+ "loss_split_25C": null,
+ "copper_map": null,
+ "cases": {
+  "h5-k0.4": {
+   "h_W_m2K": 5.0,
+   "k_lam": 0.4,
+   "spreader": false,
+   "iterations": 2,
+   "T_J_C": {
+    "Q1": 64.60180766821715,
+    "Q2": 68.04910392008686
+   },
+   "T_case_C": {
+    "Q1": 64.60121365001316,
+    "Q2": 68.04845819321399
+   },
+   "board_max_C": 67.00264295370926,
+   "copper_mean_C": 25.0,
+   "fet_loss_W": {
+    "Q1": 0.0,
+    "Q2": 1.0,
+    "total": 1.0
+   },
+   "copper_loss_W": 0.0,
+   "T1_energy_balance": {
+    "in_W": 1.0,
+    "out_W": 0.9999999999867932,
+    "error": -1.3206769011731012e-11
+   },
+   "theta_JA_Q2_K_per_W": 43.049103920086864
+  },
+  "h5-k0.4-spreader": {
+   "h_W_m2K": 5.0,
+   "k_lam": 0.4,
+   "spreader": true,
+   "iterations": 2,
+   "T_J_C": {
+    "Q1": 26.374441117721958,
+    "Q2": 28.513126314372915
+   },
+   "T_case_C": {
+    "Q1": 26.321577997809793,
+    "Q2": 28.378006071512413
+   },
+   "board_max_C": 28.159637903052865,
+   "copper_mean_C": 25.0,
+   "fet_loss_W": {
+    "Q1": 0.0,
+    "Q2": 1.0,
+    "total": 1.0
+   },
+   "copper_loss_W": 0.0,
+   "T1_energy_balance": {
+    "in_W": 1.0,
+    "out_W": 0.999999999982928,
+    "error": -1.7072010471963495e-11
+   },
+   "theta_JA_Q2_K_per_W": 3.513126314372915
+  },
+  "h10-k0.4": {
+   "h_W_m2K": 10.0,
+   "k_lam": 0.4,
+   "spreader": false,
+   "iterations": 2,
+   "T_J_C": {
+    "Q1": 45.33452151226604,
+    "Q2": 48.780152854135245
+   },
+   "T_case_C": {
+    "Q1": 45.3339114949199,
+    "Q2": 48.77943947095116
+   },
+   "board_max_C": 47.73371539909592,
+   "copper_mean_C": 25.0,
+   "fet_loss_W": {
+    "Q1": 0.0,
+    "Q2": 1.0,
+    "total": 1.0
+   },
+   "copper_loss_W": 0.0,
+   "T1_energy_balance": {
+    "in_W": 1.0,
+    "out_W": 1.000000000000316,
+    "error": 3.1596947280831955e-13
+   },
+   "theta_JA_Q2_K_per_W": 23.780152854135245
+  },
+  "h10-k0.4-spreader": {
+   "h_W_m2K": 10.0,
+   "k_lam": 0.4,
+   "spreader": true,
+   "iterations": 2,
+   "T_J_C": {
+    "Q1": 26.255993457044692,
+    "Q2": 28.388510058675422
+   },
+   "T_case_C": {
+    "Q1": 26.207686016389186,
+    "Q2": 28.258182748726366
+   },
+   "board_max_C": 28.010885956920877,
+   "copper_mean_C": 25.0,
+   "fet_loss_W": {
+    "Q1": 0.0,
+    "Q2": 1.0,
+    "total": 1.0
+   },
+   "copper_loss_W": 0.0,
+   "T1_energy_balance": {
+    "in_W": 1.0,
+    "out_W": 0.999999999977546,
+    "error": -2.2454038628438866e-11
+   },
+   "theta_JA_Q2_K_per_W": 3.388510058675422
+  },
+  "h25-k0.4": {
+   "h_W_m2K": 25.0,
+   "k_lam": 0.4,
+   "spreader": false,
+   "iterations": 2,
+   "T_J_C": {
+    "Q1": 33.76431304981984,
+    "Q2": 37.20497344502443
+   },
+   "T_case_C": {
+    "Q1": 33.76365577563766,
+    "Q2": 37.204058140663896
+   },
+   "board_max_C": 36.15862774203502,
+   "copper_mean_C": 25.0,
+   "fet_loss_W": {
+    "Q1": 0.0,
+    "Q2": 1.0,
+    "total": 1.0
+   },
+   "copper_loss_W": 0.0,
+   "T1_energy_balance": {
+    "in_W": 1.0,
+    "out_W": 0.9999999999943942,
+    "error": -5.605849118239803e-12
+   },
+   "theta_JA_Q2_K_per_W": 12.204973445024429
+  },
+  "h25-k0.4-spreader": {
+   "h_W_m2K": 25.0,
+   "k_lam": 0.4,
+   "spreader": true,
+   "iterations": 2,
+   "T_J_C": {
+    "Q1": 26.018826483156538,
+    "Q2": 28.13868060464922
+   },
+   "T_case_C": {
+    "Q1": 25.979640849188602,
+    "Q2": 28.017962119855014
+   },
+   "board_max_C": 27.712519374375866,
+   "copper_mean_C": 25.0,
+   "fet_loss_W": {
+    "Q1": 0.0,
+    "Q2": 1.0,
+    "total": 1.0
+   },
+   "copper_loss_W": 0.0,
+   "T1_energy_balance": {
+    "in_W": 1.0,
+    "out_W": 0.9999999999579852,
+    "error": -4.2014836054704574e-11
+   },
+   "theta_JA_Q2_K_per_W": 3.1386806046492204
+  }
+ }
+}

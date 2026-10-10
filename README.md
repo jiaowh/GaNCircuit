@@ -173,6 +173,12 @@ What the screens show, given the fixed parts:
   S6 (step di/dt 30.9 against 29.9 A/ns). **S5** has no limit set and **S9** cannot be decided from these runs, so
   even a candidate passing everything else would not count as meeting all goals. V8 fails S13 on every corner set.
 
+A board model of copper (DC) loss and steady-state temperature adds what the transistor-only scores leave out. Board
+copper loses about 0.2 W against about 2.1 W in the transistors. On a bare board in still air (an assumed cooling
+coefficient), the transistors reach roughly 80 C and V8 runs about 1 K hotter than stock, because it removes vias
+under the transistors that also carry heat; with EPC's optional heat-spreader the layouts do not differ. These
+temperatures rest on assumed cooling and are not hardware predictions.
+
 In these screens the goals pull against each other: lowering the power-loop inductance lowers overshoot (S2) but
 speeds up the current change (S6) and raises switching energy (S10). The screens scale every inductance together or
 idealize one connection, so they do not cover every legal copper, via and gate-return change. Meeting all goals has
