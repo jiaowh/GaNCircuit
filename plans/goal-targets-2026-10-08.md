@@ -448,3 +448,27 @@ PH (U80.PH branch only) x0.6 / x1.5; G1P (Q1 gate path without U80.PH: R80/R81 b
 GND branches incl. Q2.S2) x0.5 / x2. Coupling directions keep self inductances and must stay positive definite
 (checked; a failing factor is reported and replaced by the largest passing one in steps of 0.25). Same bench, same
 stock reference rerun, same scoring and mix (groups as above). 18 cases.
+
+Stage 1b result (11 October 2026; 18/18 usable; `results/gan/epc90133-direction-screen-1b.json`, score file updated):
+CSQ2 (Q2 driver-return coupling to the power return) x0.5: Q2 gate peak -67 / -63 % (0.63 / 0.61 V), settling +36 %;
+x1.75 (2 not positive definite): gate peak +120 / +102 %, settling -16 %. CSQ1 x0.5: di/dt -14 / -25 %, settling
+-9 / -11 %, Eon+Eoff +7 / +8 %; x1.5: overshoot +265 / +202 % (oscillatory). G1P x1.5: overshoot -9.2 / -4.4 %, gate
+peak -6.8 / -3.6 %, di/dt +2.2 / +1.7 %, Q1 gate extremes unchanged. Mix (Q1DRV budget shared by DRV1, PH, G1P): the
+amended rule is feasible only at its limits; best overshoot with all else no worse -7.4 / -6.3 %; S2 and S10 -10 %
+infeasible. Gate-loop inductances from the networks (turn-on loop, mutual terms included): stock Q1 599 pH, Q2 561 pH;
+K2 Q2 1008 pH (its isolated return detours), so part of K2's settling cost is DRV2-like (x1.5 direction: +5.7 %).
+
+### Stage 2 candidate C3: dedicated driver-return island (declared 11 October 2026, about 03:30, before its build)
+
+Design (Infineon DG165832 / ST guidance: gate return on an inner plane directly under the gate path, joined to the
+source near the gate): K1's base; the three driver GND vias isolated on In2-In6 (EPC antipads) but kept on In1; on
+In1 a GND island under Q2's gate drive (about x 15.3-17.4, y 26.1-29.3), separated from the plane by slits of at
+least 0.16 mm (cut rectangles; exact pieces fitted to clear other nets' In1 copper, every attempt kept); one new GND
+via (board's smallest size) on Q2's top-layer source copper beside the gate end, at about (17.15, 26.25), joined to
+top and In1 only (antipads In2-In6). Return path: Q2.S2 -> top source copper -> new via -> In1 island under the
+gate path -> driver vias -> U80.GND. Acceptance as K1/K2 (L1-L4, drills = stock + K1's hole + the new hole, gate-loop
+checks), then one G extraction (WSL, beside the still-running screen job), the nominal pair, outperform scoring, and
+the K2 checks (50 ps, C_SW) if it beats K2's balance.
+Frozen prediction: Q2 turn-on gate loop below stock's 561 pH (K2: 1008); board common-source L(Q2) at most K2's
+37.1 pH; Q2 gate peak -25 to -40 % (K2 -29 / -25); settling +8 to +25 % (K2 +21 / +20), i.e. the settling penalty
+shrinks but the amended rule is still missed on settling; overshoot and losses within +/-1 %.

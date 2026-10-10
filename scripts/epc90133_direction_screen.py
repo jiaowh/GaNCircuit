@@ -32,12 +32,24 @@ GROUPS = {
     "DRV2": ["r82_g", "r83_g", "u80_lgh", "u80_lgl", "u80_gnd"],
 }
 POWER = GROUPS["VIN"] + GROUPS["GND"] + GROUPS["SW"]
+# Stage 1b (declared 11 October 2026): Q1's gate drive split, and the common-source couplings alone.
+GROUPS_1B = {"PH": ["u80_ph"], "G1P": ["r80_g", "r81_g", "u80_ugh", "u80_ugl"]}
+COUPLINGS_1B = {"CSQ1": (["u80_ph"], GROUPS["SW"]), "CSQ2": (["u80_gnd"], GROUPS["GND"])}
+K_FACTORS = (0.5, 2.0)
 FACTORS = (0.6, 1.5)
 R_FACTORS = (2.0, 4.0)
 
 
-def directions():
+def directions(stage="1"):
     out = {}
+    if stage == "1b":
+        for g, members in GROUPS_1B.items():
+            for s in FACTORS:
+                out[f"{g}x{s:g}".replace(".", "p")] = ("L", members, s)
+        for g, pair in COUPLINGS_1B.items():
+            for s in K_FACTORS:
+                out[f"{g}x{s:g}".replace(".", "p")] = ("K", pair, s)
+        return out
     for g in GROUPS:
         for s in FACTORS:
             out[f"{g}x{s:g}".replace(".", "p")] = ("L", GROUPS[g], s)
@@ -46,16 +58,42 @@ def directions():
     return out
 
 
-def make(base_path, prefix):
+def make(base_path, prefix, stage="1"):
     base = json.loads(base_path.read_text(encoding="utf-8"))
     names = [p["name"] for p in base["ports"]]
     L0, R0 = np.array(base["L_H"]), np.array(base["R_ohm"])
     sha = hashlib.sha256(base_path.read_bytes()).hexdigest()
     OUT.mkdir(parents=True, exist_ok=True)
     made = {}
-    for d, (kind, group, s) in directions().items():
-        idx = [names.index(n) for n in group]
+    for d, (kind, group, s) in directions(stage).items():
         rep = copy.deepcopy(base)
+        if kind == "K":
+            a_, b_ = ([names.index(n) for n in g_] for g_ in group)
+            f = s
+            while True:
+                L = L0.copy()
+                for i in a_:
+                    for j in b_:
+                        L[i, j] *= f
+                        L[j, i] *= f
+                if np.linalg.eigvalsh(L).min() > 0:
+                    break
+                f = 1 + (f - 1) - (0.25 if f > 1 else -0.25)
+                if abs(f - 1) < 1e-9:
+                    raise SystemExit(f"{d}: no positive definite factor")
+            if f != s:
+                print(f"{d}: factor {s} not positive definite, used {f}", flush=True)
+            rep["L_H"] = L.tolist()
+            rep["case"] = f"{prefix}{d}"
+            rep["direction_screen"] = {"base": str(base_path.relative_to(ROOT)), "base_sha256": sha, "kind": kind,
+                                       "group": group, "factor": f, "declared_factor": s,
+                                       "note": "synthetic sensitivity network, not a geometry or extraction"}
+            rep.pop("evidence_directory", None)
+            path = OUT / f"{prefix}{d}.json"
+            path.write_text(json.dumps(rep) + "\n", encoding="utf-8")
+            made[f"{prefix}{d}"] = str(path.relative_to(ROOT))
+            continue
+        idx = [names.index(n) for n in group]
         if kind == "L":
             dv = np.ones(len(names))
             dv[idx] = np.sqrt(s)
@@ -111,11 +149,12 @@ def main():
     ap.add_argument("reports", nargs="*")
     ap.add_argument("--base", type=Path, default=BASE)
     ap.add_argument("--prefix", default="D")
+    ap.add_argument("--stage", default="1", choices=("1", "1b"))
     ap.add_argument("--reference", default="stock")
     ap.add_argument("--output", type=Path)
     a = ap.parse_args()
     if a.action == "make":
-        make(a.base, a.prefix)
+        make(a.base, a.prefix, a.stage)
     else:
         score(a.reports, a.reference, a.output)
     return 0

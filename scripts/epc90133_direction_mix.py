@@ -51,7 +51,8 @@ def measured():
 def group(n):
     """Directions of one group share a budget: at most one full change, in one direction."""
     if n.startswith("D") and "x" in n:
-        return n[1:].split("x")[0]
+        g = n[1:].split("x")[0]
+        return "Q1DRV" if g in ("DRV1", "PH", "G1P") else g  # stage 1b splits DRV1: one shared budget
     if n.startswith("Lx"):
         return "L"
     return n
