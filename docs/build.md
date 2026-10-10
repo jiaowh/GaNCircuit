@@ -3831,7 +3831,9 @@ Run 2 (declared above; queue `runs/confirm-V8d075-queue.ps1`) finished on 9 Octo
   11.24 / 10.52), 14.29 / 11.85 V at 60 V (stock 13.74 / 12.50), 4.51 / 4.27 V at no load (stock 4.86 / 5.54);
   ramp x0.9 and x1.1 within 2 % of stock. Every corner fails S8 (Q2 gate peak 0.65-2.21 V against < 0.5 V), as for
   stock and V8.
-- **Switch-node capacitance pair** (stock + 135 pF, V8d075 + 188.84 pF; scored RETROSPECTIVELY with the new
+- **Switch-node capacitance pair** (switch-node-to-ground capacitance 135 pF for stock, 188.84 pF in total for
+  V8d075 = 135 pF plus a 53.84 pF parallel-plate estimate; both are estimates, so these cases add an omitted effect
+  without establishing its size; scored RETROSPECTIVELY with the new
   `--case-tag=-csw` scorer option, added after this result and checked to leave the default scoring identical:
   `results/gan/epc90133-goals-assessment-V8d075-csw.json`):
 
@@ -3844,16 +3846,22 @@ Run 2 (declared above; queue `runs/confirm-V8d075-queue.ps1`) finished on 9 Octo
 | Eon + Eoff | 5.76 / 5.95 uJ | 5.89 / 6.09 uJ |
 | FET loss | 2.118 / 2.112 W | 2.146 / 2.145 W |
 
-  V8d075 meets S1, S3, S4 and S7 and fails S2, S6, S8, S10 and S12 under both drivers; S5, S9, S11 and S13 are
+  V8d075 meets S1, S3, S4 and S7 and fails S2, S6, S8, S10 and S12 under both drivers (S6 on di/dt; its peak
+  current is lower than stock's under both drivers); S5, S9, S11 and S13 are
   undetermined (no corners or dead-time sweep in this pair). The declared plain-versus-C_SW comparison cannot be
   made because the plain nominal pair is missing, so these verdicts are reported only for the with-capacitance
   condition and are not called capacitance-insensitive.
-- **Frozen prediction holds:** overshoot stays above S2's 9.6 V under the ramp driver (12.64 V with C_SW); S6 and S10
-  are no better than V8 (both fail).
+- **Frozen prediction only partly checked:** the extraction part holds (G loop inductance -17.2 %, forecast -10 to
+  -20 %). The with-capacitance ramp overshoot (12.64 V) is consistent with the forecast failure of S2's 9.6 V, and S6
+  and S10 fail there as they do for V8, but no plain nominal case and no V8 case with C_SW exist, so the switching
+  part of the prediction is not checked under matched conditions.
 
-Reading: the 17 % lower board loop inductance did not lower the switch-node overshoot in this bench; the ring
-frequency rose (about 263 to 279 MHz at no load) while the overshoot amplitude barely changed. The bench adds the
+Reading: in the with-capacitance pair the 17 % lower board loop inductance did not lower the switch-node overshoot
+(+4.5 % ramp, -3.1 % step against stock); whether the added capacitance offsets a gain cannot be told without the
+missing plain nominal cases. At no load (plain cases) the ring frequency rose (about 263 to 279 MHz) while the
+overshoot amplitude changed little. The bench adds the
 assumed 50 pH package source inductance, the device model's capacitances and the extra C_SW, but the dominant term has
-not been isolated, so no attribution is claimed. S8 fails at every condition for every design, so no candidate
-reaches all goals irrespective of the timed-out cases. As declared, no follow-up sweep is launched and the timed-out
+not been isolated, so no attribution is claimed. S8 fails at every usable scored condition for every design (V8d075
+0.65 V at no load up to 2.21 V at 60 V), and V8d075's S13 corner failure alone rejects an all-goals pass; the
+timed-out cases cannot reverse it. V8 stays the provisional candidate; neither design is hardware-validated. As declared, no follow-up sweep is launched and the timed-out
 cases are not rerun. Candidate page republished with two with-capacitance rows compared with each other.
