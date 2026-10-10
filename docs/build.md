@@ -3933,3 +3933,14 @@ EPC-size antipads (r 0.3275 mm) on In1-In6 around the driver GND vias (15.429, 2
 gate-loop checks pass; A loop L +0.01 %. Render of In1 confirms the three driver vias and the new probe via are
 isolated from the plane. G extraction and nominal pair launched 19:29 through WMI (`runs/K2-chain.ps1`), beside K1's
 (two FastHenry jobs, about 2.8 GB each, within WSL's 8 GB).
+
+**K1 result (10 October 2026).** G extraction complete in 5.2 h (14:59-20:11, beside K2 from 19:29); nominal pair
+20:15, both usable (`results/gan/epc90133-goals-G-K1.json`). G against stock through the route: loop L 0.2523 ->
+0.2522 nH, Q2 board common-source L 48.02 -> 46.64 pH (-2.9 %), Q1 0.99 -> 0.88 pH. **The frozen prediction fails**
+(at least -30 % common-source L; gate peak -5 to -15 %). Switching against stock (ramp / step): Q2 gate peak -1.29 /
+-1.24 %, settling +2.68 / 0.00 %, every other rule quantity within +/-0.06 %
+(`results/gan/epc90133-outperform-K1.json`): declared and amended rule NOT met, only on the gate peak. Goals
+(`results/gan/epc90133-goals-assessment-K1.json`, nominal only): S1, S4, S7 met; S3 missed (ramp settling +2.7 %) and
+S6 missed by +0.03 % di/dt (numerical-noise size, reported as the definition gives it). Reading: with the driver
+vias still joined to the planes, the new top bridge is in parallel with the plane path and carries power current,
+so it changes little; this is a hypothesis, tested by K2. Decision tree step 2 (spike-limited) applies: K2.

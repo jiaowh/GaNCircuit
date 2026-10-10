@@ -739,9 +739,72 @@
     "L_loop_nH": 0.49242392884767927,
     "R_loop_mohm": 4.03451754037708
    },
-   "G": null,
+   "G": {
+    "source": "vendor/epc/epc90133/reconstruction/export/K1/extraction/G-m1-mid-K1.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.2524699891757645,
+    "R_loop_mohm": 2.015559986826614,
+    "L_cs_Q1_pH": 0.8761643652455177,
+    "L_cs_Q2_pH": 46.63514651972915
+   },
    "goals": {
-    "vendor": null,
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": false,
+      "S4": true,
+      "S5": null,
+      "S6": false,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": null,
+      "S12": false,
+      "S13": null
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-K1.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.31293869018555,
+       "overshoot_V": 11.118995629583097,
+       "settling_s": 1.3425e-07,
+       "tr_s": 1.6832405780547758e-09,
+       "tf_s": 4.1755856378748374e-09,
+       "dvdt_V_per_ns": 22.813138240985538,
+       "id_peak_A": 58.530391693115234,
+       "didt_A_per_ns": 42.2402,
+       "vgs_max_V": 5.031345367431641,
+       "vgs_min_V": -1.8731244504451752,
+       "q2_gate_peak_V": 1.914662480354309,
+       "eon_eoff_J": 5.585390754340251e-06,
+       "efficiency": 0.991411474428731
+      },
+      "step-Ls50": {
+       "vpk_V": 58.983821868896484,
+       "overshoot_V": 10.786935380582264,
+       "settling_s": 1.315e-07,
+       "tr_s": 1.7906228640047326e-09,
+       "tf_s": 4.219847403011495e-09,
+       "dvdt_V_per_ns": 21.445051759318154,
+       "id_peak_A": 52.491641998291016,
+       "didt_A_per_ns": 33.48807999999998,
+       "vgs_max_V": 4.991828918457031,
+       "vgs_min_V": -1.3049146756529808,
+       "q2_gate_peak_V": 1.6383918523788452,
+       "eon_eoff_J": 5.7787339891385015e-06,
+       "efficiency": 0.9914443677338921
+      }
+     },
+     "dead_time_optimum_ns": null,
+     "corners": {
+      "passed": 0,
+      "usable": 0,
+      "declared": 10
+     }
+    },
     "EPC2302DS": null
    }
   },
@@ -912,6 +975,7 @@
   "vendor": [
    "results/gan/epc90133-goals-assessment-V8d075.json",
    "results/gan/epc90133-goals-assessment-vendor-rev2.json",
+   "results/gan/epc90133-goals-assessment-K1.json",
    "results/gan/epc90133-goals-assessment-V8d075-csw.json",
    "results/gan/epc90133-goals-assessment-V8d075-csw.json"
   ],
