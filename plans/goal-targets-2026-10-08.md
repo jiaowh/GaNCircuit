@@ -432,3 +432,19 @@ the outperform metrics against that reference; then a linear mix of directions (
 also mixed with K2's measured direction. A direction is a sensitivity, not a design: a promising mix leads to a
 geometry candidate only through stage 2 (realizability, declared separately). Budget: 34 cases, about 3 min each,
 at most 4 LTspice jobs at once; timeout 3,600 s.
+
+Stage 1 result (11 October 2026; `results/gan/epc90133-direction-screen-score.json`, `-direction-mix.json`; run 1 of
+the screen launched only stock because of a shell-quoting error and is kept as `-run1-launch-error`; run 2 complete,
+30/30 usable). Mix revision 2 (made after the first mix output, before any use: each group may use at most one full
+change in one direction; the resistance direction RPOW is reported separately as not known to be buildable). Without
+RPOW: S2 overshoot -10 % and S10 -10 % are infeasible with the other limits; the amended rule is feasible only at its
+limits (V8 x0.53, K2 x0.22, DRV2 x0.6 at 0.19, GND x0.6 at 0.05, DRV1 x1.5 at 0.06); best Q2 gate peak with every
+other limit kept -15.6 / -15.2 %. Loop-inductance reductions raise di/dt and Eon+Eoff in every pure direction; V8 is
+the exception, plausibly because it also raised Q1's common-source L (0.99 -> 4.15 pH).
+
+Stage 1b (declared now, before its runs): split Q1's gate drive and isolate the common-source couplings. Directions:
+PH (U80.PH branch only) x0.6 / x1.5; G1P (Q1 gate path without U80.PH: R80/R81 branches, UGH/UGL) x0.6 / x1.5; CSQ1
+(every coupling coefficient between U80.PH and the SW branches Q1.S2/Q1.S46) x0.5 / x2; CSQ2 (between U80.GND and the
+GND branches incl. Q2.S2) x0.5 / x2. Coupling directions keep self inductances and must stay positive definite
+(checked; a failing factor is reported and replaced by the largest passing one in steps of 0.25). Same bench, same
+stock reference rerun, same scoring and mix (groups as above). 18 cases.
