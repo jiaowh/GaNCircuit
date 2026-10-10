@@ -413,3 +413,22 @@ scale together (an assumption), K2's ratio (about 27 % / 20 %) cannot reach both
 settling penalty disappears with C_SW, K2 goes to decision-tree step 1 (corners) under the C_SW condition.
 K2's thermal run (declared model) is run as for the other layouts. The common-source screen's blind test on K2 was
 missed (K2's G finished before the screen); the screen's stock/K1 check continues.
+
+### Exhaustive improvement search, stage 1: direction screen (declared 11 October 2026, about 01:20)
+
+Owner: keep searching every changeable from all angles, combinations included, autonomously within this PC's
+limits. Stage 1 asks which kinds of layout change can move which goals, before any geometry is drawn. Method
+(`scripts/epc90133_direction_screen.py`): synthetic network reports derived from stock's G extraction (numbers only,
+no geometry), each scaling one branch group by congruence (L' = D L D, D = sqrt(s) on the group's rows/columns, so
+the group's self inductance scales by s, every coupling coefficient is unchanged and the matrix stays positive
+definite; the bench's l_scale does the same for all branches). Groups: VIN (all capacitor VIN branches), GND (all
+capacitor GND branches and Q2.S2), SW (Q1.S2, Q1.S46), CM (the Cm bank's VIN and GND branches: distance to the
+second bank), DRV1 (Q1's gate drive: R80/R81 branches, UGH/UGL, U80.PH), DRV2 (Q2's: R82/R83, LGH/LGL, U80.GND);
+factors 0.6 and 1.5; plus RPOW (diagonal resistance of every power branch x2 and x4: how much high-frequency loss
+would restore damping). Each direction runs `@{ramp,step}-Ls50-gear` (vendor model, assumed 50 pH) through the
+unchanged switching bench via --ext-file; stock's own pair is rerun in the same call as the reference. Scoring:
+the outperform metrics against that reference; then a linear mix of directions (screening assumption, as the
+10 October trade-off screen) for (a) the amended rule, (b) S2 -10 %, (c) S10 -10 %, (d) best S8 with S3 <= +5 %,
+also mixed with K2's measured direction. A direction is a sensitivity, not a design: a promising mix leads to a
+geometry candidate only through stage 2 (realizability, declared separately). Budget: 34 cases, about 3 min each,
+at most 4 LTspice jobs at once; timeout 3,600 s.
