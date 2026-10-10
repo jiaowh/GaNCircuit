@@ -162,3 +162,35 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def compose(base_path, steps, name, note):
+    """Stage 1c: one synthetic network with several direction changes applied together (congruence L scalings and
+    coupling scalings, in order), to test the linear mixes directly. steps: list of (kind, group(s), factor)."""
+    base = json.loads(Path(base_path).read_text(encoding="utf-8"))
+    names = [p["name"] for p in base["ports"]]
+    L = np.array(base["L_H"])
+    for kind, group, f in steps:
+        if kind == "L":
+            dv = np.ones(len(names))
+            dv[[names.index(n) for n in group]] = np.sqrt(f)
+            L = dv[:, None] * L * dv[None, :]
+        elif kind == "K":
+            a_, b_ = ([names.index(n) for n in g_] for g_ in group)
+            for i in a_:
+                for j in b_:
+                    L[i, j] *= f
+                    L[j, i] *= f
+    ev = float(np.linalg.eigvalsh(L).min())
+    rep = copy.deepcopy(base)
+    rep["L_H"] = L.tolist()
+    rep["case"] = name
+    rep.pop("evidence_directory", None)
+    rep["direction_screen"] = {"base": str(Path(base_path)), "base_sha256": hashlib.sha256(Path(base_path).read_bytes()).hexdigest(),
+                               "kind": "composite", "steps": [[k, g, f] for k, g, f in steps], "min_eigenvalue_H": ev,
+                               "note": note}
+    if ev <= 0:
+        raise SystemExit(f"{name}: not positive definite ({ev:.3g})")
+    path = OUT / f"{name}.json"
+    path.write_text(json.dumps(rep) + "\n", encoding="utf-8")
+    return path

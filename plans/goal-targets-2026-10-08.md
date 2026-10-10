@@ -472,3 +472,24 @@ the K2 checks (50 ps, C_SW) if it beats K2's balance.
 Frozen prediction: Q2 turn-on gate loop below stock's 561 pH (K2: 1008); board common-source L(Q2) at most K2's
 37.1 pH; Q2 gate peak -25 to -40 % (K2 -29 / -25); settling +8 to +25 % (K2 +21 / +20), i.e. the settling penalty
 shrinks but the amended rule is still missed on settling; overshoot and losses within +/-1 %.
+
+Stage 1c (11 October 2026, after the goal-count mix): the linear model claimed S1, S2, S6, S8 together (S3 lost) for a
+mix of about ten directions. Applied together in one network (`MIX4`, on V8, K2 share omitted;
+`results/gan/epc90133-direction-screen-1c.json`) it gives overshoot +22.1 / +1.6 %, di/dt +8.5 / +11.9 %, settling
++10.5 / +7.2 %, Q2 gate peak 0.78 / 0.70 V (-60 / -58 %): S2, S6 and S8 missed. Linear superposition of large changes
+is not reliable here; mixes of several large directions are not reported as findings.
+
+### Search stage 3: direct network search (declared 11 October 2026, about 04:00, before its runs)
+
+Question: does ANY combination of the screened network changes beat stock's goal count, judged by direct simulation
+of the combined network (no superposition)? `scripts/epc90133_network_search.py`: composite networks on stock's G
+network with log-uniform factors CM, VIN, GND, SW, DRV2, G1P, PH in [0.6, 1.5], CSQ2 in [0.5, 1.5] and CSQ1 in [0.5,
+1.25] (1.5 oscillates); every network checked positive definite (else resampled). Score per network, both drivers
+(ramp/step-Ls50, vendor model, 50 pH): goals met among S1, S2 (overshoot -10 % and <= 9.6 V), S3 (settling <= stock),
+S4 (tr, tf <= 1.1 x stock), S6 (Q1 peak current and di/dt <= stock), S7 (+5.5 / -3 V), S8 (< 0.5 V), S10 (Eon+Eoff
+-10 %) (S5, S9, S11, S12, S13 not evaluated here: unset, undeterminable, a dead-time property, FET-only, corners);
+tiebreak: sum over failed goals of the normalised shortfall. Stock scores 5 (S1, S3, S4, S6, S7). Rounds: 1) 32
+Latin-hypercube networks; 2-4) 16 networks each around the three best (factor spread halved each round); a stock
+pair rerun in every round as reference. At most 4 LTspice jobs, 3,600 s timeout, about 5 h. Outcome: the best goal
+count and its network; if no network beats 5, layout changes of these kinds cannot (in this model) add a goal without
+losing one. A network target is not a layout: any winner goes to realizability (stage 2) before any claim.
