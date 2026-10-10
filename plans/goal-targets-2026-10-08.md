@@ -351,3 +351,45 @@ rules, keeps every net connection, and can be assembled (courtyards clear, stand
 schematic and BOM, board outline, connectors, measurement connectors, test points, holes (template "Fixed" list),
 the stackup range and probes/functions kept. Earlier results stay tied to the limits they were run under; L3a's
 "too little room" reading applied only to the 1 mm assumption.
+
+### Free-placement study (declared 10 October 2026, about 23:50; owner: "try them, start planning and preparing")
+
+Pre-study evidence, no solver run: `scripts/epc90133_loop_split.py` splits each G report's loop inductance where
+the voltage drops (g_summary's network and excitation; capacitor terminals weighted by current share)
+(`results/gan/epc90133-loop-split.json`). Stock 252.7 pH = VIN copper (capacitors to Q1) 18.1 pH (7 %) + SW copper
+(Q2 to Q1) 54.2 pH (21 %) + GND return (Q2's source back under both FETs to the capacitors) 180.4 pH (71 %). V8,
+V8d075 and K1 change mainly the GND section (168.0, 142.7, 179.9 pH). The split describes this network; it is not a
+unique partial-inductance decomposition. Driver-area inventory (KiCad board): U80 (15.53, 29.70), C80 VCC
+decoupling (15.23, 27.90), C81 bootstrap (14.43, 31.40), R80-R83 (16.0-17.2, 27.9-31.4), gate-probe resistors R11
+(16.13, 32.30) and R22 (16.83, 26.90) leading to the fixed probe connectors J2/J22, logic inputs NetC70_1/NetC75_1
+from the left. The driver sits centred between the two gate pins (Q1.G y 32.17, Q2.G y 27.22), 2.7 mm away.
+
+Family D, driver group (targets S8 and S7: Q2/Q1 gate peaks).
+1. Waits for K2's result, which decides the mechanism: (a) K2 lowers L_cs(Q2) by at least 20 %: D candidates build
+   on K2 (shorten the isolated return by moving the driver group toward Q2); (b) otherwise D1: driver group (U80,
+   C80, C81, R80-R83, with R11/R22 kept on their probe paths) moved and/or rotated so U80's GND ball and C80's GND
+   pad join Q2's source copper next to Q2's gate (EPC guidance: driver return taken from the joined source copper
+   near the gate; pin 2 is not a separate Kelvin pin). C80/C81 loops no longer than stock's (the bench holds the
+   driver supplies ideal, so it cannot see them grow).
+2. Screen first: the common-source screen (if it passes its declared check) with added gate-loop ports; the
+   gate-loop definition and its reproduction check on stock's G report are declared before first use. Quantities:
+   L_cs(Q1), L_cs(Q2), gate-loop L of Q1 and Q2, L_loop.
+3. Gate to a G extraction and the nominal switching pair: L_cs(Q2) at least 20 % below stock (K1: -2.9 % gave
+   -1.3 % gate peak; -20 % for the 10 % gate-peak rule assumes a linear relation, labelled as an assumption) and
+   Q1's L_cs and gate-loop L not more than 10 % above stock. A frozen prediction (L_cs and gate peak) per candidate
+   before its screen. At most two G extractions in this family; scoring as K1 (outperform rule, then goals).
+4. New tooling is a prerequisite and is qualified on its own before any candidate uses it: rotation (if needed) and
+   rerouting of U80's fan-out (its 12 balls at 0.4 mm pitch); every candidate passes the L1-L4 and gate-loop checks.
+
+Family P, capacitor placement (target S2: needs about 45 % lower loop L).
+* Expectation, stated before any P run: placement alone does not reach S2. 71 % of the loop is the return under
+  the stacked FETs, whose length the capacitor positions barely change (L3a: +0.75 %); the best legal result so far
+  is V8d075 at -17 % (G).
+* P1, a cheap test of that expectation: Ci7, the outlying input capacitor (x 26.85; 8.7 % current share), moved into
+  the free slot of the Ci row at x = 24.15 (row pitch 1.30 mm), if DRC allows. A-variant screen against stock
+  through the route. Frozen prediction: A loop L change between 0 and -2 %, below the 4 % threshold, so no G run.
+* P2, a rearrangement of the power stage (FET positions/orientation and the copper on all eight layers) is the only
+  route with a chance at S2 and is a redesign beyond the rectangle-edit tooling: not started without an owner
+  decision on that scope.
+Stop rule: the family stops when its screens or gates fail, when tooling cannot produce a DRC-clean candidate, or
+after the stated G budget; every outcome is recorded in docs/build.md.
