@@ -4061,3 +4061,50 @@ stock's complete 47-port G extraction: the shorted network converges far more sl
 solver; cause not separately diagnosed), so the expected saving (about 5 h -> 30 min) does not exist. The stock run is
 left to finish for the declared accuracy check; the queued K1 run is not wanted (no time advantage). The idea that
 the per-port cost is fixed was the agent's estimate from K1's iteration count and is wrong for this reduced deck.
+
+### Exhaustive improvement search: direction screens (11 October 2026)
+
+Owner (11 October): keep searching every changeable, combinations included, autonomously. Declared stages in
+`plans/goal-targets-2026-10-08.md` ("Exhaustive improvement search"). Tools: `scripts/epc90133_direction_screen.py`
+(synthetic networks from stock's G report: congruence scaling of a branch group, or scaling of selected coupling
+coefficients; numbers only, in `results/gan/direction-screen/`), the unchanged switching bench via --ext-file, and
+`scripts/epc90133_direction_mix.py` (linear mixes; scipy linprog).
+
+Stage 1 (30 cases, `-direction-screen-run2.json`; run 1 launched only stock, a quoting error, kept). Changes against
+the stock pair of the same call, ramp / step:
+
+| Direction | Overshoot | Settling | di/dt | Eon+Eoff | Q2 gate peak |
+|---|---|---|---|---|---|
+| CM x0.6 (second bank closer) | -5.7 / -8.8 % | -0.6 / -1.0 % | +3.7 / +3.3 % | +1.3 / +0.9 % | -10.4 / -10.2 % |
+| GND x0.6 | -8.2 / -12.5 % | -0.2 / -3.2 % | +5.6 / +4.8 % | +1.3 / +0.8 % | -15.9 / -15.6 % |
+| SW x0.6 | -9.8 / -8.7 % | -5.4 / -8.0 % | +4.7 / +4.1 % | +0.2 / +0.1 % | +7.7 / +7.2 % |
+| DRV1 x1.5 (Q1 gate drive) | -10.7 / -19.5 % | +2.5 / -0.2 % | +14.5 / +14.3 % | -1.7 / -1.3 % | +5.5 / -8.2 % |
+| DRV2 x0.6 (Q2 gate drive) | +1.0 / +0.4 % | -2.5 / +0.2 % | -0.1 / -0.4 % | +0.1 / +0.1 % | -3.4 / -3.8 % |
+| RPOW x4 (power-branch R) | -4.4 / -4.5 % | -11.7 / -11.6 % | -0.9 / -0.9 % | -0.5 / -0.6 % | -4.2 / -3.9 % |
+
+Stage 1b (18 cases, `-direction-screen-1b.json`): CSQ2 (Q2 driver-return coupling) x0.5 gate peak -67 / -63 %
+(0.63 / 0.61 V) with settling +36 %, x1.75 the reverse (+120 / +102 %, -16 %); CSQ1 x0.5 di/dt -14 / -25 %, settling
+-9 / -11 %, Eon+Eoff +7 / +8 %; CSQ1 x1.5 oscillatory (overshoot +265 / +202 %); G1P (Q1 gate path) x1.5 overshoot
+-9.2 / -4.4 %, gate peak -6.8 / -3.6 %, di/dt +2.2 / +1.7 %. Gate-loop inductances computed from the networks:
+stock Q1 599 pH, Q2 561 pH; K2 Q2 1008 pH (its isolated return detours). Linear mixes (per-group budgets, RPOW
+separate): S2 -10 % and S10 -10 % infeasible with the other quantities no worse; the amended rule only at its limits;
+a goal-count mix claimed S1, S2, S6, S8 (losing S3).
+
+Stage 1c (`-direction-screen-1c.json`): that mix applied in one network (MIX4) gives overshoot +22.1 / +1.6 %, di/dt
++8.5 / +11.9 %, gate peak 0.78 / 0.70 V: superposition of large changes fails; such mixes are not findings. Stage 3
+(direct network search, declared) replaces them.
+
+Common-source screen result (`results/gan/epc90133-cs-screen-stock.json`): loop L and L_cs(Q2) equal the G report's
+within 0.001 % and 0.05 % (L_cs(Q1) -1.3 %), but the run took 16,432 s (4.6 h) against 3.45 h for the full G
+extraction: accurate, no faster. The K1 run was stopped at its start (task stop; no FastHenry left running).
+
+### Candidate C3: dedicated driver-return island (build, 11 October 2026)
+
+Declared in the plan (stage 2). Build history, all kept: run 1 crashed (cut of the In1 plane outline: EPC's outline
+self-touches at (8.76, 31.94)); run 2 (repair by buffer(0)) REJECTED: the repair removed 5.9 mm^2 of plane and isolated
+a GND piece (isolated_copper 14); run 3 (repair by make_valid) REJECTED: 11.9 mm^2 change, zones_intersect. Run 4
+(RETROSPECTIVE method change: the slits are copper-pour keep-outs, the mechanism of the stock-hole keep-outs; plane
+outlines untouched; new primitive `keepout`) ACCEPTED at L1-L3: DRC types as stock (isolated_copper 13, nothing
+unconnected or below the rule), pad nets equal, power-loop checks as stock; renders of In1/In2 show the island and
+the In2 isolation as intended. The make_valid repair stays in `reshape` for cut edits (logged with its area change).
+Chain `runs/C3-chain.ps1` (WMI, `runs/C3-chain.launch.json`): A extraction 03:17-03:18 (exit 0), G from 03:18.
