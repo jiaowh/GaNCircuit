@@ -3925,3 +3925,11 @@ export (terminal boxes within 0.005 mm of stock's, the route's usual representat
 
 G extraction and the nominal K1 switching pair launched 10 October 14:59 through WMI (`runs/K1-chain.ps1`,
 `runs/K1-chain.launch.json`; one FastHenry job, expected about 6.5 h, 15 h cap, stopped by PID only).
+
+**K2 built and launched in parallel** (pre-result procedural change in the plan, before any K1 result): K1 plus
+EPC-size antipads (r 0.3275 mm) on In1-In6 around the driver GND vias (15.429, 27.201), (15.592, 26.200),
+(15.603, 28.549) (`antipad` primitive). Accepted (`results/gan/epc90133-board-export-K2.json`): DRC types as stock,
+0 unconnected, nothing below the rule; pad nets equal; power-loop checks as stock; drills = stock + K1's one hole;
+gate-loop checks pass; A loop L +0.01 %. Render of In1 confirms the three driver vias and the new probe via are
+isolated from the plane. G extraction and nominal pair launched 19:29 through WMI (`runs/K2-chain.ps1`), beside K1's
+(two FastHenry jobs, about 2.8 GB each, within WSL's 8 GB).
