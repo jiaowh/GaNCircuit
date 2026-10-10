@@ -177,6 +177,10 @@
   [
    "L3b capacitors with their return vias",
    "Not built."
+  ],
+  [
+   "Gate return with existing vias",
+   "Not buildable: the probe connection (R22, J22, J2) encloses the driver's top-layer ground; K1 adds one via instead."
   ]
  ],
  "candidates": [
@@ -707,6 +711,33 @@
     "outcome": "complete",
     "L_loop_nH": 0.31508578387503433,
     "R_loop_mohm": 4.983996421582043
+   },
+   "G": null,
+   "goals": {
+    "vendor": null,
+    "EPC2302DS": null
+   }
+  },
+  {
+   "id": "K1",
+   "label": "K1 Kelvin return",
+   "what": "Q2 driver ground joined to Q2's source on the top layer; probe trace moved to the bottom through one new via",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-K1.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "ref": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/K1/extraction/A-m1-mid-K1.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.49242392884767927,
+    "R_loop_mohm": 4.03451754037708
    },
    "G": null,
    "goals": {

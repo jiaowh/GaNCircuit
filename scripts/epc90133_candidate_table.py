@@ -40,6 +40,7 @@ CANDIDATES = [
     ("V8+d0.100", "V8 + 0.100 mm", "V8 with 0.100 mm dielectric", "V8", "A-m1-mid-d0.100-V8", None, None),
     ("V8+d0.075", "V8 + 0.075 mm", "V8 with 0.075 mm dielectric (best screened legal combination)", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
     ("V8+d0.050", "V8 + 0.050 mm *", "Sensitivity only: below the industry-practice limit", "V8", "A-m1-mid-d0.050-V8", None, None),
+    ("K1", "K1 Kelvin return", "Q2 driver ground joined to Q2's source on the top layer; probe trace moved to the bottom through one new via", "K1", "A-m1-mid-K1", None, "K1"),
     ("stock+csw", "Stock + SW capacitance", "Reference for the row below: stock with 135 pF switch-node-to-ground capacitance (estimate)", "stock", "A-m1-mid-stock", "G-m1-mid-stock", None),
     ("V8+d0.075+csw", "V8 + 0.075 mm + SW capacitance", "V8 + 0.075 mm with 188.8 pF (the thinner layer adds 53.8 pF); compared with the row above", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
 ]
@@ -51,6 +52,7 @@ NOT_IN_TABLE = [
     ("Added return vias (round 2b)", "Four legal additions changed screened loop inductance by -0.02 %; earlier additions damaged the power path."),
     ("L4a low-side driver return", "Inspected 9 October, not built: the low-side gate probe connection blocks a top-layer return."),
     ("L3b capacitors with their return vias", "Not built."),
+    ("Gate return with existing vias", "Not buildable: the probe connection (R22, J22, J2) encloses the driver's top-layer ground; K1 adds one via instead."),
 ]
 
 # Goal columns: key, goal, label, metric, unit, scale, better ('lower', 'higher', None), digits
