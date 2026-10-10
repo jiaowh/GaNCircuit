@@ -4052,3 +4052,12 @@ variant was built (the declared scaling argument). The free-placement driver fam
 mechanism and is not started. Thermal: as stock within 0.2 K (`results/gan/epc90133-thermal-K2.json`).
 Run notes: the first C_SW call failed before any case (stock needs its extraction passed with --ext-file); the stock
 50 ps pair ran in a separate call for the same reason. The common-source screen's blind test on K2 was missed.
+
+### Common-source screen: no speed gain (11 October 2026, 02:20)
+
+The declared screen (`scripts/epc90133_cs_screen.py`; plan "Common-source screen") replaces G's 47 ports by g_summary's
+shorts and three ports. Its stock run started 10 October 22:38 and was still solving after 3.5 h, against 3.45 h for
+stock's complete 47-port G extraction: the shorted network converges far more slowly per port (FastHenry's iterative
+solver; cause not separately diagnosed), so the expected saving (about 5 h -> 30 min) does not exist. The stock run is
+left to finish for the declared accuracy check; the queued K1 run is not wanted (no time advantage). The idea that
+the per-port cost is fixed was the agent's estimate from K1's iteration count and is wrong for this reduced deck.
