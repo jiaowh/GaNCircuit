@@ -1,0 +1,130 @@
+{
+ "schema": "epc90133-outperform/1",
+ "evaluator_sha256": "11103f2690fc09fb12ecee8e90ffdc44b75eeb494d84c36e7dcbfe277a91b12d",
+ "inputs": {
+  "results\\gan\\epc90133-goals-G-K2.json": "74a02c7e49b388164ee13f607dbfb7ffc54d1d8c39f92565632fcf921647adf5",
+  "C:\\Users\\Jiaow\\Documents\\github\\phd_circuit\\results\\gan\\epc90133-goals-G.json": "2a444244d2e633cb16a1a94232e2fb8bf5d9887bceeb07a7b5a36a8476ccb469"
+ },
+ "candidate": "K2",
+ "relative_change_pct": {
+  "ramp-Ls50": {
+   "vpk_V": -0.009196059276384005,
+   "overshoot_V": -0.08401884768880485,
+   "settling_s": 20.65009560229447,
+   "id_peak_A": 0.09473744603336609,
+   "didt_A_per_ns": -0.21086654212977285,
+   "eon_eoff_J": -0.20556298118726835,
+   "fet_loss_W": 0.23554850644738057,
+   "tr_s": -0.2796042767451157,
+   "tf_s": -0.06293031549975403,
+   "q2_gate_peak_V": -28.941732671971188,
+   "values": {
+    "candidate": {
+     "vpk_V": 59.31361770629883,
+     "overshoot_V": 11.115788483970476,
+     "f_r_Hz": 262114565.74389875,
+     "settling_s": 1.5775000000000002e-07,
+     "settling_censored": 0.0,
+     "tr_s": 1.678805717507639e-09,
+     "tf_s": 4.172929445759401e-09,
+     "dvdt_V_per_ns": 22.873403157697595,
+     "id_peak_A": 58.56594467163086,
+     "didt_A_per_ns": 42.13671999999999,
+     "vgs_max_V": 5.083057403564453,
+     "vgs_min_V": -1.2440743818879128,
+     "q2_gate_peak_V": 1.3782561421394348,
+     "eon_eoff_J": 5.5719204037989125e-06,
+     "fet_loss_W": 2.0837791309371623,
+     "efficiency": 0.9913923223670014
+    },
+    "stock": {
+     "vpk_V": 59.31907272338867,
+     "overshoot_V": 11.125135694785051,
+     "f_r_Hz": 262760236.1013061,
+     "settling_s": 1.3075e-07,
+     "settling_censored": 0.0,
+     "tr_s": 1.6835128915519736e-09,
+     "tf_s": 4.1755571370396125e-09,
+     "dvdt_V_per_ns": 22.80944814423152,
+     "id_peak_A": 58.51051330566406,
+     "didt_A_per_ns": 42.22576000000001,
+     "vgs_max_V": 5.030094146728516,
+     "vgs_min_V": -1.8991279602050781,
+     "q2_gate_peak_V": 1.9396140575408936,
+     "eon_eoff_J": 5.583397802773839e-06,
+     "fet_loss_W": 2.0788823546001036,
+     "efficiency": 0.9914123762701659
+    }
+   }
+  },
+  "step-Ls50": {
+   "vpk_V": -0.028117120351622837,
+   "overshoot_V": -0.15474409872578976,
+   "settling_s": 20.34220532319391,
+   "id_peak_A": 0.3743220850611628,
+   "didt_A_per_ns": 1.3162580697590576,
+   "eon_eoff_J": 0.08884534053184012,
+   "fet_loss_W": 0.31501484498799304,
+   "tr_s": -0.23123016966661858,
+   "tf_s": -0.09853958363030824,
+   "q2_gate_peak_V": -25.113840625441753,
+   "values": {
+    "candidate": {
+     "vpk_V": 58.97346496582031,
+     "overshoot_V": 10.776453875001387,
+     "f_r_Hz": 261755722.9178489,
+     "settling_s": 1.5825e-07,
+     "settling_censored": 0.0,
+     "tr_s": 1.7866547894810855e-09,
+     "tf_s": 4.2156636201368135e-09,
+     "dvdt_V_per_ns": 21.492680189860778,
+     "id_peak_A": 52.67268371582031,
+     "didt_A_per_ns": 33.911199999999994,
+     "vgs_max_V": 5.024646759033203,
+     "vgs_min_V": -0.917556494474411,
+     "q2_gate_peak_V": 1.2423577308654785,
+     "eon_eoff_J": 5.782503038148279e-06,
+     "fet_loss_W": 2.077483097398052,
+     "efficiency": 0.9914181068358093
+    },
+    "stock": {
+     "vpk_V": 58.99005126953125,
+     "overshoot_V": 10.793155646430527,
+     "f_r_Hz": 262363841.89149055,
+     "settling_s": 1.315e-07,
+     "settling_censored": 0.0,
+     "tr_s": 1.7907956492993428e-09,
+     "tf_s": 4.219821814983239e-09,
+     "dvdt_V_per_ns": 21.44298262899186,
+     "id_peak_A": 52.476253509521484,
+     "didt_A_per_ns": 33.47063999999999,
+     "vgs_max_V": 4.990875244140625,
+     "vgs_min_V": -1.32490449026227,
+     "q2_gate_peak_V": 1.658995121717453,
+     "eon_eoff_J": 5.777370113996714e-06,
+     "fet_loss_W": 2.0709592682693487,
+     "efficiency": 0.9914448256224975
+    }
+   }
+  }
+ },
+ "verdicts": {
+  "declared": {
+   "pass": false,
+   "failures": [
+    "ramp-Ls50:settling_s +20.65 %",
+    "step-Ls50:settling_s +20.34 %",
+    "step-Ls50:didt_A_per_ns +1.32 %"
+   ]
+  },
+  "amended": {
+   "pass": false,
+   "failures": [
+    "ramp-Ls50:settling_s +20.65 %",
+    "step-Ls50:settling_s +20.34 %",
+    "step-Ls50:didt_A_per_ns +1.32 %"
+   ]
+  }
+ },
+ "note": "provisional until the declared 50 ps check of the deciding cases agrees"
+}

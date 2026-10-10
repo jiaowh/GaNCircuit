@@ -393,3 +393,23 @@ Family P, capacitor placement (target S2: needs about 45 % lower loop L).
   decision on that scope.
 Stop rule: the family stops when its screens or gates fail, when tooling cannot produce a DRC-clean candidate, or
 after the stated G budget; every outcome is recorded in docs/build.md.
+
+### K2 result and confirmation checks (declared 11 October 2026, about 00:50, after K2's nominal result)
+
+K2 nominal (`results/gan/epc90133-outperform-K2.json`): Q2 gate peak -28.9 / -25.1 % (ramp / step), settling
++20.7 / +20.3 %, step di/dt +1.32 %, every other quantity within +/-0.4 %: amended rule NOT met (settling, di/dt).
+Board common-source L(Q2) 48.02 -> 37.14 pH (-22.7 %). The frozen K2 prediction (common-source L below K1's, gate
+peak lower, settling longer) holds in direction. The decision tree's outcome is "stop"; before reporting K2's
+balance sheet, two checks of whether its trade-off is robust (no new candidate):
+1. Numerical: K2 and stock @{ramp,step}-Ls50-gear-ms50 (declared check form). The trade-off counts as confirmed if,
+   at 50 ps, the gate-peak and settling changes against stock keep their sign and stay within 25 % (relative) of the
+   100 ps values, and the amended-rule verdict is the same.
+2. Switch-node capacitance: K2 and stock @{ramp,step}-Ls50-gear-csw at 135 pF each (K2 does not change the SW copper),
+   both rerun now so that the pair comes from the same code. The settling penalty persists if K2's settling is
+   still more than +5 % above stock+C_SW.
+If both confirm, the gate-return family stops as the tree says; K2 is reported as the best tested S8 value with its
+settling cost. No intermediate variant (fewer driver vias isolated) is built: if the gate-peak and settling changes
+scale together (an assumption), K2's ratio (about 27 % / 20 %) cannot reach both -10 % and +5 % at once. If the
+settling penalty disappears with C_SW, K2 goes to decision-tree step 1 (corners) under the C_SW condition.
+K2's thermal run (declared model) is run as for the other layouts. The common-source screen's blind test on K2 was
+missed (K2's G finished before the screen); the screen's stock/K1 check continues.
