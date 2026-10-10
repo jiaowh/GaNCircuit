@@ -169,6 +169,13 @@ CASES.update({
            # Run 3 (RETROSPECTIVE after run 2's DRC: the via came out on GND): tracks tie the via to R22.1 and J22.1.
            ("add_track", "F.Cu", "NetJ2_1", [(15.98, 26.88), (16.379, 26.90)], 0.25),
            ("add_track", "B.Cu", "NetJ2_1", [(15.98, 26.88), (16.10, 26.75), (16.10, 25.30)], 0.30)],
+})
+CASES.update({
+    # Candidate K2 (declared 10 October 2026 before any K1 result; K1 decision tree step 2): K1 plus EPC-size antipads
+    # on In1-In6 around the three driver GND vias, so the driver's ground reaches the planes only through Q2's source
+    # copper (top) and the bottom layer.
+    "K2": CASES["K1"] + [("antipad", x, y, EPC_ANTIPAD_R, ("In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu"))
+                         for x, y in ((15.429, 27.201), (15.592, 26.200), (15.603, 28.549))],
 })  # retrospective amendment after X0 run 1
 
 

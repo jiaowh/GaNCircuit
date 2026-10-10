@@ -381,6 +381,18 @@ def apply_edits(text, edits, geo):
             for lay in ap_layers:
                 lines.insert(len(lines) - 1, keepout_line(lay, Point(x, y).buffer(r_ap, 16)))
             log.append({"op": [op[0], x, y, size, drill, net, list(ap_layers), r_ap], "net_number": int(num.group(1))})
+        elif op[0] == "antipad":
+            # Candidate K2 (declared 10 October 2026 before any K1 result): a round keep-out of radius r on each
+            # listed layer around an existing via, so the planes there no longer join it (EPC-size antipad).
+            _, x, y, r_ap, ap_layers = op
+            kx, ky = to_kicad(x, y)
+            hit = [ln for ln in lines if (m := re.match(r"\t\(via \(at ([-\d.]+) ([-\d.]+)\)", ln))
+                   and abs(float(m.group(1)) - kx) < 0.02 and abs(float(m.group(2)) - ky) < 0.02]
+            if len(hit) != 1:
+                raise SystemExit(f"antipad ({x}, {y}): {len(hit)} vias")
+            for lay in ap_layers:
+                lines.insert(len(lines) - 1, keepout_line(lay, Point(x, y).buffer(r_ap, 16)))
+            log.append({"op": [op[0], x, y, r_ap, list(ap_layers)]})
         elif op[0] == "add_track":
             # K1 build run 3 (10 October 2026, RETROSPECTIVE after run 2's DRC): a via joined only through rebuilt
             # zones (no frozen fill at load) was given the surrounding zone's net (GND) by KiCad, so the new via is
