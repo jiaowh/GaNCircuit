@@ -198,3 +198,28 @@ library, LTspice 26.1.1, 16 solver threads each, CPU not throttled; cause not id
 corners, C_SW) was stopped after 13 min; process A (V8d075 nominal, 4 jobs) continues alone; B's five steps are
 queued to run one after another after A (4 jobs), then scoring (`runs/confirm-V8d075-queue.ps1`). No case
 definition, check or reading rule changed.
+
+## "Outperforms stock" rule and the gate-return candidate (owner decision, 10 October 2026)
+
+Declared after the V8d075 run-2 result and before any gate-return geometry, extraction or switching result exists.
+Owner decision: the search target is a simulated layout that outperforms stock, defined as **no worse plus a clear
+gain**. This is a separate rule beside S1-S13 (which stay recorded and scored); it does not relax any goal limit.
+Vendor model, assumed 50 pH, G network, nominal 48 V point, judged under BOTH ramp-Ls50 and step-Ls50:
+
+- **No worse:** every stock-relative goal quantity is no more than 0.5 % worse than stock: S1 peak voltage, S2
+  overshoot, S3 settling, S6 Q1 peak current and di/dt, S10 Eon + Eoff, S12 FET-only loss/efficiency. S4 rise/fall
+  time stays within its own 1.10 x stock, and S7 within its own +5.5 / -3 V. The 0.5 % allowance is five times the
+  largest change seen in the 50 ps time-step checks (within 0.1 %); a numerical check of the deciding cases is
+  required before a win is claimed.
+- **Clear gain:** Q2's gate peak during the rise (S8 quantity) at least 10 % below stock's. (V8d075's 34 % shorter
+  board common-source path gave 6-9 %.)
+- The switch-node capacitance assumption must be the same for candidate and stock; a candidate that changes the
+  SW copper or dielectric is judged in a matched with-C_SW pair.
+
+Base: **stock**, not V8 (V8 already exceeds the 0.5 % allowance: ramp overshoot +1.8 %, settling +1.3 %).
+Candidate: a local low-side gate-driver return (research note ranking 1), using existing vias and the qualified
+KiCad edit route. First step, no solver: a read-only feasibility inspection of the saved geometry; if a legal
+route needs a new via, whole-driver ground isolation, cut source pads or moved probe features, the candidate stops
+there. If feasible: the edit, its DRC/net/power-loop checks, one G extraction (planned from the 6.47 h V8d075 case,
+15 h cap), then the nominal stock/candidate pair under both drivers (4 cases plus a 50 ps check of deciding cases).
+Stop after that pair whatever the outcome; corners only by a separate declaration.
