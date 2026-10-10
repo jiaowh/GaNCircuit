@@ -340,3 +340,14 @@ K2's G extraction (two heavy WSL jobs, about 2.5 GB each). If it passes: it beco
 mechanism is common-source inductance; it says nothing about switching (gate peak, settling), which still needs G
 and LTspice. If it fails: recorded, not used. K2's screen value is then frozen before K2's G result as its first
 blind test.
+
+### Component positions (owner correction, 10 October 2026, about 23:00)
+
+The 1 mm position limits for the FETs, driver and decoupling capacitors (section "Layout limits") were the agent's
+assumption, filed under the owner's "go with industry standard" decision; the owner did not set them. Owner: parts
+may be placed wherever physically possible and viable, as long as the electrical schematic stays the same. From now
+on: any position, rotation or board side for the parts on the parasitic paths, provided the design passes EPC's DRC
+rules, keeps every net connection, and can be assembled (courtyards clear, standard pick-and-place). Unchanged:
+schematic and BOM, board outline, connectors, measurement connectors, test points, holes (template "Fixed" list),
+the stackup range and probes/functions kept. Earlier results stay tied to the limits they were run under; L3a's
+"too little room" reading applied only to the 1 mm assumption.
