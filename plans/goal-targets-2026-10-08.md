@@ -503,3 +503,9 @@ Stage 3b (declared now, before its runs): which part of N3_00 carries it. Compos
 (CSQ1 0.67, CSQ2 0.57); R2 gate side only (R1 + DRV2 0.66, PH 0.67, G1P 0.78); R3 power side only (CM 0.71, VIN 1.25,
 GND 0.62, SW 1.38). Same bench and scorer. If R2 keeps 6 goals, stage 2 designs a both-driver return-island
 candidate (C3 for Q2 plus an analogous Q1 island); if only R3 or the full set does, it is a power-stage redesign.
+Stage 3b result: no subset keeps the gain (couplings only 2 goals, gate side only 3, power side only 2; round3b.json):
+N3_00's six goals need all nine changes together. Stage 3c (declared now): robustness at the template's +/-10 %
+parasitic corner, N3_00, N3_04 and stock at l0.9 / l1.1 (every extracted inductance scaled), both drivers; a
+network that loses S2 or S8 there is reported as a fragile model optimum, not a design target.
+Stage 3c result (`round3c-corners.json`, 12/12 usable): at l0.9 N3_00 and N3_04 keep S1, S2, S3, S6, S7 and lose S8
+narrowly (step gate peak 0.529 V); at l1.1 both keep all six. S2 is robust (overshoot 5.6-7.9 V), S8 marginal.

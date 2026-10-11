@@ -4108,3 +4108,27 @@ outlines untouched; new primitive `keepout`) ACCEPTED at L1-L3: DRC types as sto
 unconnected or below the rule), pad nets equal, power-loop checks as stock; renders of In1/In2 show the island and
 the In2 isolation as intended. The make_valid repair stays in `reshape` for cut edits (logged with its area change).
 Chain `runs/C3-chain.ps1` (WMI, `runs/C3-chain.launch.json`): A extraction 03:17-03:18 (exit 0), G from 03:18.
+
+### Direct network search (stage 3, 11 October 2026)
+
+`scripts/epc90133_network_search.py` (declared in the plan): composite networks on stock's G network, nine log-uniform
+factors (CM, VIN, GND, SW, DRV2, G1P, PH in 0.6-1.5; CSQ2 0.5-1.5; CSQ1 0.5-1.25), each simulated directly under both
+drivers and scored by goals met (S1, S2, S3, S4, S6, S7, S8, S10; stock 5). Rounds: 32 Latin-hypercube networks, then
+3 x 16 around the best. Run history (all kept): launch 1 crashed after round 1 (the stock pair and one case hung to
+the 3,600 s timeout, so nothing scored; `runs/network-search-launch1.*`); RETROSPECTIVE fix: failed cases rerun once
+(round<r>-retry.json) and rounds with an unusable reference rescored; launch 2 completed rounds 2-4 but rounds 2-3 lost
+their reference again (hung 'timing' stages, which the first retry passed as case names; kept as
+`*-retry-run1-wrongnames.json`); second fix maps stages to cases; rounds 2-3 rescored. Round 4's centres were chosen
+before rounds 2-3 were scored.
+
+Result (79 usable networks): 37 reach 5 goals, two reach 6 (N3_00, N3_04: S1, S2, S3, S6, S7, S8; S4, S10 lost). The
+5-goal networks are either stock's set or S2 instead of S4. N3_00 against stock (ramp / step): overshoot 6.04 / 7.49 V
+(11.13 / 10.79), Q2 gate peak 0.42 / 0.47 V (1.94 / 1.66), settling 115 / 119 ns (131 / 132), di/dt 39.3 / 25.3 A/ns
+(42.2 / 33.5), tr 2.06 / 2.22 ns (+23 / +24 %), Eon+Eoff +11 / +10 %, FET loss +7 %. Factors: CM 0.71, VIN 1.25,
+GND 0.62, SW 1.38, DRV2 0.66, G1P 0.78, PH 0.67, CSQ2 0.57, CSQ1 0.67: both return couplings reduced (Q2's lowers the
+gate peak, Q1's slows the edge and restores the damping that Q2's reduction removes).
+Decomposition (stage 3b, `round3b.json`): couplings only 2 goals (overshoot 15.9 / 12.2 V), gate side only 3, power
+side only 2: the six goals need all nine changes together. Corners (stage 3c, `round3c-corners.json`): l0.9 keeps
+five (S8 lost at 0.53 V step), l1.1 keeps six. Reading: in this model a coordinated redesign of both the power stage
+and both gate-return paths could trade rise time and about 7 % FET loss for S2 and S8 (one goal more than stock);
+it is a network target, not a layout, and it sits where the model is least validated (damping, assumed 50 pH).

@@ -1,0 +1,294 @@
+{
+ "schema": "epc90133-switching-sensitivity/1",
+ "study": "goals",
+ "numerical_check": null,
+ "scope": "Sensitivity of simulated switching to exploratory extraction assumptions. Not a validated prediction: the extraction is unqualified for plane holes and via arrays, the driver is behavioural, capacitor models are assumed, and gate-charge-dependent quantities carry the EPC2302 Fig. 7 exception.",
+ "evaluator_sha256": "59d95a0cb08f70771b70c1353b7cb2af3fb5c1db24c19a6134482a0e286f19bb",
+ "input_manifest": {
+  "taken_at": "start of run, when the inputs were loaded",
+  "evaluator_sha256": "59d95a0cb08f70771b70c1353b7cb2af3fb5c1db24c19a6134482a0e286f19bb",
+  "extractions": {},
+  "vendor_library": {
+   "file": "EPCGaNLibrary.lib",
+   "sha256": "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069"
+  },
+  "modules": {
+   "scripts/epc9097_switching.py": "49606f03c3ea15abb3ca12508b2880a9c88a6e8273478073dd719b84ad44884c",
+   "scripts/epc2302_baseline.py": "e1461c1ec2d44156048dc083ebf9001d575f6f69188a78f29742d5d8595f10db",
+   "scripts/epc2204_baseline.py": "d11c193b89a9756700acb73a01cf0ef457a95a2a8581e83f4ae2a20d06cd02f9",
+   "src/circuit_tools/ltspice.py": "1278aa517478a8f16d73376b38700d4ab8274f181c7742b491c8fae539b1d8ea",
+   "src/circuit_tools/adapters.py": "6bb00770b2b6d7316107d29f9089f45ce6c0b254ceecd1d7274198cd41711a39"
+  }
+ },
+ "conditions": {
+  "VIN": 48.0,
+  "VOUT": 12.0,
+  "IOUT": 20.0,
+  "f_sw_Hz": 250000.0,
+  "L_out_H": 2.2e-06,
+  "duty": 0.25,
+  "ripple_A": 16.363636363636363,
+  "I_peak_A": 28.18181818181818,
+  "I_valley_A": 11.818181818181818,
+  "dead_time_s": 1e-08,
+  "dead_time_note": "per-case 'dead' overrides it (design study)",
+  "source": "owner's execution template (8 October 2026), corner per --vin/--iout"
+ },
+ "fixed_assumptions": {
+  "capacitors": {
+   "Ci": {
+    "C": 1.1e-07,
+    "ESL": 2.5e-10,
+    "ESR": 0.01
+   },
+   "Cm": {
+    "C": 5e-07,
+    "ESL": 3.5e-10,
+    "ESR": 0.01
+   }
+  },
+  "bus": {
+   "R_sup": 0.02,
+   "L_sup": 2e-08,
+   "R_bus": 0.002,
+   "L_bus": 1e-09
+  },
+  "N_cm_lumped": 10,
+  "gate_resistors_ohm": [
+   1.0,
+   0.0
+  ],
+  "driver_supplies_V": [
+   5.0,
+   5.0
+  ],
+  "temperature_C": 25,
+  "maxstep_s": 2e-11,
+  "reltol": 1e-06,
+  "measurement": "ideal probe, Q2 drain terminal to Q2 source terminal"
+ },
+ "driver_calibration": {
+  "pull_up_edge_s": 8.253071403810289e-09,
+  "pull_down_edge_s": 3.730319663131087e-09,
+  "targets_s": [
+   8e-09,
+   4e-09
+  ]
+ },
+ "driver_step_calibration": {
+  "source_ramp_s": 1e-10,
+  "r_grid_ohm": [
+   0.4,
+   0.5,
+   0.6,
+   0.7,
+   0.8,
+   1.0,
+   1.2,
+   1.4,
+   1.6,
+   1.8
+  ],
+  "rise_s": [
+   2.64325336958765e-09,
+   3.3024121155694874e-09,
+   3.961582351037884e-09,
+   4.620753771068382e-09,
+   5.279922375829081e-09,
+   6.59825883798106e-09,
+   7.916595584222192e-09,
+   9.234932593896153e-09,
+   1.0553265283543945e-08,
+   1.1871601003887524e-08
+  ],
+  "fall_s": [
+   2.6432441751329864e-09,
+   3.3024164412142467e-09,
+   3.96158476914474e-09,
+   4.620753759267155e-09,
+   5.27992305787529e-09,
+   6.598257288123521e-09,
+   7.916593405325948e-09,
+   9.234930799057809e-09,
+   1.0553267353578212e-08,
+   1.1871600775693669e-08
+  ],
+  "r_src_ohm": 1.2126529734302816,
+  "r_snk_ohm": 0.6058278273752117,
+  "limits_ohm": [
+   1.4,
+   0.8
+  ],
+  "D1_within_datasheet_maximum": true
+ },
+ "reference": "B-m1-mid",
+ "materiality": {
+  "sw_fall_time_90_10_s": [
+   "rel",
+   0.1
+  ],
+  "sw_rise_time_10_90_s": [
+   "rel",
+   0.1
+  ],
+  "sw_overshoot_above_bus_V": [
+   "rel_or_abs",
+   0.1,
+   1.0
+  ],
+  "ringing_frequency_Hz": [
+   "rel",
+   0.05
+  ],
+  "ringing_damping_ratio": [
+   "rel",
+   0.2
+  ]
+ },
+ "cases": {},
+ "comparison_to_reference": {},
+ "runs": {
+  "driver_edge_0": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.625,
+   "warnings": [],
+   "netlist_sha256": "18fa2f10376fcd653d66f31e0e8912ef3e337caa848f7c12a494eb39f5159d5e"
+  },
+  "driver_edge_1": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6559999999881256,
+   "warnings": [],
+   "netlist_sha256": "bee9ff376d96b0f852e3eb81144c43d3617a218457e2daa59c0c5f7408b09f77"
+  },
+  "driver_edge_2": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "4f9f41651bba513677056b704594fa5a82566d2cb8dafa2675004f42e50573d1"
+  },
+  "driver_edge_3": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6719999999913853,
+   "warnings": [],
+   "netlist_sha256": "dfe06d271f2610ec8617b138207e1bcfb4fb320367f8dd821d86ecd4eb03c70d"
+  },
+  "driver_edge_4": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6719999999913853,
+   "warnings": [],
+   "netlist_sha256": "31387dabbd279f2012bf03b8c84571b49131fe07c27deb5e6812641c3c3a7ea7"
+  },
+  "driver_edge_5": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7030000000086147,
+   "warnings": [],
+   "netlist_sha256": "de35bdf13e349c2c52d5185b82391f2115046cd51428062da572a2308378167a"
+  },
+  "driver_edge_6": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6719999999913853,
+   "warnings": [],
+   "netlist_sha256": "bc7ba4881dade74d9d3fc3b3319fc416c8b589c7734eda265e84636eeb1d6cc4"
+  },
+  "driver_edge_7": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "3a4cd0d3f027e90b789a908b452b77cf737c7aa2816ebc68a359ec6371892a58"
+  },
+  "driver_edge_8": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "9cb75fd53978540dc12455291ccdd0e5ed2ae2f9f578109eb1376ecfba25475a"
+  },
+  "driver_edge_9": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6719999999913853,
+   "warnings": [],
+   "netlist_sha256": "3611f4f78fc686611a895ecab3969cc414bf86b2819a2497cd9e324e18750e5f"
+  },
+  "driver_step_0": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6719999999913853,
+   "warnings": [],
+   "netlist_sha256": "1d94d243743eefc227f257a6f96b7d1627f5c1355c83435cba9b2a4ae094eb92"
+  },
+  "driver_step_1": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6719999999913853,
+   "warnings": [],
+   "netlist_sha256": "eab64aca0ec9c9997d1d4a55f8263657caf2fd614f42c7cfddeacbc5b57f369e"
+  },
+  "driver_step_2": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "add9d05216b2088ab37e0aeecc3a41709e7770bf4a481678ec63a5563a1725d4"
+  },
+  "driver_step_3": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "4d17c3dc00a613067bfc7ec8659b1f6060ddc0e3accee9c54041e1804c64cc00"
+  },
+  "driver_step_4": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6879999999946449,
+   "warnings": [],
+   "netlist_sha256": "9422d278806efa9b564ec7738e2b7b10d4940d58ebe1767d9bd3bc8dd848b502"
+  },
+  "driver_step_5": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.7039999999979045,
+   "warnings": [],
+   "netlist_sha256": "52eaea44b6f98a13675b91201d6853709f4b011f6ad537dca2c3574c51780e24"
+  },
+  "driver_step_6": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "d3d602329b5b42b8ec31e8fc52ce869720c68d1a68d611d21ab013598bd7edb1"
+  },
+  "driver_step_7": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6710000000020955,
+   "warnings": [],
+   "netlist_sha256": "3b213efa516dd7cd91f55b21ed894f051cf304dbddfab600dff707f3c8358bee"
+  },
+  "driver_step_8": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "4beed55aae45b88812e002bde116994ba146d765f860093cabc371dd89f0a860"
+  },
+  "driver_step_9": {
+   "status": "completed",
+   "message": null,
+   "duration_s": 0.6870000000053551,
+   "warnings": [],
+   "netlist_sha256": "3f97030f3ed006f5f0f8d8f4d5cf1527398eea45360d44424ab64c42108a0ed4"
+  }
+ },
+ "evidence_directory": "runs\\epc90133-switching-e651eb1ee379",
+ "complete": true
+}
