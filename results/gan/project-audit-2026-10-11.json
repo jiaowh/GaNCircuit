@@ -1,0 +1,208 @@
+{
+  "schema": "epc90133-audit-2026-10-11/1",
+  "reviewed_head": "6cfc6b0",
+  "scope": "9-11 October; stored data, source review and small counterexamples; no board reruns",
+  "audit_script_sha256": "fc6efead71f6108a7ed47d8368e058fe75df54a7ddb051ab010764504dc175a8",
+  "search_replay": {
+    "networks": 80,
+    "count_histogram": {
+      "3": 21,
+      "4": 16,
+      "5": 37,
+      "2": 3,
+      "6": 2,
+      "unusable": 1
+    },
+    "stored_score_mismatches": [],
+    "official_subset_differences": [],
+    "censored_cases": [],
+    "invalid_cases": []
+  },
+  "recorded_hashes": {
+    "count": 182,
+    "status_counts": {
+      "match": 182
+    },
+    "exceptions": []
+  },
+  "model_identities": [
+    "2a72e3f25e8b472fdb73cd993148f1097d72a4f3f819813b01cfd38ba69c9069"
+  ],
+  "candidate_packages": {
+    "K1": {
+      "accepted": true,
+      "manifest_matches_report": true,
+      "files_checked": 16,
+      "mismatched_files": []
+    },
+    "K2": {
+      "accepted": true,
+      "manifest_matches_report": true,
+      "files_checked": 16,
+      "mismatched_files": []
+    },
+    "C3": {
+      "accepted": true,
+      "manifest_matches_report": true,
+      "files_checked": 16,
+      "mismatched_files": []
+    }
+  },
+  "candidate_metric_replay": {
+    "K1": {
+      "relative_metric_mismatches": [],
+      "saved_verdicts": {
+        "declared": {
+          "pass": false,
+          "failures": [
+            "ramp-Ls50:settling_s +2.68 %",
+            "ramp-Ls50:q2_gate_peak_V -1.29 % (needs <= -10 %)",
+            "step-Ls50:q2_gate_peak_V -1.24 % (needs <= -10 %)"
+          ]
+        },
+        "amended": {
+          "pass": false,
+          "failures": [
+            "ramp-Ls50:q2_gate_peak_V -1.29 % (needs <= -10 %)",
+            "step-Ls50:q2_gate_peak_V -1.24 % (needs <= -10 %)"
+          ]
+        }
+      }
+    },
+    "K2": {
+      "relative_metric_mismatches": [],
+      "saved_verdicts": {
+        "declared": {
+          "pass": false,
+          "failures": [
+            "ramp-Ls50:settling_s +20.65 %",
+            "step-Ls50:settling_s +20.34 %",
+            "step-Ls50:didt_A_per_ns +1.32 %"
+          ]
+        },
+        "amended": {
+          "pass": false,
+          "failures": [
+            "ramp-Ls50:settling_s +20.65 %",
+            "step-Ls50:settling_s +20.34 %",
+            "step-Ls50:didt_A_per_ns +1.32 %"
+          ]
+        }
+      }
+    },
+    "C3": {
+      "relative_metric_mismatches": [],
+      "saved_verdicts": {
+        "declared": {
+          "pass": false,
+          "failures": [
+            "ramp-Ls50:settling_s +14.72 %",
+            "step-Ls50:settling_s +11.79 %",
+            "step-Ls50:didt_A_per_ns +0.96 %"
+          ]
+        },
+        "amended": {
+          "pass": false,
+          "failures": [
+            "ramp-Ls50:settling_s +14.72 %",
+            "step-Ls50:settling_s +11.79 %",
+            "step-Ls50:didt_A_per_ns +0.96 %"
+          ]
+        }
+      }
+    }
+  },
+  "K2_confirmation_relative_percent": {
+    "ms50": {
+      "ramp-Ls50": {
+        "q2_gate_peak_V": -28.941807393407203,
+        "settling_s": 20.65009560229447,
+        "didt_A_per_ns": -0.2121885257160061
+      },
+      "step-Ls50": {
+        "q2_gate_peak_V": -25.11384513691317,
+        "settling_s": 20.34220532319391,
+        "didt_A_per_ns": 1.3164986585242122
+      }
+    },
+    "csw": {
+      "ramp-Ls50": {
+        "q2_gate_peak_V": -28.634109425283228,
+        "settling_s": 20.248667850799286,
+        "didt_A_per_ns": -0.16979740468731075
+      },
+      "step-Ls50": {
+        "q2_gate_peak_V": -24.90613709704961,
+        "settling_s": 23.188405797101442,
+        "didt_A_per_ns": 1.3092222596338354
+      }
+    }
+  },
+  "outperform_fault_probes": {
+    "S7_overvoltage": {
+      "declared": {
+        "pass": true,
+        "failures": []
+      },
+      "amended": {
+        "pass": true,
+        "failures": []
+      }
+    },
+    "nonfinite_loss": {
+      "declared": {
+        "pass": true,
+        "failures": []
+      },
+      "amended": {
+        "pass": true,
+        "failures": []
+      }
+    },
+    "model_mismatch": {
+      "declared": {
+        "pass": true,
+        "failures": []
+      },
+      "amended": {
+        "pass": true,
+        "failures": []
+      }
+    }
+  },
+  "censored_settling_probe": {
+    "search_S3": true,
+    "official_S3": false
+  },
+  "thermal_gap_probe": {
+    "copper_left_fraction": 1,
+    "copper_right_fraction": 0,
+    "laminate_conductivity": 0,
+    "computed_lateral_conductance_W_per_K": 0.013690599999999999,
+    "expected_copper_only_conductance": 0
+  },
+  "thermal_via_probe": {
+    "all_plane_copper_fractions": 0,
+    "adjacent_plane_node_conductances_W_per_K": [
+      0.021735994883832266,
+      0.021735994883832266,
+      0.01695407600938917,
+      0.021735994883832266,
+      0.01695407600938917,
+      0.021735994883832266,
+      0.021735994883832266
+    ],
+    "limitation": "No independent barrel node or per-layer pad/antipad contact representation"
+  },
+  "overlapping_factor_effects": {
+    "Ci_VIN_self_L_ratio": 1.2484135416313726,
+    "Cm_VIN_self_L_ratio": 0.8922993985633569,
+    "Cm_GND_self_L_ratio": 0.44021288243359935
+  },
+  "source_hashes": {
+    "scripts\\assess_epc90133_goals.py": "fc996ef98b786d91ab60690eb384c26e0e3818dd6b82635f114cd9327fa61fc2",
+    "scripts\\assess_epc90133_outperform.py": "11103f2690fc09fb12ecee8e90ffdc44b75eeb494d84c36e7dcbfe277a91b12d",
+    "scripts\\epc90133_network_search.py": "86083fea67d1be653e6557e80156d4aa8986adf7e473a2be7df1fb109ba3a850",
+    "scripts\\epc90133_thermal.py": "c67baf0947f8cb5d5190799d8f5b24e353e43fd681d8c66303a6c042489fb420"
+  }
+}

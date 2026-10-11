@@ -4144,3 +4144,44 @@ common-source L(Q2) 48.02 -> 34.01 pH (-29 %; K2 37.14), Q1 0.99 -> 1.41 pH; Q2 
 settling range and overshoot/loss held; the gate loop (predicted below 561 pH) and the gate-peak range (-25 to -40 %)
 FAILED. Reading: the island shortens K2's detour but not to stock's loop; the gate-peak-per-settling ratio (about
 1.3) is no better than K2's (1.4), so C3 does not beat K2's balance and the declared 50 ps / C_SW checks are not run.
+
+### Audit of 9-11 October work and proposed exploration (11 October 2026)
+
+Reviewed HEAD `6cfc6b0` at the owner's request. Report:
+`docs/project-audit-2026-10-11.md`; separate evidence:
+`results/gan/project-audit-2026-10-11.json`. Replay from the repository root:
+`python scripts/audit_epc90133_2026_10_11.py` (NumPy/SciPy). Executed with installed
+Windows Python 3.12; approximately 5 seconds for the final audit run. No board
+export, LTspice, FastHenry or large thermal run was launched. Existing source,
+study results and pre-existing untracked work were preserved.
+
+All 80 search entries replay exactly (79 usable, two nominal six-goal networks),
+and their eight evaluated goals agree with the main scorer. All 182 checked
+extraction/helper hash references match; K1/K2/C3 export manifests and their 48
+listed files match. Their saved relative switching metrics also replay exactly.
+K2 confirmation retains the gate-peak reduction and settling penalty: at 50 ps,
+gate peak -28.94/-25.11%, settling +20.65/+20.34%; with matched C_SW, gate peak
+-28.63/-24.91%, settling +20.25/+23.19% (ramp/step).
+
+Confirmed defects: the outperform scorer passes controlled faults with a 6 V
+gate maximum, NaN loss or a mismatched model identity; the search scorer omits
+settling censoring (no affected saved search cases). The thermal grid assigns
+0.0136906 W/K of copper conductance between a full-copper cell and an empty one
+when laminate conduction is removed; its via representation also omits
+layer-specific barrel/plane contact. Existing small thermal layout differences
+are therefore unqualified sensitivities, not established cooling rankings.
+Runner stop conditions and copper/thermal dependency records need repair before
+their next use. These findings do not reverse the stored switching failures.
+
+Interpretation correction, retrospective: only three grouped subsets of the
+six-goal network were tested; their failure does not prove all nine settings
+necessary. The settings overlap and are inductance/coupling changes, not nine
+independent trace-length requirements. Both nominal winners lose S8 at x0.9;
+they are fragile model optima under the declared rule, not qualified redesign
+targets. The current placement rule permits viable rotations and board-side
+changes as well as movements beyond 1 mm.
+
+Recommendation: repair acceptance checks, then at most one coordinated physical
+layout feasibility study, with any extraction separately declared and bounded.
+Measurement readiness remains the priority. The audit report evaluates each
+proposed direction and records limits; no new layout search was started.
