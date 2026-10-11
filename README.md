@@ -179,6 +179,15 @@ coefficient), the transistors reach roughly 80 C and V8 runs about 1 K hotter th
 under the transistors that also carry heat; with EPC's optional heat-spreader the layouts do not differ. These
 temperatures rest on assumed cooling and are not hardware predictions.
 
+A wider search then scaled each group of extracted inductances and couplings in turn, and simulated 80 combined
+networks directly. Two return-path candidates were built: K2 (driver ground cut off from the inner planes) and C3
+(a dedicated ground island under the low-side gate drive). Both lower the low-side gate spike, by about a quarter
+(K2) and a fifth (C3), but lengthen the switch-node ringing by 12-21 %. Across all combined networks the best reaches
+six goals instead of stock's five, gaining overshoot (S2) and the gate-spike limit (S8) at the cost of a slower
+edge (S4) and about 7 % more transistor loss. It needs nine coordinated changes across the power stage and both gate
+returns, no subset of them works on its own, and the gate-spike margin disappears at the -10 % parasitic corner. It
+is a target for a full redesign in a model whose damping and package inductance are not validated, not a layout.
+
 In these screens the goals pull against each other: lowering the power-loop inductance lowers overshoot (S2) but
 speeds up the current change (S6) and raises switching energy (S10). The screens scale every inductance together or
 idealize one connection, so they do not cover every legal copper, via and gate-return change. Meeting all goals has
