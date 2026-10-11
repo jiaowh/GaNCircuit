@@ -493,3 +493,13 @@ Latin-hypercube networks; 2-4) 16 networks each around the three best (factor sp
 pair rerun in every round as reference. At most 4 LTspice jobs, 3,600 s timeout, about 5 h. Outcome: the best goal
 count and its network; if no network beats 5, layout changes of these kinds cannot (in this model) add a goal without
 losing one. A network target is not a layout: any winner goes to realizability (stage 2) before any claim.
+
+Stage 3 result (11 October 2026; `results/gan/network-search/search.json`, rounds 1-4, 80 networks; rounds 1-3 lost
+cases to hung LTspice stages and were rescored after one retry, see build notes): stock 5 goals (S1, S3, S4, S6, S7);
+37 networks reach 5, two reach 6: N3_00 and N3_04 meet S1, S2, S3, S6, S7, S8 (S4 lost: tr +23 %; Eon+Eoff +10-12 %,
+FET loss +7 %). N3_00: overshoot 6.0 / 7.5 V, Q2 gate peak 0.42 / 0.47 V, settling 115 / 119 ns. Both reduce BOTH
+return couplings (CSQ1 0.67 / 0.57, CSQ2 0.57 / 0.51) with shorter GND and gate-side branches.
+Stage 3b (declared now, before its runs): which part of N3_00 carries it. Composites on stock: R1 couplings only
+(CSQ1 0.67, CSQ2 0.57); R2 gate side only (R1 + DRV2 0.66, PH 0.67, G1P 0.78); R3 power side only (CM 0.71, VIN 1.25,
+GND 0.62, SW 1.38). Same bench and scorer. If R2 keeps 6 goals, stage 2 designs a both-driver return-island
+candidate (C3 for Q2 plus an analogous Q1 island); if only R3 or the full set does, it is a power-stage redesign.
