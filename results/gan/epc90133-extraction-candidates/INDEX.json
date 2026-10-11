@@ -1,6 +1,14 @@
 {
  "note": "Copy the per-candidate extraction reports from the git-ignored reconstruction export into tracked results.",
  "files": {
+  "results/gan/epc90133-extraction-candidates/C3/A-m1-mid-C3.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/C3/extraction/A-m1-mid-C3.json",
+   "original_sha256": "b8593deb975d002ffde7e890fc85bc1d60999fbf7dc730a463f9591a24f3b18b"
+  },
+  "results/gan/epc90133-extraction-candidates/C3/G-m1-mid-C3.json": {
+   "original": "vendor/epc/epc90133/reconstruction/export/C3/extraction/G-m1-mid-C3.json",
+   "original_sha256": "5eb9ec14d991c80b891e3c0830249929338facab83b28f8dcd7313a13117c39c"
+  },
   "results/gan/epc90133-extraction-candidates/K1/A-m1-mid-K1.json": {
    "original": "vendor/epc/epc90133/reconstruction/export/K1/extraction/A-m1-mid-K1.json",
    "original_sha256": "428f76c44609133dd278cc192fe58b0a94ee956c1429df6c065caac5457ccaaf"

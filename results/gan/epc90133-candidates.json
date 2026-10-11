@@ -903,6 +903,96 @@
    }
   },
   {
+   "id": "C3",
+   "label": "C3 driver-return island",
+   "what": "K2's idea with a dedicated ground island on inner layer 1 under Q2's gate drive, joined to Q2's source by one new via near the gate",
+   "board_export": {
+    "accepted": true,
+    "source": "results/gan/epc90133-board-export-C3.json",
+    "checks": {
+     "L1_drc": true,
+     "L2_nets": true,
+     "L3_power_loop": true,
+     "L4_extraction": true
+    }
+   },
+   "ref": null,
+   "A": {
+    "source": "vendor/epc/epc90133/reconstruction/export/C3/extraction/A-m1-mid-C3.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.49262503442861705,
+    "R_loop_mohm": 4.037539585403768
+   },
+   "G": {
+    "source": "vendor/epc/epc90133/reconstruction/export/C3/extraction/G-m1-mid-C3.json",
+    "outcome": "complete",
+    "L_loop_nH": 0.2538236095096704,
+    "R_loop_mohm": 2.0241192209301073,
+    "L_cs_Q1_pH": 1.4051213163697653,
+    "L_cs_Q2_pH": 34.00706884102226
+   },
+   "goals": {
+    "vendor": {
+     "verdict": {
+      "S1": true,
+      "S2": false,
+      "S3": false,
+      "S4": true,
+      "S5": null,
+      "S6": false,
+      "S7": true,
+      "S8": false,
+      "S9": null,
+      "S10": false,
+      "S11": null,
+      "S12": false,
+      "S13": null
+     },
+     "all_met": false,
+     "source": "results/gan/epc90133-goals-assessment-C3.json",
+     "values": {
+      "ramp-Ls50": {
+       "vpk_V": 59.296607971191406,
+       "overshoot_V": 11.101585783090506,
+       "settling_s": 1.5000000000000002e-07,
+       "tr_s": 1.675859052383177e-09,
+       "tf_s": 4.1730851358208705e-09,
+       "dvdt_V_per_ns": 22.913621491850876,
+       "id_peak_A": 58.74185562133789,
+       "didt_A_per_ns": 42.205359999999985,
+       "vgs_max_V": 5.064174652099609,
+       "vgs_min_V": -1.444691888988018,
+       "q2_gate_peak_V": 1.561022311449051,
+       "eon_eoff_J": 5.578598231047836e-06,
+       "efficiency": 0.9914009123630297
+      },
+      "step-Ls50": {
+       "vpk_V": 58.98862838745117,
+       "overshoot_V": 10.791066839018576,
+       "settling_s": 1.47e-07,
+       "tr_s": 1.7873734224453652e-09,
+       "tf_s": 4.216039707239211e-09,
+       "dvdt_V_per_ns": 21.484038823551312,
+       "id_peak_A": 52.6838493347168,
+       "didt_A_per_ns": 33.79112000000001,
+       "vgs_max_V": 5.012828826904297,
+       "vgs_min_V": -1.0268620550632477,
+       "q2_gate_peak_V": 1.363774374127388,
+       "eon_eoff_J": 5.776297553848382e-06,
+       "efficiency": 0.9914345999987111
+      }
+     },
+     "dead_time_optimum_ns": null,
+     "corners": {
+      "passed": 0,
+      "usable": 0,
+      "declared": 10
+     }
+    },
+    "EPC2302DS": null
+   }
+  },
+  {
    "id": "stock+csw",
    "label": "Stock + SW capacitance",
    "what": "Reference for the row below: stock with 135 pF switch-node-to-ground capacitance (estimate)",
@@ -1071,6 +1161,7 @@
    "results/gan/epc90133-goals-assessment-vendor-rev2.json",
    "results/gan/epc90133-goals-assessment-K1.json",
    "results/gan/epc90133-goals-assessment-K2.json",
+   "results/gan/epc90133-goals-assessment-C3.json",
    "results/gan/epc90133-goals-assessment-V8d075-csw.json",
    "results/gan/epc90133-goals-assessment-V8d075-csw.json"
   ],

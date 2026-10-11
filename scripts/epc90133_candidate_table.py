@@ -20,7 +20,7 @@ ASSESS = {"vendor": [RES / "epc90133-goals-assessment-V8d075.json", RES / "epc90
           "EPC2302DS": [RES / "epc90133-goals-assessment-ds-rev2.json"]}
 GOAL_NAME = {"V8+d0.075": "V8d075", "stock+csw": "stock", "V8+d0.075+csw": "V8d075"}  # candidate id -> design name
 # Sensitivity rows scored from their own assessment and compared with their own reference row, not plain stock.
-OWN_ASSESS = {"K1": {"vendor": [RES / "epc90133-goals-assessment-K1.json"]}, "K2": {"vendor": [RES / "epc90133-goals-assessment-K2.json"]},"stock+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]},
+OWN_ASSESS = {"K1": {"vendor": [RES / "epc90133-goals-assessment-K1.json"]}, "K2": {"vendor": [RES / "epc90133-goals-assessment-K2.json"]}, "C3": {"vendor": [RES / "epc90133-goals-assessment-C3.json"]},"stock+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]},
               "V8+d0.075+csw": {"vendor": [RES / "epc90133-goals-assessment-V8d075-csw.json"]}}
 OWN_REF = {"stock+csw": "stock+csw", "V8+d0.075+csw": "stock+csw"}
 ROUTE_THRESHOLD = 0.04
@@ -42,6 +42,7 @@ CANDIDATES = [
     ("V8+d0.050", "V8 + 0.050 mm *", "Sensitivity only: below the industry-practice limit", "V8", "A-m1-mid-d0.050-V8", None, None),
     ("K1", "K1 Kelvin return", "Q2 driver ground joined to Q2's source on the top layer; probe trace moved to the bottom through one new via", "K1", "A-m1-mid-K1", "G-m1-mid-K1", "K1"),
     ("K2", "K2 isolated driver return", "K1 plus the three driver ground vias cut off from the inner planes: the driver's ground reaches the planes only through Q2's source copper and the bottom layer", "K2", "A-m1-mid-K2", "G-m1-mid-K2", "K2"),
+    ("C3", "C3 driver-return island", "K2's idea with a dedicated ground island on inner layer 1 under Q2's gate drive, joined to Q2's source by one new via near the gate", "C3", "A-m1-mid-C3", "G-m1-mid-C3", "C3"),
     ("stock+csw", "Stock + SW capacitance", "Reference for the row below: stock with 135 pF switch-node-to-ground capacitance (estimate)", "stock", "A-m1-mid-stock", "G-m1-mid-stock", None),
     ("V8+d0.075+csw", "V8 + 0.075 mm + SW capacitance", "V8 + 0.075 mm with 188.8 pF (the thinner layer adds 53.8 pF); compared with the row above", "V8", "A-m1-mid-d0.075-V8", "G-m1-mid-d0.075-V8", None),
 ]

@@ -4132,3 +4132,15 @@ side only 2: the six goals need all nine changes together. Corners (stage 3c, `r
 five (S8 lost at 0.53 V step), l1.1 keeps six. Reading: in this model a coordinated redesign of both the power stage
 and both gate-return paths could trade rise time and about 7 % FET loss for S2 and S8 (one goal more than stock);
 it is a network target, not a layout, and it sits where the model is least validated (damping, assumed 50 pH).
+
+### Candidate C3 result (11 October 2026)
+
+Chain: A 03:17-03:18, G 03:18-10:44 (7.4 h, beside the LTspice search), nominal pair 10:46, both usable; acceptance
+L1-L4 pass (`results/gan/epc90133-board-export-C3.json`). G against stock: loop L 252.7 -> 253.8 pH (+0.4 %), board
+common-source L(Q2) 48.02 -> 34.01 pH (-29 %; K2 37.14), Q1 0.99 -> 1.41 pH; Q2 turn-on gate loop 561 -> 755 pH (K2
+1008). Switching (`results/gan/epc90133-outperform-C3.json`, ramp / step): Q2 gate peak -19.5 / -17.8 % (1.56 /
+1.36 V), settling +14.7 / +11.8 %, step di/dt +0.96 %, everything else within +/-0.5 %: rule not met. Goals
+(`-goals-assessment-C3.json`): S1, S4, S7 met; S3, S6 (step di/dt), S8 missed. Frozen prediction: common-source L,
+settling range and overshoot/loss held; the gate loop (predicted below 561 pH) and the gate-peak range (-25 to -40 %)
+FAILED. Reading: the island shortens K2's detour but not to stock's loop; the gate-peak-per-settling ratio (about
+1.3) is no better than K2's (1.4), so C3 does not beat K2's balance and the declared 50 ps / C_SW checks are not run.
