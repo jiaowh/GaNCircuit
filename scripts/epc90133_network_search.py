@@ -130,7 +130,10 @@ def retry_failed(r, ext):
     timeout while the other 63 ran in about 2 min each. RETROSPECTIVE robustness change: failed cases are rerun once
     (round<r>-retry.json) and replace the failed ones; nothing else is rerun."""
     rep_ = json.loads((OUTDIR / f"round{r}.json").read_text(encoding="utf-8"))
-    failed = [k for k, v in rep_.get("runs", {}).items() if v.get("status") != "completed" and "@" in k]
+    # Rounds 2-3 (RETROSPECTIVE fix): failed runs can be a case's internal stages (e.g. '<case>-timing'), which are not
+    # case names; map every failed run to its case (the name up to '-gear').
+    failed = sorted({k.split("-gear")[0] + "-gear" for k, v in rep_.get("runs", {}).items()
+                     if v.get("status") != "completed" and "@" in k})
     if not failed:
         return
     names = {k.split("@")[0] for k in failed}
